@@ -1,0 +1,69 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?eclipse version="3.4"?>
+<plugin>
+   <extension
+         point="org.eclipse.ui.commands">
+      <category
+            name="BrowserSim"
+            id="org.jboss.tools.vpe.browsersim.eclipse.commands.category">
+      </category>
+      <command
+            name="Run BrowserSim"
+            categoryId="org.jboss.tools.vpe.browsersim.eclipse.commands.category"
+            id="org.jboss.tools.vpe.browsersim.eclipse.commands.runBrowserSim">
+      </command>
+   </extension>
+   <extension
+         point="org.eclipse.ui.handlers">
+      <handler
+            commandId="org.jboss.tools.vpe.browsersim.eclipse.commands.runBrowserSim"
+            class="org.jboss.tools.vpe.browsersim.eclipse.handlers.RunBrowserSimHandler">
+      </handler>
+   </extension>
+   <extension
+         point="org.eclipse.ui.bindings">
+      <key
+            commandId="org.jboss.tools.vpe.browsersim.eclipse.commands.runBrowserSim"
+            contextId="org.eclipse.ui.contexts.window"
+            sequence="M1+6"
+            schemeId="org.eclipse.ui.defaultAcceleratorConfiguration">
+      </key>
+   </extension>
+   <extension
+         point="org.eclipse.ui.menus">
+      <menuContribution
+            locationURI="toolbar:org.eclipse.ui.main.toolbar?after=additions">
+         <toolbar
+               id="org.jboss.tools.vpe.browsersim.eclipse.toolbars.sampleToolbar">
+            <command
+                  commandId="org.jboss.tools.vpe.browsersim.eclipse.commands.runBrowserSim"
+                  icon="icons/sample.gif"
+                  tooltip="Run BrowserSim"
+                  id="org.jboss.tools.vpe.browsersim.eclipse.toolbars.runBrowserSim">
+            </command>
+         </toolbar>
+      </menuContribution>
+   </extension>
+   <extension
+         point="org.eclipse.ui.editors">
+      <editor
+            extensions="html"
+            icon="icons/sample.gif"
+            id="org.jboss.tools.vpe.browsersim.eclipse.editors.BrowserSimLauncher"
+            launcher="org.jboss.tools.vpe.browsersim.eclipse.editors.BrowserSimEditorLauncher"
+            name="BrowserSim">
+      </editor>
+   </extension>
+   <extension point="org.eclipse.ui.browser.browsers">
+       <browser
+             executable=""
+             factoryclass="org.jboss.tools.vpe.browsersim.eclipse.BrowserSimFactory"
+             id="org.jboss.tools.vpe.browsersim.eclipse"
+             name="BrowserSim"
+             os="Win32,linux,MacOSX">
+          <location>
+             .
+          </location>
+   </browser>
+   </extension>
+</plugin>
