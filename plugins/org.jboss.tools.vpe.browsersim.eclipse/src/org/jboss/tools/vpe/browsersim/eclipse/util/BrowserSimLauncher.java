@@ -10,6 +10,7 @@
  ******************************************************************************/
 package org.jboss.tools.vpe.browsersim.eclipse.util;
 
+import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.ArrayList;
@@ -26,8 +27,8 @@ public class BrowserSimLauncher {
 	public static void launchBrowserSim(String initialUrl) {
 		String pathSeparator = System.getProperty("path.separator");
 		
-		String classPath = getBundleLocation("org.jboss.tools.vpe.browsersim") + "bin/"
-				+ pathSeparator + getBundleLocation("org.jboss.tools.vpe.browsersim.browser") + "bin/"
+		String classPath = getBundleLocation("org.jboss.tools.vpe.browsersim")
+				+ pathSeparator + getBundleLocation("org.jboss.tools.vpe.browsersim.browser")
 				+ pathSeparator + getBundleLocation("org.eclipse.swt")
 				+ pathSeparator + getBundleLocation("org.eclipse.swt." + PlatformUtil.CURRENT_PLATFORM);
 		String javaCommand = System.getProperty("java.home") + "/bin/java";
@@ -86,9 +87,20 @@ public class BrowserSimLauncher {
 	
 	private static String getBundleLocation(String symbolicName) {
 		String locationId = Platform.getBundle(symbolicName).getLocation();
+		File bundleLocation;
 		if (locationId.startsWith("reference:file:")) {
-			return locationId.substring("reference:file:".length());
+			bundleLocation = new File(locationId.substring("reference:file:".length()));
+		} else {
+			bundleLocation = new File(locationId);
 		}
-		return locationId;
+		
+		if (bundleLocation.isDirectory()) {
+			File binDirectory = new File(bundleLocation, "bin");
+			if (binDirectory.isDirectory()) {
+				bundleLocation = binDirectory;
+			}
+		}
+
+		return bundleLocation.getAbsolutePath();
 	}
 }
