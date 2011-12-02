@@ -47,6 +47,7 @@ import org.eclipse.swt.widgets.ToolItem;
 import org.jboss.tools.vpe.browsersim.browser.AbstractWebKitBrowser;
 import org.jboss.tools.vpe.browsersim.browser.WebKitBrowserFactory;
 import org.jboss.tools.vpe.browsersim.model.Device;
+import org.jboss.tools.vpe.browsersim.model.DeviceOrientation;
 import org.jboss.tools.vpe.browsersim.model.DevicesList;
 import org.jboss.tools.vpe.browsersim.model.DevicesListHolder;
 import org.jboss.tools.vpe.browsersim.model.DevicesListStorage;
@@ -66,6 +67,7 @@ public class BrowserSim implements Runnable {
 	private String initialUrl;
 	private Menu devicesMenu;
 	private DevicesListHolder devicesListHolder;
+	private DeviceOrientation deviceOrientation;
 
 	public static void main(String[] args) {
 		String initialUrl;
@@ -175,7 +177,10 @@ public class BrowserSim implements Runnable {
 		});
 		browser.addLocationListener(new LocationListener() {
 			public void changed(LocationEvent event) {
-				if (event.top) locationText.setText(event.location);
+				if (event.top) {
+					locationText.setText(event.location);
+				}
+				initOrientation(deviceOrientation.getOrientationAngle());
 			}
 			public void changing(LocationEvent event) {
 			}
@@ -247,17 +252,38 @@ public class BrowserSim implements Runnable {
 			}
 		});
 		
+		ToolItem itemRotateCounterclockwise = new ToolItem(toolbar, SWT.PUSH);
+//		itemGo.setText("Rotate Counterclockwise");
+		itemRotateCounterclockwise.addListener(SWT.Selection, new Listener() {
+			public void handleEvent(Event event) {
+				rotateDevice(true);
+			}
+		});
+		
+		ToolItem itemRotateClockwise = new ToolItem(toolbar, SWT.PUSH);
+//		itemGo.setText("Rotate Clockwise");
+		itemRotateClockwise.addListener(SWT.Selection, new Listener() {
+			public void handleEvent(Event event) {
+				rotateDevice(false);
+			}
+		});
+		
 		final Image imageBack = new Image(display, ResourcesUtil.getResourceAsStream("/org/jboss/tools/vpe/browsersim/resources/icons/nav_backward.gif")); //$NON-NLS-1$
 		final Image imageForward = new Image(display, ResourcesUtil.getResourceAsStream("/org/jboss/tools/vpe/browsersim/resources/icons/nav_forward.gif")); //$NON-NLS-1$
 		final Image imageStop = new Image(display, ResourcesUtil.getResourceAsStream("/org/jboss/tools/vpe/browsersim/resources/icons/nav_stop.gif")); //$NON-NLS-1$
 		final Image imageRefresh = new Image(display, ResourcesUtil.getResourceAsStream("/org/jboss/tools/vpe/browsersim/resources/icons/nav_refresh.gif")); //$NON-NLS-1$
 		final Image imageGo = new Image(display, ResourcesUtil.getResourceAsStream("/org/jboss/tools/vpe/browsersim/resources/icons/nav_go.gif")); //$NON-NLS-1$
+		final Image imageRotateClockwise = new Image(display, ResourcesUtil.getResourceAsStream("/org/jboss/tools/vpe/browsersim/resources/icons/rotate_clockwise.png")); //$NON-NLS-1$
+		final Image imageRotateCounterclockwise = new Image(display, ResourcesUtil.getResourceAsStream("/org/jboss/tools/vpe/browsersim/resources/icons/rotate_counterclockwise.png")); //$NON-NLS-1$		
 		
 		itemBack.setImage(imageBack);
 		itemForward.setImage(imageForward);
 		itemStop.setImage(imageStop);
 		itemRefresh.setImage(imageRefresh);
 		itemGo.setImage(imageGo);
+		itemRotateClockwise.setImage(imageRotateClockwise);
+		itemRotateCounterclockwise.setImage(imageRotateCounterclockwise);
+		
 		shell.addDisposeListener(new DisposeListener() {
 			public void widgetDisposed(DisposeEvent e) {
 				imageBack.dispose();
@@ -265,11 +291,10 @@ public class BrowserSim implements Runnable {
 				imageStop.dispose();
 				imageRefresh.dispose();
 				imageGo.dispose();
+				imageRotateClockwise.dispose();
+				imageRotateCounterclockwise.dispose();
 			}
 		});
-		
-		itemForward.setImage(imageForward);
-
 
 		return toolbar;
 	}
@@ -369,20 +394,46 @@ public class BrowserSim implements Runnable {
 				menuItem.setSelection(menuItem.getData() == device);				
 			}
 		}
+		
+		setBrowserSize(device.getWidth(), device.getHeight());
+		deviceOrientation = new DeviceOrientation(device.getWidth() < device.getHeight() 
+					? DeviceOrientation.PORTRAIT
+					: DeviceOrientation.LANDSCAPE);
+		deviceOrientation.addObserver(new Observer() {
+			public void update(Observable o, Object arg) {
+				int orientationAngle = ((DeviceOrientation) o).getOrientationAngle();
+				
+				int minSize = Math.min(device.getWidth(), device.getHeight());
+				int maxSize = Math.max(device.getWidth(), device.getHeight());
+				
+				if (orientationAngle == DeviceOrientation.LANDSCAPE
+						|| orientationAngle == DeviceOrientation.LANDSCAPE_INVERTED) {
+					setBrowserSize(maxSize, minSize);					
+				} else {
+					setBrowserSize(minSize, maxSize);										
+				}
+				
+				fireOrientationChangeEvent(orientationAngle);
+			}
+		});
 
 		browser.setDefaultUserAgent(device.getUserAgent());
+		browser.refresh();
+	}
+
+	private void setBrowserSize(int width, int height) {
 		GridData data = (GridData) browser.getLayoutData();
 		
 		Rectangle clientArea = display.getClientArea();
 		int shellWidthHint = SWT.DEFAULT;
-		if (device.getWidth() != Device.DEFAULT_SIZE) {
-			data.widthHint = device.getWidth();
+		if (width != Device.DEFAULT_SIZE) {
+			data.widthHint = width;
 		} else if (data.widthHint == SWT.DEFAULT) {
 			shellWidthHint = clientArea.width;
 		}
 		int shellHeightHint = SWT.DEFAULT;
-		if (device.getHeight() != Device.DEFAULT_SIZE) {
-			data.heightHint =  device.getHeight();
+		if (height != Device.DEFAULT_SIZE) {
+			data.heightHint =  height;
 		} else if (data.heightHint == SWT.DEFAULT) {
 			shellHeightHint = clientArea.height;
 		}
@@ -411,6 +462,28 @@ public class BrowserSim implements Runnable {
 		}
 		
 		shell.setBounds(shellBounds);
-		browser.refresh();
+	}
+	
+	private void initOrientation(int orientation) {
+		browser.execute("window.onorientationchange = null;"
+				+ "window.orientation = " + orientation + ";");		
+	}
+	
+	private void fireOrientationChangeEvent(int orientation) {
+		browser.execute("window.orientation = " + orientation + ";"
+				+ "(function(){"
+				+ 		"var event = document.createEvent('Event');"
+				+ 		"event.initEvent('orientationchange', false, false);" // http://jsbin.com/azefow/6   https://developer.mozilla.org/en/DOM/document.createEvent
+				+ 		"window.dispatchEvent(event);"
+				+ 		"if (typeof window.onorientationchange === 'function') {"
+				+			"window.onorientationchange(event);"
+				+ 		"}"
+				+	"})();"
+		);
+	}
+	
+	protected void rotateDevice(boolean counterclockwise) {
+		deviceOrientation.turnDevice(counterclockwise);
+		deviceOrientation.notifyObservers();
 	}
 }
