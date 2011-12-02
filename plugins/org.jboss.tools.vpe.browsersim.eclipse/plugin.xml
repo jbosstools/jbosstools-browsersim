@@ -8,7 +8,7 @@
             id="org.jboss.tools.vpe.browsersim.eclipse.commands.category">
       </category>
       <command
-            name="Run BrowserSim"
+            name="Run Mobile Browser Simulator"
             categoryId="org.jboss.tools.vpe.browsersim.eclipse.commands.category"
             id="org.jboss.tools.vpe.browsersim.eclipse.commands.runBrowserSim">
       </command>
@@ -38,7 +38,7 @@
             <command
                   commandId="org.jboss.tools.vpe.browsersim.eclipse.commands.runBrowserSim"
                   icon="icons/sample.gif"
-                  tooltip="Run BrowserSim"
+                  tooltip="Run Mobile Browser Simulator"
                   id="org.jboss.tools.vpe.browsersim.eclipse.toolbars.runBrowserSim">
             </command>
          </toolbar>
@@ -59,7 +59,7 @@
              executable=""
              factoryclass="org.jboss.tools.vpe.browsersim.eclipse.BrowserSimFactory"
              id="org.jboss.tools.vpe.browsersim.eclipse"
-             name="BrowserSim"
+             name="Mobile Browser Simulator"
              os="Win32,linux,MacOSX">
           <location>
              .

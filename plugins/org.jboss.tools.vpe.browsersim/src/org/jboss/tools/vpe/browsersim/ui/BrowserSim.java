@@ -56,7 +56,7 @@ import org.jboss.tools.vpe.browsersim.util.ResourcesUtil;
  * @author Yahor Radtsevich (yradtsevich)
  */
 public class BrowserSim implements Runnable {
-	private static final String DEFAULT_URL = "http://www.w3schools.com/js/tryit_view.asp?filename=try_nav_useragent"; //$NON-NLS-1$
+	private static final String DEFAULT_URL = "about:blank"; //"http://www.w3schools.com/js/tryit_view.asp?filename=try_nav_useragent"; //$NON-NLS-1$
 	private AbstractWebKitBrowser browser;
 	private Display display;
 	private Shell shell;
