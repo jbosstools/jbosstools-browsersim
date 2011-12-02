@@ -38,32 +38,41 @@ public class WebKitTests extends TestCase {
 		shell.setLayout(new FillLayout());
 		final AbstractWebKitBrowser webKitBrowser = WebKitBrowserFactory.createWebKitBrowser(shell, SWT.NONE);
 		assertNotNull(webKitBrowser);
-		ExpressionExecutor expressionEvaluator = new ExpressionExecutor(webKitBrowser);
+		ExpressionsEvaluator expressionsEvaluator = new ExpressionsEvaluator(webKitBrowser);
 		
-		String initialUserAgent = (String) expressionEvaluator.evaluate("navigator.userAgent");
+		String initialUserAgent = (String) expressionsEvaluator.evaluate("navigator.userAgent");
 		
 		webKitBrowser.setDefaultUserAgent(CUSTOM_USER_AGENT);
-		String customUserAgent = (String) expressionEvaluator.evaluate("navigator.userAgent");
+		String customUserAgent = (String) expressionsEvaluator.evaluate("navigator.userAgent");
 		assertEquals(CUSTOM_USER_AGENT, customUserAgent);
 		
 		webKitBrowser.setDefaultUserAgent(null);
-		String finalUserAgent = (String) expressionEvaluator.evaluate("navigator.userAgent");
+		String finalUserAgent = (String) expressionsEvaluator.evaluate("navigator.userAgent");
 		assertEquals(initialUserAgent, finalUserAgent);
 		
-		expressionEvaluator.dispose();
+		expressionsEvaluator.dispose();
 		display.dispose();
 	}
 }
 
 /**
+ * Evaluator of JavaScript expressions. Typical usage:
+ * <pre>
+ * ExpressionsEvaluator expressionsEvaluator = new ExpressionsEvaluator(browser);
+ * String userAgent = (String) expressionsEvaluator.evaluate("navigator.userAgent");
+ * expressionsEvaluator.dispose();
+ * </pre>
+ * 
  * @author Yahor Radtsevich (yradtsevich)
  */
-class ExpressionExecutor {
-	private static final String EXPRESSION_EXECUTOR_RESULT_EXTRACTOR_FUNCTION_NAME = "expressionExecutorResultExtractor";
+class ExpressionsEvaluator {
+	private static long expressionExecutorFunctionId = 0;
+	
+	private final String EXPRESSION_EXECUTOR_RESULT_EXTRACTOR_FUNCTION_NAME = "__resultExtractor" + expressionExecutorFunctionId++;
 	private Browser browser;
 	private ResultExtractorFunction resultExtractorFunction;
 
-	public ExpressionExecutor(Browser browser) {
+	public ExpressionsEvaluator(Browser browser) {
 		this.browser = browser;
 		resultExtractorFunction = new ResultExtractorFunction(browser, EXPRESSION_EXECUTOR_RESULT_EXTRACTOR_FUNCTION_NAME);
 	}
