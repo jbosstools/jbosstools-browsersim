@@ -424,7 +424,7 @@ public class BrowserSim implements Runnable {
 	private void setBrowserSize(int width, int height) {
 		GridData data = (GridData) browser.getLayoutData();
 		
-		Rectangle clientArea = display.getClientArea();
+		Rectangle clientArea = getMonitorClientArea();
 		int shellWidthHint = SWT.DEFAULT;
 		if (width != Device.DEFAULT_SIZE) {
 			data.widthHint = width;
@@ -462,6 +462,19 @@ public class BrowserSim implements Runnable {
 		}
 		
 		shell.setBounds(shellBounds);
+	}
+
+	private Rectangle getMonitorClientArea() {
+		Rectangle clientArea = shell.getMonitor().getClientArea();
+
+		/* on Linux returned monitor client area may be bigger
+		 * than the monitor bounds when multiple monitors are used.
+		 * The following code fixes this */
+		Rectangle bounds = shell.getMonitor().getBounds();
+		clientArea.width = Math.min(clientArea.width, bounds.width);
+		clientArea.height = Math.min(clientArea.height, bounds.height);
+		
+		return clientArea;
 	}
 	
 	private void initOrientation(int orientation) {
