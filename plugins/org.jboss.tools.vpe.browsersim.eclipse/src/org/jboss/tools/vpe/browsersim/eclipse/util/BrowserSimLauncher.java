@@ -13,13 +13,15 @@ package org.jboss.tools.vpe.browsersim.eclipse.util;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
-import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.eclipse.core.runtime.FileLocator;
 import org.eclipse.core.runtime.Platform;
 import org.eclipse.core.runtime.preferences.ConfigurationScope;
 import org.jboss.tools.vpe.browsersim.browser.PlatformUtil;
+import org.jboss.tools.vpe.browsersim.eclipse.Activator;
+import org.osgi.framework.Bundle;
 
 /**
  * @author "Yahor Radtsevich (yradtsevich)"
@@ -82,32 +84,29 @@ public class BrowserSimLauncher {
 				};
 			}.start();
 		} catch (IOException e) {
-			e.printStackTrace();
+			Activator.logError(e.getMessage(), e);
 		}
 	}
 	
 	private static String getBundleLocation(String symbolicName) throws IOException {
-		String eclipseHome = new URL(System.getProperty("eclipse.home.location")).getFile();
-		String locationId = Platform.getBundle(symbolicName).getLocation();
-
-		File bundleLocation;
-		if (locationId.startsWith("reference:file:")) {
-			bundleLocation = new File(locationId.substring("reference:file:".length()));
-		} else {
-			bundleLocation = new File(locationId);
+		Bundle bundle = Platform.getBundle(symbolicName);
+		if (bundle == null) {
+			throw new IOException("Cannot find bundle: " + symbolicName);
 		}
 		
-		if (!bundleLocation.isAbsolute()) {
-			bundleLocation = new File(eclipseHome, bundleLocation.getPath());
-		}
-		
-		if (bundleLocation.isDirectory()) {
-			File binDirectory = new File(bundleLocation, "bin");
-			if (binDirectory.isDirectory()) {
-				bundleLocation = binDirectory;
+		try {
+			File bundleLocation = FileLocator.getBundleFile(bundle);
+			
+			if (bundleLocation.isDirectory()) {
+				File binDirectory = new File(bundleLocation, "bin");
+				if (binDirectory.isDirectory()) {
+					bundleLocation = binDirectory;
+				}
 			}
+	
+			return bundleLocation.getCanonicalPath();
+		} catch (IOException e) {
+			throw new IOException("Cannot resolve the path to bundle: " + symbolicName, e);
 		}
-
-		return bundleLocation.getCanonicalPath();
 	}
 }

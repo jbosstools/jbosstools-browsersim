@@ -26,7 +26,7 @@ public class WebKitBrowserFactory {
 			return new WebKitBrowser_gtk_linux_x86(parent, style);
 		} else if (PlatformUtil.CURRENT_PLATFORM.equals("gtk.linux.x86_64")) {
 			return new WebKitBrowser_gtk_linux_x86_64(parent, style);
-		} else if (PlatformUtil.CURRENT_PLATFORM.equals("cocoa.macosx")) {
+		} else if (PlatformUtil.CURRENT_PLATFORM.startsWith("cocoa.macosx")) {
 			return new WebKitBrowser_webkit_cocoa_macos(parent, style);
 		} else if (PlatformUtil.CURRENT_PLATFORM.equals("win32.win32.x86")) {
 			return new WebKitBrowser_win32_win32_x86(parent, style);

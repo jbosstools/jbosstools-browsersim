@@ -23,10 +23,13 @@ public class PlatformUtil {
 		String ws = getWs();
 		String arch = getArch();
 
-		CURRENT_PLATFORM = ws + '.' + os + ("macosx".equals(os) ? "" : '.' + arch);
+		if ("macosx".equals(os) && "x86".equals(arch)) {
+			CURRENT_PLATFORM = ws + '.' + os; // special case for MacOSX x86 (its SWT bundle has name org.eclipse.swt.cocoa.macosx)
+		} else {			
+			CURRENT_PLATFORM = ws + '.' + os + '.' + arch;
+		}
 	}
-	
-	
+
 	/*
 	 * Copy of org.eclipse.swt.internal.Library.arch() 
 	 */

@@ -10,6 +10,8 @@
  ******************************************************************************/
 package org.jboss.tools.vpe.browsersim.eclipse;
 
+import org.eclipse.core.runtime.IStatus;
+import org.eclipse.core.runtime.Status;
 import org.eclipse.jface.resource.ImageDescriptor;
 import org.eclipse.ui.plugin.AbstractUIPlugin;
 import org.osgi.framework.BundleContext;
@@ -58,6 +60,10 @@ public class Activator extends AbstractUIPlugin {
 	 */
 	public static Activator getDefault() {
 		return plugin;
+	}
+	
+	public static void logError(String message, Throwable throwable) {
+		getDefault().getLog().log(new Status(IStatus.ERROR, PLUGIN_ID, message, throwable));
 	}
 
 	/**
