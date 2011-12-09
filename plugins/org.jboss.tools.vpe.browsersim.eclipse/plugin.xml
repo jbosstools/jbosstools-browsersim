@@ -13,13 +13,6 @@
             id="org.jboss.tools.vpe.browsersim.eclipse.commands.runBrowserSim">
       </command>
    </extension>
-   <extension
-         point="org.eclipse.ui.handlers">
-      <handler
-            commandId="org.jboss.tools.vpe.browsersim.eclipse.commands.runBrowserSim"
-            class="org.jboss.tools.vpe.browsersim.eclipse.handlers.RunBrowserSimHandler">
-      </handler>
-   </extension>
    <!--extension
          point="org.eclipse.ui.bindings">
       <key
@@ -30,19 +23,20 @@
       </key>
    </extension-->
    <extension
-         point="org.eclipse.ui.menus">
-      <menuContribution
-            locationURI="toolbar:org.eclipse.ui.main.toolbar?after=additions">
-         <toolbar
-               id="org.jboss.tools.vpe.browsersim.eclipse.toolbars.sampleToolbar">
-            <command
-                  commandId="org.jboss.tools.vpe.browsersim.eclipse.commands.runBrowserSim"
-                  icon="icons/sample.gif"
-                  tooltip="Run Mobile Browser Simulator"
-                  id="org.jboss.tools.vpe.browsersim.eclipse.toolbars.runBrowserSim">
-            </command>
-         </toolbar>
-      </menuContribution>
+         point="org.eclipse.ui.actionSets">
+      <actionSet
+            id="org.jboss.tools.vpe.browsersim.eclipse.actionSet"
+            label="Mobile Browser Simulator"
+            visible="false">
+            	<action
+                   id="org.jboss.tools.vpe.browsersim.eclipse.runBrowserSim"
+                   definitionId="org.jboss.tools.vpe.browsersim.eclipse.commands.runBrowserSim"
+                   toolbarPath="browserSim"
+                   label="Run Mobile Browser Simulator"
+                   class="org.jboss.tools.vpe.browsersim.eclipse.actions.RunBrowserSimAction"
+                   icon="icons/sample.gif">
+            	</action>
+      </actionSet>
    </extension>
    <extension
          point="org.eclipse.ui.editors">
