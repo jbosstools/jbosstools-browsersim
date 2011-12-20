@@ -1,6 +1,6 @@
 Manifest-Version: 1.0
 Bundle-ManifestVersion: 2
-Bundle-Name: BrowserSim Eclipse Plug-in
+Bundle-Name: Eclipse integrations of BrowserSim
 Bundle-SymbolicName: org.jboss.tools.vpe.browsersim.eclipse;singleton:=true
 Bundle-Version: 3.3.0.qualifier
 Bundle-Activator: org.jboss.tools.vpe.browsersim.eclipse.Activator
@@ -14,3 +14,4 @@ Require-Bundle: org.eclipse.ui,
  org.eclipse.ui.browser
 Bundle-ActivationPolicy: lazy
 Bundle-RequiredExecutionEnvironment: JavaSE-1.6
+Bundle-Vendor: JBoss by Red Hat
