@@ -20,8 +20,9 @@ import org.jboss.tools.vpe.browsersim.browser.internal.WebKitBrowser_win32_win32
 /**
  * @author "Yahor Radtsevich (yradtsevich)"
  */
-public class WebKitBrowserFactory {
-	public static AbstractWebKitBrowser createWebKitBrowser(Composite parent, int style) {
+public class WebKitBrowserFactory implements IBrowserSimBrowserFactory {
+	@Override
+	public AbstractWebKitBrowser createBrowser(Composite parent, int style) {
 		if (PlatformUtil.CURRENT_PLATFORM.equals("gtk.linux.x86")) {
 			return new WebKitBrowser_gtk_linux_x86(parent, style);
 		} else if (PlatformUtil.CURRENT_PLATFORM.equals("gtk.linux.x86_64")) {

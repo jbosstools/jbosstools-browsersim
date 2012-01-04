@@ -11,22 +11,17 @@
 package org.jboss.tools.vpe.browsersim.browser;
 
 import org.eclipse.swt.SWT;
-import org.eclipse.swt.browser.Browser;
 import org.eclipse.swt.widgets.Composite;
 
 /**
  * @author Yahor Radtsevich (yradtsevich)
  */
-public abstract class AbstractWebKitBrowser extends Browser {
+public abstract class AbstractWebKitBrowser extends BrowserSimBrowser {
 
 	private String defaultUserAgent;
 
 	public AbstractWebKitBrowser(Composite parent, int style) {
 		super(parent, style | SWT.WEBKIT);
-	}
-
-	@Override
-	protected void checkSubclass() {
 	}
 
 	@Override
@@ -37,6 +32,7 @@ public abstract class AbstractWebKitBrowser extends Browser {
 		return result;
 	}
 
+	@Override
 	public void setDefaultUserAgent(String defaultUserAgent) {
 		this.defaultUserAgent = defaultUserAgent;
 		setCustomUserAgent(defaultUserAgent);

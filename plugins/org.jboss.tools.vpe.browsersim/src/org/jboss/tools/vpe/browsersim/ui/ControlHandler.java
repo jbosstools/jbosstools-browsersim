@@ -8,24 +8,18 @@
  * Contributor:
  *     Red Hat, Inc. - initial API and implementation
  ******************************************************************************/
-package org.jboss.tools.vpe.browsersim.util;
-
-import java.io.InputStream;
-
-import org.jboss.tools.vpe.browsersim.ui.BrowserSim;
+package org.jboss.tools.vpe.browsersim.ui;
 
 /**
  * @author Yahor Radtsevich (yradtsevich)
  */
-public class ResourcesUtil {
-
-	private static final String RESOURCES_ROOT_FOLDER = "/org/jboss/tools/vpe/browsersim/resources/"; //$NON-NLS-1$
-
-	public static InputStream getResourceAsStream(String name) {
-		if (name.startsWith("/")) {
-			return BrowserSim.class.getResourceAsStream(name);
-		} else {
-			return BrowserSim.class.getResourceAsStream(RESOURCES_ROOT_FOLDER + name);
-		}
-	}
+public interface ControlHandler {
+	void goBack();
+	void goForward();
+	void goHome();
+	void goToAddress(String address);
+	void showContextMenu();
+	void rotate(boolean counterclockwise);
+	void stop();
+	void refresh();
 }

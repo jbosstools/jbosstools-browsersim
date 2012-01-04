@@ -17,6 +17,7 @@ import java.util.Observer;
 
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.SWTError;
+import org.eclipse.swt.browser.Browser;
 import org.eclipse.swt.browser.LocationEvent;
 import org.eclipse.swt.browser.LocationListener;
 import org.eclipse.swt.browser.ProgressEvent;
@@ -27,47 +28,35 @@ import org.eclipse.swt.events.DisposeEvent;
 import org.eclipse.swt.events.DisposeListener;
 import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
-import org.eclipse.swt.graphics.Image;
-import org.eclipse.swt.graphics.Point;
-import org.eclipse.swt.graphics.Rectangle;
 import org.eclipse.swt.layout.GridData;
-import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Display;
-import org.eclipse.swt.widgets.Event;
-import org.eclipse.swt.widgets.Label;
-import org.eclipse.swt.widgets.Listener;
 import org.eclipse.swt.widgets.Menu;
 import org.eclipse.swt.widgets.MenuItem;
 import org.eclipse.swt.widgets.MessageBox;
-import org.eclipse.swt.widgets.ProgressBar;
 import org.eclipse.swt.widgets.Shell;
-import org.eclipse.swt.widgets.Text;
-import org.eclipse.swt.widgets.ToolBar;
-import org.eclipse.swt.widgets.ToolItem;
-import org.jboss.tools.vpe.browsersim.browser.AbstractWebKitBrowser;
+import org.jboss.tools.vpe.browsersim.browser.BrowserSimBrowser;
 import org.jboss.tools.vpe.browsersim.browser.WebKitBrowserFactory;
 import org.jboss.tools.vpe.browsersim.model.Device;
 import org.jboss.tools.vpe.browsersim.model.DeviceOrientation;
 import org.jboss.tools.vpe.browsersim.model.DevicesList;
 import org.jboss.tools.vpe.browsersim.model.DevicesListHolder;
 import org.jboss.tools.vpe.browsersim.model.DevicesListStorage;
-import org.jboss.tools.vpe.browsersim.util.ResourcesUtil;
+import org.jboss.tools.vpe.browsersim.ui.skin.BrowserSimSkin;
+import org.jboss.tools.vpe.browsersim.ui.skin.NativeSkin;
 
 /**
  * @author Yahor Radtsevich (yradtsevich)
  */
 public class BrowserSim implements Runnable {
 	private static final String DEFAULT_URL = "about:blank"; //"http://www.w3schools.com/js/tryit_view.asp?filename=try_nav_useragent"; //$NON-NLS-1$
-	private AbstractWebKitBrowser browser;
+	private BrowserSimBrowser browser;
 	private Display display;
 	private Shell shell;
-	private Text locationText;
-	private Label statusLabel;
-	private ProgressBar progressBar;
 	private String initialUrl;
 	private Menu devicesMenu;
 	private DevicesListHolder devicesListHolder;
 	private DeviceOrientation deviceOrientation;
+	private BrowserSimSkin skin;
 
 	public static void main(String[] args) {
 		String initialUrl;
@@ -93,7 +82,24 @@ public class BrowserSim implements Runnable {
 	
 	@Override
 	public void run() {
-		shell = new Shell(display);
+		skin = new NativeSkin();//new AppleIPhone3Skin();
+		skin.setBrowserFactory(new WebKitBrowserFactory());
+
+		try {
+			skin.createControls(display);
+		} catch (SWTError e) {
+			System.out.println(Messages.BrowserSim_COULD_NOT_INSTANTIATE_WEBKIT_BROWSER + e.getMessage());
+			
+			MessageBox messageBox = new MessageBox(new Shell(display), SWT.OK | SWT.ICON_ERROR);
+			messageBox.setText("Error");
+			messageBox.setMessage(Messages.BrowserSim_COULD_NOT_INSTANTIATE_WEBKIT_BROWSER + e.getMessage());
+			messageBox.open();
+			
+			display.dispose();
+			return;
+		}
+		
+		shell = skin.getShell();
 		shell.addDisposeListener(new DisposeListener() {
 			public void widgetDisposed(DisposeEvent e) {
 				if (devicesListHolder != null) {
@@ -102,46 +108,35 @@ public class BrowserSim implements Runnable {
 			}
 		});
 		shell.setText(Messages.BrowserSim_BROWSER_SIM);
-		GridLayout gridLayout = new GridLayout();
-		gridLayout.numColumns = 3;
-		shell.setLayout(gridLayout);
-		Menu appMenuBar = display.getMenuBar();
-		if (appMenuBar == null) {
-			appMenuBar = new Menu(shell, SWT.BAR);
-			shell.setMenuBar(appMenuBar);
-		}
-
-		ToolBar toolbar = createControlBar();		
-		GridData data = new GridData();
-		data.horizontalSpan = 3;
-		toolbar.setLayoutData(data);
-
-		Label labelAddress = new Label(shell, SWT.NONE);
-		labelAddress.setText(Messages.BrowserSim_ADDRESS);
 		
-		locationText = new Text(shell, SWT.BORDER);
-		data = new GridData();
-		data.horizontalAlignment = GridData.FILL;
-		data.horizontalSpan = 2;
-		data.grabExcessHorizontalSpace = true;
-		data.widthHint = 0;
-		locationText.setLayoutData(data);
+		browser = skin.getBrowser();
+		
+		browser.addProgressListener(new ProgressListener() {
+			public void changed(ProgressEvent event) {
+				if (event.total == 0) return;                            
+				int ratio = event.current * 100 / event.total;
+				skin.progressChanged(ratio);
+			}
+			public void completed(ProgressEvent event) {
+				skin.progressChanged(-1);
+			}
+		});
+		browser.addStatusTextListener(new StatusTextListener() {
+			public void changed(StatusTextEvent event) {
+				skin.statusTextChanged(event.text);
+			}
+		});
+		browser.addLocationListener(new LocationListener() {
+			public void changed(LocationEvent event) {
+				if (event.top) {
+					skin.locationChanged(event.location);
+				}
+			}
+			public void changing(LocationEvent event) {
+			}
+		});
 
-		try {
-			browser = WebKitBrowserFactory.createWebKitBrowser(shell, SWT.NONE);
-		} catch (SWTError e) {
-			System.out.println(Messages.BrowserSim_COULD_NOT_INSTANTIATE_WEBKIT_BROWSER + e.getMessage());
-			
-			MessageBox messageBox = new MessageBox(shell, SWT.OK | SWT.ICON_ERROR);
-			messageBox.setText("Error");
-			messageBox.setMessage(Messages.BrowserSim_COULD_NOT_INSTANTIATE_WEBKIT_BROWSER + e.getMessage());
-			messageBox.open();
-			
-			display.dispose();
-			return;
-		}
-
-		data = new GridData();
+		GridData data = new GridData();
 		data.horizontalAlignment = GridData.FILL;
 		data.verticalAlignment = GridData.FILL;
 		data.horizontalSpan = 3;
@@ -149,154 +144,42 @@ public class BrowserSim implements Runnable {
 		data.grabExcessVerticalSpace = true;
 		browser.setLayoutData(data);
 
-		statusLabel = new Label(shell, SWT.NONE);
-		data = new GridData(GridData.FILL_HORIZONTAL);
-		data.horizontalSpan = 2;
-		data.widthHint = 0;
-		statusLabel.setLayoutData(data);
-
-		progressBar = new ProgressBar(shell, SWT.NONE);
-		data = new GridData();
-		data.horizontalAlignment = GridData.END;
-		progressBar.setLayoutData(data);
-
-		browser.addProgressListener(new ProgressListener() {
-			public void changed(ProgressEvent event) {
-					if (event.total == 0) return;                            
-					int ratio = event.current * 100 / event.total;
-					progressBar.setSelection(ratio);
-			}
-			public void completed(ProgressEvent event) {
-				progressBar.setSelection(0);
-			}
-		});
-		browser.addStatusTextListener(new StatusTextListener() {
-			public void changed(StatusTextEvent event) {
-				statusLabel.setText(event.text);	
-			}
-		});
 		browser.addLocationListener(new LocationListener() {
 			public void changed(LocationEvent event) {
-				if (event.top) {
-					locationText.setText(event.location);
-				}
 				initOrientation(deviceOrientation.getOrientationAngle());
 			}
 			public void changing(LocationEvent event) {
 			}
 		});
 		
+		skin.setControlHandler(new ControlHandlerImpl(browser));
+		
 		devicesListHolder = new DevicesListHolder();
-		fillMenuBar(appMenuBar);
+		Menu appMenuBar = skin.getMenuBar();
+		if (appMenuBar != null) {
+			fillMenuBar(appMenuBar);
+		}
 		
-		locationText.addListener(SWT.DefaultSelection, new Listener() {
-			public void handleEvent(Event e) {
-				browser.setUrl(locationText.getText());
-			}
-		});
+		DevicesList devicesList = DevicesListStorage.loadUserDefinedDevicesList();
+		if (devicesList == null) {
+			devicesList = DevicesListStorage.loadDefaultDevicesList();
+		}
 		
-		DevicesList devicesList = devicesListHolder.getDevicesList(); 
+		devicesListHolder.setDevicesList(devicesList);
+		devicesListHolder.notifyObservers();
+
 		if (devicesList != null && devicesList.getDevices() != null 
 				&& devicesList.getSelectedDeviceIndex() < devicesList.getDevices().size()) {
 			setDevice(devicesList.getDevices().get(devicesList.getSelectedDeviceIndex()));
 		}
-		shell.open();
+
 		browser.setUrl(initialUrl);
 		
-		while (!shell.isDisposed()) {
+		while (!this.shell.isDisposed()) {
 			if (!display.readAndDispatch())
 				display.sleep();
 		}
 		display.dispose();
-	}
-
-	public ToolBar createControlBar() {
-		ToolBar toolbar = new ToolBar(shell, SWT.NONE);
-		ToolItem itemBack = new ToolItem(toolbar, SWT.PUSH);
-//		itemBack.setText("Back");
-		itemBack.addListener(SWT.Selection, new Listener() {
-			public void handleEvent(Event event) {
-				browser.back();
-			}
-		});
-		
-		ToolItem itemForward = new ToolItem(toolbar, SWT.PUSH);
-//		itemForward.setText("Forward");
-		itemForward.addListener(SWT.Selection, new Listener() {
-			public void handleEvent(Event event) {
-				browser.forward();
-			}
-		});
-		
-		ToolItem itemStop = new ToolItem(toolbar, SWT.PUSH);
-//		itemStop.setText("Stop");
-		itemStop.addListener(SWT.Selection, new Listener() {
-			public void handleEvent(Event event) {
-				browser.stop();
-			}
-		});
-		
-		ToolItem itemRefresh = new ToolItem(toolbar, SWT.PUSH);
-//		itemRefresh.setText("Refresh");
-		itemRefresh.addListener(SWT.Selection, new Listener() {
-			public void handleEvent(Event event) {
-				browser.refresh();
-			}
-		});
-		
-		ToolItem itemGo = new ToolItem(toolbar, SWT.PUSH);
-//		itemGo.setText("Go");
-		itemGo.addListener(SWT.Selection, new Listener() {
-			public void handleEvent(Event event) {
-				browser.setUrl(locationText.getText());
-			}
-		});
-		
-		ToolItem itemRotateCounterclockwise = new ToolItem(toolbar, SWT.PUSH);
-//		itemGo.setText("Rotate Counterclockwise");
-		itemRotateCounterclockwise.addListener(SWT.Selection, new Listener() {
-			public void handleEvent(Event event) {
-				rotateDevice(true);
-			}
-		});
-		
-		ToolItem itemRotateClockwise = new ToolItem(toolbar, SWT.PUSH);
-//		itemGo.setText("Rotate Clockwise");
-		itemRotateClockwise.addListener(SWT.Selection, new Listener() {
-			public void handleEvent(Event event) {
-				rotateDevice(false);
-			}
-		});
-		
-		final Image imageBack = new Image(display, ResourcesUtil.getResourceAsStream("/org/jboss/tools/vpe/browsersim/resources/icons/nav_backward.gif")); //$NON-NLS-1$
-		final Image imageForward = new Image(display, ResourcesUtil.getResourceAsStream("/org/jboss/tools/vpe/browsersim/resources/icons/nav_forward.gif")); //$NON-NLS-1$
-		final Image imageStop = new Image(display, ResourcesUtil.getResourceAsStream("/org/jboss/tools/vpe/browsersim/resources/icons/nav_stop.gif")); //$NON-NLS-1$
-		final Image imageRefresh = new Image(display, ResourcesUtil.getResourceAsStream("/org/jboss/tools/vpe/browsersim/resources/icons/nav_refresh.gif")); //$NON-NLS-1$
-		final Image imageGo = new Image(display, ResourcesUtil.getResourceAsStream("/org/jboss/tools/vpe/browsersim/resources/icons/nav_go.gif")); //$NON-NLS-1$
-		final Image imageRotateClockwise = new Image(display, ResourcesUtil.getResourceAsStream("/org/jboss/tools/vpe/browsersim/resources/icons/rotate_clockwise.png")); //$NON-NLS-1$
-		final Image imageRotateCounterclockwise = new Image(display, ResourcesUtil.getResourceAsStream("/org/jboss/tools/vpe/browsersim/resources/icons/rotate_counterclockwise.png")); //$NON-NLS-1$		
-		
-		itemBack.setImage(imageBack);
-		itemForward.setImage(imageForward);
-		itemStop.setImage(imageStop);
-		itemRefresh.setImage(imageRefresh);
-		itemGo.setImage(imageGo);
-		itemRotateClockwise.setImage(imageRotateClockwise);
-		itemRotateCounterclockwise.setImage(imageRotateCounterclockwise);
-		
-		shell.addDisposeListener(new DisposeListener() {
-			public void widgetDisposed(DisposeEvent e) {
-				imageBack.dispose();
-				imageForward.dispose();
-				imageStop.dispose();
-				imageRefresh.dispose();
-				imageGo.dispose();
-				imageRotateClockwise.dispose();
-				imageRotateCounterclockwise.dispose();
-			}
-		});
-
-		return toolbar;
 	}
 
 	public void fillMenuBar(Menu appMenuBar) {
@@ -325,15 +208,7 @@ public class BrowserSim implements Runnable {
 				});
 			}
 		});
-		
-		DevicesList devicesList = DevicesListStorage.loadUserDefinedDevicesList();
-		if (devicesList == null) {
-			devicesList = DevicesListStorage.loadDefaultDevicesList();
-		}
-		
-		devicesListHolder.setDevicesList(devicesList);
-		devicesListHolder.notifyObservers();
-		
+
 		new MenuItem(devicesMenu, SWT.BAR);
 		MenuItem manageDevicesMenuItem = new MenuItem(devicesMenu, SWT.PUSH);
 		manageDevicesMenuItem.setText(Messages.BrowserSim_MORE);
@@ -389,13 +264,15 @@ public class BrowserSim implements Runnable {
 	}
 	
 	public void setDevice(final Device device) {
-		for (MenuItem menuItem : devicesMenu.getItems()) {
-			if (menuItem.getData() instanceof Device) {
-				menuItem.setSelection(menuItem.getData() == device);				
+		if (devicesMenu != null) {
+			for (MenuItem menuItem : devicesMenu.getItems()) {
+				if (menuItem.getData() instanceof Device) {
+					menuItem.setSelection(menuItem.getData() == device);				
+				}
 			}
 		}
 		
-		setBrowserSize(device.getWidth(), device.getHeight());
+		skin.setBrowserSize(device.getWidth(), device.getHeight());
 		deviceOrientation = new DeviceOrientation(device.getWidth() < device.getHeight() 
 					? DeviceOrientation.PORTRAIT
 					: DeviceOrientation.LANDSCAPE);
@@ -408,9 +285,9 @@ public class BrowserSim implements Runnable {
 				
 				if (orientationAngle == DeviceOrientation.LANDSCAPE
 						|| orientationAngle == DeviceOrientation.LANDSCAPE_INVERTED) {
-					setBrowserSize(maxSize, minSize);					
+					skin.setBrowserSize(maxSize, minSize);					
 				} else {
-					setBrowserSize(minSize, maxSize);										
+					skin.setBrowserSize(minSize, maxSize);										
 				}
 				
 				fireOrientationChangeEvent(orientationAngle);
@@ -419,62 +296,6 @@ public class BrowserSim implements Runnable {
 
 		browser.setDefaultUserAgent(device.getUserAgent());
 		browser.refresh();
-	}
-
-	private void setBrowserSize(int width, int height) {
-		GridData data = (GridData) browser.getLayoutData();
-		
-		Rectangle clientArea = getMonitorClientArea();
-		int shellWidthHint = SWT.DEFAULT;
-		if (width != Device.DEFAULT_SIZE) {
-			data.widthHint = width;
-		} else if (data.widthHint == SWT.DEFAULT) {
-			shellWidthHint = clientArea.width;
-		}
-		int shellHeightHint = SWT.DEFAULT;
-		if (height != Device.DEFAULT_SIZE) {
-			data.heightHint =  height;
-		} else if (data.heightHint == SWT.DEFAULT) {
-			shellHeightHint = clientArea.height;
-		}
-		Point shellSize = shell.computeSize(shellWidthHint, shellHeightHint);
-		shellSize.x = Math.min(shellSize.x, clientArea.width);
-		shellSize.y = Math.min(shellSize.y, clientArea.height);
-		shell.setSize(shellSize);
-		
-		Rectangle shellBounds = shell.getBounds();
-		int bottomOverlap = shellBounds.y + shellBounds.height - (clientArea.y + clientArea.height);
-		if (bottomOverlap > 0) {
-			if (shellBounds.y > bottomOverlap) {
-				shellBounds.y -= bottomOverlap;
-			} else {
-				shellBounds.y = 0;
-			}
-		}
-		
-		int rightOverlap = shellBounds.x + shellBounds.width - (clientArea.x + clientArea.width);
-		if (rightOverlap > 0) {
-			if (shellBounds.x > rightOverlap) {
-				shellBounds.x -= rightOverlap;
-			} else {
-				shellBounds.x = 0;
-			}
-		}
-		
-		shell.setBounds(shellBounds);
-	}
-
-	private Rectangle getMonitorClientArea() {
-		Rectangle clientArea = shell.getMonitor().getClientArea();
-
-		/* on Linux returned monitor client area may be bigger
-		 * than the monitor bounds when multiple monitors are used.
-		 * The following code fixes this */
-		Rectangle bounds = shell.getMonitor().getBounds();
-		clientArea.width = Math.min(clientArea.width, bounds.width);
-		clientArea.height = Math.min(clientArea.height, bounds.height);
-		
-		return clientArea;
 	}
 	
 	private void initOrientation(int orientation) {
@@ -498,5 +319,53 @@ public class BrowserSim implements Runnable {
 	protected void rotateDevice(boolean counterclockwise) {
 		deviceOrientation.turnDevice(counterclockwise);
 		deviceOrientation.notifyObservers();
+	}
+	
+	class ControlHandlerImpl implements ControlHandler {
+		private Browser browser;
+		
+		public ControlHandlerImpl(Browser browser) {
+			this.browser = browser;
+		}
+
+		@Override
+		public void goBack() {
+			browser.back();
+		}
+
+		@Override
+		public void goForward() {
+			browser.forward();
+		}
+
+		@Override
+		public void goHome() {
+			browser.setUrl("about:blank");//XXX
+		}
+
+		@Override
+		public void goToAddress(String address) {
+			browser.setUrl(address);
+		}
+
+		@Override
+		public void showContextMenu() {
+			// TODO Auto-generated method stub//XXX
+		}
+
+		@Override
+		public void rotate(boolean counterclockwise) {
+			BrowserSim.this.rotateDevice(counterclockwise);
+		}
+
+		@Override
+		public void stop() {
+			browser.stop();
+		}
+
+		@Override
+		public void refresh() {
+			browser.refresh();
+		}
 	}
 }

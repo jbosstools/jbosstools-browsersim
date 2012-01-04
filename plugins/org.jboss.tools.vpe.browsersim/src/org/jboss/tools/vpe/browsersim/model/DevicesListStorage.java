@@ -30,7 +30,7 @@ import org.jboss.tools.vpe.browsersim.util.ResourcesUtil;
  */
 public class DevicesListStorage {
 	
-	private static final String DEFAULT_PREFERENCES_RESOURCE = "/org/jboss/tools/vpe/browsersim/resources/config/devices.cfg";
+	private static final String DEFAULT_PREFERENCES_RESOURCE = "config/devices.cfg";
 	private static final String USER_PREFERENCES_FOLDER = "org.jboss.tools.vpe.browsersim";
 	private static final String USER_PREFERENCES_FILE = "devices.cfg";
 
