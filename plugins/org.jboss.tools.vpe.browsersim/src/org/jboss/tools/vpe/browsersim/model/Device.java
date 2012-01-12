@@ -10,6 +10,10 @@
  ******************************************************************************/
 package org.jboss.tools.vpe.browsersim.model;
 
+import org.jboss.tools.vpe.browsersim.ui.skin.AppleIPhone3Skin;
+import org.jboss.tools.vpe.browsersim.ui.skin.BrowserSimSkin;
+import org.jboss.tools.vpe.browsersim.ui.skin.NativeSkin;
+
 /**
  * @author Yahor Radtsevich (yradtsevich)
  */
@@ -20,6 +24,7 @@ public class Device {
 	private int width;
 	private int height;
 	private String userAgent;
+	private Class<? extends BrowserSimSkin> skinClass;
 
 	public Device(String name, int width, int height, String userAgent) {
 		this.name = name;
@@ -42,5 +47,14 @@ public class Device {
 
 	public String getName() {
 		return name;
+	}
+
+	public Class<? extends BrowserSimSkin> getSkinClass() {
+		//XXX
+		if (name != null && name.equals("Apple iPhone 3 (skinned!)")) {
+			return AppleIPhone3Skin.class;
+		} else {
+			return NativeSkin.class;
+		}
 	}
 }

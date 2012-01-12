@@ -99,6 +99,13 @@ public class NativeSkin implements BrowserSimSkin {
 		locationText.setLayoutData(data);
 		
 		browser = browserFactory.createBrowser(skinComposite, SWT.NONE);
+		GridData browserData = new GridData();
+		browserData.horizontalAlignment = GridData.FILL;
+		browserData.verticalAlignment = GridData.FILL;
+		browserData.horizontalSpan = 3;
+		browserData.grabExcessHorizontalSpace = true;
+		browserData.grabExcessVerticalSpace = true;
+		browser.setLayoutData(browserData);
 		
 		statusLabel = new Label(skinComposite, SWT.NONE);
 		data = new GridData(GridData.FILL_HORIZONTAL);
@@ -312,5 +319,11 @@ public class NativeSkin implements BrowserSimSkin {
 	@Override
 	public void statusTextChanged(String statusText) {
 		statusLabel.setText(statusText);
+	}
+
+	@Override
+	public void setOrientation(int orientation) {
+		// do nothing, only browser size should change it should
+		// be done by calling setBrowserSize(int width, int height)
 	}
 }

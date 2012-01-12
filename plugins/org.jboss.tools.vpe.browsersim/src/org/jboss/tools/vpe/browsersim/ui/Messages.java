@@ -25,6 +25,8 @@ public class Messages {
 	public static String BrowserSim_EXIT;
 	public static String BrowserSim_FILE;
 	public static String BrowserSim_MORE;
+	public static String BrowserSim_TURN_LEFT;
+	public static String BrowserSim_TURN_RIGHT;
 	public static String EditDeviceDialog_CANCEL;
 	public static String EditDeviceDialog_EDIT_DEVICE;
 	public static String EditDeviceDialog_HEIGHT;

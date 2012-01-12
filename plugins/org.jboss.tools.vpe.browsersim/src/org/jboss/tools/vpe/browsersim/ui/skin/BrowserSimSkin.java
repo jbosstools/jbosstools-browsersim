@@ -32,4 +32,5 @@ public interface BrowserSimSkin {
 	void locationChanged(String newLocation);
 	void progressChanged(int percents); // -1 for completed
 	void statusTextChanged(String newStatusText);
+	void setOrientation(int orientation);
 }
