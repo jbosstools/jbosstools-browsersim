@@ -15,15 +15,14 @@ import org.eclipse.swt.SWT;
 import org.eclipse.swt.browser.BrowserFunction;
 import org.eclipse.swt.browser.LocationEvent;
 import org.eclipse.swt.browser.LocationListener;
+import org.eclipse.swt.events.MouseAdapter;
+import org.eclipse.swt.events.MouseEvent;
 import org.eclipse.swt.events.PaintEvent;
 import org.eclipse.swt.events.PaintListener;
-import org.eclipse.swt.events.SelectionAdapter;
-import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.graphics.Point;
 import org.eclipse.swt.graphics.Rectangle;
 import org.eclipse.swt.graphics.Region;
-import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Event;
@@ -106,13 +105,13 @@ public class AppleIPhone3Skin implements BrowserSimSkin {
 	private Text locationText;
 	private ProgressBar progressBar;
 	private int orientation;
-	private ButtonImageDecorator backButtonDecorator;
-	private ButtonImageDecorator forwardButtonDecorator;
-	private ButtonImageDecorator refreshButtonDecorator;
-	private ButtonImageDecorator stopButtonDecorator;
+	private CompositeImageDecorator backCompositeDecorator;
+	private CompositeImageDecorator forwardCompositeDecorator;
+	private CompositeImageDecorator refreshCompositeDecorator;
+	private CompositeImageDecorator stopCompositeDecorator;
 	private Image shellImage;
 	private Region shellRegion;
-	private ButtonImageDecorator showAddressBarButtonDecorator;
+	private CompositeImageDecorator showAddressBarCompositeDecorator;
 	private boolean addressBarVisible = true;
 	private int currentOrientationIndex;
 	private CompositeImageDecorator addressBarDecorator;
@@ -139,25 +138,29 @@ public class AppleIPhone3Skin implements BrowserSimSkin {
 		Image stopImage = imageList.getImage("iphone_skin/stop.png");
 		Image stopSelectedImage = imageList.getImage("iphone_skin/stop-selected.png");
 
-		Button backButton = new Button(shell, SWT.FLAT);
-		backButton.addSelectionListener(new SelectionAdapter() {
-			public void widgetSelected(SelectionEvent e) {
-				controlHandler.goBack();
+		Composite backComposite = new Composite(shell, SWT.NONE);
+		backComposite.addMouseListener(new MouseAdapter() {
+			public void mouseDown(MouseEvent e) {
+				if (e.button == 1) {
+					controlHandler.goBack();
+				}
 			};
 		});
-		backButtonDecorator = new ButtonImageDecorator(backButton);
-		backButtonDecorator.setImages(backImage, backSelectedImage);
-		backButtonDecorator.setLocations(BACK_LOCATION[VERTICAL], BACK_LOCATION[HORIZONTAL]);
+		backCompositeDecorator = new CompositeImageDecorator(backComposite);
+		backCompositeDecorator.setImages(backImage, backSelectedImage);
+		backCompositeDecorator.setLocations(BACK_LOCATION[VERTICAL], BACK_LOCATION[HORIZONTAL]);
 
-		Button forwardButton = new Button(shell, SWT.FLAT);
-		forwardButton.addSelectionListener(new SelectionAdapter() {
-			public void widgetSelected(SelectionEvent e) {
-				controlHandler.goForward();
+		Composite forwardComposite = new Composite(shell, SWT.NONE);
+		forwardComposite.addMouseListener(new MouseAdapter() {
+			public void mouseDown(MouseEvent e) {
+				if (e.button == 1) {
+					controlHandler.goForward();
+				}
 			}
 		});
-		forwardButtonDecorator = new ButtonImageDecorator(forwardButton);
-		forwardButtonDecorator.setImages(forwardImage, forwardSelectedImage);
-		forwardButtonDecorator.setLocations(FORWARD_LOCATION[VERTICAL], FORWARD_LOCATION[HORIZONTAL]);
+		forwardCompositeDecorator = new CompositeImageDecorator(forwardComposite);
+		forwardCompositeDecorator.setImages(forwardImage, forwardSelectedImage);
+		forwardCompositeDecorator.setLocations(FORWARD_LOCATION[VERTICAL], FORWARD_LOCATION[HORIZONTAL]);
 		
 		Composite addressBar = new Composite(shell, SWT.NONE);
 		addressBarDecorator = new CompositeImageDecorator(addressBar);
@@ -172,43 +175,49 @@ public class AppleIPhone3Skin implements BrowserSimSkin {
 		progressBar.setVisible(false);
 
 		
-		Button refreshButton = new Button(addressBar, SWT.FLAT);
-		refreshButton.addSelectionListener(new SelectionAdapter() {
-			public void widgetSelected(SelectionEvent e) {
-				controlHandler.refresh();
+		Composite refreshComposite = new Composite(addressBar, SWT.NONE);
+		refreshComposite.addMouseListener(new MouseAdapter() {
+			public void mouseDown(MouseEvent e) {
+				if (e.button == 1) {
+					controlHandler.refresh();
+				}
 			}
 		});
-		refreshButtonDecorator = new ButtonImageDecorator(refreshButton);
-		refreshButtonDecorator.setImages(refreshImage, refreshSelectedImage);
-		refreshButtonDecorator.setLocations(REFRESH_LOCATION[VERTICAL], REFRESH_LOCATION[HORIZONTAL]);
+		refreshCompositeDecorator = new CompositeImageDecorator(refreshComposite);
+		refreshCompositeDecorator.setImages(refreshImage, refreshSelectedImage);
+		refreshCompositeDecorator.setLocations(REFRESH_LOCATION[VERTICAL], REFRESH_LOCATION[HORIZONTAL]);
 		
-		Button stopButton = new Button(addressBar, SWT.FLAT);
-		stopButtonDecorator = new ButtonImageDecorator(stopButton);
-		stopButtonDecorator.setImages(stopImage, stopSelectedImage);
-		stopButtonDecorator.setLocations(STOP_LOCATION[VERTICAL], STOP_LOCATION[HORIZONTAL]);
-		stopButton.addSelectionListener(new SelectionAdapter() {
-			public void widgetSelected(SelectionEvent e) {
-				controlHandler.stop();
+		Composite stopComposite = new Composite(addressBar, SWT.NONE);
+		stopCompositeDecorator = new CompositeImageDecorator(stopComposite);
+		stopCompositeDecorator.setImages(stopImage, stopSelectedImage);
+		stopCompositeDecorator.setLocations(STOP_LOCATION[VERTICAL], STOP_LOCATION[HORIZONTAL]);
+		stopComposite.addMouseListener(new MouseAdapter() {
+			public void mouseDown(MouseEvent e) {
+				if (e.button == 1) {
+					controlHandler.stop();
+				}
 			}
 		});
 		
-		Button showAddressBarButton = new Button(shell, SWT.FLAT);
-		showAddressBarButton.addSelectionListener(new SelectionAdapter() {
-			public void widgetSelected(SelectionEvent e) {
-				setAddressBarVisible(!addressBarVisible);
+		Composite showAddressBarComposite = new Composite(shell, SWT.NONE);
+		showAddressBarComposite.addMouseListener(new MouseAdapter() {
+			public void mouseDown(MouseEvent e) {
+				if (e.button == 1) {
+					setAddressBarVisible(!addressBarVisible);
+				}
 			}
 		});
-		showAddressBarButtonDecorator = new ButtonImageDecorator(showAddressBarButton);
+		showAddressBarCompositeDecorator = new CompositeImageDecorator(showAddressBarComposite);
 		Image showAddressBarVerticalImage = imageList.getImage(SHOW_ADDRESS_BAR_IMAGE[VERTICAL]);
 		Image showAddressBarHorizontalImage = imageList.getImage(SHOW_ADDRESS_BAR_IMAGE[HORIZONTAL]);
-		showAddressBarButtonDecorator.setImages(showAddressBarVerticalImage, showAddressBarVerticalImage, showAddressBarHorizontalImage, showAddressBarHorizontalImage);
-		showAddressBarButtonDecorator.setLocations(SHOW_ADDRESS_BAR_LOCATION[VERTICAL], SHOW_ADDRESS_BAR_LOCATION[HORIZONTAL]);
+		showAddressBarCompositeDecorator.setImages(showAddressBarVerticalImage, showAddressBarVerticalImage, showAddressBarHorizontalImage, showAddressBarHorizontalImage);
+		showAddressBarCompositeDecorator.setLocations(SHOW_ADDRESS_BAR_LOCATION[VERTICAL], SHOW_ADDRESS_BAR_LOCATION[HORIZONTAL]);
 
 		Listener l = new Listener() {
 			Point origin;
 
 			public void handleEvent(Event e) {
-				if ((e.stateMask & SWT.BUTTON1) != 0 || e.button == 1) { // left mouse button
+				if ((e.stateMask & SWT.BUTTON1) != 0 || e.button == 1) { // left mouse Composite
 					switch (e.type) {
 					case SWT.MouseDown:
 						origin = new Point(e.x, e.y);
@@ -301,11 +310,11 @@ public class AppleIPhone3Skin implements BrowserSimSkin {
 	private void setWidgetsBounds(int orientationIndex) {
 		boolean vertical = orientationIndex == VERTICAL;
 		addressBarDecorator.setVertical(vertical);
-		backButtonDecorator.setVertical(vertical);
-		forwardButtonDecorator.setVertical(vertical);
-		refreshButtonDecorator.setVertical(vertical);
-		stopButtonDecorator.setVertical(vertical);
-		showAddressBarButtonDecorator.setVertical(vertical);
+		backCompositeDecorator.setVertical(vertical);
+		forwardCompositeDecorator.setVertical(vertical);
+		refreshCompositeDecorator.setVertical(vertical);
+		stopCompositeDecorator.setVertical(vertical);
+		showAddressBarCompositeDecorator.setVertical(vertical);
 		
 		locationText.setBounds(URL_RECTANGLE[orientationIndex]);
 		progressBar.setBounds(PROGRESS_BAR_RECTANGLE[orientationIndex]);
