@@ -146,6 +146,12 @@ public class BrowserSim {
 		
 		Menu appMenuBar = skin.getMenuBar();
 		if (appMenuBar != null) {
+			//delete all existing items, if any (necessary for systems like MacOS
+			// that have system (non-shell) menu bar), to do not create duplicate items while changing skins
+			for (MenuItem item : appMenuBar.getItems()) {
+				item.dispose();
+			}
+			
 			createMenusForMenuBar(appMenuBar);
 		}
 		
