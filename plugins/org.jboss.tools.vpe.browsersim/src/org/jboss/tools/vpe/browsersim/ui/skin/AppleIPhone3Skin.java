@@ -361,8 +361,10 @@ public class AppleIPhone3Skin implements BrowserSimSkin {
 	}
 
 	@Override
-	public void locationChanged(String location) {
+	public void locationChanged(String location, boolean backEnabled, boolean forwardEnabled) {
 		locationText.setText(location);
+		backCompositeDecorator.setVisible(backEnabled);
+		forwardCompositeDecorator.setVisible(forwardEnabled);
 	}
 
 	@Override

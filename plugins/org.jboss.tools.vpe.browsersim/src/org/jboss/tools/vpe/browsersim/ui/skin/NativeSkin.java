@@ -300,8 +300,10 @@ public class NativeSkin implements BrowserSimSkin {
 	}
 
 	@Override
-	public void locationChanged(String location) {
+	public void locationChanged(String location, boolean backEnabled, boolean forwardEnabled) {
 		locationText.setText(location);
+		itemBack.setEnabled(backEnabled);
+		itemForward.setEnabled(forwardEnabled);
 	}
 
 	@Override

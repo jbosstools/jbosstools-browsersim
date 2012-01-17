@@ -86,6 +86,7 @@ public class BrowserSim {
 		browserSim.initDevicesListHolder();
 		browserSim.devicesListHolder.setDevicesList(devicesList);
 		browserSim.devicesListHolder.notifyObservers();
+		browserSim.controlHandler.goHome();
 		
 		while (browserSim.skin!= null && browserSim.skin.getShell() != null && !browserSim.skin.getShell().isDisposed()) {//XXX
 			if (!display.readAndDispatch())
@@ -177,7 +178,8 @@ public class BrowserSim {
 		browser.addLocationListener(new LocationListener() {
 			public void changed(LocationEvent event) {
 				if (event.top) {
-					skin.locationChanged(event.location);
+					BrowserSimBrowser browser = (BrowserSimBrowser) event.widget;
+					skin.locationChanged(event.location, browser.isBackEnabled(), browser.isForwardEnabled());
 				}
 			}
 			public void changing(LocationEvent event) {
@@ -360,9 +362,9 @@ public class BrowserSim {
 		skin.getBrowser().setDefaultUserAgent(device.getUserAgent());
 		
 		if (oldSkinUrl != null) {
-			skin.getBrowser().setUrl(oldSkinUrl);
+			skin.getBrowser().setUrl(oldSkinUrl); // skin (and browser instance) is changed
 		} else {
-			skin.getBrowser().setUrl(homeUrl);
+			skin.getBrowser().refresh(); // only user agent and size of the browser is changed
 		}
 	}
 
