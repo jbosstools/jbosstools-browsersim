@@ -20,11 +20,13 @@ public class Messages {
 	public static String BrowserSim_ADDRESS;
 	public static String BrowserSim_BROWSER_SIM;
 	public static String BrowserSim_COULD_NOT_INSTANTIATE_WEBKIT_BROWSER;
+	public static String BrowserSim_COULD_NOT_OPEN_DEFAULT_BROWSER;
 	public static String BrowserSim_DEVICES;
 	public static String BrowserSim_ERROR;
 	public static String BrowserSim_EXIT;
 	public static String BrowserSim_FILE;
 	public static String BrowserSim_MORE;
+	public static String BrowserSim_OPEN_IN_DEFAULT_BROWSER;
 	public static String BrowserSim_TURN_LEFT;
 	public static String BrowserSim_TURN_RIGHT;
 	public static String EditDeviceDialog_CANCEL;

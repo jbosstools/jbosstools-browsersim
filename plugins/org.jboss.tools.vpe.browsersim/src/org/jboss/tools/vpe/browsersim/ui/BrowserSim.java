@@ -10,6 +10,7 @@
  ******************************************************************************/
 package org.jboss.tools.vpe.browsersim.ui;
 
+import java.awt.Desktop;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.List;
@@ -120,13 +121,7 @@ public class BrowserSim {
 		try {
 			skin.createControls(display);
 		} catch (SWTError e) {
-			System.err.println(Messages.BrowserSim_COULD_NOT_INSTANTIATE_WEBKIT_BROWSER + e.getMessage());
-			
-			MessageBox messageBox = new MessageBox(new Shell(display), SWT.OK | SWT.ICON_ERROR);
-			messageBox.setText("Error");
-			messageBox.setMessage(Messages.BrowserSim_COULD_NOT_INSTANTIATE_WEBKIT_BROWSER + e.getMessage());
-			messageBox.open();
-			
+			showErrorMessage(new Shell(display), Messages.BrowserSim_COULD_NOT_INSTANTIATE_WEBKIT_BROWSER + e.getMessage());
 			display.dispose();
 			return;
 		}
@@ -265,8 +260,10 @@ public class BrowserSim {
 		});
 	}
 
-	private void addFileMenuItems(Menu file) {
-		MenuItem exit = new MenuItem(file, SWT.PUSH);
+	private void addFileMenuItems(Menu menu) {
+		addOpenInDefaultBrowserItem(menu);
+		
+		MenuItem exit = new MenuItem(menu, SWT.PUSH);
 		exit.setText(Messages.BrowserSim_EXIT);
 		exit.addSelectionListener(new SelectionAdapter() {
 			public void widgetSelected(SelectionEvent e) {
@@ -291,6 +288,33 @@ public class BrowserSim {
 				controlHandler.rotate(false);
 			}
 		});
+	}
+
+	public void addOpenInDefaultBrowserItem(Menu menu) {
+		if (Desktop.isDesktopSupported()) {
+			if (Desktop.getDesktop().isSupported(Desktop.Action.BROWSE)) {
+				MenuItem openInDefaultBrowser = new MenuItem(menu, SWT.PUSH);
+				openInDefaultBrowser.setText(Messages.BrowserSim_OPEN_IN_DEFAULT_BROWSER);
+				openInDefaultBrowser.addSelectionListener(new SelectionAdapter() {
+					public void widgetSelected(SelectionEvent e) {
+						try {
+							Desktop.getDesktop().browse(new URI(skin.getBrowser().getUrl()));
+						} catch (Exception e1) {
+							showErrorMessage(skin.getShell(), Messages.BrowserSim_COULD_NOT_OPEN_DEFAULT_BROWSER + e1.getMessage());
+						}
+					}
+				});
+			}
+		}
+	}
+	
+	private void showErrorMessage(Shell shell, String message) {
+		System.err.println(message);
+		
+		MessageBox messageBox = new MessageBox(shell, SWT.OK | SWT.ICON_ERROR);
+		messageBox.setText(Messages.BrowserSim_ERROR);
+		messageBox.setMessage(message);
+		messageBox.open();
 	}
 
 	private void addDevicesListForMenu(final DevicesList devicesList, Menu devicesMenu) {
