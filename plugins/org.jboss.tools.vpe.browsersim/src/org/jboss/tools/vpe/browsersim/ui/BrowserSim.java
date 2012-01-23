@@ -157,8 +157,12 @@ public class BrowserSim {
 		
 		browser.addProgressListener(new ProgressListener() {
 			public void changed(ProgressEvent event) {
-				if (event.total == 0) return;
-				int ratio = event.current * 100 / event.total;
+				int ratio;
+				if (event.current == event.total || event.total == 0) {
+					ratio = -1;
+				} else {
+					ratio = event.current * 100 / event.total;
+				}
 				skin.progressChanged(ratio);
 			}
 			public void completed(ProgressEvent event) {
