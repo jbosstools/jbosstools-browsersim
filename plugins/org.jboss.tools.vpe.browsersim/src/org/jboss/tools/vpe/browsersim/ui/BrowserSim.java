@@ -13,6 +13,7 @@ package org.jboss.tools.vpe.browsersim.ui;
 import java.awt.Desktop;
 import java.net.URI;
 import java.net.URISyntaxException;
+import java.net.URL;
 import java.util.List;
 import java.util.Observable;
 import java.util.Observer;
@@ -302,7 +303,8 @@ public class BrowserSim {
 				openInDefaultBrowser.addSelectionListener(new SelectionAdapter() {
 					public void widgetSelected(SelectionEvent e) {
 						try {
-							Desktop.getDesktop().browse(new URI(skin.getBrowser().getUrl()));
+							URL url = new URL(skin.getBrowser().getUrl()); // validate URL (to do not open 'about:blank' and similar)
+							Desktop.getDesktop().browse(url.toURI());
 						} catch (Exception e1) {
 							showErrorMessage(skin.getShell(), Messages.BrowserSim_COULD_NOT_OPEN_DEFAULT_BROWSER + e1.getMessage());
 						}
