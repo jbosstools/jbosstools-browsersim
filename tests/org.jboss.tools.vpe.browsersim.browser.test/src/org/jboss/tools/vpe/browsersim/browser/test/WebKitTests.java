@@ -36,7 +36,7 @@ public class WebKitTests extends TestCase {
 		Display display = new Display();
 		Shell shell = new Shell(display);
 		shell.setLayout(new FillLayout());
-		final AbstractWebKitBrowser webKitBrowser = WebKitBrowserFactory.createWebKitBrowser(shell, SWT.NONE);
+		final AbstractWebKitBrowser webKitBrowser = new WebKitBrowserFactory().createBrowser(shell, SWT.NONE);
 		assertNotNull(webKitBrowser);
 		ExpressionsEvaluator expressionsEvaluator = new ExpressionsEvaluator(webKitBrowser);
 		
