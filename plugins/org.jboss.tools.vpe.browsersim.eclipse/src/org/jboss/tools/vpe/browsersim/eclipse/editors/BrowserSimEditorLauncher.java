@@ -19,6 +19,7 @@ import org.jboss.tools.vpe.browsersim.eclipse.util.BrowserSimLauncher;
  * @author "Yahor Radtsevich (yradtsevich)"
  */
 public class BrowserSimEditorLauncher implements IEditorLauncher {
+	public static final String EDITOR_ID = "org.jboss.tools.vpe.browsersim.eclipse.editors.BrowserSimLauncher"; //$NON-NLS-1$
 
 	@Override
 	public void open(IPath file) {

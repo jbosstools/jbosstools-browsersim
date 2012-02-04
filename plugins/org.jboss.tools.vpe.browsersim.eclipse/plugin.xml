@@ -41,7 +41,7 @@
    <extension
          point="org.eclipse.ui.editors">
       <editor
-            extensions="html"
+            extensions="htm, html"
             icon="icons/sample.gif"
             id="org.jboss.tools.vpe.browsersim.eclipse.editors.BrowserSimLauncher"
             launcher="org.jboss.tools.vpe.browsersim.eclipse.editors.BrowserSimEditorLauncher"
