@@ -34,7 +34,7 @@
                    toolbarPath="browserSim"
                    label="Run BrowserSim"
                    class="org.jboss.tools.vpe.browsersim.eclipse.actions.RunBrowserSimAction"
-                   icon="icons/sample.gif">
+                   icon="icons/browsersim_16px.png">
             	</action>
       </actionSet>
    </extension>
@@ -42,7 +42,7 @@
          point="org.eclipse.ui.editors">
       <editor
             extensions="htm, html"
-            icon="icons/sample.gif"
+            icon="icons/browsersim_16px.png"
             id="org.jboss.tools.vpe.browsersim.eclipse.editors.BrowserSimLauncher"
             launcher="org.jboss.tools.vpe.browsersim.eclipse.editors.BrowserSimEditorLauncher"
             name="BrowserSim">
