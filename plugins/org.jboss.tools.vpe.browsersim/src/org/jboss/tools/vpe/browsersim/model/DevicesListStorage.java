@@ -33,6 +33,7 @@ public class DevicesListStorage {
 	private static final String DEFAULT_PREFERENCES_RESOURCE = "config/devices.cfg";
 	private static final String USER_PREFERENCES_FOLDER = "org.jboss.tools.vpe.browsersim";
 	private static final String USER_PREFERENCES_FILE = "devices.cfg";
+	private static final int CURRENT_CONFIG_VERSION = 2;
 
 	public static void saveUserDefinedDevicesList(DevicesList devicesList) {
 		File configFolder = new File(USER_PREFERENCES_FOLDER);
@@ -61,23 +62,29 @@ public class DevicesListStorage {
 	}
 	
 	public static DevicesList loadDefaultDevicesList() {
-		DevicesList devicesList;
+		DevicesList devicesList = null;
 		try {
 			devicesList = loadDevicesList(ResourcesUtil.getResourceAsStream(
 					DEFAULT_PREFERENCES_RESOURCE));
 		} catch (IOException e) {
 			e.printStackTrace();
-			devicesList = new DevicesList(new ArrayList<Device>(), 0);
 		}
 		
+		if (devicesList == null) {
+			Device device = new Device("Default", 1024, 768, null, null);
+			List<Device> devices = new ArrayList<Device>();
+			devices.add(device);
+			devicesList = new DevicesList(devices, 0);
+		}
+
 		return devicesList;
 	}
 
 	private static void saveDevicesList(DevicesList devicesList, File file) throws IOException {
 		BufferedWriter writer = new BufferedWriter(new FileWriter(file));
 		
-		writer.write(String.valueOf(devicesList.getSelectedDeviceIndex()));
-		writer.write('\n');
+		writer.write("ConfigVersion=" + String.valueOf(CURRENT_CONFIG_VERSION) + "\n");
+		writer.write("SelectedDeviceIndex=" + String.valueOf(devicesList.getSelectedDeviceIndex()) + "\n");
 		
 		for (Device device : devicesList.getDevices()) {
 			writer.write( encode(device.getName() ));
@@ -85,9 +92,13 @@ public class DevicesListStorage {
 			writer.write(encode( String.valueOf(device.getWidth()) ));
 			writer.write('\t');
 			writer.write(encode( String.valueOf(device.getHeight()) ));
+			writer.write('\t');
 			if (device.getUserAgent() != null) {
-				writer.write('\t');
 				writer.write( encode(device.getUserAgent() ));
+			}
+			writer.write('\t');
+			if (device.getSkinId() != null) {
+				writer.write( encode(device.getSkinId() ));
 			}
 			writer.write('\n');
 		}
@@ -103,31 +114,58 @@ public class DevicesListStorage {
 	private static DevicesList loadDevicesList(InputStream inputStream) throws IOException {
 		BufferedReader reader = new BufferedReader(new InputStreamReader(inputStream));
 		
-		String nextLine = reader.readLine();
+		List<Device> devices = null;
 		int selectedDeviceIndex = 0;
-		if (nextLine != null) {
-			selectedDeviceIndex = Integer.parseInt(nextLine);
-		}
-		Pattern devicePattern = Pattern.compile("^(.*)\\t(\\-?[0-9]*)\\t(\\-?[0-9]*)(\\t(.*))?$");
-	
-		List<Device> devices = new ArrayList<Device>();
-		while ((nextLine = reader.readLine()) != null) {
-			Matcher deviceMatcher = devicePattern.matcher(nextLine);
-			if (deviceMatcher.matches()) {
-				devices.add(new Device(
-						decode(deviceMatcher.group(1)),
-						Integer.parseInt(deviceMatcher.group(2)),
-						Integer.parseInt(deviceMatcher.group(3)),
-						deviceMatcher.group(5) != null 
-							? decode(deviceMatcher.group(5))
-							: null
-				));
+		try {
+			String nextLine;
+			
+			int configVersion = 0;
+			if ((nextLine = reader.readLine()) != null) {
+				Pattern pattern = Pattern.compile("ConfigVersion=([0-9]+)");
+				Matcher matcher = pattern.matcher(nextLine);
+				if (matcher.matches()) {
+					configVersion = Integer.parseInt(matcher.group(1));
+				}
 			}
+			
+			if (configVersion == CURRENT_CONFIG_VERSION) {
+				if ((nextLine = reader.readLine()) != null) {
+					Pattern pattern = Pattern.compile("SelectedDeviceIndex=([0-9]+)");
+					Matcher matcher = pattern.matcher(nextLine);
+					if (matcher.matches()) {
+						selectedDeviceIndex = Integer.parseInt(matcher.group(1));
+					}
+				}
+				
+				Pattern devicePattern = Pattern.compile("^(.*)\\t(\\-?[0-9]+)\\t(\\-?[0-9]+)\\t(.+)?\\t(.+)?$");
+				
+				devices = new ArrayList<Device>();
+				while ((nextLine = reader.readLine()) != null) {
+					Matcher deviceMatcher = devicePattern.matcher(nextLine);
+					if (deviceMatcher.matches()) {
+						devices.add(new Device(
+								decode(deviceMatcher.group(1)),
+								Integer.parseInt(deviceMatcher.group(2)),
+								Integer.parseInt(deviceMatcher.group(3)),
+								deviceMatcher.group(4) != null 
+								? decode(deviceMatcher.group(4))
+										: null,
+										deviceMatcher.group(5) != null 
+										? decode(deviceMatcher.group(5))
+												: null
+								));
+					}
+				}
+			}	
+		} finally {
+			reader.close();
 		}
 		
-		reader.close();
-		
-		return new DevicesList(devices, selectedDeviceIndex);
+		if (devices == null || devices.size() <= selectedDeviceIndex) {
+			return null;
+		} else { 
+			return new DevicesList(devices, selectedDeviceIndex);
+		}
 	}
 
 	private static String encode(String string) {

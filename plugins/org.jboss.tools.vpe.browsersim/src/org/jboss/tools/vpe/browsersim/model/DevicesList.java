@@ -21,6 +21,7 @@ import java.util.Observable;
 public class DevicesList extends Observable {
 	private List<Device> devices;
 	private int selectedDeviceIndex;
+	private boolean useSkins = true;
 
 	public DevicesList(List<Device> devices, int selectedDeviceIndex) {
 		this.devices = devices;
@@ -38,6 +39,17 @@ public class DevicesList extends Observable {
 	public void setSelectedDeviceIndex(int currentDeviceIndex) {
 		if (this.selectedDeviceIndex != currentDeviceIndex) {
 			this.selectedDeviceIndex = currentDeviceIndex;
+			setChanged();
+		}
+	}
+
+	public boolean getUseSkins() {
+		return useSkins;
+	}
+
+	public void setUseSkins(boolean useSkins) {
+		if (this.useSkins != useSkins) {
+			this.useSkins = useSkins;
 			setChanged();
 		}
 	}

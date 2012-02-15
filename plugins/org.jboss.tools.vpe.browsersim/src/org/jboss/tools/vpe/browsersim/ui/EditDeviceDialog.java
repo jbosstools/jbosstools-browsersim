@@ -145,7 +145,8 @@ public class EditDeviceDialog extends Dialog {
 				resultDevice = new Device(textName.getText(),
 						checkButtonWidth.getSelection() ? Integer.valueOf("0" + textWidth.getText()) : Device.DEFAULT_SIZE,
 						checkButtonHeight.getSelection() ? Integer.valueOf("0" + textHeight.getText()) : Device.DEFAULT_SIZE,
-						checkButtonUserAgent.getSelection() ? textUserAgent.getText() : null);
+						checkButtonUserAgent.getSelection() ? textUserAgent.getText() : null,
+								null);
 				shell.close();
 			}
 		});

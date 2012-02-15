@@ -22,6 +22,7 @@ import java.util.Observer;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.SWTError;
 import org.eclipse.swt.browser.Browser;
+import org.eclipse.swt.browser.BrowserFunction;
 import org.eclipse.swt.browser.LocationEvent;
 import org.eclipse.swt.browser.LocationListener;
 import org.eclipse.swt.browser.ProgressEvent;
@@ -34,10 +35,13 @@ import org.eclipse.swt.events.MenuAdapter;
 import org.eclipse.swt.events.MenuEvent;
 import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
+import org.eclipse.swt.graphics.Point;
+import org.eclipse.swt.graphics.Rectangle;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Menu;
 import org.eclipse.swt.widgets.MenuItem;
 import org.eclipse.swt.widgets.MessageBox;
+import org.eclipse.swt.widgets.Monitor;
 import org.eclipse.swt.widgets.Shell;
 import org.jboss.tools.vpe.browsersim.browser.BrowserSimBrowser;
 import org.jboss.tools.vpe.browsersim.browser.WebKitBrowserFactory;
@@ -46,15 +50,14 @@ import org.jboss.tools.vpe.browsersim.model.DeviceOrientation;
 import org.jboss.tools.vpe.browsersim.model.DevicesList;
 import org.jboss.tools.vpe.browsersim.model.DevicesListHolder;
 import org.jboss.tools.vpe.browsersim.model.DevicesListStorage;
+import org.jboss.tools.vpe.browsersim.model.SkinMap;
 import org.jboss.tools.vpe.browsersim.ui.skin.BrowserSimSkin;
-import org.jboss.tools.vpe.browsersim.ui.skin.NativeSkin;
 
 /**
  * @author Yahor Radtsevich (yradtsevich)
  */
 public class BrowserSim {
 	private static final String DEFAULT_URL = "about:blank"; //"http://www.w3schools.com/js/tryit_view.asp?filename=try_nav_useragent"; //$NON-NLS-1$
-	private static final Class<? extends BrowserSimSkin> DEFAULT_SKIN_CLASS = NativeSkin.class;
 	private Display display;
 	private String homeUrl;
 	private DevicesListHolder devicesListHolder;
@@ -85,7 +88,7 @@ public class BrowserSim {
 		Device defaultDevice = devicesList.getDevices().get(devicesList.getSelectedDeviceIndex());
 		Display display = new Display();
 		BrowserSim browserSim = new BrowserSim(display, homeUrl);
-		browserSim.initSkin(defaultDevice);
+		browserSim.initSkin(getSkinClass(defaultDevice, devicesList.getUseSkins()));
 		browserSim.initDevicesListHolder();
 		browserSim.devicesListHolder.setDevicesList(devicesList);
 		browserSim.devicesListHolder.notifyObservers();
@@ -103,12 +106,7 @@ public class BrowserSim {
 		this.homeUrl = homeUrl;
 	}
 	
-	public void initSkin(Device device) {
-		Class<? extends BrowserSimSkin> skinClass = device.getSkinClass();
-		if (skinClass == null) {
-			skinClass = DEFAULT_SKIN_CLASS;
-		}
-		
+	public void initSkin(Class<? extends BrowserSimSkin> skinClass) {
 		try {
 			skin = skinClass.newInstance();//new AppleIPhone3Skin();//new NativeSkin();
 		} catch (InstantiationException e1) {
@@ -154,7 +152,7 @@ public class BrowserSim {
 		}
 		
 		Menu contextMenu = new Menu(shell);
-		shell.setMenu(contextMenu);
+		skin.setContextMenu(contextMenu);
 		createMenuItemsForContextMenu(contextMenu);
 		
 		browser.addProgressListener(new ProgressListener() {
@@ -194,6 +192,39 @@ public class BrowserSim {
 			public void changing(LocationEvent event) {
 			}
 		});
+		
+		browser.addLocationListener(new LocationListener() {
+			private BrowserFunction scrollListener = null;
+			public void changed(LocationEvent event) {
+				if (scrollListener != null) {
+					scrollListener.dispose();
+				}
+				scrollListener = new BrowserFunction(((Browser)event.widget), "_browserSim_scrollListener") {
+					public Object function(Object[] arguments) {
+						double pageYOffset = (Double) arguments[0];
+						if (pageYOffset > 0.0) {
+							skin.setAddressBarVisible(false);
+						}
+						return null;
+					}
+				};
+				
+				((Browser)event.widget).execute(
+						"(function() {" +
+							"var scrollListener = function(e){" +
+								"window._browserSim_scrollListener(window.pageYOffset)" +
+							"};" +
+							"window.addEventListener('scroll', scrollListener);" +
+							"window.addEventListener('beforeunload', function(e){" +
+								"window.removeEventListener('scroll', scrollListener);" +
+								"delete window._browserSim_scrollListener;" +
+							"})" +
+						"})();");
+			}
+			public void changing(LocationEvent event) {
+				skin.setAddressBarVisible(true);
+			}
+		});
 	}
 
 	private void initDevicesListHolder() {
@@ -203,11 +234,11 @@ public class BrowserSim {
 				DevicesListHolder devicesManager = (DevicesListHolder) o;
 				DevicesList devicesList = devicesManager.getDevicesList();
 				if (devicesList.getSelectedDeviceIndex() < devicesList.getDevices().size()) {
-					setDevice(devicesList.getDevices().get(devicesList.getSelectedDeviceIndex()));
+					setSelectedDevice(devicesList);
 				}
 				devicesList.addObserver(new Observer() {
 					public void update(Observable o, Object arg) {
-						setDevice(((DevicesList)o).getDevices().get(((DevicesList)o).getSelectedDeviceIndex()));
+						setSelectedDevice((DevicesList)o);
 					}
 				});
 			}
@@ -262,6 +293,18 @@ public class BrowserSim {
 					devicesListHolder.setDevicesList(newDevicesList);
 					devicesListHolder.notifyObservers();
 				}
+			}
+		});
+		
+		MenuItem useSkinsMenuItem = new MenuItem(devicesMenu, SWT.CHECK);
+		useSkinsMenuItem.setText("Use Skins");
+		useSkinsMenuItem.setSelection(devicesListHolder.getDevicesList().getUseSkins());
+		useSkinsMenuItem.addSelectionListener(new SelectionAdapter() {
+			public void widgetSelected(SelectionEvent e) {
+				MenuItem menuItem = (MenuItem) e.widget; 
+				DevicesList devicesList = devicesListHolder.getDevicesList();
+				devicesList.setUseSkins(menuItem.getSelection());
+				devicesList.notifyObservers();
 			}
 		});
 	}
@@ -361,34 +404,39 @@ public class BrowserSim {
 		return dropdown;
 	}
 	
-	public void setDevice(final Device device) {
+	public void setSelectedDevice(DevicesList devicesList) {
+		final Device device = devicesList.getDevices().get(devicesList.getSelectedDeviceIndex());
+		Class<? extends BrowserSimSkin> newSkinClass = getSkinClass(device, devicesList.getUseSkins());
 		String oldSkinUrl = null;
-		if (device.getSkinClass() != skin.getClass() 
-				|| (device.getSkinClass() == null && skin.getClass() != DEFAULT_SKIN_CLASS)) {
+		if (newSkinClass != skin.getClass()) {
 			oldSkinUrl = skin.getBrowser().getUrl();
 			skin.getBrowser().getShell().dispose();//XXX
-			initSkin(device);
+			initSkin(newSkinClass);
 		}
 		
-		skin.setBrowserSize(device.getWidth(), device.getHeight());
 		deviceOrientation = new DeviceOrientation(device.getWidth() < device.getHeight()
 					? DeviceOrientation.PORTRAIT
 					: DeviceOrientation.LANDSCAPE);
+		Rectangle clientArea = getMonitorClientArea();
+		skin.setOrientationAndSize(new Point(clientArea.width, clientArea.height), 
+				deviceOrientation.getOrientationAngle(),
+				new Point(device.getWidth(), device.getHeight()));
+		fixShellLocation(clientArea);
 		deviceOrientation.addObserver(new Observer() {
 			public void update(Observable o, Object arg) {
 				int orientationAngle = ((DeviceOrientation) o).getOrientationAngle();
 				
 				int minSize = Math.min(device.getWidth(), device.getHeight());
 				int maxSize = Math.max(device.getWidth(), device.getHeight());
-				
+				Point browserSize;
 				if (orientationAngle == DeviceOrientation.LANDSCAPE
 						|| orientationAngle == DeviceOrientation.LANDSCAPE_INVERTED) {
-					skin.setBrowserSize(maxSize, minSize);
+					browserSize = new Point(maxSize, minSize);
 				} else {
-					skin.setBrowserSize(minSize, maxSize);
+					browserSize = new Point(minSize, maxSize);
 				}
 				
-				fireOrientationChangeEvent(orientationAngle);
+				fireOrientationChangeEvent(orientationAngle, browserSize);
 			}
 		});
 
@@ -400,14 +448,20 @@ public class BrowserSim {
 			skin.getBrowser().refresh(); // only user agent and size of the browser is changed
 		}
 	}
+	
+	private static Class<? extends BrowserSimSkin> getSkinClass(Device device, boolean useSkins) {
+		return SkinMap.getInstance().getSkinClass(useSkins ? device.getSkinId() : null);
+	}
 
 	private void initOrientation(int orientation) {
 		skin.getBrowser().execute("window.onorientationchange = null;"
 				+ "window.orientation = " + orientation + ";");
 	}
 	
-	private void fireOrientationChangeEvent(int orientation) {
-		skin.setOrientation(orientation);
+	private void fireOrientationChangeEvent(int orientation, Point browserSize) {
+		Rectangle clientArea = getMonitorClientArea();
+		skin.setOrientationAndSize(new Point(clientArea.width, clientArea.height), orientation, browserSize);
+		fixShellLocation(clientArea);
 		skin.getBrowser().execute("window.orientation = " + orientation + ";"
 				+ "(function(){"
 				+ 		"var event = document.createEvent('Event');"
@@ -418,6 +472,45 @@ public class BrowserSim {
 				+ 		"}"
 				+	"})();"
 		);
+	}
+	
+	private void fixShellLocation(Rectangle clientArea) {
+		Shell shell = skin.getShell();
+		Point shellLocation = shell.getLocation();
+		Point shellSize = shell.getSize();
+		int bottomOverlap = shellLocation.y + shellSize.y - (clientArea.y + clientArea.height);
+		if (bottomOverlap > 0) {
+			if (shellLocation.y > bottomOverlap) {
+				shellLocation.y -= bottomOverlap;
+			} else {
+				shellLocation.y = 0;
+			}
+		}
+		
+		int rightOverlap = shellLocation.x + shellSize.x - (clientArea.x + clientArea.width);
+		if (rightOverlap > 0) {
+			if (shellLocation.x > rightOverlap) {
+				shellLocation.x -= rightOverlap;
+			} else {
+				shellLocation.x = 0;
+			}
+		}
+		
+		shell.setLocation(shellLocation);
+	}
+	
+	private Rectangle getMonitorClientArea() {
+		Monitor monitor = skin.getShell().getMonitor();
+		Rectangle clientArea = monitor.getClientArea();
+
+		/* on Linux returned monitor client area may be bigger
+		 * than the monitor bounds when multiple monitors are used.
+		 * The following code fixes this */
+		Rectangle bounds = monitor.getBounds();
+		clientArea.width = Math.min(clientArea.width, bounds.width);
+		clientArea.height = Math.min(clientArea.height, bounds.height);
+		
+		return clientArea;
 	}
 	
 	protected void rotateDevice(boolean counterclockwise) {

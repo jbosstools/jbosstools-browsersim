@@ -118,7 +118,7 @@ public class ManageDevicesDialog extends Dialog {
 		buttonAdd.addSelectionListener(new SelectionAdapter() {
 			public void widgetSelected(SelectionEvent e) {
 				Device newDevice = new EditDeviceDialog(shell,  SWT.APPLICATION_MODAL | SWT.SHELL_TRIM,
-						new Device(Messages.ManageDevicesDialog_NEW_DEVICE, 480, 800, Messages.ManageDevicesDialog_NEW_USER_AGENT)).open();
+						new Device(Messages.ManageDevicesDialog_NEW_DEVICE, 480, 800, Messages.ManageDevicesDialog_NEW_USER_AGENT, null)).open();
 				if (newDevice != null) {
 					devices.add(newDevice);
 					selectedDeviceIndex = devices.size() - 1;

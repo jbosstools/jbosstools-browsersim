@@ -12,9 +12,6 @@ package org.jboss.tools.vpe.browsersim.ui.skin;
 
 
 import org.eclipse.swt.SWT;
-import org.eclipse.swt.browser.BrowserFunction;
-import org.eclipse.swt.browser.LocationEvent;
-import org.eclipse.swt.browser.LocationListener;
 import org.eclipse.swt.events.MouseAdapter;
 import org.eclipse.swt.events.MouseEvent;
 import org.eclipse.swt.events.PaintEvent;
@@ -60,7 +57,7 @@ public class AppleIPhone3Skin implements BrowserSimSkin {
 	private static final Point[] REFRESH_LOCATION = {new Point(290, 28), new Point(447, 28)};
 	private static final Point[] STOP_LOCATION = {new Point(261, 33), new Point(412, 33)};
 	
-	private static final int[][] VISIBLE_REGION = {{
+	public static final int[][] VISIBLE_REGION = {{
 		62, 3, 257, 3, 258, 2, 258, 0, 320, 0, 320, 2, 321, 3, 330, 3, 331, 4, 334, 4, 335, 5, 338, 5, 339, 6, 341, 6,
 		342, 7, 344, 7, 345, 8, 347, 8, 348, 9, 349, 9, 350, 10, 351, 10, 353, 12, 354, 12, 355, 13, 356, 13, 359, 16,
 		360, 16, 368, 24, 368, 25, 371, 28, 371, 29, 373, 31, 373, 32, 374, 33, 374, 34, 375, 35, 375, 36, 376, 37,
@@ -116,7 +113,6 @@ public class AppleIPhone3Skin implements BrowserSimSkin {
 	private int currentOrientationIndex;
 	private CompositeImageDecorator addressBarDecorator;
 	private ImageList imageList;
-	private BrowserFunction scrollListener = null;
 
 	@Override
 	public void setBrowserFactory(IBrowserSimBrowserFactory browserFactory) {
@@ -251,37 +247,6 @@ public class AppleIPhone3Skin implements BrowserSimSkin {
 //		Label showAddressBarLabel = new Label(shell, SWT.NONE);
 //		showAddressBarLabel.setBounds(new Rectangle(33, 126, 320, 18));
 		browser = browserFactory.createBrowser(shell, SWT.NONE);
-		browser.addLocationListener(new LocationListener() {
-			public void changed(LocationEvent event) {
-				if (scrollListener != null) {
-					scrollListener.dispose();
-				}
-				scrollListener = new BrowserFunction(browser, "_browserSim_scrollListener") {
-					public Object function(Object[] arguments) {
-						double pageYOffset = (Double) arguments[VERTICAL];
-						if (pageYOffset > 0.0) {
-							setAddressBarVisible(false);
-						}
-						return null;
-					}
-				};
-				
-				browser.execute(
-						"(function() {" +
-							"var scrollListener = function(e){" +
-								"window._browserSim_scrollListener(window.pageYOffset)" +
-							"};" +
-							"window.addEventListener('scroll', scrollListener);" +
-							"window.addEventListener('beforeunload', function(e){" +
-								"window.removeEventListener('scroll', scrollListener);" +
-								"delete window._browserSim_scrollListener;" +
-							"})" +
-						"})();");
-			}
-			public void changing(LocationEvent event) {
-				setAddressBarVisible(true);
-			}
-		});
 
 		locationText.addListener(SWT.DefaultSelection, new Listener() {
 			public void handleEvent(Event e) {
@@ -294,7 +259,7 @@ public class AppleIPhone3Skin implements BrowserSimSkin {
 		shell.open();
 	}
 	
-	private void setAddressBarVisible(boolean visible) {
+	public void setAddressBarVisible(boolean visible) {
 		Rectangle browserBounds;
 		if (visible) {
 			browserBounds = BROWSER_RECTANGLE[currentOrientationIndex];
@@ -356,11 +321,6 @@ public class AppleIPhone3Skin implements BrowserSimSkin {
 	}
 
 	@Override
-	public void setBrowserSize(int width, int height) {
-		// TODO Auto-generated method stub
-	}
-
-	@Override
 	public void locationChanged(String location, boolean backEnabled, boolean forwardEnabled) {
 		locationText.setText(location);
 		backCompositeDecorator.setVisible(backEnabled);
@@ -380,11 +340,14 @@ public class AppleIPhone3Skin implements BrowserSimSkin {
 
 	@Override
 	public void statusTextChanged(String newStatusText) {
-		// TODO Auto-generated method stub
+		// not supported
 	}
 
+
 	@Override
-	public void setOrientation(int orientation) {
+	public void setOrientationAndSize(Point maximumShellSize, int orientation, Point browserSize) {
+		// browserSize is ignored by this skin
+		
 		if ((this.orientation == DeviceOrientation.PORTRAIT || this.orientation == DeviceOrientation.PORTRAIT_INVERTED) &&
 				(orientation == DeviceOrientation.LANDSCAPE || orientation == DeviceOrientation.LANDSCAPE_INVERTED)) {
 			//changed from portrait to landscape
@@ -397,6 +360,11 @@ public class AppleIPhone3Skin implements BrowserSimSkin {
 		setWidgetsBounds(currentOrientationIndex);
 		
 		this.orientation = orientation;
+	}
+
+	@Override
+	public void setContextMenu(Menu contextMenu) {
+		shell.setMenu(contextMenu);
 	}
 }
 

@@ -15,7 +15,6 @@ import org.eclipse.swt.events.DisposeEvent;
 import org.eclipse.swt.events.DisposeListener;
 import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.graphics.Point;
-import org.eclipse.swt.graphics.Rectangle;
 import org.eclipse.swt.layout.FillLayout;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
@@ -228,60 +227,26 @@ public class NativeSkin implements BrowserSimSkin {
 		return toolbar;
 	}
 	
-	public void setBrowserSize(int width, int height) {
+	@Override
+	public void setOrientationAndSize(Point maximumShellSize, int orientation, Point browserSize) {
 		GridData data = (GridData) browser.getLayoutData();
 		
-		Rectangle clientArea = getMonitorClientArea();
 		int shellWidthHint = SWT.DEFAULT;
-		if (width != Device.DEFAULT_SIZE) {
-			data.widthHint = width;
+		if (browserSize.x != Device.DEFAULT_SIZE) {
+			data.widthHint = browserSize.x;
 		} else if (data.widthHint == SWT.DEFAULT) {
-			shellWidthHint = clientArea.width;
+			shellWidthHint = maximumShellSize.x;
 		}
 		int shellHeightHint = SWT.DEFAULT;
-		if (height != Device.DEFAULT_SIZE) {
-			data.heightHint =  height;
+		if (browserSize.y != Device.DEFAULT_SIZE) {
+			data.heightHint =  browserSize.y;
 		} else if (data.heightHint == SWT.DEFAULT) {
-			shellHeightHint = clientArea.height;
+			shellHeightHint = maximumShellSize.y;
 		}
 		Point shellSize = shell.computeSize(shellWidthHint, shellHeightHint);
-		shellSize.x = Math.min(shellSize.x, clientArea.width);
-		shellSize.y = Math.min(shellSize.y, clientArea.height);
+		shellSize.x = Math.min(shellSize.x, maximumShellSize.x);
+		shellSize.y = Math.min(shellSize.y, maximumShellSize.y);
 		shell.setSize(shellSize);
-		
-		Rectangle shellBounds = shell.getBounds();
-		int bottomOverlap = shellBounds.y + shellBounds.height - (clientArea.y + clientArea.height);
-		if (bottomOverlap > 0) {
-			if (shellBounds.y > bottomOverlap) {
-				shellBounds.y -= bottomOverlap;
-			} else {
-				shellBounds.y = 0;
-			}
-		}
-		
-		int rightOverlap = shellBounds.x + shellBounds.width - (clientArea.x + clientArea.width);
-		if (rightOverlap > 0) {
-			if (shellBounds.x > rightOverlap) {
-				shellBounds.x -= rightOverlap;
-			} else {
-				shellBounds.x = 0;
-			}
-		}
-		
-		shell.setBounds(shellBounds);
-	}
-	
-	private Rectangle getMonitorClientArea() {
-		Rectangle clientArea = skinComposite.getMonitor().getClientArea();
-
-		/* on Linux returned monitor client area may be bigger
-		 * than the monitor bounds when multiple monitors are used.
-		 * The following code fixes this */
-		Rectangle bounds = skinComposite.getMonitor().getBounds();
-		clientArea.width = Math.min(clientArea.width, bounds.width);
-		clientArea.height = Math.min(clientArea.height, bounds.height);
-		
-		return clientArea;
 	}
 	
 	@Override
@@ -324,8 +289,12 @@ public class NativeSkin implements BrowserSimSkin {
 	}
 
 	@Override
-	public void setOrientation(int orientation) {
-		// do nothing, only browser size should change it should
-		// be done by calling setBrowserSize(int width, int height)
+	public void setAddressBarVisible(boolean visible) {
+		// not supported
+	}
+
+	@Override
+	public void setContextMenu(Menu contextMenu) {
+		// not supported
 	}
 }

@@ -10,6 +10,7 @@
  ******************************************************************************/
 package org.jboss.tools.vpe.browsersim.ui.skin;
 
+import org.eclipse.swt.graphics.Point;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Menu;
 import org.eclipse.swt.widgets.Shell;
@@ -27,10 +28,11 @@ public interface BrowserSimSkin {
 	Shell getShell();
 	Menu getMenuBar();
 	void setControlHandler(ControlHandler controlHandler);
-	void setBrowserSize(int width, int height);
 	
 	void locationChanged(String newLocation, boolean backEnabled, boolean forwardEnabled);
 	void progressChanged(int percents); // -1 for completed
 	void statusTextChanged(String newStatusText);
-	void setOrientation(int orientation);
+	void setOrientationAndSize(Point maximumShellSize, int orientation, Point browserSize);
+	void setAddressBarVisible(boolean visible);
+	void setContextMenu(Menu contextMenu);
 }

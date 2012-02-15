@@ -25,7 +25,7 @@ import org.jboss.tools.vpe.browsersim.util.ResourcesUtil;
  * 
  * @author Yahor Radtsevich (yradtsevich)
  */
-class ImageList {
+public class ImageList {
 	private Widget disposable;
 	private Map<String, Image> imageMap = new HashMap<String, Image>();
 	
