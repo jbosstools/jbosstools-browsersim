@@ -168,8 +168,10 @@ public class RunBrowserSimAction implements IWorkbenchWindowActionDelegate {
 		if (selection instanceof IStructuredSelection) {
 		    IStructuredSelection ssel = (IStructuredSelection) selection;
 		    Object firstSelectedElement = ssel.getFirstElement();
-		    file = (IFile) Platform.getAdapterManager().getAdapter(firstSelectedElement,
-		            IFile.class);
+		    if (firstSelectedElement != null) {
+			    file = (IFile) Platform.getAdapterManager().getAdapter(firstSelectedElement,
+			            IFile.class);
+		    }
 		    
 		    if (file == null) {
 		        if (firstSelectedElement instanceof IAdaptable) {
