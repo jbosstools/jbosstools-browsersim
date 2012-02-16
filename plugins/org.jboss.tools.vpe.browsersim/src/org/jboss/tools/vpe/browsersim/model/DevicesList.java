@@ -21,11 +21,12 @@ import java.util.Observable;
 public class DevicesList extends Observable {
 	private List<Device> devices;
 	private int selectedDeviceIndex;
-	private boolean useSkins = true;
+	private boolean useSkins;
 
-	public DevicesList(List<Device> devices, int selectedDeviceIndex) {
+	public DevicesList(List<Device> devices, int selectedDeviceIndex, boolean useSkins) {
 		this.devices = devices;
 		this.selectedDeviceIndex = selectedDeviceIndex;
+		this.useSkins = useSkins;
 	}
 
 	public List<Device> getDevices() {

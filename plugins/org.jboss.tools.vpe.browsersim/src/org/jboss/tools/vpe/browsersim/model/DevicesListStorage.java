@@ -33,7 +33,7 @@ public class DevicesListStorage {
 	private static final String DEFAULT_PREFERENCES_RESOURCE = "config/devices.cfg";
 	private static final String USER_PREFERENCES_FOLDER = "org.jboss.tools.vpe.browsersim";
 	private static final String USER_PREFERENCES_FILE = "devices.cfg";
-	private static final int CURRENT_CONFIG_VERSION = 2;
+	private static final int CURRENT_CONFIG_VERSION = 3;
 
 	public static void saveUserDefinedDevicesList(DevicesList devicesList) {
 		File configFolder = new File(USER_PREFERENCES_FOLDER);
@@ -74,7 +74,7 @@ public class DevicesListStorage {
 			Device device = new Device("Default", 1024, 768, null, null);
 			List<Device> devices = new ArrayList<Device>();
 			devices.add(device);
-			devicesList = new DevicesList(devices, 0);
+			devicesList = new DevicesList(devices, 0, true);
 		}
 
 		return devicesList;
@@ -85,6 +85,7 @@ public class DevicesListStorage {
 		
 		writer.write("ConfigVersion=" + String.valueOf(CURRENT_CONFIG_VERSION) + "\n");
 		writer.write("SelectedDeviceIndex=" + String.valueOf(devicesList.getSelectedDeviceIndex()) + "\n");
+		writer.write("UseSkins=" + String.valueOf(devicesList.getUseSkins()) + "\n");
 		
 		for (Device device : devicesList.getDevices()) {
 			writer.write( encode(device.getName() ));
@@ -116,6 +117,7 @@ public class DevicesListStorage {
 		
 		List<Device> devices = null;
 		int selectedDeviceIndex = 0;
+		boolean useSkins = true;
 		try {
 			String nextLine;
 			
@@ -134,6 +136,14 @@ public class DevicesListStorage {
 					Matcher matcher = pattern.matcher(nextLine);
 					if (matcher.matches()) {
 						selectedDeviceIndex = Integer.parseInt(matcher.group(1));
+					}
+				}
+				
+				if ((nextLine = reader.readLine()) != null) {
+					Pattern pattern = Pattern.compile("UseSkins=(true|false)");
+					Matcher matcher = pattern.matcher(nextLine);
+					if (matcher.matches()) {
+						useSkins = Boolean.parseBoolean(matcher.group(1));
 					}
 				}
 				
@@ -164,7 +174,7 @@ public class DevicesListStorage {
 		if (devices == null || devices.size() <= selectedDeviceIndex) {
 			return null;
 		} else { 
-			return new DevicesList(devices, selectedDeviceIndex);
+			return new DevicesList(devices, selectedDeviceIndex, useSkins);
 		}
 	}
 

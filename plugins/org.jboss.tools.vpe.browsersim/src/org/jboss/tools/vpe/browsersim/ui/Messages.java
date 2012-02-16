@@ -34,7 +34,9 @@ public class Messages {
 	public static String EditDeviceDialog_HEIGHT;
 	public static String EditDeviceDialog_MANAGE_DEVICES;
 	public static String EditDeviceDialog_NAME;
+	public static String EditDeviceDialog_NONE;
 	public static String EditDeviceDialog_OK;
+	public static String EditDeviceDialog_SKIN;
 	public static String EditDeviceDialog_USER_AGENT;
 	public static String EditDeviceDialog_WIDTH;
 	public static String ManageDevicesDialog_ADD;
@@ -44,11 +46,13 @@ public class Messages {
 	public static String ManageDevicesDialog_EDIT;
 	public static String ManageDevicesDialog_HEIGHT;
 	public static String ManageDevicesDialog_NAME;
+	public static String ManageDevicesDialog_NONE;
 	public static String ManageDevicesDialog_NEW_DEVICE;
 	public static String ManageDevicesDialog_NEW_USER_AGENT;
 	public static String ManageDevicesDialog_OK;
 	public static String ManageDevicesDialog_REMOVE;
 	public static String ManageDevicesDialog_REVERT_ALL;
+	public static String ManageDevicesDialog_SKIN;
 	public static String ManageDevicesDialog_LOAD_DEFAULTS;
 	public static String ManageDevicesDialog_USER_AGENT;
 	public static String ManageDevicesDialog_WIDTH;

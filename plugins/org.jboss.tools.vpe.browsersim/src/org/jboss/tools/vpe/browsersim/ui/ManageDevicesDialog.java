@@ -79,7 +79,7 @@ public class ManageDevicesDialog extends Dialog {
 	 */
 	private void createContents() {
 		shell = new Shell(getParent(), getStyle());
-		shell.setSize(450, 300);
+		shell.setSize(650, 450);
 		shell.setText(getText());
 		shell.setLayout(new GridLayout(2, false));
 
@@ -108,6 +108,10 @@ public class ManageDevicesDialog extends Dialog {
 		TableColumn tableColumnUseragent = new TableColumn(table, SWT.NONE);
 		tableColumnUseragent.setWidth(100);
 		tableColumnUseragent.setText(Messages.ManageDevicesDialog_USER_AGENT);
+		
+		TableColumn tableColumnSkin = new TableColumn(table, SWT.NONE);
+		tableColumnSkin.setWidth(100);
+		tableColumnSkin.setText(Messages.ManageDevicesDialog_SKIN);
 		
 		Composite compositeControls = new Composite(shell, SWT.NONE);
 		compositeControls.setLayoutData(new GridData(SWT.LEFT, SWT.TOP, false, false, 1, 1));
@@ -188,7 +192,7 @@ public class ManageDevicesDialog extends Dialog {
 		shell.setDefaultButton(buttonOk);
 		buttonOk.addSelectionListener(new SelectionAdapter() {
 			public void widgetSelected(SelectionEvent e) {
-				resultDevicesList = new DevicesList(devices, selectedDeviceIndex);
+				resultDevicesList = new DevicesList(devices, selectedDeviceIndex, oldDevicesList.getUseSkins());
 				shell.close();
 			}
 		});
@@ -214,7 +218,8 @@ public class ManageDevicesDialog extends Dialog {
 					device.getName(), 
 					device.getWidth() == Device.DEFAULT_SIZE ? Messages.ManageDevicesDialog_DEFAULT : String.valueOf(device.getWidth()),
 					device.getHeight() == Device.DEFAULT_SIZE ? Messages.ManageDevicesDialog_DEFAULT : String.valueOf(device.getHeight()),
-					device.getUserAgent() == null ? Messages.ManageDevicesDialog_DEFAULT : device.getUserAgent()
+					device.getUserAgent() == null ? Messages.ManageDevicesDialog_DEFAULT : device.getUserAgent(),
+					device.getSkinId() == null ?  Messages.ManageDevicesDialog_NONE : device.getSkinId()
 			});
 		}
 		table.setSelection(selectedDeviceIndex);

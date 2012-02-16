@@ -10,6 +10,12 @@
  ******************************************************************************/
 package org.jboss.tools.vpe.browsersim.ui;
 
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.Comparator;
+import java.util.List;
+
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.FocusAdapter;
 import org.eclipse.swt.events.FocusEvent;
@@ -21,6 +27,7 @@ import org.eclipse.swt.layout.FillLayout;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Button;
+import org.eclipse.swt.widgets.Combo;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Dialog;
 import org.eclipse.swt.widgets.Display;
@@ -28,6 +35,7 @@ import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Shell;
 import org.eclipse.swt.widgets.Text;
 import org.jboss.tools.vpe.browsersim.model.Device;
+import org.jboss.tools.vpe.browsersim.model.SkinMap;
 
 /**
  * @author Yahor Radtsevich (yradtsevich)
@@ -43,6 +51,8 @@ public class EditDeviceDialog extends Dialog {
 	private Button checkButtonWidth;
 	private Button checkButtonHeight;
 	private Button checkButtonUserAgent;
+	private Combo comboSkin;
+	private List<String> skinIds;
 
 	/**
 	 * Create the dialog.
@@ -134,6 +144,23 @@ public class EditDeviceDialog extends Dialog {
 		
 		attachCheckBoxToText(checkButtonUserAgent, textUserAgent);
 		
+		Label labelSkin = new Label(shell, SWT.NONE);
+		labelSkin.setText(Messages.EditDeviceDialog_SKIN);
+		
+		comboSkin = new Combo (shell, SWT.READ_ONLY);
+		comboSkin.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, true, false, 1, 1));
+		
+		skinIds = new ArrayList<String>(SkinMap.getInstance().getSkinIds());
+		Collections.sort(skinIds, new Comparator<String>() {
+			@Override
+			public int compare(String o1, String o2) {
+				return o1.toLowerCase().compareTo(o2.toLowerCase());
+			}
+		});		
+		skinIds.add(0, Messages.EditDeviceDialog_NONE);
+		comboSkin.setItems(skinIds.toArray(new String[0]));
+		comboSkin.setText(initialDevice.getSkinId() == null ? Messages.EditDeviceDialog_NONE : initialDevice.getSkinId());
+		
 		Composite composite = new Composite(shell, SWT.NONE);
 		composite.setLayout(new FillLayout(SWT.HORIZONTAL));
 		composite.setLayoutData(new GridData(SWT.RIGHT, SWT.BOTTOM, true, true, 2, 1));
@@ -146,7 +173,7 @@ public class EditDeviceDialog extends Dialog {
 						checkButtonWidth.getSelection() ? Integer.valueOf("0" + textWidth.getText()) : Device.DEFAULT_SIZE,
 						checkButtonHeight.getSelection() ? Integer.valueOf("0" + textHeight.getText()) : Device.DEFAULT_SIZE,
 						checkButtonUserAgent.getSelection() ? textUserAgent.getText() : null,
-								null);
+						comboSkin.getSelectionIndex() == 0 ? null : skinIds.get(comboSkin.getSelectionIndex()));
 				shell.close();
 			}
 		});
