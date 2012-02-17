@@ -1,5 +1,7 @@
 package org.jboss.tools.vpe.browsersim.ui.skin.ios;
 
+import java.util.Arrays;
+
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.MouseAdapter;
 import org.eclipse.swt.events.MouseEvent;
@@ -21,13 +23,15 @@ import org.eclipse.swt.widgets.Shell;
 import org.eclipse.swt.widgets.Text;
 import org.jboss.tools.vpe.browsersim.browser.BrowserSimBrowser;
 import org.jboss.tools.vpe.browsersim.browser.IBrowserSimBrowserFactory;
-import org.jboss.tools.vpe.browsersim.model.Device;
 import org.jboss.tools.vpe.browsersim.model.DeviceOrientation;
 import org.jboss.tools.vpe.browsersim.ui.ControlHandler;
+import org.jboss.tools.vpe.browsersim.ui.skin.AppleIPhone3Skin;
 import org.jboss.tools.vpe.browsersim.ui.skin.BrowserSimSkin;
 
 public class AppleIPhone3ResizableSkin implements BrowserSimSkin {
-	private static final Point VERTICAL_BORDERS_SIZE = new Point(384 - 320, 727 - 480);
+	private static final Point NORMAL_SKREEN_SIZE = new Point(320, 480);
+	private static final Point NORMAL_SKIN_SIZE = new Point(384, 727);
+	private static final Point VERTICAL_BORDERS_SIZE = new Point(NORMAL_SKIN_SIZE.x - NORMAL_SKREEN_SIZE.x, NORMAL_SKIN_SIZE.y - NORMAL_SKREEN_SIZE.y);
 	private static final Point HORIZONTAL_BORDERS_SIZE = new Point(VERTICAL_BORDERS_SIZE.y, VERTICAL_BORDERS_SIZE.x);
 	private static final IPhoneSkinDescriptor VERTICAL_IPHONE3_DESCRIPTOR;
 	static {
@@ -125,32 +129,67 @@ public class AppleIPhone3ResizableSkin implements BrowserSimSkin {
 	}
 
 	private void setShellRegion() {
-		shell.setRegion(null);
-		display.asyncExec(new Runnable() {
-			
-			@Override
-			public void run() {
-				Region region = new Region();		
-//		shellRegion.add(AppleIPhone3Skin.VISIBLE_REGION[0]);
-				GC gc = new GC(shell);
-				final Image screenshot = new Image(display, shell.getBounds());
-				gc.copyArea(screenshot, 0, 0);
-				gc.dispose();
-				ImageData imageData = screenshot.getImageData();
-				region.add(0, 0, imageData.width, imageData.height);
-				int firstPixel = imageData.getPixel(0, 0);
-				for (int i = 0; i < imageData.height; i++) {
-					for (int j = 0; j < imageData.width; j++) {
-						if (imageData.getPixel(j, i) == firstPixel) {
-							region.subtract(j, i, 1, 1);
-						}
-					}
-				}
-				screenshot.dispose();
-				shell.setRegion(region);
-				region.dispose();
+		int[] normalRegion;
+		if (vertical) {
+			normalRegion = AppleIPhone3Skin.VISIBLE_REGION[0];
+		} else {
+			normalRegion = AppleIPhone3Skin.VISIBLE_REGION[1];
+		}
+		
+		Point normalRegionSize = new Point(0, 0);		
+		for (int i = 0; i < normalRegion.length; i += 2) {
+			if (normalRegionSize.x < normalRegion[i]) {
+				normalRegionSize.x = normalRegion[i];
 			}
-		});
+			if (normalRegionSize.y < normalRegion[i + 1]) {
+				normalRegionSize.y = normalRegion[i + 1];
+			}
+		}
+		
+		Point normalRegionCenter = new Point(normalRegionSize.x / 2, normalRegionSize.y / 2);
+		Point shellSize = shell.getSize();
+		Point regionIncrement = new Point(shellSize.x - normalRegionSize.x, shellSize.y - normalRegionSize.y);
+		
+		int[] shellRegion = Arrays.copyOf(normalRegion, normalRegion.length);
+		for (int i = 0; i < shellRegion.length; i += 2) {
+			if (shellRegion[i] > normalRegionCenter.x) {
+				shellRegion[i] += regionIncrement.x;
+			}
+			if (shellRegion[i + 1] > normalRegionCenter.y) {
+				shellRegion[i + 1] += regionIncrement.y;
+			}
+		}
+		Region region = new Region();
+		region.add(shellRegion);
+		shell.setRegion(region);
+		region.dispose();
+		////////////////////////////////
+//		shell.setRegion(null);
+//		display.asyncExec(new Runnable() {
+//			
+//			@Override
+//			public void run() {
+//				Region region = new Region();		
+////		shellRegion.add(AppleIPhone3Skin.VISIBLE_REGION[0]);
+//				GC gc = new GC(shell);
+//				final Image screenshot = new Image(display, shell.getBounds());
+//				gc.copyArea(screenshot, 0, 0);
+//				gc.dispose();
+//				ImageData imageData = screenshot.getImageData();
+//				region.add(0, 0, imageData.width, imageData.height);
+//				int firstPixel = imageData.getPixel(0, 0);
+//				for (int i = 0; i < imageData.height; i++) {
+//					for (int j = 0; j < imageData.width; j++) {
+//						if (imageData.getPixel(j, i) == firstPixel) {
+//							region.subtract(j, i, 1, 1);
+//						}
+//					}
+//				}
+//				screenshot.dispose();
+//				shell.setRegion(region);
+//				region.dispose();
+//			}
+//		});
 	}
 
 	private void bindIPhoneCompositeControls() {
