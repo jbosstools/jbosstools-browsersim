@@ -10,8 +10,7 @@
  ******************************************************************************/
 package org.jboss.tools.vpe.browsersim.ui;
 
-import java.awt.Desktop;
-import java.io.IOException;
+import java.net.MalformedURLException;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.net.URL;
@@ -37,6 +36,7 @@ import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.graphics.Point;
 import org.eclipse.swt.graphics.Rectangle;
+import org.eclipse.swt.program.Program;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Menu;
 import org.eclipse.swt.widgets.MenuItem;
@@ -340,24 +340,19 @@ public class BrowserSim {
 	}
 
 	public void addOpenInDefaultBrowserItem(Menu menu) {
-		if (Desktop.isDesktopSupported()) {
-			if (Desktop.getDesktop().isSupported(Desktop.Action.BROWSE)) {
-				MenuItem openInDefaultBrowser = new MenuItem(menu, SWT.PUSH);
-				openInDefaultBrowser.setText(Messages.BrowserSim_OPEN_IN_DEFAULT_BROWSER);
-				openInDefaultBrowser.addSelectionListener(new SelectionAdapter() {
-					public void widgetSelected(SelectionEvent e) {
-						try {
-							URL url = new URL(skin.getBrowser().getUrl()); // validate URL (to do not open 'about:blank' and similar)
-							Desktop.getDesktop().browse(url.toURI());
-						} catch (IOException e1) {
-							showErrorMessage(skin.getShell(), Messages.BrowserSim_COULD_NOT_OPEN_DEFAULT_BROWSER + e1.getMessage());
-						} catch (URISyntaxException e2) {
-							showErrorMessage(skin.getShell(), Messages.BrowserSim_COULD_NOT_OPEN_DEFAULT_BROWSER + e2.getMessage());
-						} 
+		MenuItem openInDefaultBrowser = new MenuItem(menu, SWT.PUSH);
+		openInDefaultBrowser.setText(Messages.BrowserSim_OPEN_IN_DEFAULT_BROWSER);
+		openInDefaultBrowser.addSelectionListener(new SelectionAdapter() {
+			public void widgetSelected(SelectionEvent e) {
+					URL url;
+					try {
+						url = new URL(skin.getBrowser().getUrl());// validate URL (to do not open 'about:blank' and similar)
+						Program.launch(url.toString());
+					} catch (MalformedURLException e1) {
+						showErrorMessage(skin.getShell(), Messages.BrowserSim_COULD_NOT_OPEN_DEFAULT_BROWSER + e1.getMessage());
 					}
-				});
 			}
-		}
+		});
 	}
 	
 	private void showErrorMessage(Shell shell, String message) {
