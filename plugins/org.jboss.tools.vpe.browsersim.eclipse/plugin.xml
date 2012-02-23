@@ -60,4 +60,19 @@
           </location>
    </browser>
    </extension>
+	<extension point="org.eclipse.ui.perspectiveExtensions"> 
+		<perspectiveExtension targetID="org.jboss.tools.common.ui.JBossPerspective"> 
+			<actionSet id="org.jboss.tools.vpe.browsersim.eclipse.actionSet"/> 
+		</perspectiveExtension> 
+	</extension>
+	<extension point="org.eclipse.ui.perspectiveExtensions"> 
+		<perspectiveExtension targetID="org.jboss.tools.jst.web.ui.WebDevelopmentPerspective"> 
+			<actionSet id="org.jboss.tools.vpe.browsersim.eclipse.actionSet"/> 
+		</perspectiveExtension> 
+	</extension>
+	<extension point="org.eclipse.ui.perspectiveExtensions"> 
+		<perspectiveExtension targetID="org.jboss.tools.jst.cssPerspective"> 
+			<actionSet id="org.jboss.tools.vpe.browsersim.eclipse.actionSet"/> 
+		</perspectiveExtension> 
+	</extension>
 </plugin>
