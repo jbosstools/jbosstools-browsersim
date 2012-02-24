@@ -45,6 +45,7 @@ import org.eclipse.swt.widgets.MessageBox;
 import org.eclipse.swt.widgets.Monitor;
 import org.eclipse.swt.widgets.Shell;
 import org.jboss.tools.vpe.browsersim.browser.BrowserSimBrowser;
+import org.jboss.tools.vpe.browsersim.browser.PlatformUtil;
 import org.jboss.tools.vpe.browsersim.browser.WebKitBrowserFactory;
 import org.jboss.tools.vpe.browsersim.model.Device;
 import org.jboss.tools.vpe.browsersim.model.DeviceOrientation;
@@ -70,6 +71,10 @@ public class BrowserSim {
 	private Image[] icons;
 
 	public static void main(String[] args) {
+		if (PlatformUtil.OS_MACOSX.equals(PlatformUtil.getOs())) {
+			// set application name for Mac OS X menu-bar https://issues.jboss.org/browse/JBIDE-11048
+			System.setProperty("com.apple.mrj.application.apple.menu.about.name", Messages.BrowserSim_BROWSER_SIM);//$NON-NLS-1$
+		}
 		String homeUrl;
 		if (args.length > 0) {
 			String lastArg = args[args.length - 1];

@@ -17,13 +17,14 @@ import org.eclipse.swt.SWT;
  */
 public class PlatformUtil {
 
+	public static final String OS_MACOSX = "macosx";
 	public static final String CURRENT_PLATFORM;
 	static {
 		String os = getOs();
 		String ws = getWs();
 		String arch = getArch();
 
-		if ("macosx".equals(os) && "x86".equals(arch)) {
+		if (OS_MACOSX.equals(os) && "x86".equals(arch)) {
 			CURRENT_PLATFORM = ws + '.' + os; // special case for MacOSX x86 (its SWT bundle has name org.eclipse.swt.cocoa.macosx)
 		} else {			
 			CURRENT_PLATFORM = ws + '.' + os + '.' + arch;
@@ -45,13 +46,13 @@ public class PlatformUtil {
 	/*
 	 * Copy of org.eclipse.swt.internal.Library.os()
 	 */
-	private static String getOs() {
+	public static String getOs() {
 		String osName = System.getProperty("os.name"); //$NON-NLS-1$
 		if (osName.equals ("Linux")) return "linux"; //$NON-NLS-1$ $NON-NLS-2$
 		if (osName.equals ("AIX")) return "aix"; //$NON-NLS-1$ $NON-NLS-2$
 		if (osName.equals ("Solaris") || osName.equals ("SunOS")) return "solaris"; //$NON-NLS-1$ $NON-NLS-2$ $NON-NLS-3$
 		if (osName.equals ("HP-UX")) return "hpux"; //$NON-NLS-1$ $NON-NLS-2$
-		if (osName.equals ("Mac OS X")) return "macosx"; //$NON-NLS-1$ $NON-NLS-2$
+		if (osName.equals ("Mac OS X")) return OS_MACOSX; //$NON-NLS-1$ $NON-NLS-2$
 		if (osName.startsWith ("Win")) return "win32"; //$NON-NLS-1$ $NON-NLS-2$
 		return osName;
 	}
