@@ -34,6 +34,7 @@ import org.eclipse.swt.events.MenuAdapter;
 import org.eclipse.swt.events.MenuEvent;
 import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
+import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.graphics.Point;
 import org.eclipse.swt.graphics.Rectangle;
 import org.eclipse.swt.program.Program;
@@ -52,19 +53,21 @@ import org.jboss.tools.vpe.browsersim.model.DevicesListHolder;
 import org.jboss.tools.vpe.browsersim.model.DevicesListStorage;
 import org.jboss.tools.vpe.browsersim.model.SkinMap;
 import org.jboss.tools.vpe.browsersim.ui.skin.BrowserSimSkin;
+import org.jboss.tools.vpe.browsersim.util.ResourcesUtil;
 
 /**
  * @author Yahor Radtsevich (yradtsevich)
  */
 public class BrowserSim {
 	private static final String DEFAULT_URL = "about:blank"; //"http://www.w3schools.com/js/tryit_view.asp?filename=try_nav_useragent"; //$NON-NLS-1$
+	private static final String[] BROWSERSIM_ICONS = {"icons/browsersim_16px.png", "icons/browsersim_32px.png", "icons/browsersim_64px.png", "icons/browsersim_128px.png", "icons/browsersim_256px.png", }; //$NON-NLS-1$//$NON-NLS-2$//$NON-NLS-3$//$NON-NLS-4$//$NON-NLS-5$
 	private Display display;
 	private String homeUrl;
 	private DevicesListHolder devicesListHolder;
 	private DeviceOrientation deviceOrientation;
 	private BrowserSimSkin skin;
-//	private BrowserSimBrowser browser;
 	private ControlHandler controlHandler;
+	private Image[] icons;
 
 	public static void main(String[] args) {
 		String homeUrl;
@@ -87,7 +90,7 @@ public class BrowserSim {
 		}
 		Device defaultDevice = devicesList.getDevices().get(devicesList.getSelectedDeviceIndex());
 		Display display = new Display();
-		BrowserSim browserSim = new BrowserSim(display, homeUrl);
+		BrowserSim browserSim = new BrowserSim(display, homeUrl);		
 		browserSim.initSkin(getSkinClass(defaultDevice, devicesList.getUseSkins()));
 		browserSim.initDevicesListHolder();
 		browserSim.devicesListHolder.setDevicesList(devicesList);
@@ -98,12 +101,26 @@ public class BrowserSim {
 			if (!display.readAndDispatch())
 				display.sleep();
 		}
+		browserSim.dispose();
 		display.dispose();
 	}
 
 	public BrowserSim(Display display, String homeUrl) {
 		this.display = display;
 		this.homeUrl = homeUrl;
+		
+		this.icons = new Image[BROWSERSIM_ICONS.length];
+		for (int i = 0; i < BROWSERSIM_ICONS.length; i++) {
+			String iconLocation = BROWSERSIM_ICONS[i];
+			icons[i] = new Image(display, ResourcesUtil.getResourceAsStream(iconLocation));
+		}
+	}
+	
+	private void dispose() {
+		for (Image icon : icons) {
+			icon.dispose();
+		}
+		icons = null;
 	}
 	
 	public void initSkin(Class<? extends BrowserSimSkin> skinClass) {
@@ -134,7 +151,7 @@ public class BrowserSim {
 				}
 			}
 		});
-		shell.setText(Messages.BrowserSim_BROWSER_SIM);
+		setShellAttibutes();
 		
 		BrowserSimBrowser browser = skin.getBrowser();
 		controlHandler = new ControlHandlerImpl(browser);
@@ -225,6 +242,14 @@ public class BrowserSim {
 				skin.setAddressBarVisible(true);
 			}
 		});
+	}
+	
+	private void setShellAttibutes() {
+		Shell shell = skin.getShell();
+		if (shell != null) {
+			shell.setImages(icons);
+			shell.setText(Messages.BrowserSim_BROWSER_SIM);
+		}
 	}
 
 	private void initDevicesListHolder() {
