@@ -12,3 +12,8 @@ Require-Bundle: org.eclipse.swt;bundle-version="3.7.0",
  org.jboss.tools.vpe.browsersim.browser;bundle-version="1.0.0"
 Export-Package: org.jboss.tools.vpe.browsersim.ui
 Bundle-Vendor: JBoss by Red Hat
+Eclipse-PlatformFilter: (|
+                            (&(osgi.ws=win32)(osgi.os=win32)(osgi.arch=x86))
+                            (&(osgi.ws=cocoa)(osgi.os=macosx) (|(osgi.arch=x86)(osgi.arch=x86_64)) ) 
+                            (&(osgi.ws=gtk)(osgi.os=linux) (|(osgi.arch=x86)(osgi.arch=x86_64)) )
+                        )
