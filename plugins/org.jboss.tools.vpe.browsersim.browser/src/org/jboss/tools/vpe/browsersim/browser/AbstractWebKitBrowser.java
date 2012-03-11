@@ -26,10 +26,18 @@ public abstract class AbstractWebKitBrowser extends BrowserSimBrowser {
 
 	@Override
 	public boolean setUrl(String url, String postData, String[] headers) {
-		setCustomUserAgent(defaultUserAgent);
-		boolean result = super.setUrl(url, postData, headers);
-		setCustomUserAgent(defaultUserAgent);
-		return result;
+		if (url != null && url.trim().isEmpty()) {
+			/* If the url is empty, then just ignore it to avoid
+			 * StringIndexOutOfBoundsException under Linux (JBIDE-11165)
+			 * (in the case if url == null, then super.setUrl
+			 * will throw an IllegalArgumentException, thus we do not need to handle this).*/
+			return false;
+		} else {
+			setCustomUserAgent(defaultUserAgent);
+			boolean result = super.setUrl(url, postData, headers);
+			setCustomUserAgent(defaultUserAgent);
+			return result;
+		}
 	}
 
 	@Override
