@@ -44,7 +44,7 @@ public class IOSPageTitleStyledText extends StyledText {
 		if(SWT.getPlatform() == "win32") {
 			font = new Font(device, "Arial", 9, style);	
 		} else if (SWT.getPlatform() == "gtk") {
-			font = new Font(device, "Baekmuk Batang", 9, style);		
+			font = new Font(device, "Helvetica", 9, style);		
 		} else if (SWT.getPlatform() == "cocoa") {
 			font = new Font(device, "Helvetica", 12, style);
 		} else {
