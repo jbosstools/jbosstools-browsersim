@@ -30,6 +30,7 @@ public interface BrowserSimSkin {
 	void setControlHandler(ControlHandler controlHandler);
 	
 	void locationChanged(String newLocation, boolean backEnabled, boolean forwardEnabled);
+	void pageTitleChanged(String newTitle);
 	void progressChanged(int percents); // -1 for completed
 	void statusTextChanged(String newStatusText);
 	void setOrientationAndSize(Point maximumShellSize, int orientation, Point browserSize);

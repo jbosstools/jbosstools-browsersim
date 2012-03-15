@@ -5,9 +5,6 @@ import java.util.Arrays;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.MouseAdapter;
 import org.eclipse.swt.events.MouseEvent;
-import org.eclipse.swt.graphics.GC;
-import org.eclipse.swt.graphics.Image;
-import org.eclipse.swt.graphics.ImageData;
 import org.eclipse.swt.graphics.Point;
 import org.eclipse.swt.graphics.Region;
 import org.eclipse.swt.layout.FillLayout;
@@ -284,6 +281,12 @@ public class AppleIPhone3ResizableSkin implements BrowserSimSkin {
 		iPhoneComposite.getBackButtonComposite().setEnabled(backEnabled);
 		iPhoneComposite.getForwardButtonComposite().setEnabled(forwardEnabled);
 	}
+	
+
+	@Override
+	public void pageTitleChanged(String newTitle) {
+		iPhoneComposite.getPageTitleStyledText().setText(newTitle);
+	}
 
 	@Override
 	public void progressChanged(int percents) {
@@ -306,6 +309,7 @@ public class AppleIPhone3ResizableSkin implements BrowserSimSkin {
 	public void setOrientationAndSize(Point maximumShellSize, int orientation, Point browserSize) {
 		vertical = (orientation == DeviceOrientation.PORTRAIT || orientation == DeviceOrientation.PORTRAIT_INVERTED);
 		String urlTextText = iPhoneComposite.getUrlText().getText();
+		String pageTitle = iPhoneComposite.getPageTitleStyledText().getText();
 		boolean backEnabled = iPhoneComposite.getBackButtonComposite().getEnabled();
 		boolean forwardEnabled = iPhoneComposite.getForwardButtonComposite().getEnabled();
 		boolean navBarVisible = iPhoneComposite.isNavBarCompositeVisible();
@@ -344,6 +348,7 @@ public class AppleIPhone3ResizableSkin implements BrowserSimSkin {
 		setShellRegion();
 		
 		iPhoneComposite.getUrlText().setText(urlTextText);
+		iPhoneComposite.getPageTitleStyledText().setText(pageTitle);
 		iPhoneComposite.getBackButtonComposite().setEnabled(backEnabled);
 		iPhoneComposite.getForwardButtonComposite().setEnabled(forwardEnabled);
 		iPhoneComposite.setNavBarCompositeVisible(navBarVisible);

@@ -366,5 +366,10 @@ public class AppleIPhone3Skin implements BrowserSimSkin {
 	public void setContextMenu(Menu contextMenu) {
 		shell.setMenu(contextMenu);
 	}
+
+	@Override
+	public void pageTitleChanged(String newTitle) {
+		// not supported	
+	}
 }
 

@@ -1,5 +1,6 @@
 package org.jboss.tools.vpe.browsersim.ui.skin.ios;
 import org.eclipse.swt.SWT;
+import org.eclipse.swt.custom.StyledText;
 import org.eclipse.swt.events.MouseAdapter;
 import org.eclipse.swt.events.MouseEvent;
 import org.eclipse.swt.layout.FormAttachment;
@@ -146,6 +147,10 @@ public class AppleIPhoneComposite extends Composite {
 	
 	public ProgressBar getProgressBar() {
 		return navBarComposite.getProgressBar();
+	}
+	
+	public StyledText getPageTitleStyledText() {
+		return navBarComposite.getPageTitleStyledText();
 	}
 	
 	@Override

@@ -284,6 +284,11 @@ public class NativeSkin implements BrowserSimSkin {
 	}
 
 	@Override
+	public void pageTitleChanged(String newTitle) {
+		// not supported
+	}
+
+	@Override
 	public void statusTextChanged(String statusText) {
 		statusLabel.setText(statusText);
 	}
@@ -297,4 +302,5 @@ public class NativeSkin implements BrowserSimSkin {
 	public void setContextMenu(Menu contextMenu) {
 		// not supported
 	}
+	
 }

@@ -28,6 +28,8 @@ import org.eclipse.swt.browser.ProgressEvent;
 import org.eclipse.swt.browser.ProgressListener;
 import org.eclipse.swt.browser.StatusTextEvent;
 import org.eclipse.swt.browser.StatusTextListener;
+import org.eclipse.swt.browser.TitleEvent;
+import org.eclipse.swt.browser.TitleListener;
 import org.eclipse.swt.events.DisposeEvent;
 import org.eclipse.swt.events.DisposeListener;
 import org.eclipse.swt.events.MenuAdapter;
@@ -245,6 +247,13 @@ public class BrowserSim {
 			}
 			public void changing(LocationEvent event) {
 				skin.setAddressBarVisible(true);
+			}
+		});
+		
+		browser.addTitleListener(new TitleListener() {
+			@Override
+			public void changed(TitleEvent event) {
+				skin.pageTitleChanged(event.title);
 			}
 		});
 	}

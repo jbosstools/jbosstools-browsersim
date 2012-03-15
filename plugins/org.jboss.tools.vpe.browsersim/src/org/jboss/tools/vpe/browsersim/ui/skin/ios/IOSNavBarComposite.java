@@ -1,5 +1,6 @@
 package org.jboss.tools.vpe.browsersim.ui.skin.ios;
 import org.eclipse.swt.SWT;
+import org.eclipse.swt.custom.StyledText;
 import org.eclipse.swt.graphics.Rectangle;
 import org.eclipse.swt.layout.FormAttachment;
 import org.eclipse.swt.layout.FormData;
@@ -20,6 +21,7 @@ public class IOSNavBarComposite extends Composite {
 	private ImageButtonComposite refreshButtonComposite;
 	private Text urlText;
 	private ProgressBar progressBar;
+	private StyledText pageTitleStyledText;
 
 	/**
 	 * Create the composite.
@@ -31,8 +33,17 @@ public class IOSNavBarComposite extends Composite {
 
 		this.setLayout(new FormLayout());
 		
-		urlText = new Text(this, SWT.SINGLE);
+		pageTitleStyledText = new IOSPageTitleStyledText(this, imageList);
 		FormData formData = new FormData();
+		formData.left = new FormAttachment(0, 0);
+		formData.right = new FormAttachment(100, 0);
+		formData.top = new FormAttachment(0, 0);
+		formData.bottom = new FormAttachment(0, 26);
+		formData.height = 27;
+		pageTitleStyledText.setLayoutData(formData);
+		urlText = new Text(this, SWT.SINGLE);
+		
+		formData = new FormData();
 		formData.left = new FormAttachment(0, 12);
 		formData.right = new FormAttachment(100, -62);
 		formData.top = new FormAttachment(0, 33);
@@ -106,5 +117,9 @@ public class IOSNavBarComposite extends Composite {
 
 	public ProgressBar getProgressBar() {
 		return progressBar;
+	}
+	
+	public StyledText getPageTitleStyledText() {
+		return pageTitleStyledText;
 	}
 }
