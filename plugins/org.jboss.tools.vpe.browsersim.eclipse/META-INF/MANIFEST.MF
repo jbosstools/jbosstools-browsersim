@@ -15,8 +15,3 @@ Require-Bundle: org.eclipse.ui,
 Bundle-ActivationPolicy: lazy
 Bundle-RequiredExecutionEnvironment: JavaSE-1.6
 Bundle-Vendor: JBoss by Red Hat
-Eclipse-PlatformFilter: (|
-                            (&(osgi.ws=win32)(osgi.os=win32)(osgi.arch=x86))
-                            (&(osgi.ws=cocoa)(osgi.os=macosx) (|(osgi.arch=x86)(osgi.arch=x86_64)) ) 
-                            (&(osgi.ws=gtk)(osgi.os=linux) (|(osgi.arch=x86)(osgi.arch=x86_64)) )
-                        )
