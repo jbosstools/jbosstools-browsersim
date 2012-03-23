@@ -10,9 +10,13 @@
  ******************************************************************************/
 package org.jboss.tools.vpe.browsersim.eclipse.util;
 
+import java.io.BufferedInputStream;
+import java.io.BufferedReader;
+import java.io.BufferedWriter;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.InputStreamReader;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -57,14 +61,17 @@ public class BrowserSimLauncher {
 			
 			Process browserSimProcess = processBuilder.start();
 
-			final InputStream errorStream = browserSimProcess.getErrorStream();
-			final InputStream inputStream = browserSimProcess.getInputStream();
+			final InputStreamReader errorReader = new InputStreamReader(browserSimProcess.getErrorStream());
+			final InputStreamReader inputReader = new InputStreamReader(browserSimProcess.getInputStream());
+
 			new Thread() {
 				public void run() {
-					int nextByte;
+					int nextCharInt;
+					String nextLine;
 					try {
-						while ((nextByte = inputStream.read()) >= 0) {
-							System.out.write(nextByte);
+						while ((nextCharInt = inputReader.read()) >= 0) {
+							char nextChar = (char) nextCharInt;
+							System.out.print(nextChar);
 						}
 					} catch (IOException e) {
 						e.printStackTrace();
@@ -73,10 +80,10 @@ public class BrowserSimLauncher {
 			}.start();
 			new Thread() {
 				public void run() {
-					int nextByte;
+					int nextCharInt;
 					try {
-						while ((nextByte = errorStream.read()) >= 0) {
-							System.err.write(nextByte);
+						while ((nextCharInt = errorReader.read()) >= 0) {
+							System.err.print((char) nextCharInt);
 						}
 					} catch (IOException e) {
 						e.printStackTrace();
