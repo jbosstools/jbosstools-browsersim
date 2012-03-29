@@ -26,12 +26,12 @@
 						</goals>
 					</execution>
 				</executions>
-            <configuration>
-              <excludes>
-                <plugin id="org.jboss.tools.vpe.browsersim.eclipse"/>
-                <!-- <feature id="sourcefeature.feature.nosource"/> -->
-              </excludes>
-            </configuration>
+			       	<configuration>
+				       	<excludes>
+	                			<plugin id="org.jboss.tools.vpe.browsersim.eclipse"/>
+                				<!-- <feature id="sourcefeature.feature.nosource"/> -->
+              				</excludes>
+            			</configuration>
 			</plugin>
 			<plugin>
 				<groupId>org.eclipse.tycho</groupId>
