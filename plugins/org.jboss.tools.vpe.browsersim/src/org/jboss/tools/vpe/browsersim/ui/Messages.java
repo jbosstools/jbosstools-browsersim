@@ -29,6 +29,7 @@ public class Messages {
 	public static String BrowserSim_OPEN_IN_DEFAULT_BROWSER;
 	public static String BrowserSim_TURN_LEFT;
 	public static String BrowserSim_TURN_RIGHT;
+	public static String BrowserSim_VIEW_PAGE_SOURCE;
 	public static String EditDeviceDialog_CANCEL;
 	public static String EditDeviceDialog_EDIT_DEVICE;
 	public static String EditDeviceDialog_HEIGHT;

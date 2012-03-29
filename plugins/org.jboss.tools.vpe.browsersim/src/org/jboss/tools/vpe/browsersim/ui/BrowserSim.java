@@ -10,6 +10,7 @@
  ******************************************************************************/
 package org.jboss.tools.vpe.browsersim.ui;
 
+import java.io.File;
 import java.net.MalformedURLException;
 import java.net.URI;
 import java.net.URISyntaxException;
@@ -17,6 +18,8 @@ import java.net.URL;
 import java.util.List;
 import java.util.Observable;
 import java.util.Observer;
+
+import javax.xml.bind.DatatypeConverter;
 
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.SWTError;
@@ -64,6 +67,12 @@ import org.jboss.tools.vpe.browsersim.util.ResourcesUtil;
 public class BrowserSim {
 	private static final String DEFAULT_URL = "about:blank"; //"http://www.w3schools.com/js/tryit_view.asp?filename=try_nav_useragent"; //$NON-NLS-1$
 	private static final String[] BROWSERSIM_ICONS = {"icons/browsersim_16px.png", "icons/browsersim_32px.png", "icons/browsersim_64px.png", "icons/browsersim_128px.png", "icons/browsersim_256px.png", }; //$NON-NLS-1$//$NON-NLS-2$//$NON-NLS-3$//$NON-NLS-4$//$NON-NLS-5$
+	private static final String BROWSERSIM_CLASS_NAME = "org.jboss.tools.vpe.browsersim.ui.BrowserSim";
+	/** @see org.jboss.tools.vpe.browsersim.eclipse.callbacks.OpenFileCallback */
+	private static final String OPEN_FILE_COMMAND = BROWSERSIM_CLASS_NAME + ".command.openFile:";
+	/** @see org.jboss.tools.vpe.browsersim.eclipse.callbacks.ViewSourceCallback */
+	private static final String VIEW_SOURCE_COMMAND = BROWSERSIM_CLASS_NAME + ".command.viewSource:";
+	
 	private Display display;
 	private String homeUrl;
 	private DevicesListHolder devicesListHolder;
@@ -350,6 +359,7 @@ public class BrowserSim {
 
 	private void addFileMenuItems(Menu menu) {
 		addOpenInDefaultBrowserItem(menu);
+		addViewSourceItem(menu);
 		
 		MenuItem exit = new MenuItem(menu, SWT.PUSH);
 		exit.setText(Messages.BrowserSim_EXIT);
@@ -390,6 +400,30 @@ public class BrowserSim {
 					} catch (MalformedURLException e1) {
 						showErrorMessage(skin.getShell(), Messages.BrowserSim_COULD_NOT_OPEN_DEFAULT_BROWSER + e1.getMessage());
 					}
+			}
+		});
+	}
+
+	public void addViewSourceItem(Menu menu) {
+		MenuItem openInDefaultBrowser = new MenuItem(menu, SWT.PUSH);
+		openInDefaultBrowser.setText(Messages.BrowserSim_VIEW_PAGE_SOURCE);
+		openInDefaultBrowser.addSelectionListener(new SelectionAdapter() {
+			public void widgetSelected(SelectionEvent e) {
+				if (skin.getBrowser().getUrl().startsWith("file:")) {
+					URI uri = null;
+					try {
+						uri = new URI(skin.getBrowser().getUrl());
+						File sourceFile = new File(uri);
+						System.out.println(OPEN_FILE_COMMAND + sourceFile.getAbsolutePath()); // send command to Eclipse
+					} catch (URISyntaxException e1) {
+						e1.printStackTrace();
+					}
+				} else {
+					System.out.println(VIEW_SOURCE_COMMAND + skin.getBrowser().getUrl()); // send command to Eclipse
+					String source = skin.getBrowser().getText();
+					String base64Source = DatatypeConverter.printBase64Binary(source.getBytes());
+					System.out.println(base64Source);
+				}
 			}
 		});
 	}

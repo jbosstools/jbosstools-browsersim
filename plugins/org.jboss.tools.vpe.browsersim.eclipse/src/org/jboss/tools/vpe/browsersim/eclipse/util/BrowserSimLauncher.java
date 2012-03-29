@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2007-2011 Red Hat, Inc.
+ * Copyright (c) 2007-2012 Red Hat, Inc.
  * Distributed under license by Red Hat, Inc. All rights reserved.
  * This program is made available under the terms of the
  * Eclipse Public License v1.0 which accompanies this distribution,
@@ -10,13 +10,10 @@
  ******************************************************************************/
 package org.jboss.tools.vpe.browsersim.eclipse.util;
 
-import java.io.BufferedInputStream;
-import java.io.BufferedReader;
-import java.io.BufferedWriter;
 import java.io.File;
 import java.io.IOException;
-import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.io.Reader;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -25,12 +22,18 @@ import org.eclipse.core.runtime.Platform;
 import org.eclipse.core.runtime.preferences.ConfigurationScope;
 import org.jboss.tools.vpe.browsersim.browser.PlatformUtil;
 import org.jboss.tools.vpe.browsersim.eclipse.Activator;
+import org.jboss.tools.vpe.browsersim.eclipse.callbacks.BrowserSimCallback;
+import org.jboss.tools.vpe.browsersim.eclipse.callbacks.OpenFileCallback;
+import org.jboss.tools.vpe.browsersim.eclipse.callbacks.ViewSourceCallback;
 import org.osgi.framework.Bundle;
 
 /**
  * @author "Yahor Radtsevich (yradtsevich)"
  */
 public class BrowserSimLauncher {
+	public static final String BROWSERSIM_CLASS_NAME = "org.jboss.tools.vpe.browsersim.ui.BrowserSim";
+	private static final BrowserSimCallback[] BROWSERSIM_CALLBACKS = { new ViewSourceCallback(), new OpenFileCallback() }; 
+
 	public static void launchBrowserSim(String initialUrl) {
 		String pathSeparator = System.getProperty("path.separator");
 		try {
@@ -51,7 +54,7 @@ public class BrowserSimLauncher {
 			
 			commandElements.add("-cp");
 			commandElements.add(classPath);
-			commandElements.add("org.jboss.tools.vpe.browsersim.ui.BrowserSim");
+			commandElements.add(BROWSERSIM_CLASS_NAME);
 			if (initialUrl != null) {
 				commandElements.add(initialUrl);
 			}
@@ -62,16 +65,18 @@ public class BrowserSimLauncher {
 			Process browserSimProcess = processBuilder.start();
 
 			final InputStreamReader errorReader = new InputStreamReader(browserSimProcess.getErrorStream());
-			final InputStreamReader inputReader = new InputStreamReader(browserSimProcess.getInputStream());
-
+			final Reader inputReader = new InputStreamReader(browserSimProcess.getInputStream());
 			new Thread() {
 				public void run() {
-					int nextCharInt;
-					String nextLine;
 					try {
-						while ((nextCharInt = inputReader.read()) >= 0) {
-							char nextChar = (char) nextCharInt;
-							System.out.print(nextChar);
+						TransparentReader transparentReader = new TransparentReader(inputReader, System.out);
+						String nextLine;
+						while ((nextLine = transparentReader.readLine(true)) != null) {
+							for (BrowserSimCallback callback : BROWSERSIM_CALLBACKS) { 
+								if (nextLine.startsWith(callback.getCallbackId())) {
+									callback.call(nextLine, transparentReader);
+								}
+							}
 						}
 					} catch (IOException e) {
 						e.printStackTrace();
