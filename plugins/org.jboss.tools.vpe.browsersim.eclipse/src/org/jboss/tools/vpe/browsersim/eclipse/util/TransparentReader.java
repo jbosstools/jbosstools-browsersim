@@ -29,9 +29,9 @@ public class TransparentReader {
 	
 	public String readLine(boolean forwardToConcole) throws IOException {
 		StringBuilder nextLine = new StringBuilder();
-		int nextCharInt; 
+		int nextCharInt = -1; 
 		boolean eolReached = false;
-		while ((nextCharInt = reader.read()) >= 0 && !eolReached) {
+		while (!eolReached && (nextCharInt = reader.read()) >= 0) {
 			char nextChar = (char) nextCharInt;
 			if (forwardToConcole) {
 				output.print(nextChar);

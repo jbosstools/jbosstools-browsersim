@@ -30,7 +30,6 @@ import org.eclipse.ui.IWorkbenchPage;
 import org.eclipse.ui.IWorkbenchWindow;
 import org.eclipse.ui.PartInitException;
 import org.eclipse.ui.PlatformUI;
-import org.eclipse.ui.part.EditorPart;
 import org.eclipse.ui.texteditor.ITextEditor;
 import org.jboss.tools.jst.jsp.jspeditor.JSPMultiPageEditor;
 import org.jboss.tools.vpe.browsersim.eclipse.util.BrowserSimLauncher;
