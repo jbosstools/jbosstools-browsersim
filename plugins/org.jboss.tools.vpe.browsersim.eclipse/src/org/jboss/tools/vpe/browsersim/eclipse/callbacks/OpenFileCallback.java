@@ -11,6 +11,7 @@
 package org.jboss.tools.vpe.browsersim.eclipse.callbacks;
 
 import java.io.File;
+import java.io.FileNotFoundException;
 
 import org.eclipse.core.filesystem.EFS;
 import org.eclipse.core.filesystem.IFileStore;
@@ -20,6 +21,7 @@ import org.eclipse.ui.IWorkbenchWindow;
 import org.eclipse.ui.PartInitException;
 import org.eclipse.ui.PlatformUI;
 import org.eclipse.ui.ide.IDE;
+import org.jboss.tools.vpe.browsersim.eclipse.Activator;
 import org.jboss.tools.vpe.browsersim.eclipse.util.BrowserSimLauncher;
 import org.jboss.tools.vpe.browsersim.eclipse.util.TransparentReader;
 
@@ -49,7 +51,8 @@ public class OpenFileCallback implements BrowserSimCallback {
 		Display.getDefault().asyncExec(new Runnable() {
 			@Override
 			public void run() {
-				File fileToOpen = new File(lastString.substring(OPEN_FILE_COMMAND.length()));
+				String fileNameToOpen = lastString.substring(OPEN_FILE_COMMAND.length());
+				File fileToOpen = new File(fileNameToOpen);
 
 				if (fileToOpen.exists() && fileToOpen.isFile()) {
 					IFileStore fileStore = EFS.getLocalFileSystem().getStore(fileToOpen.toURI());
@@ -60,13 +63,15 @@ public class OpenFileCallback implements BrowserSimCallback {
 						try {
 							IDE.openEditorOnFileStore(page, fileStore);
 						} catch (PartInitException e) {
-							//TODO: put exception handler
+							Activator.logError(e.getMessage(), e);
 						}
 					} else {
-						// TODO: log exception
+						Exception e = new Exception("Cannot obtain workbench page");
+						Activator.logError(e.getMessage(), e);
 					}
 				} else {
-					//TODO: Do something if the file does not exist
+					FileNotFoundException e = new FileNotFoundException("Cannot open file: " + fileNameToOpen);
+					Activator.logError(e.getMessage(), e);
 				}
 			}
 		});

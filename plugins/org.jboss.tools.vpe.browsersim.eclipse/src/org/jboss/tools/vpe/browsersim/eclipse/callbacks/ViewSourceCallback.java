@@ -32,6 +32,7 @@ import org.eclipse.ui.PartInitException;
 import org.eclipse.ui.PlatformUI;
 import org.eclipse.ui.texteditor.ITextEditor;
 import org.jboss.tools.jst.jsp.jspeditor.JSPMultiPageEditor;
+import org.jboss.tools.vpe.browsersim.eclipse.Activator;
 import org.jboss.tools.vpe.browsersim.eclipse.util.BrowserSimLauncher;
 import org.jboss.tools.vpe.browsersim.eclipse.util.TransparentReader;
 
@@ -128,10 +129,11 @@ public class ViewSourceCallback implements BrowserSimCallback {
 					editor.doSave(null); // reset resource-changed marker
 				}
 			} catch (PartInitException e) {
-				// TODO: log exception
+				Activator.logError(e.getMessage(), e);
 			}
 		} else {
-			// TODO: log exception
+			Exception e = new Exception("Cannot obtain workbench page");
+			Activator.logError(e.getMessage(), e);
 		}
 	}
 }
