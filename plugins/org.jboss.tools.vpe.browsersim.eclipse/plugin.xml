@@ -71,4 +71,13 @@
 			<actionSet id="org.jboss.tools.vpe.browsersim.eclipse.actionSet"/> 
 		</perspectiveExtension> 
 	</extension>
+ <extension
+       id="application"
+       point="org.eclipse.core.runtime.applications">
+    <application>
+       <run
+             class="org.jboss.tools.vpe.browsersim.eclipse.BrowsersimApplication">
+       </run>
+    </application>
+ </extension>
 </plugin>
