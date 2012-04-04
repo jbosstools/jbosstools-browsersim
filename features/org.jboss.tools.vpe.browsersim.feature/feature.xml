@@ -15,8 +15,5 @@
 
    <plugin id="org.jboss.tools.vpe.browsersim" download-size="0" install-size="0" version="0.0.0" unpack="false" />
    <plugin id="org.jboss.tools.vpe.browsersim.browser" download-size="0" install-size="0" version="0.0.0" unpack="false" />
-
-   <plugin id="org.jboss.tools.vpe.browsersim.eclipse" arch="x86" download-size="0" install-size="0" version="0.0.0" unpack="false" />
-   <plugin id="org.jboss.tools.vpe.browsersim.eclipse" os="linux,macosx" arch="x86_64" download-size="0" install-size="0" version="0.0.0" unpack="false" />
-
+   <plugin id="org.jboss.tools.vpe.browsersim.eclipse" download-size="0" install-size="0" version="0.0.0" unpack="false"/>
 </feature>
