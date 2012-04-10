@@ -126,13 +126,8 @@ public class AppleIPhone3ResizableSkin implements BrowserSimSkin {
 	}
 
 	private void setShellRegion() {
-		int[] normalRegion;
-		if (vertical) {
-			normalRegion = AppleIPhone3Skin.VISIBLE_REGION[0];
-		} else {
-			normalRegion = AppleIPhone3Skin.VISIBLE_REGION[1];
-		}
-		
+		int[] normalRegion = getNormalRegion(vertical);
+
 		Point normalRegionSize = new Point(0, 0);		
 		for (int i = 0; i < normalRegion.length; i += 2) {
 			if (normalRegionSize.x < normalRegion[i]) {
@@ -317,19 +312,14 @@ public class AppleIPhone3ResizableSkin implements BrowserSimSkin {
 		iPhoneComposite.setMenu(null);
 		
 		AppleIPhoneComposite oldIPhoneComposite = iPhoneComposite;
-		IPhoneSkinDescriptor skinDescriptor;
-		if (vertical) {
-			skinDescriptor = VERTICAL_IPHONE3_DESCRIPTOR;
-		} else {
-			skinDescriptor = HORIZONTAL_IPHONE3_DESCRIPTOR;
-		}
+		IPhoneSkinDescriptor skinDescriptor = getSkinDescriptor(vertical);
 		iPhoneComposite = new AppleIPhoneComposite(shell, skinDescriptor);
 		bindIPhoneCompositeControls();
 		Composite browserContainer = iPhoneComposite.getBrowserContainer();
 		browserContainer.setLayout(new FillLayout());
 		browser.setParent(browserContainer);
 		oldIPhoneComposite.dispose();
-		Point bordersSize = vertical ? VERTICAL_BORDERS_SIZE : HORIZONTAL_BORDERS_SIZE;
+		Point bordersSize = getBordersSize(vertical);
 		int shellWidth;
 		if (browserSize.x == SWT.DEFAULT) {
 			shellWidth = SWT.DEFAULT;
@@ -355,6 +345,31 @@ public class AppleIPhone3ResizableSkin implements BrowserSimSkin {
 		iPhoneComposite.setMenu(contextMenu);
 	}
 
+	protected Point getBordersSize(boolean vertical) {
+		Point bordersSize = vertical ? VERTICAL_BORDERS_SIZE : HORIZONTAL_BORDERS_SIZE;
+		return bordersSize;
+	}
+
+	protected IPhoneSkinDescriptor getSkinDescriptor(boolean vertical) {
+		IPhoneSkinDescriptor skinDescriptor;
+		if (vertical) {
+			skinDescriptor = VERTICAL_IPHONE3_DESCRIPTOR;
+		} else {
+			skinDescriptor = HORIZONTAL_IPHONE3_DESCRIPTOR;
+		}
+		return skinDescriptor;
+	}
+	
+	protected int[] getNormalRegion(boolean vertical) {
+		int[] normalRegion;
+		if (vertical) {
+			normalRegion = AppleIPhone3Skin.VISIBLE_REGION[0];
+		} else {
+			normalRegion = AppleIPhone3Skin.VISIBLE_REGION[1];
+		}
+		return normalRegion;
+	}
+	
 	@Override
 	public void setAddressBarVisible(boolean visible) {
 		iPhoneComposite.setNavBarCompositeVisible(visible);

@@ -1,12 +1,12 @@
 package org.jboss.tools.vpe.browsersim.model;
 
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
 import org.jboss.tools.vpe.browsersim.ui.skin.BrowserSimSkin;
 import org.jboss.tools.vpe.browsersim.ui.skin.NativeSkin;
+import org.jboss.tools.vpe.browsersim.ui.skin.android.AndroidResizableSkin;
 import org.jboss.tools.vpe.browsersim.ui.skin.ios.AppleIPhone3ResizableSkin;
 
 public class SkinMap {
@@ -18,6 +18,7 @@ public class SkinMap {
 		map = new HashMap<String, Class<? extends BrowserSimSkin>>();
 		
 		map.put("Apple iPhone 3", AppleIPhone3ResizableSkin.class);
+		map.put("Android", AndroidResizableSkin.class);
 	}
 	
 	public static SkinMap getInstance() {

@@ -9,7 +9,7 @@ import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.widgets.Composite;
 
 
-class ImageDescriptor extends WidgetDescriptor {
+public class ImageDescriptor extends WidgetDescriptor {
 	protected String imageName;
 
 	public ImageDescriptor(String imageName, int horizontalSpan, int verticalSpan, int stretching) {
