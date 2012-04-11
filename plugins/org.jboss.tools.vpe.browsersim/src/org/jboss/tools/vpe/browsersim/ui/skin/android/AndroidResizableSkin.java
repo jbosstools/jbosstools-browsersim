@@ -12,6 +12,13 @@ import org.jboss.tools.vpe.browsersim.ui.skin.ios.ImageDescriptor;
 public class AndroidResizableSkin  extends AppleIPhone3ResizableSkin {
 	private static final Point NORMAL_SKREEN_SIZE = new Point(240, 1);
 	private static final Point NORMAL_SKIN_SIZE = new Point(339, 186);
+	public static final int[] VISIBLE_REGION_VERTICAL = {20, 0, 318, 0, 319, 1, 321, 1, 322, 2, 323, 2, 325, 4, 326, 4,
+		328, 6, 329, 6, 332, 9, 332, 10, 335, 13, 335, 14, 336, 15, 336, 17, 337, 18, 337, 20, 338, 21, 338, 163, 337,
+		164, 337, 166, 336, 167, 336, 169, 335, 170, 335, 171, 333, 173, 333, 174, 327, 180, 326, 180, 325, 181, 324,
+		181, 323, 182, 322, 182, 321, 183, 320, 183, 318, 185, 20, 185, 18, 183, 17, 183, 16, 182, 15, 182, 14, 181,
+		13, 181, 12, 180, 11, 180, 5, 174, 5, 173, 3, 171, 3, 170, 2, 169, 2, 167, 1, 166, 1, 164, 0, 163, 0, 21, 1,
+		20, 1, 18, 2, 17, 2, 15, 3, 14, 3, 13, 6, 10, 6, 9, 7, 9, 9, 7, 9, 6, 10, 6, 12, 4, 13, 4, 15, 2, 16, 2, 17, 1,
+		19, 1};
 	private static final Point VERTICAL_BORDERS_SIZE = new Point(NORMAL_SKIN_SIZE.x - NORMAL_SKREEN_SIZE.x, NORMAL_SKIN_SIZE.y - NORMAL_SKREEN_SIZE.y);
 	private static final Point HORIZONTAL_BORDERS_SIZE = new Point(VERTICAL_BORDERS_SIZE.y, VERTICAL_BORDERS_SIZE.x);
 	private static final IPhoneSkinDescriptor VERTICAL_IPHONE3_DESCRIPTOR;
@@ -95,19 +102,6 @@ public class AndroidResizableSkin  extends AppleIPhone3ResizableSkin {
 	
 	@Override
 	protected int[] getNormalRegion(boolean vertical) {
-		int[] normalRegion = new int[8];
-		normalRegion[0] = 0;
-		normalRegion[1] = 0;
-		
-		normalRegion[2] = 339;
-		normalRegion[3] = 0;
-		
-		normalRegion[4] = 339;
-		normalRegion[5] = 186;
-		
-		normalRegion[6] = 0;
-		normalRegion[7] = 186;
-		
-		return normalRegion;
+		return VISIBLE_REGION_VERTICAL;
 	}
 }
