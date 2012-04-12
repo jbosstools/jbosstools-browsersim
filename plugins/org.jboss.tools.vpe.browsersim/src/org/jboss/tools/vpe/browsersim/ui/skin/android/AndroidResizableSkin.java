@@ -11,17 +11,18 @@ import org.jboss.tools.vpe.browsersim.ui.skin.ios.ImageDescriptor;
 
 public class AndroidResizableSkin  extends AppleIPhone3ResizableSkin {
 	private static final Point NORMAL_SKREEN_SIZE = new Point(240, 1);
-	private static final Point NORMAL_SKIN_SIZE = new Point(339, 186);
-	public static final int[] VISIBLE_REGION_VERTICAL = {20, 0, 318, 0, 319, 1, 321, 1, 322, 2, 323, 2, 325, 4, 326, 4,
-		328, 6, 329, 6, 332, 9, 332, 10, 335, 13, 335, 14, 336, 15, 336, 17, 337, 18, 337, 20, 338, 21, 338, 163, 337,
-		164, 337, 166, 336, 167, 336, 169, 335, 170, 335, 171, 333, 173, 333, 174, 327, 180, 326, 180, 325, 181, 324,
-		181, 323, 182, 322, 182, 321, 183, 320, 183, 318, 185, 20, 185, 18, 183, 17, 183, 16, 182, 15, 182, 14, 181,
-		13, 181, 12, 180, 11, 180, 5, 174, 5, 173, 3, 171, 3, 170, 2, 169, 2, 167, 1, 166, 1, 164, 0, 163, 0, 21, 1,
-		20, 1, 18, 2, 17, 2, 15, 3, 14, 3, 13, 6, 10, 6, 9, 7, 9, 9, 7, 9, 6, 10, 6, 12, 4, 13, 4, 15, 2, 16, 2, 17, 1,
-		19, 1};
+	private static final Point NORMAL_SKIN_SIZE = new Point(339, 156);
+	public static final int[] VISIBLE_REGION_VERTICAL =   {24, 0, 314, 0, 315, 1, 318, 1, 319, 2, 320, 2, 321, 3, 322,
+		3, 323, 4, 324, 4, 325, 5, 326, 5, 329, 8, 330, 8, 331, 9, 331, 10, 334, 13, 334, 14, 335, 15, 335, 16, 336, 17,
+		336, 18, 337, 19, 337, 21, 338, 22, 338, 162, 337, 163, 337, 165, 336, 166, 336, 168, 335, 169, 335, 170, 333,
+		172, 333, 173, 327, 179, 326, 179, 324, 181, 323, 181, 322, 182, 321, 182, 320, 183, 318, 183, 317, 184, 316,
+		184, 315, 185, 23, 185, 22, 184, 21, 184, 20, 183, 18, 183, 17, 182, 16, 182, 15, 181, 14, 181, 12, 179, 11,
+		179, 5, 173, 5, 172, 3, 170, 3, 169, 2, 168, 2, 166, 1, 165, 1, 163, 0, 162, 0, 22, 1, 21, 1, 19, 2, 18, 2, 17,
+		3, 16, 3, 15, 4, 14, 4, 13, 7, 10, 7, 9, 8, 8, 9, 8, 12, 5, 13, 5, 14, 4, 15, 4, 16, 3, 17, 3, 18, 2, 20, 2, 21,
+		1, 23, 1};
 	private static final Point VERTICAL_BORDERS_SIZE = new Point(NORMAL_SKIN_SIZE.x - NORMAL_SKREEN_SIZE.x, NORMAL_SKIN_SIZE.y - NORMAL_SKREEN_SIZE.y);
 	private static final Point HORIZONTAL_BORDERS_SIZE = new Point(VERTICAL_BORDERS_SIZE.y, VERTICAL_BORDERS_SIZE.x);
-	private static final IPhoneSkinDescriptor VERTICAL_IPHONE3_DESCRIPTOR;
+	private static final IPhoneSkinDescriptor VERTICAL_DESCRIPTOR;
 	static {
 		String bd = "android/droid/vertical/";
 		ImageDescriptor iOsDescriptor = new ImageDescriptor(null, 3, 1, SWT.VERTICAL | SWT.HORIZONTAL);
@@ -48,7 +49,7 @@ public class AndroidResizableSkin  extends AppleIPhone3ResizableSkin {
 			formData.bottom = new FormAttachment(100, -132);
 			forwardButtonDescriptor = new ButtonDescriptor(formData, bd2 + "forward.png", bd2 + "forward-disabled.png", bd2 + "forward-selected.png");
 		}
-		VERTICAL_IPHONE3_DESCRIPTOR = new IPhoneSkinDescriptor(bodyGridSize, bodyGridImageDescriptors, iOsDescriptor, backButtonDescriptor, forwardButtonDescriptor);
+		VERTICAL_DESCRIPTOR = new IPhoneSkinDescriptor(bodyGridSize, bodyGridImageDescriptors, iOsDescriptor, backButtonDescriptor, forwardButtonDescriptor);
 	}
 	private static final IPhoneSkinDescriptor HORIZONTAL_IPHONE3_DESCRIPTOR;
 	static {
@@ -93,9 +94,9 @@ public class AndroidResizableSkin  extends AppleIPhone3ResizableSkin {
 	protected IPhoneSkinDescriptor getSkinDescriptor(boolean vertical) {
 		IPhoneSkinDescriptor skinDescriptor;
 		if (vertical) {
-			skinDescriptor = VERTICAL_IPHONE3_DESCRIPTOR;
+			skinDescriptor = VERTICAL_DESCRIPTOR;
 		} else {
-			skinDescriptor = HORIZONTAL_IPHONE3_DESCRIPTOR;
+			skinDescriptor = VERTICAL_DESCRIPTOR;
 		}
 		return skinDescriptor;
 	}
