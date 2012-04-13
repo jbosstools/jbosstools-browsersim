@@ -1,7 +1,7 @@
-package org.jboss.tools.vpe.browsersim.ui.skin.ios;
+package org.jboss.tools.vpe.browsersim.ui.skin;
 import org.eclipse.swt.SWT;
 
-class WidgetDescriptor {
+public class WidgetDescriptor {
 	protected int horizontalSpan;
 	protected int verticalSpan;
 	protected int stretching;

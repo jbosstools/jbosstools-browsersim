@@ -1,6 +1,4 @@
-package org.jboss.tools.vpe.browsersim.ui.skin.ios;
-import org.jboss.tools.vpe.browsersim.ui.skin.ImageList;
-import org.jboss.tools.vpe.browsersim.ui.skin.ios.WidgetDescriptor;
+package org.jboss.tools.vpe.browsersim.ui.skin;
 
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.graphics.Image;

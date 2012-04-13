@@ -4,10 +4,12 @@ import org.eclipse.swt.SWT;
 import org.eclipse.swt.graphics.Point;
 import org.eclipse.swt.layout.FormAttachment;
 import org.eclipse.swt.layout.FormData;
+import org.eclipse.swt.widgets.Composite;
+import org.jboss.tools.vpe.browsersim.ui.skin.DeviceComposite;
+import org.jboss.tools.vpe.browsersim.ui.skin.ImageDescriptor;
 import org.jboss.tools.vpe.browsersim.ui.skin.ios.AppleIPhone3ResizableSkin;
 import org.jboss.tools.vpe.browsersim.ui.skin.ios.ButtonDescriptor;
 import org.jboss.tools.vpe.browsersim.ui.skin.ios.IPhoneSkinDescriptor;
-import org.jboss.tools.vpe.browsersim.ui.skin.ios.ImageDescriptor;
 
 public class AndroidResizableSkin  extends AppleIPhone3ResizableSkin {
 	private static final Point NORMAL_SKREEN_SIZE = new Point(240, 1);
@@ -22,7 +24,7 @@ public class AndroidResizableSkin  extends AppleIPhone3ResizableSkin {
 		1, 23, 1};
 	private static final Point VERTICAL_BORDERS_SIZE = new Point(NORMAL_SKIN_SIZE.x - NORMAL_SKREEN_SIZE.x, NORMAL_SKIN_SIZE.y - NORMAL_SKREEN_SIZE.y);
 	private static final Point HORIZONTAL_BORDERS_SIZE = new Point(VERTICAL_BORDERS_SIZE.y, VERTICAL_BORDERS_SIZE.x);
-	private static final IPhoneSkinDescriptor VERTICAL_DESCRIPTOR;
+	private static final AndroidSkinDescriptor VERTICAL_DESCRIPTOR;
 	static {
 		String bd = "android/droid/vertical/";
 		ImageDescriptor iOsDescriptor = new ImageDescriptor(null, 3, 1, SWT.VERTICAL | SWT.HORIZONTAL);
@@ -33,23 +35,38 @@ public class AndroidResizableSkin  extends AppleIPhone3ResizableSkin {
 			};
 		int bodyGridSize = 5;
 		
-		String bd2 = "ios/";
+		String bd2 = "android/";
 		ButtonDescriptor backButtonDescriptor;
 		{
 			FormData formData = new FormData();
-			formData.left = new FormAttachment(0, 52);
-			formData.bottom = new FormAttachment(100, -132);
-			backButtonDescriptor = new ButtonDescriptor(formData, bd2 + "back.png", bd2 + "back-disabled.png", bd2 + "back-selected.png");
+			formData.left = new FormAttachment(0, 61);
+			formData.bottom = new FormAttachment(100, -41);
+			backButtonDescriptor = new ButtonDescriptor(formData, bd2 + "back.png", bd2 + "back.png", bd2 + "back-selected.png");//XXX
 		}
 		
 		ButtonDescriptor forwardButtonDescriptor;
 		{
 			FormData formData = new FormData();
-			formData.left = new FormAttachment(0, 115);
-			formData.bottom = new FormAttachment(100, -132);
-			forwardButtonDescriptor = new ButtonDescriptor(formData, bd2 + "forward.png", bd2 + "forward-disabled.png", bd2 + "forward-selected.png");
+			formData.left = new FormAttachment(33, 12);
+			formData.bottom = new FormAttachment(100, -41);
+			forwardButtonDescriptor = new ButtonDescriptor(formData, bd2 + "forward.png", bd2 + "forward.png", bd2 + "forward-selected.png");//XXX
 		}
-		VERTICAL_DESCRIPTOR = new IPhoneSkinDescriptor(bodyGridSize, bodyGridImageDescriptors, iOsDescriptor, backButtonDescriptor, forwardButtonDescriptor);
+		ButtonDescriptor homeButtonDescriptor;
+		{
+			FormData formData = new FormData();
+			formData.left = new FormAttachment(67, -45);
+			formData.bottom = new FormAttachment(100, -41);
+			homeButtonDescriptor = new ButtonDescriptor(formData, bd2 + "home.png", bd2 + "home.png", bd2 + "home-selected.png");//XXX
+		}
+		ButtonDescriptor refreshButtonDescriptor;
+		{
+			FormData formData = new FormData();
+			formData.left = new FormAttachment(100, -61 - 28);
+			formData.bottom = new FormAttachment(100, -41);
+			refreshButtonDescriptor = new ButtonDescriptor(formData, bd2 + "refresh.png", bd2 + "refresh.png", bd2 + "refresh-selected.png");//XXX
+		}
+		VERTICAL_DESCRIPTOR = new AndroidSkinDescriptor(bodyGridSize, bodyGridImageDescriptors, iOsDescriptor,
+				backButtonDescriptor, forwardButtonDescriptor, homeButtonDescriptor, refreshButtonDescriptor);
 	}
 	private static final IPhoneSkinDescriptor HORIZONTAL_IPHONE3_DESCRIPTOR;
 	static {
@@ -91,14 +108,14 @@ public class AndroidResizableSkin  extends AppleIPhone3ResizableSkin {
 	}
 
 	@Override
-	protected IPhoneSkinDescriptor getSkinDescriptor(boolean vertical) {
-		IPhoneSkinDescriptor skinDescriptor;
+	protected DeviceComposite createDeviceComposite(Composite parent, boolean vertical) {
+		AndroidSkinDescriptor skinDescriptor;
 		if (vertical) {
 			skinDescriptor = VERTICAL_DESCRIPTOR;
 		} else {
 			skinDescriptor = VERTICAL_DESCRIPTOR;
 		}
-		return skinDescriptor;
+		return new AndroidComposite(parent, skinDescriptor);
 	}
 	
 	@Override

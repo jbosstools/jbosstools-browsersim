@@ -1,4 +1,4 @@
-package org.jboss.tools.vpe.browsersim.ui.skin.ios;
+package org.jboss.tools.vpe.browsersim.ui.skin;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.MouseEvent;
 import org.eclipse.swt.events.MouseTrackListener;
@@ -6,7 +6,7 @@ import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.graphics.Rectangle;
 import org.eclipse.swt.layout.FormData;
 import org.eclipse.swt.widgets.Composite;
-import org.jboss.tools.vpe.browsersim.ui.skin.ImageList;
+import org.jboss.tools.vpe.browsersim.ui.skin.ios.ButtonDescriptor;
 
 
 public class ImageButtonComposite extends Composite {

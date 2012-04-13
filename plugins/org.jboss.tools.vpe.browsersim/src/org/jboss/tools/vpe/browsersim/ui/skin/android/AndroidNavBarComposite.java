@@ -1,6 +1,6 @@
-package org.jboss.tools.vpe.browsersim.ui.skin.ios;
+package org.jboss.tools.vpe.browsersim.ui.skin.android;
+
 import org.eclipse.swt.SWT;
-import org.eclipse.swt.custom.StyledText;
 import org.eclipse.swt.graphics.Rectangle;
 import org.eclipse.swt.layout.FormAttachment;
 import org.eclipse.swt.layout.FormData;
@@ -13,58 +13,38 @@ import org.jboss.tools.vpe.browsersim.ui.skin.ImageButtonComposite;
 import org.jboss.tools.vpe.browsersim.ui.skin.ImageDescriptor;
 import org.jboss.tools.vpe.browsersim.ui.skin.ImageList;
 
-
-public class IOSNavBarComposite extends Composite {
-	private final String BD = "ios/";
+public class AndroidNavBarComposite extends Composite {
+	private final String BD = "android/";
 	private final ImageDescriptor[] BODY_DESCRIPTOR = {
-		new ImageDescriptor(BD + "nav-1.png"), new ImageDescriptor(BD + "nav-2.png", 1, 1, SWT.HORIZONTAL), new ImageDescriptor(BD + "nav-3.png"), new ImageDescriptor(BD + "nav-4.png", 1, 1, SWT.HORIZONTAL), new ImageDescriptor(BD + "nav-5.png")
+		new ImageDescriptor(BD + "nav-1.png"), new ImageDescriptor(BD + "nav-2.png", 1, 1, SWT.HORIZONTAL), new ImageDescriptor(BD + "nav-3.png")
 	};
 	private ImageButtonComposite stopButtonComposite;
-	private ImageButtonComposite refreshButtonComposite;
 	private Text urlText;
 	private ProgressBar progressBar;
-	private StyledText pageTitleStyledText;
 
 	/**
 	 * Create the composite.
 	 * @param parent
 	 * @param style
 	 */
-	public IOSNavBarComposite(Composite parent, ImageList imageList) {
+	public AndroidNavBarComposite(Composite parent, ImageList imageList) {
 		super(parent, SWT.NONE);
 
 		this.setLayout(new FormLayout());
 		
-		pageTitleStyledText = new IOSPageTitleStyledText(this, imageList);
-		FormData formData = new FormData();
-		formData.left = new FormAttachment(0, 0);
-		formData.right = new FormAttachment(100, 0);
-		formData.top = new FormAttachment(0, 0);
-		formData.bottom = new FormAttachment(0, 26);
-		formData.height = 27;
-		pageTitleStyledText.setLayoutData(formData);
 		urlText = new Text(this, SWT.SINGLE);
 		
-		formData = new FormData();
-		formData.left = new FormAttachment(0, 12);
-		formData.right = new FormAttachment(100, -62);
-		formData.top = new FormAttachment(0, 33);
-		formData.bottom = new FormAttachment(100, -8);
+		FormData formData = new FormData();
+		formData.left = new FormAttachment(0, 17);
+		formData.right = new FormAttachment(100, -55);
+		formData.top = new FormAttachment(0, 22);
+		formData.bottom = new FormAttachment(100, -20);
 		urlText.setLayoutData(formData);
 		
-		refreshButtonComposite = new ImageButtonComposite(this, imageList.getImage(BD + "refresh.png"), imageList.getImage(BD + "refresh.png"), imageList.getImage(BD + "refresh-selected.png"));
-		formData = new FormData();
-		Rectangle refreshImageBounds = imageList.getImage(BD + "refresh.png").getBounds();
-		formData.right = new FormAttachment(100, -8);
-		formData.bottom = new FormAttachment(100, -7);
-		formData.width = refreshImageBounds.width;
-		formData.height = refreshImageBounds.height;
-		refreshButtonComposite.setLayoutData(formData);
-
 		stopButtonComposite = new ImageButtonComposite(this, imageList.getImage(BD + "stop.png"), imageList.getImage(BD + "stop.png"), imageList.getImage(BD + "stop-selected.png"));
 		formData = new FormData();
 		Rectangle stopImageBounds = imageList.getImage(BD + "stop.png").getBounds();
-		formData.right = new FormAttachment(100, -42);
+		formData.right = new FormAttachment(100, -12);
 		formData.bottom = new FormAttachment(100, -11);
 		formData.width = stopImageBounds.width;
 		formData.height = stopImageBounds.height;
@@ -73,9 +53,9 @@ public class IOSNavBarComposite extends Composite {
 		progressBar = new ProgressBar(this, SWT.NONE);
 		progressBar.setVisible(false);
 		formData = new FormData();
-		formData.left = new FormAttachment(0, 7);
-		formData.right = new FormAttachment(100, -36);
-		formData.bottom = new FormAttachment(100, -1);
+		formData.left = new FormAttachment(0, 10);
+		formData.right = new FormAttachment(100, -10);
+		formData.top = new FormAttachment(0, 2);
 		formData.height = 5;
 		progressBar.setLayoutData(formData);
 		
@@ -109,19 +89,11 @@ public class IOSNavBarComposite extends Composite {
 		return stopButtonComposite;
 	}
 
-	public ImageButtonComposite getRefreshButtonComposite() {
-		return refreshButtonComposite;
-	}
-
 	public Text getUrlText() {
 		return urlText;
 	}
 
 	public ProgressBar getProgressBar() {
 		return progressBar;
-	}
-	
-	public StyledText getPageTitleStyledText() {
-		return pageTitleStyledText;
 	}
 }

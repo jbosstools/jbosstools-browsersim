@@ -24,6 +24,8 @@ import org.jboss.tools.vpe.browsersim.model.DeviceOrientation;
 import org.jboss.tools.vpe.browsersim.ui.ControlHandler;
 import org.jboss.tools.vpe.browsersim.ui.skin.AppleIPhone3Skin;
 import org.jboss.tools.vpe.browsersim.ui.skin.BrowserSimSkin;
+import org.jboss.tools.vpe.browsersim.ui.skin.DeviceComposite;
+import org.jboss.tools.vpe.browsersim.ui.skin.ImageDescriptor;
 
 public class AppleIPhone3ResizableSkin implements BrowserSimSkin {
 	private static final Point NORMAL_SKREEN_SIZE = new Point(320, 480);
@@ -100,7 +102,7 @@ public class AppleIPhone3ResizableSkin implements BrowserSimSkin {
 	private Shell shell;
 	private BrowserSimBrowser browser;
 	private ControlHandler controlHandler;
-	private AppleIPhoneComposite iPhoneComposite;
+	private DeviceComposite deviceComposite;
 
 	@Override
 	public void setBrowserFactory(IBrowserSimBrowserFactory browserFactory) {
@@ -113,10 +115,10 @@ public class AppleIPhone3ResizableSkin implements BrowserSimSkin {
 		shell = new Shell(display, SWT.NO_TRIM | SWT.NO_BACKGROUND);
 		shell.setLayout(new FillLayout());
 		
-		iPhoneComposite = new AppleIPhoneComposite(shell, VERTICAL_IPHONE3_DESCRIPTOR);
+		deviceComposite = new AppleIPhoneComposite(shell, VERTICAL_IPHONE3_DESCRIPTOR);
 		vertical = true;
 		bindIPhoneCompositeControls();
-		Composite browserContainer = iPhoneComposite.getBrowserContainer();
+		Composite browserContainer = deviceComposite.getBrowserContainer();
 		browserContainer.setLayout(new FillLayout());
 		browser = browserFactory.createBrowser(browserContainer, SWT.NONE);
 		
@@ -185,35 +187,35 @@ public class AppleIPhone3ResizableSkin implements BrowserSimSkin {
 	}
 
 	private void bindIPhoneCompositeControls() {
-		iPhoneComposite.getBackButtonComposite().addMouseListener(new MouseAdapter() {
+		deviceComposite.getBackButtonComposite().addMouseListener(new MouseAdapter() {
 			public void mouseDown(MouseEvent e) {
 				if (e.button == 1) {
 					controlHandler.goBack();
 				}
 			}
 		});
-		iPhoneComposite.getForwardButtonComposite().addMouseListener(new MouseAdapter() {
+		deviceComposite.getForwardButtonComposite().addMouseListener(new MouseAdapter() {
 			public void mouseDown(MouseEvent e) {
 				if (e.button == 1) {
 					controlHandler.goForward();
 				}
 			}
 		});
-		iPhoneComposite.getStopButtonComposite().addMouseListener(new MouseAdapter() {
+		deviceComposite.getStopButtonComposite().addMouseListener(new MouseAdapter() {
 			public void mouseDown(MouseEvent e) {
 				if (e.button == 1) {
 					controlHandler.stop();
 				}
 			}
 		});
-		iPhoneComposite.getRefreshButtonComposite().addMouseListener(new MouseAdapter() {
+		deviceComposite.getRefreshButtonComposite().addMouseListener(new MouseAdapter() {
 			public void mouseDown(MouseEvent e) {
 				if (e.button == 1) {
 					controlHandler.refresh();
 				}
 			}
 		});
-		iPhoneComposite.getUrlText().addListener(SWT.DefaultSelection, new Listener() {
+		deviceComposite.getUrlText().addListener(SWT.DefaultSelection, new Listener() {
 			public void handleEvent(Event e) {
 				controlHandler.goToAddress(((Text)e.widget).getText());
 			}
@@ -244,9 +246,9 @@ public class AppleIPhone3ResizableSkin implements BrowserSimSkin {
 				}
 			}
 		};
-		iPhoneComposite.addListener(SWT.MouseDown, l);
-		iPhoneComposite.addListener(SWT.MouseUp, l);
-		iPhoneComposite.addListener(SWT.MouseMove, l);
+		deviceComposite.addListener(SWT.MouseDown, l);
+		deviceComposite.addListener(SWT.MouseUp, l);
+		deviceComposite.addListener(SWT.MouseMove, l);
 	}
 
 	@Override
@@ -272,20 +274,22 @@ public class AppleIPhone3ResizableSkin implements BrowserSimSkin {
 	@Override
 	public void locationChanged(String newLocation, boolean backEnabled,
 			boolean forwardEnabled) {
-		iPhoneComposite.getUrlText().setText(newLocation);
-		iPhoneComposite.getBackButtonComposite().setEnabled(backEnabled);
-		iPhoneComposite.getForwardButtonComposite().setEnabled(forwardEnabled);
+		deviceComposite.getUrlText().setText(newLocation);
+		deviceComposite.getBackButtonComposite().setEnabled(backEnabled);
+		deviceComposite.getForwardButtonComposite().setEnabled(forwardEnabled);
 	}
 	
 
 	@Override
 	public void pageTitleChanged(String newTitle) {
-		iPhoneComposite.getPageTitleStyledText().setText(newTitle);
+		if (deviceComposite.getPageTitleStyledText() != null) {
+			deviceComposite.getPageTitleStyledText().setText(newTitle);
+		}
 	}
 
 	@Override
 	public void progressChanged(int percents) {
-		ProgressBar progressBar = iPhoneComposite.getProgressBar();
+		ProgressBar progressBar = deviceComposite.getProgressBar();
 		if (percents > 0) {
 			progressBar.setVisible(true);
 			progressBar.setSelection(percents);
@@ -303,22 +307,21 @@ public class AppleIPhone3ResizableSkin implements BrowserSimSkin {
 	@Override
 	public void setOrientationAndSize(Point maximumShellSize, int orientation, Point browserSize) {
 		vertical = (orientation == DeviceOrientation.PORTRAIT || orientation == DeviceOrientation.PORTRAIT_INVERTED);
-		String urlTextText = iPhoneComposite.getUrlText().getText();
-		String pageTitle = iPhoneComposite.getPageTitleStyledText().getText();
-		boolean backEnabled = iPhoneComposite.getBackButtonComposite().getEnabled();
-		boolean forwardEnabled = iPhoneComposite.getForwardButtonComposite().getEnabled();
-		boolean navBarVisible = iPhoneComposite.isNavBarCompositeVisible();
-		Menu contextMenu = iPhoneComposite.getMenu();
-		iPhoneComposite.setMenu(null);
+		String urlTextText = deviceComposite.getUrlText().getText();
+		String pageTitle = deviceComposite.getPageTitleStyledText() != null ? deviceComposite.getPageTitleStyledText().getText() : "";
+		boolean backEnabled = deviceComposite.getBackButtonComposite().getEnabled();
+		boolean forwardEnabled = deviceComposite.getForwardButtonComposite().getEnabled();
+		boolean navBarVisible = deviceComposite.isNavBarCompositeVisible();
+		Menu contextMenu = deviceComposite.getMenu();
+		deviceComposite.setMenu(null);
 		
-		AppleIPhoneComposite oldIPhoneComposite = iPhoneComposite;
-		IPhoneSkinDescriptor skinDescriptor = getSkinDescriptor(vertical);
-		iPhoneComposite = new AppleIPhoneComposite(shell, skinDescriptor);
+		DeviceComposite oldDeviceComposite = deviceComposite;
+		deviceComposite = createDeviceComposite(shell, vertical);
 		bindIPhoneCompositeControls();
-		Composite browserContainer = iPhoneComposite.getBrowserContainer();
+		Composite browserContainer = deviceComposite.getBrowserContainer();
 		browserContainer.setLayout(new FillLayout());
 		browser.setParent(browserContainer);
-		oldIPhoneComposite.dispose();
+		oldDeviceComposite.dispose();
 		Point bordersSize = getBordersSize(vertical);
 		int shellWidth;
 		if (browserSize.x == SWT.DEFAULT) {
@@ -337,12 +340,14 @@ public class AppleIPhone3ResizableSkin implements BrowserSimSkin {
 		shell.layout(true);
 		setShellRegion();
 		
-		iPhoneComposite.getUrlText().setText(urlTextText);
-		iPhoneComposite.getPageTitleStyledText().setText(pageTitle);
-		iPhoneComposite.getBackButtonComposite().setEnabled(backEnabled);
-		iPhoneComposite.getForwardButtonComposite().setEnabled(forwardEnabled);
-		iPhoneComposite.setNavBarCompositeVisible(navBarVisible);
-		iPhoneComposite.setMenu(contextMenu);
+		deviceComposite.getUrlText().setText(urlTextText);
+		if (deviceComposite.getPageTitleStyledText() != null) {
+			deviceComposite.getPageTitleStyledText().setText(pageTitle);
+		}
+		deviceComposite.getBackButtonComposite().setEnabled(backEnabled);
+		deviceComposite.getForwardButtonComposite().setEnabled(forwardEnabled);
+		deviceComposite.setNavBarCompositeVisible(navBarVisible);
+		deviceComposite.setMenu(contextMenu);
 	}
 
 	protected Point getBordersSize(boolean vertical) {
@@ -350,14 +355,15 @@ public class AppleIPhone3ResizableSkin implements BrowserSimSkin {
 		return bordersSize;
 	}
 
-	protected IPhoneSkinDescriptor getSkinDescriptor(boolean vertical) {
+	protected DeviceComposite createDeviceComposite(Composite parent, boolean vertical) {
 		IPhoneSkinDescriptor skinDescriptor;
 		if (vertical) {
 			skinDescriptor = VERTICAL_IPHONE3_DESCRIPTOR;
 		} else {
 			skinDescriptor = HORIZONTAL_IPHONE3_DESCRIPTOR;
 		}
-		return skinDescriptor;
+		
+		return new AppleIPhoneComposite(parent, skinDescriptor);
 	}
 	
 	protected int[] getNormalRegion(boolean vertical) {
@@ -372,11 +378,11 @@ public class AppleIPhone3ResizableSkin implements BrowserSimSkin {
 	
 	@Override
 	public void setAddressBarVisible(boolean visible) {
-		iPhoneComposite.setNavBarCompositeVisible(visible);
+		deviceComposite.setNavBarCompositeVisible(visible);
 	}
 
 	@Override
 	public void setContextMenu(Menu contextMenu) {
-		iPhoneComposite.setMenu(contextMenu);
+		deviceComposite.setMenu(contextMenu);
 	}
 }

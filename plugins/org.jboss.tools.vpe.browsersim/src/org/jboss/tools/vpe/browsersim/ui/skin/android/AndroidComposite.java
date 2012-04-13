@@ -1,4 +1,5 @@
-package org.jboss.tools.vpe.browsersim.ui.skin.ios;
+package org.jboss.tools.vpe.browsersim.ui.skin.android;
+
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.custom.StyledText;
 import org.eclipse.swt.events.MouseAdapter;
@@ -19,10 +20,9 @@ import org.jboss.tools.vpe.browsersim.ui.skin.ImageDescriptor;
 import org.jboss.tools.vpe.browsersim.ui.skin.ImageList;
 import org.jboss.tools.vpe.browsersim.ui.skin.DeviceComposite;
 
-
-public class AppleIPhoneComposite extends Composite implements DeviceComposite {
+public class AndroidComposite extends Composite implements DeviceComposite {
 	private ImageList imageList;
-	private Composite iOsCompositeContainer;
+	private Composite androidOsCompositeContainer;
 	
 //	ImageDescriptor I_OS_DESCRIPTOR = new ImageDescriptor(null, 5, 3, SWT.VERTICAL | SWT.HORIZONTAL);
 //	ImageDescriptor[] BODY_DESCRIPTOR = {
@@ -34,9 +34,11 @@ public class AppleIPhoneComposite extends Composite implements DeviceComposite {
 //	};
 
 	private Composite browserContainer;
-	private IOSNavBarComposite navBarComposite;
+	private AndroidNavBarComposite navBarComposite;
 	private ImageButtonComposite forwardButtonComposite;
 	private ImageButtonComposite backButtonComposite;
+	private ImageButtonComposite homeButtonComposite;
+	private ImageButtonComposite refreshButtonComposite;
 
 	private Composite bodyComposite;
 
@@ -46,7 +48,7 @@ public class AppleIPhoneComposite extends Composite implements DeviceComposite {
 	 * @param skinDescriptor 
 	 * @param style
 	 */
-	public AppleIPhoneComposite(Composite parent, IPhoneSkinDescriptor skinDescriptor) {
+	public AndroidComposite(Composite parent, AndroidSkinDescriptor skinDescriptor) {
 		super(parent, SWT.NONE);
 		
 		imageList = new ImageList(this);
@@ -54,6 +56,8 @@ public class AppleIPhoneComposite extends Composite implements DeviceComposite {
 		
 		backButtonComposite = new ImageButtonComposite(this, imageList, skinDescriptor.getBackButton());
 		forwardButtonComposite = new ImageButtonComposite(this, imageList, skinDescriptor.getForwardButton());
+		refreshButtonComposite = new ImageButtonComposite(this, imageList, skinDescriptor.getRefreshButton());
+		homeButtonComposite = new ImageButtonComposite(this, imageList, skinDescriptor.getHomeButton());
 		
 		bodyComposite = new Composite(this, SWT.NONE);
 		FormData formData = new FormData();
@@ -72,8 +76,8 @@ public class AppleIPhoneComposite extends Composite implements DeviceComposite {
 		
 		for (ImageDescriptor descriptor : skinDescriptor.getBodyGridImageDescriptors()) {
 			Composite composite = descriptor.createWidget(bodyComposite, imageList);
-			if (descriptor == skinDescriptor.getiOSDescriptor()) {
-				iOsCompositeContainer = composite;
+			if (descriptor == skinDescriptor.getAndroidOSDescriptor()) {
+				androidOsCompositeContainer = composite;
 			}
 		}
 		
@@ -82,16 +86,16 @@ public class AppleIPhoneComposite extends Composite implements DeviceComposite {
 		gridLayout.horizontalSpacing = 0;
 		gridLayout.marginWidth = 0;
 		gridLayout.marginHeight = 0;
-		iOsCompositeContainer.setLayout(gridLayout);
-		IOsTimeComposite timeComposite = new IOsTimeComposite(iOsCompositeContainer, imageList);
+		androidOsCompositeContainer.setLayout(gridLayout);
+		AndroidTimeComposite timeComposite = new AndroidTimeComposite(androidOsCompositeContainer, imageList);
 		GridData gridData = new GridData(SWT.FILL, SWT.BEGINNING, true, false, 1, 1);
 		timeComposite.setLayoutData(gridData);
 		
-		navBarComposite = new IOSNavBarComposite(iOsCompositeContainer, imageList);
+		navBarComposite = new AndroidNavBarComposite(androidOsCompositeContainer, imageList);
 		gridData = new GridData(SWT.FILL, SWT.BEGINNING, true, false, 1, 1);
 		navBarComposite.setLayoutData(gridData);
 
-		browserContainer = new Composite(iOsCompositeContainer, SWT.NONE);
+		browserContainer = new Composite(androidOsCompositeContainer, SWT.NONE);
 		gridData = new GridData(SWT.FILL, SWT.FILL, true, true, 1, 1);
 		browserContainer.setLayoutData(gridData);
 
@@ -144,7 +148,7 @@ public class AppleIPhoneComposite extends Composite implements DeviceComposite {
 		} else {
 			gridData.heightHint = 0;
 		}
-		iOsCompositeContainer.layout();
+		androidOsCompositeContainer.layout();
 	}
 	
 	/* (non-Javadoc)
@@ -169,7 +173,15 @@ public class AppleIPhoneComposite extends Composite implements DeviceComposite {
 	 */
 	@Override
 	public ImageButtonComposite getRefreshButtonComposite() {
-		return navBarComposite.getRefreshButtonComposite();
+		return refreshButtonComposite;
+	}
+	
+	/* (non-Javadoc)
+	 * @see org.jboss.tools.vpe.browsersim.ui.skin.ios.PhoneComposite#getRefreshButtonComposite()
+	 */
+	@Override
+	public ImageButtonComposite getHomeButtonComposite() {
+		return homeButtonComposite;
 	}
 
 	/* (non-Javadoc)
@@ -193,7 +205,7 @@ public class AppleIPhoneComposite extends Composite implements DeviceComposite {
 	 */
 	@Override
 	public StyledText getPageTitleStyledText() {
-		return navBarComposite.getPageTitleStyledText();
+		return null;
 	}
 	
 	/* (non-Javadoc)
@@ -240,10 +252,5 @@ public class AppleIPhoneComposite extends Composite implements DeviceComposite {
 		for (Control child :bodyComposite.getChildren()) {
 			child.setMenu(menu);
 		}
-	}
-
-	@Override
-	public ImageButtonComposite getHomeButtonComposite() {
-		return null;
 	}
 }
