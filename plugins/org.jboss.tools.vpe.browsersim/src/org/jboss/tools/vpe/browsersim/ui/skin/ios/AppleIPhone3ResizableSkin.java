@@ -215,6 +215,15 @@ public class AppleIPhone3ResizableSkin implements BrowserSimSkin {
 				}
 			}
 		});
+		if (deviceComposite.getHomeButtonComposite() != null) {
+			deviceComposite.getHomeButtonComposite().addMouseListener(new MouseAdapter() {
+				public void mouseDown(MouseEvent e) {
+					if (e.button == 1) {
+						controlHandler.goHome();
+					}
+				}
+			});
+		}
 		deviceComposite.getUrlText().addListener(SWT.DefaultSelection, new Listener() {
 			public void handleEvent(Event e) {
 				controlHandler.goToAddress(((Text)e.widget).getText());
