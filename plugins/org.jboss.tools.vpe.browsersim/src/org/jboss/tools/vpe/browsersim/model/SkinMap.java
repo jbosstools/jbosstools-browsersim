@@ -8,6 +8,7 @@ import org.jboss.tools.vpe.browsersim.ui.skin.BrowserSimSkin;
 import org.jboss.tools.vpe.browsersim.ui.skin.NativeSkin;
 import org.jboss.tools.vpe.browsersim.ui.skin.android.AndroidResizableSkin;
 import org.jboss.tools.vpe.browsersim.ui.skin.ios.AppleIPhone3ResizableSkin;
+import org.jboss.tools.vpe.browsersim.ui.skin.ios.AppleIPhone4ResizableSkin;
 
 public class SkinMap {
 	public static final  Class<? extends BrowserSimSkin> DEFAULT_SKIN_CLASS = NativeSkin.class;
@@ -17,7 +18,8 @@ public class SkinMap {
 	private SkinMap(){
 		map = new HashMap<String, Class<? extends BrowserSimSkin>>();
 		
-		map.put("Apple iPhone 3", AppleIPhone3ResizableSkin.class);
+		map.put("iPhone 3", AppleIPhone3ResizableSkin.class);
+		map.put("iPhone 4", AppleIPhone4ResizableSkin.class);
 		map.put("Android", AndroidResizableSkin.class);
 	}
 	

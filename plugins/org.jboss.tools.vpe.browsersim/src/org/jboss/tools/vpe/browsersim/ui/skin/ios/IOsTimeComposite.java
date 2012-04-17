@@ -14,7 +14,6 @@ public class IOsTimeComposite extends AbstractTimeComposite {
 	
 	public IOsTimeComposite(Composite parent, ImageList imageList) {
 		super(parent, imageList);
-		System.out.println("ss");
 	}
 
 	protected ImageDescriptor[] getBodyDescriptor() {

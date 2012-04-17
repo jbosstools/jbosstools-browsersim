@@ -33,7 +33,7 @@ public class DevicesListStorage {
 	private static final String DEFAULT_PREFERENCES_RESOURCE = "config/devices.cfg";
 	private static final String USER_PREFERENCES_FOLDER = "org.jboss.tools.vpe.browsersim";
 	private static final String USER_PREFERENCES_FILE = "devices.cfg";
-	private static final int CURRENT_CONFIG_VERSION = 3;
+	private static final int CURRENT_CONFIG_VERSION = 4;
 
 	public static void saveUserDefinedDevicesList(DevicesList devicesList) {
 		File configFolder = new File(USER_PREFERENCES_FOLDER);
