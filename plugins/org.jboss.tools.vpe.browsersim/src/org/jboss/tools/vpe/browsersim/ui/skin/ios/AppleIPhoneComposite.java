@@ -9,18 +9,15 @@ import org.eclipse.swt.layout.FormLayout;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Composite;
-import org.eclipse.swt.widgets.Control;
-import org.eclipse.swt.widgets.Listener;
-import org.eclipse.swt.widgets.Menu;
 import org.eclipse.swt.widgets.ProgressBar;
 import org.eclipse.swt.widgets.Text;
+import org.jboss.tools.vpe.browsersim.ui.skin.DeviceComposite;
 import org.jboss.tools.vpe.browsersim.ui.skin.ImageButtonComposite;
 import org.jboss.tools.vpe.browsersim.ui.skin.ImageDescriptor;
 import org.jboss.tools.vpe.browsersim.ui.skin.ImageList;
-import org.jboss.tools.vpe.browsersim.ui.skin.DeviceComposite;
 
 
-public class AppleIPhoneComposite extends Composite implements DeviceComposite {
+public class AppleIPhoneComposite extends DeviceComposite {
 	private ImageList imageList;
 	private Composite iOsCompositeContainer;
 	
@@ -37,8 +34,6 @@ public class AppleIPhoneComposite extends Composite implements DeviceComposite {
 	private IOSNavBarComposite navBarComposite;
 	private ImageButtonComposite forwardButtonComposite;
 	private ImageButtonComposite backButtonComposite;
-
-	private Composite bodyComposite;
 
 	/**
 	 * Create the composite.
@@ -196,52 +191,6 @@ public class AppleIPhoneComposite extends Composite implements DeviceComposite {
 		return navBarComposite.getPageTitleStyledText();
 	}
 	
-	/* (non-Javadoc)
-	 * @see org.jboss.tools.vpe.browsersim.ui.skin.ios.PhoneComposite#addListener(int, org.eclipse.swt.widgets.Listener)
-	 */
-	@Override
-	public void addListener(int eventType, Listener listener) {
-		super.addListener(eventType, listener);
-		switch (eventType) {
-		case SWT.MouseDown:
-		case SWT.MouseUp:
-		case SWT.MouseMove:
-			bodyComposite.addListener(eventType, listener);
-			for (Control child : bodyComposite.getChildren()) {
-				child.addListener(eventType, listener);
-			}
-		}
-	}
-	
-	/* (non-Javadoc)
-	 * @see org.jboss.tools.vpe.browsersim.ui.skin.ios.PhoneComposite#removeListener(int, org.eclipse.swt.widgets.Listener)
-	 */
-	@Override
-	public void removeListener(int eventType, Listener listener) {
-		super.removeListener(eventType, listener);
-		switch (eventType) {
-		case SWT.MouseDown:
-		case SWT.MouseUp:
-		case SWT.MouseMove:
-			bodyComposite.removeListener(eventType, listener);
-			for (Control child :bodyComposite.getChildren()) {
-				child.removeListener(eventType, listener);
-			}
-		}
-	}
-	
-	/* (non-Javadoc)
-	 * @see org.jboss.tools.vpe.browsersim.ui.skin.ios.PhoneComposite#setMenu(org.eclipse.swt.widgets.Menu)
-	 */
-	@Override
-	public void setMenu(Menu menu) {
-		super.setMenu(menu);
-		bodyComposite.setMenu(menu);
-		for (Control child :bodyComposite.getChildren()) {
-			child.setMenu(menu);
-		}
-	}
-
 	@Override
 	public ImageButtonComposite getHomeButtonComposite() {
 		return null;
