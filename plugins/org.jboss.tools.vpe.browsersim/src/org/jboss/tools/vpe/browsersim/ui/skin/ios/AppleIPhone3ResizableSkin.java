@@ -3,8 +3,6 @@ package org.jboss.tools.vpe.browsersim.ui.skin.ios;
 import java.util.Arrays;
 
 import org.eclipse.swt.SWT;
-import org.eclipse.swt.events.MouseAdapter;
-import org.eclipse.swt.events.MouseEvent;
 import org.eclipse.swt.graphics.Point;
 import org.eclipse.swt.graphics.Region;
 import org.eclipse.swt.layout.FillLayout;
@@ -12,27 +10,25 @@ import org.eclipse.swt.layout.FormAttachment;
 import org.eclipse.swt.layout.FormData;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Display;
-import org.eclipse.swt.widgets.Event;
-import org.eclipse.swt.widgets.Listener;
 import org.eclipse.swt.widgets.Menu;
 import org.eclipse.swt.widgets.ProgressBar;
 import org.eclipse.swt.widgets.Shell;
-import org.eclipse.swt.widgets.Text;
 import org.jboss.tools.vpe.browsersim.browser.BrowserSimBrowser;
 import org.jboss.tools.vpe.browsersim.browser.IBrowserSimBrowserFactory;
 import org.jboss.tools.vpe.browsersim.model.DeviceOrientation;
 import org.jboss.tools.vpe.browsersim.ui.ControlHandler;
 import org.jboss.tools.vpe.browsersim.ui.skin.AppleIPhone3Skin;
-import org.jboss.tools.vpe.browsersim.ui.skin.BrowserSimSkin;
 import org.jboss.tools.vpe.browsersim.ui.skin.DeviceComposite;
 import org.jboss.tools.vpe.browsersim.ui.skin.ImageDescriptor;
+import org.jboss.tools.vpe.browsersim.ui.skin.ResizableSkin;
 
-public class AppleIPhone3ResizableSkin implements BrowserSimSkin {
+public class AppleIPhone3ResizableSkin extends ResizableSkin {
 	private static final Point NORMAL_SKREEN_SIZE = new Point(320, 480);
 	private static final Point NORMAL_SKIN_SIZE = new Point(384, 727);
 	private static final Point VERTICAL_BORDERS_SIZE = new Point(NORMAL_SKIN_SIZE.x - NORMAL_SKREEN_SIZE.x, NORMAL_SKIN_SIZE.y - NORMAL_SKREEN_SIZE.y);
 	private static final Point HORIZONTAL_BORDERS_SIZE = new Point(VERTICAL_BORDERS_SIZE.y, VERTICAL_BORDERS_SIZE.x);
 	private static final IPhoneSkinDescriptor VERTICAL_IPHONE3_DESCRIPTOR;
+	private static final int CORNERS_SIZE = 58;
 	static {
 		String bd = "ios/iphone3/vertical/";
 		ImageDescriptor iOsDescriptor = new ImageDescriptor(null, 5, 3, SWT.VERTICAL | SWT.HORIZONTAL);
@@ -61,7 +57,7 @@ public class AppleIPhone3ResizableSkin implements BrowserSimSkin {
 			formData.bottom = new FormAttachment(100, -132);
 			forwardButtonDescriptor = new ButtonDescriptor(formData, bd2 + "forward.png", bd2 + "forward-disabled.png", bd2 + "forward-selected.png");
 		}
-		VERTICAL_IPHONE3_DESCRIPTOR = new IPhoneSkinDescriptor(bodyGridSize, bodyGridImageDescriptors, iOsDescriptor, backButtonDescriptor, forwardButtonDescriptor);
+		VERTICAL_IPHONE3_DESCRIPTOR = new IPhoneSkinDescriptor(bodyGridSize, bodyGridImageDescriptors, iOsDescriptor, CORNERS_SIZE, backButtonDescriptor, forwardButtonDescriptor);
 	}
 	private static final IPhoneSkinDescriptor HORIZONTAL_IPHONE3_DESCRIPTOR;
 	static {
@@ -93,7 +89,7 @@ public class AppleIPhone3ResizableSkin implements BrowserSimSkin {
 			formData.bottom = new FormAttachment(100, -36);
 			forwardButtonDescriptor = new ButtonDescriptor(formData, bd2 + "forward.png", bd2 + "forward-disabled.png", bd2 + "forward-selected.png");
 		}
-		HORIZONTAL_IPHONE3_DESCRIPTOR = new IPhoneSkinDescriptor(bodyGridSize, bodyGridImageDescriptors, iOsDescriptor, backButtonDescriptor, forwardButtonDescriptor);
+		HORIZONTAL_IPHONE3_DESCRIPTOR = new IPhoneSkinDescriptor(bodyGridSize, bodyGridImageDescriptors, iOsDescriptor, CORNERS_SIZE, backButtonDescriptor, forwardButtonDescriptor);
 	}
 
 	private IBrowserSimBrowserFactory browserFactory;
@@ -101,8 +97,6 @@ public class AppleIPhone3ResizableSkin implements BrowserSimSkin {
 	private Display display;
 	private Shell shell;
 	private BrowserSimBrowser browser;
-	private ControlHandler controlHandler;
-	private DeviceComposite deviceComposite;
 
 	@Override
 	public void setBrowserFactory(IBrowserSimBrowserFactory browserFactory) {
@@ -117,7 +111,7 @@ public class AppleIPhone3ResizableSkin implements BrowserSimSkin {
 		
 		deviceComposite = new AppleIPhoneComposite(shell, VERTICAL_IPHONE3_DESCRIPTOR);
 		vertical = true;
-		bindIPhoneCompositeControls();
+		bindDeviceCompositeControls();
 		Composite browserContainer = deviceComposite.getBrowserContainer();
 		browserContainer.setLayout(new FillLayout());
 		browser = browserFactory.createBrowser(browserContainer, SWT.NONE);
@@ -186,80 +180,6 @@ public class AppleIPhone3ResizableSkin implements BrowserSimSkin {
 //		});
 	}
 
-	private void bindIPhoneCompositeControls() {
-		deviceComposite.getBackButtonComposite().addMouseListener(new MouseAdapter() {
-			public void mouseDown(MouseEvent e) {
-				if (e.button == 1) {
-					controlHandler.goBack();
-				}
-			}
-		});
-		deviceComposite.getForwardButtonComposite().addMouseListener(new MouseAdapter() {
-			public void mouseDown(MouseEvent e) {
-				if (e.button == 1) {
-					controlHandler.goForward();
-				}
-			}
-		});
-		deviceComposite.getStopButtonComposite().addMouseListener(new MouseAdapter() {
-			public void mouseDown(MouseEvent e) {
-				if (e.button == 1) {
-					controlHandler.stop();
-				}
-			}
-		});
-		deviceComposite.getRefreshButtonComposite().addMouseListener(new MouseAdapter() {
-			public void mouseDown(MouseEvent e) {
-				if (e.button == 1) {
-					controlHandler.refresh();
-				}
-			}
-		});
-		if (deviceComposite.getHomeButtonComposite() != null) {
-			deviceComposite.getHomeButtonComposite().addMouseListener(new MouseAdapter() {
-				public void mouseDown(MouseEvent e) {
-					if (e.button == 1) {
-						controlHandler.goHome();
-					}
-				}
-			});
-		}
-		deviceComposite.getUrlText().addListener(SWT.DefaultSelection, new Listener() {
-			public void handleEvent(Event e) {
-				controlHandler.goToAddress(((Text)e.widget).getText());
-			}
-		});
-		
-		
-		Listener l = new Listener() {
-			Point origin;
-			Point shellOrigin;
-
-			public void handleEvent(Event e) {
-				if ((e.stateMask & SWT.BUTTON1) != 0 || e.button == 1) { // left mouse Composite
-					switch (e.type) {
-					case SWT.MouseDown:
-						origin = AppleIPhone3ResizableSkin.this.display.map(shell, null, e.x, e.y);
-						shellOrigin = shell.getLocation();
-						break;
-					case SWT.MouseUp:
-						origin = null;
-						break;
-					case SWT.MouseMove:
-						if (origin != null) {
-							Point p = AppleIPhone3ResizableSkin.this.display.map(shell, null, e.x, e.y);
-							shell.setLocation(shellOrigin.x + p.x - origin.x, shellOrigin.y + p.y - origin.y);
-						}
-						break;
-					}
-				}
-			}
-		};
-		deviceComposite.addListener(SWT.MouseDown, l);
-		deviceComposite.addListener(SWT.MouseUp, l);
-		deviceComposite.addListener(SWT.MouseMove, l);
-	}
-
 	@Override
 	public BrowserSimBrowser getBrowser() {
 		return browser;
@@ -326,7 +246,7 @@ public class AppleIPhone3ResizableSkin implements BrowserSimSkin {
 		
 		DeviceComposite oldDeviceComposite = deviceComposite;
 		deviceComposite = createDeviceComposite(shell, vertical);
-		bindIPhoneCompositeControls();
+		bindDeviceCompositeControls();
 		Composite browserContainer = deviceComposite.getBrowserContainer();
 		browserContainer.setLayout(new FillLayout());
 		browser.setParent(browserContainer);

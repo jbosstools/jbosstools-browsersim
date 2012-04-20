@@ -2,6 +2,8 @@ package org.jboss.tools.vpe.browsersim.ui.skin;
 
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.custom.StyledText;
+import org.eclipse.swt.graphics.Point;
+import org.eclipse.swt.graphics.Rectangle;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Listener;
@@ -46,6 +48,7 @@ public abstract class DeviceComposite extends Composite {
 		case SWT.MouseDown:
 		case SWT.MouseUp:
 		case SWT.MouseMove:
+		case SWT.MouseExit:
 			bodyComposite.addListener(eventType, listener);
 			for (Control child : bodyComposite.getChildren()) {
 				child.addListener(eventType, listener);
@@ -63,6 +66,7 @@ public abstract class DeviceComposite extends Composite {
 		case SWT.MouseDown:
 		case SWT.MouseUp:
 		case SWT.MouseMove:
+		case SWT.MouseExit:
 			bodyComposite.removeListener(eventType, listener);
 			for (Control child :bodyComposite.getChildren()) {
 				child.removeListener(eventType, listener);
@@ -81,6 +85,32 @@ public abstract class DeviceComposite extends Composite {
 			child.setMenu(menu);
 		}
 	}
-
+	
+	public boolean isDeviceBody(Control contol) {
+		// XXX: simple implementation, there are some cases when this won't work
+		if (contol instanceof Composite) {
+			Composite composite = (Composite) contol;
+			if (composite.getParent() == bodyComposite && composite.getBackgroundImage() != null) {
+				return true;
+			}
+		}
+		
+		return false;
+	}
+	
+	public boolean isDeviceCorner(Point displayPoint) {
+		Point bodyPoint = bodyComposite.toControl(displayPoint);
+		Point bodySize = bodyComposite.getSize();
+		int cornersSize = getCornersSize();
+		Rectangle leftTopCorner = new Rectangle(0, 0, cornersSize, cornersSize);
+		Rectangle rightTopCorner = new Rectangle(bodySize.x - cornersSize, 0, cornersSize, cornersSize);
+		Rectangle leftBottomCorner = new Rectangle(0, bodySize.y - cornersSize, cornersSize, cornersSize);
+		Rectangle rightBottomCorner = new Rectangle(bodySize.x - cornersSize, bodySize.y - cornersSize, cornersSize, cornersSize);		
+		
+		return leftTopCorner.contains(bodyPoint) || rightTopCorner.contains(bodyPoint)
+				|| leftBottomCorner.contains(bodyPoint) || rightBottomCorner.contains(bodyPoint); 
+	}
+	
+	protected abstract int getCornersSize();
 	public abstract ImageButtonComposite getHomeButtonComposite();
 }

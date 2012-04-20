@@ -34,6 +34,7 @@ public class AppleIPhoneComposite extends DeviceComposite {
 	private IOSNavBarComposite navBarComposite;
 	private ImageButtonComposite forwardButtonComposite;
 	private ImageButtonComposite backButtonComposite;
+	private int cornersSize;
 
 	/**
 	 * Create the composite.
@@ -89,6 +90,8 @@ public class AppleIPhoneComposite extends DeviceComposite {
 		browserContainer = new Composite(iOsCompositeContainer, SWT.NONE);
 		gridData = new GridData(SWT.FILL, SWT.FILL, true, true, 1, 1);
 		browserContainer.setLayoutData(gridData);
+		
+		cornersSize = skinDescriptor.getCornersSize();
 
 		timeComposite.addMouseListener(new MouseAdapter() {
 			public void mouseDown(MouseEvent e) {
@@ -194,5 +197,10 @@ public class AppleIPhoneComposite extends DeviceComposite {
 	@Override
 	public ImageButtonComposite getHomeButtonComposite() {
 		return null;
+	}
+
+	@Override
+	protected int getCornersSize() {
+		return cornersSize;
 	}
 }

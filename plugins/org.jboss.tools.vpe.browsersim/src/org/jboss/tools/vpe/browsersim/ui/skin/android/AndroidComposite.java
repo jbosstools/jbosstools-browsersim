@@ -36,6 +36,7 @@ public class AndroidComposite extends DeviceComposite {
 	private ImageButtonComposite backButtonComposite;
 	private ImageButtonComposite homeButtonComposite;
 	private ImageButtonComposite refreshButtonComposite;
+	private int cornersSize;
 
 	/**
 	 * Create the composite.
@@ -43,7 +44,7 @@ public class AndroidComposite extends DeviceComposite {
 	 * @param skinDescriptor 
 	 * @param style
 	 */
-	public AndroidComposite(Composite parent, AndroidSkinDescriptor skinDescriptor) {
+	public AndroidComposite(final Composite parent, AndroidSkinDescriptor skinDescriptor) {
 		super(parent, SWT.NONE);
 		
 		imageList = new ImageList(this);
@@ -93,6 +94,7 @@ public class AndroidComposite extends DeviceComposite {
 		browserContainer = new Composite(androidOsCompositeContainer, SWT.NONE);
 		gridData = new GridData(SWT.FILL, SWT.FILL, true, true, 1, 1);
 		browserContainer.setLayoutData(gridData);
+		cornersSize = skinDescriptor.getCornersSize();
 
 		timeComposite.addMouseListener(new MouseAdapter() {
 			public void mouseDown(MouseEvent e) {
@@ -101,6 +103,23 @@ public class AndroidComposite extends DeviceComposite {
 				}
 			}
 		});
+		
+		
+		
+//		Runnable r = new Runnable() {
+//			@Override
+//			public void run() {
+//				Point displayPoint = Display.getCurrent().getCursorLocation();
+//				Point bodyPoint = bodyComposite.toControl(displayPoint);
+//				if (bodyPoint.x < 100 && bodyPoint.y < 100) {
+////					bodyComposite.setCursor(new Cursor(Display.getCurrent(), SWT.CURSOR_HAND));
+//				} else {
+//					bodyComposite.setCursor(null);					
+//				}
+//				Display.getCurrent().timerExec(100, this);
+//			}
+//		};
+//		Display.getCurrent().timerExec(500, r);
 	}
 	
 	/* (non-Javadoc)
@@ -201,5 +220,10 @@ public class AndroidComposite extends DeviceComposite {
 	@Override
 	public StyledText getPageTitleStyledText() {
 		return null;
+	}
+	
+	@Override
+	protected int getCornersSize() {
+		return cornersSize;
 	}
 }

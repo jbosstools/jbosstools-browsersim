@@ -5,17 +5,19 @@ import org.jboss.tools.vpe.browsersim.ui.skin.ImageDescriptor;
 public class IPhoneSkinDescriptor {
 	private int bodyGridSize;
 	private ImageDescriptor[] bodyGridImageDescriptors;
-	private ImageDescriptor iOSDescriptor;
+	private ImageDescriptor osDescriptor;
+	private int cornersSize;
 	private ButtonDescriptor backButton;
 	private ButtonDescriptor forwardButton;
 
 	public IPhoneSkinDescriptor(int bodyGridSize,
 			ImageDescriptor[] bodyGridImageDescriptors,
-			ImageDescriptor iOSDescriptor, ButtonDescriptor backButton,
-			ButtonDescriptor forwardButton) {
+			ImageDescriptor iOSDescriptor, int cornersSize,
+			ButtonDescriptor backButton, ButtonDescriptor forwardButton) {
 		this.bodyGridSize = bodyGridSize;
 		this.bodyGridImageDescriptors = bodyGridImageDescriptors;
-		this.iOSDescriptor = iOSDescriptor;
+		this.osDescriptor = iOSDescriptor;
+		this.cornersSize = cornersSize;
 		this.backButton = backButton;
 		this.forwardButton = forwardButton;
 	}
@@ -29,7 +31,11 @@ public class IPhoneSkinDescriptor {
 	}
 
 	public ImageDescriptor getiOSDescriptor() {
-		return iOSDescriptor;
+		return osDescriptor;
+	}
+	
+	public int getCornersSize() {
+		return cornersSize;
 	}
 
 	public ButtonDescriptor getBackButton() {

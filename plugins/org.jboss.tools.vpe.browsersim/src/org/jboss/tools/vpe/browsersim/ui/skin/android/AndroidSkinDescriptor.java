@@ -6,7 +6,8 @@ import org.jboss.tools.vpe.browsersim.ui.skin.ios.ButtonDescriptor;
 public class AndroidSkinDescriptor {
 	private int bodyGridSize;
 	private ImageDescriptor[] bodyGridImageDescriptors;
-	private ImageDescriptor iOSDescriptor;
+	private ImageDescriptor osDescriptor;
+	private int cornersSize;
 	private ButtonDescriptor backButton;
 	private ButtonDescriptor forwardButton;
 	private ButtonDescriptor homeButton;
@@ -14,12 +15,13 @@ public class AndroidSkinDescriptor {
 
 	public AndroidSkinDescriptor(int bodyGridSize,
 			ImageDescriptor[] bodyGridImageDescriptors,
-			ImageDescriptor iOSDescriptor, ButtonDescriptor backButton,
-			ButtonDescriptor forwardButton, ButtonDescriptor homeButton,
-			ButtonDescriptor refreshButton) {
+			ImageDescriptor iOSDescriptor, int cornersSize,
+			ButtonDescriptor backButton, ButtonDescriptor forwardButton,
+			ButtonDescriptor homeButton, ButtonDescriptor refreshButton) {
 		this.bodyGridSize = bodyGridSize;
 		this.bodyGridImageDescriptors = bodyGridImageDescriptors;
-		this.iOSDescriptor = iOSDescriptor;
+		this.osDescriptor = iOSDescriptor;
+		this.cornersSize = cornersSize;
 		this.backButton = backButton;
 		this.forwardButton = forwardButton;
 		this.homeButton = homeButton;
@@ -35,7 +37,11 @@ public class AndroidSkinDescriptor {
 	}
 
 	public ImageDescriptor getAndroidOSDescriptor() {
-		return iOSDescriptor;
+		return osDescriptor;
+	}
+
+	public int getCornersSize() {
+		return cornersSize;
 	}
 
 	public ButtonDescriptor getBackButton() {
