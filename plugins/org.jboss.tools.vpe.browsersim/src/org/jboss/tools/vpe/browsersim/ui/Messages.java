@@ -19,7 +19,6 @@ public class Messages {
 	private static final String BUNDLE_NAME = Messages.class.getName().toString().toLowerCase();
 	public static String BrowserSim_ADDRESS;
 	public static String BrowserSim_BROWSER_SIM;
-	public static String BrowserSim_COULD_NOT_INSTANTIATE_WEBKIT_BROWSER;
 	public static String BrowserSim_COULD_NOT_OPEN_DEFAULT_BROWSER;
 	public static String BrowserSim_DEVICES;
 	public static String BrowserSim_ERROR;
@@ -40,6 +39,10 @@ public class Messages {
 	public static String EditDeviceDialog_SKIN;
 	public static String EditDeviceDialog_USER_AGENT;
 	public static String EditDeviceDialog_WIDTH;
+	public static String ExceptionNotifier_APPLE_APPLICATION_SUPPORT_IS_NOT_FOUND;
+	public static String ExceptionNotifier_COULD_NOT_INSTANTIATE_WEBKIT_BROWSER;
+	public static String ExceptionNotifier_ONLY_32_BIT_ECLIPSE_IS_SUPPORTED_ON_WINDOWS;
+	public static String ExceptionNotifier_WEBKIT_GTK_IS_NOT_FOUND;
 	public static String ManageDevicesDialog_ADD;
 	public static String ManageDevicesDialog_CANCEL;
 	public static String ManageDevicesDialog_DEFAULT;

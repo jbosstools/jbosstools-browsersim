@@ -17,6 +17,9 @@ import org.eclipse.swt.SWT;
  */
 public class PlatformUtil {
 
+	public static final String ARCH_X86 = "x86";
+	public static final String OS_WIN32 = "win32";
+	public static final String OS_LINUX = "linux";
 	public static final String OS_MACOSX = "macosx";
 	public static final String CURRENT_PLATFORM;
 	static {
@@ -24,7 +27,7 @@ public class PlatformUtil {
 		String ws = getWs();
 		String arch = getArch();
 
-		if (OS_MACOSX.equals(os) && "x86".equals(arch)) {
+		if (OS_MACOSX.equals(os) && ARCH_X86.equals(arch)) {
 			CURRENT_PLATFORM = ws + '.' + os; // special case for MacOSX x86 (its SWT bundle has name org.eclipse.swt.cocoa.macosx)
 		} else {			
 			CURRENT_PLATFORM = ws + '.' + os + '.' + arch;
@@ -34,9 +37,9 @@ public class PlatformUtil {
 	/*
 	 * Copy of org.eclipse.swt.internal.Library.arch() 
 	 */
-	private static String getArch() {
+	public static String getArch() {
 		String osArch = System.getProperty("os.arch"); //$NON-NLS-1$
-		if (osArch.equals ("i386") || osArch.equals ("i686")) return "x86"; //$NON-NLS-1$ $NON-NLS-2$ $NON-NLS-3$
+		if (osArch.equals ("i386") || osArch.equals ("i686")) return ARCH_X86; //$NON-NLS-1$ $NON-NLS-2$ $NON-NLS-3$
 		if (osArch.equals ("amd64")) return "x86_64"; //$NON-NLS-1$ $NON-NLS-2$
 		if (osArch.equals ("IA64N")) return "ia64_32"; //$NON-NLS-1$ $NON-NLS-2$
 		if (osArch.equals ("IA64W")) return "ia64"; //$NON-NLS-1$ $NON-NLS-2$
@@ -48,12 +51,12 @@ public class PlatformUtil {
 	 */
 	public static String getOs() {
 		String osName = System.getProperty("os.name"); //$NON-NLS-1$
-		if (osName.equals ("Linux")) return "linux"; //$NON-NLS-1$ $NON-NLS-2$
+		if (osName.equals ("Linux")) return OS_LINUX; //$NON-NLS-1$ $NON-NLS-2$
 		if (osName.equals ("AIX")) return "aix"; //$NON-NLS-1$ $NON-NLS-2$
 		if (osName.equals ("Solaris") || osName.equals ("SunOS")) return "solaris"; //$NON-NLS-1$ $NON-NLS-2$ $NON-NLS-3$
 		if (osName.equals ("HP-UX")) return "hpux"; //$NON-NLS-1$ $NON-NLS-2$
 		if (osName.equals ("Mac OS X")) return OS_MACOSX; //$NON-NLS-1$ $NON-NLS-2$
-		if (osName.startsWith ("Win")) return "win32"; //$NON-NLS-1$ $NON-NLS-2$
+		if (osName.startsWith ("Win")) return OS_WIN32; //$NON-NLS-1$ $NON-NLS-2$
 		return osName;
 	}
 	

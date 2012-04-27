@@ -46,7 +46,6 @@ import org.eclipse.swt.program.Program;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Menu;
 import org.eclipse.swt.widgets.MenuItem;
-import org.eclipse.swt.widgets.MessageBox;
 import org.eclipse.swt.widgets.Monitor;
 import org.eclipse.swt.widgets.Shell;
 import org.jboss.tools.vpe.browsersim.browser.BrowserSimBrowser;
@@ -154,7 +153,8 @@ public class BrowserSim {
 		try {
 			skin.createControls(display);
 		} catch (SWTError e) {
-			showErrorMessage(new Shell(display), Messages.BrowserSim_COULD_NOT_INSTANTIATE_WEBKIT_BROWSER + e.getMessage());
+			e.printStackTrace();
+			ExceptionNotifier.showWebKitLoadError(new Shell(display), e);
 			display.dispose();
 			return;
 		}
@@ -398,7 +398,8 @@ public class BrowserSim {
 						url = new URL(skin.getBrowser().getUrl());// validate URL (to do not open 'about:blank' and similar)
 						Program.launch(url.toString());
 					} catch (MalformedURLException e1) {
-						showErrorMessage(skin.getShell(), Messages.BrowserSim_COULD_NOT_OPEN_DEFAULT_BROWSER + e1.getMessage());
+						e1.printStackTrace();
+						ExceptionNotifier.showErrorMessage(skin.getShell(), Messages.BrowserSim_COULD_NOT_OPEN_DEFAULT_BROWSER + e1.getMessage());
 					}
 			}
 		});
@@ -426,15 +427,6 @@ public class BrowserSim {
 				}
 			}
 		});
-	}
-	
-	private void showErrorMessage(Shell shell, String message) {
-		System.err.println(message);
-		
-		MessageBox messageBox = new MessageBox(shell, SWT.OK | SWT.ICON_ERROR);
-		messageBox.setText(Messages.BrowserSim_ERROR);
-		messageBox.setMessage(message);
-		messageBox.open();
 	}
 
 	private void addDevicesListForMenu(final DevicesList devicesList, Menu devicesMenu) {
