@@ -40,9 +40,9 @@ public class Messages {
 	public static String EditDeviceDialog_USER_AGENT;
 	public static String EditDeviceDialog_WIDTH;
 	public static String ExceptionNotifier_APPLE_APPLICATION_SUPPORT_IS_NOT_FOUND;
-	public static String ExceptionNotifier_WEBKIT_IS_FAILED_TO_START;
+	public static String ExceptionNotifier_BROWSERSIM_IS_FAILED_TO_START;
 	public static String ExceptionNotifier_ONLY_32_BIT_ECLIPSE_IS_SUPPORTED_ON_WINDOWS;
-	public static String ExceptionNotifier_WEBKIT_IS_FAILED_TO_START_ON_LINUX;
+	public static String ExceptionNotifier_BROWSERSIM_IS_FAILED_TO_START_ON_LINUX;
 	public static String ManageDevicesDialog_ADD;
 	public static String ManageDevicesDialog_CANCEL;
 	public static String ManageDevicesDialog_DEFAULT;

@@ -53,9 +53,9 @@ public class ExceptionNotifier {
 				&& error.getMessage().contains("Safari must be installed to use a SWT.WEBKIT-style Browser")) {
 			message = Messages.ExceptionNotifier_APPLE_APPLICATION_SUPPORT_IS_NOT_FOUND;
 		} else if (PlatformUtil.OS_LINUX.equals(os) && error.getMessage() != null) {    // Linux - probably WebKitGTK is not installed
-			message = MessageFormat.format(Messages.ExceptionNotifier_WEBKIT_IS_FAILED_TO_START_ON_LINUX, error.getMessage());
+			message = MessageFormat.format(Messages.ExceptionNotifier_BROWSERSIM_IS_FAILED_TO_START_ON_LINUX, error.getMessage());
 		} else {																	  // everything else
-			message = MessageFormat.format(Messages.ExceptionNotifier_WEBKIT_IS_FAILED_TO_START, error.getMessage());
+			message = MessageFormat.format(Messages.ExceptionNotifier_BROWSERSIM_IS_FAILED_TO_START, error.getMessage());
 		}
 		showErrorMessageWithLinks(parentShell, message);
 	}
