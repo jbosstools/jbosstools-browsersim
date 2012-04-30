@@ -170,6 +170,8 @@ public class NativeSkin implements BrowserSimSkin {
 				controlHandler.goToAddress(locationText.getText());
 			}
 		});
+		
+		UIUtil.addSelectTextOnFocusListener(locationText);
 	}
 	
 	@Override

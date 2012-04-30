@@ -588,21 +588,25 @@ public class BrowserSim {
 		@Override
 		public void goBack() {
 			browser.back();
+			browser.setFocus();
 		}
 
 		@Override
 		public void goForward() {
 			browser.forward();
+			browser.setFocus();
 		}
 
 		@Override
 		public void goHome() {
 			browser.setUrl(homeUrl);
+			browser.setFocus();
 		}
 
 		@Override
 		public void goToAddress(String address) {
 			browser.setUrl(address);
+			browser.setFocus();
 		}
 
 		@Override
@@ -618,11 +622,13 @@ public class BrowserSim {
 		@Override
 		public void stop() {
 			browser.stop();
+			browser.setFocus();
 		}
 
 		@Override
 		public void refresh() {
 			browser.refresh();
+			browser.setFocus();
 		}
 	}
 }

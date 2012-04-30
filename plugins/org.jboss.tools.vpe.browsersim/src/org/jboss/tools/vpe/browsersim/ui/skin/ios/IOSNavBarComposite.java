@@ -43,11 +43,11 @@ public class IOSNavBarComposite extends Composite {
 		formData.bottom = new FormAttachment(0, 26);
 		formData.height = 27;
 		pageTitleStyledText.setLayoutData(formData);
-		urlText = new Text(this, SWT.SINGLE);
 		
+		urlText = new Text(this, SWT.SINGLE);
 		formData = new FormData();
 		formData.left = new FormAttachment(0, 12);
-		formData.right = new FormAttachment(100, -62);
+		formData.right = new FormAttachment(100, -58);
 		formData.top = new FormAttachment(0, 33);
 		formData.bottom = new FormAttachment(100, -8);
 		urlText.setLayoutData(formData);
@@ -65,7 +65,7 @@ public class IOSNavBarComposite extends Composite {
 		formData = new FormData();
 		Rectangle stopImageBounds = imageList.getImage(BD + "stop.png").getBounds();
 		formData.right = new FormAttachment(100, -42);
-		formData.bottom = new FormAttachment(100, -11);
+		formData.bottom = new FormAttachment(100, -12);
 		formData.width = stopImageBounds.width;
 		formData.height = stopImageBounds.height;
 		stopButtonComposite.setLayoutData(formData);
