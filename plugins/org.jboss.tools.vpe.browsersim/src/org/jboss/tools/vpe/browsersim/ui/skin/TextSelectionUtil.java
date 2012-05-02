@@ -55,7 +55,9 @@ class SelectTextListenerImpl extends MouseAdapter implements SelectTextListener 
 		display.asyncExec(new Runnable() {
 			@Override
 			public void run() {
-				text.selectAll();
+				if (!text.isDisposed()) {
+					text.selectAll();
+				}
 			}
 		});
 	}
@@ -64,7 +66,9 @@ class SelectTextListenerImpl extends MouseAdapter implements SelectTextListener 
 		display.asyncExec(new Runnable() {
 			@Override
 			public void run() {
-				text.clearSelection();
+				if (!text.isDisposed()) {
+					text.clearSelection();
+				}
 			}
 		});
 	}
