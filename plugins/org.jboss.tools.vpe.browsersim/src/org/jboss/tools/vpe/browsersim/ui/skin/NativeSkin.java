@@ -171,7 +171,7 @@ public class NativeSkin implements BrowserSimSkin {
 			}
 		});
 		
-		UIUtil.addSelectTextOnFocusListener(locationText);
+		TextSelectionUtil.addSelectTextOnFocusListener(locationText);
 	}
 	
 	@Override

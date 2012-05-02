@@ -62,7 +62,7 @@ public abstract class ResizableSkin implements BrowserSimSkin {
 				controlHandler.goToAddress(((Text)e.widget).getText());
 			}
 		});
-		UIUtil.addSelectTextOnFocusListener(deviceComposite.getUrlText());
+		TextSelectionUtil.addSelectTextOnFocusListener(deviceComposite.getUrlText());
 		
 		Listener moveListener = new Listener() {
 			Point origin;
