@@ -16,18 +16,10 @@ import org.eclipse.swt.SWT;
 import org.eclipse.swt.SWTError;
 import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
-import org.eclipse.swt.graphics.Color;
-import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.layout.GridData;
-import org.eclipse.swt.layout.GridLayout;
-import org.eclipse.swt.layout.RowLayout;
 import org.eclipse.swt.program.Program;
 import org.eclipse.swt.widgets.Button;
-import org.eclipse.swt.widgets.Composite;
-import org.eclipse.swt.widgets.Dialog;
-import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Event;
-import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Link;
 import org.eclipse.swt.widgets.Listener;
 import org.eclipse.swt.widgets.MessageBox;
@@ -38,7 +30,6 @@ import org.jboss.tools.vpe.browsersim.browser.PlatformUtil;
  * @author Yahor Radtsevich (yradtsevich)
  */
 public class ExceptionNotifier {
-	
 	/**
 	 * Should be used to notify user about WebKit-loading errors
 	 */
@@ -79,84 +70,47 @@ public class ExceptionNotifier {
 	}
 }
 
+
 /**
  * Behaves like MessageBox with styles SWT.OK and SWT.ICON_ERROR, but allows HTML links is messages. 
  * @author Yahor Radtsevich (yradtsevich)
  *
  */
-class ErrorMessageBoxWithLinks extends Dialog {
-	private Shell shell;
+class ErrorMessageBoxWithLinks extends CustomMessageBox {
+
 	private String message;
 
 	public ErrorMessageBoxWithLinks(Shell parent) {
-		super(parent, SWT.NONE);
+		super(parent, parent.getDisplay().getSystemImage(SWT.ICON_ERROR));
 		message = "";
 	}
 
-	public void open() {
-		shell = new Shell(getParent(), SWT.DIALOG_TRIM);
-		GridLayout shellLayout = new GridLayout(1, true);
-		shellLayout.marginHeight = 0;
-		shellLayout.marginWidth = 0;
-		shellLayout.verticalSpacing = 0;  
-		shell.setLayout(shellLayout);
-		shell.setText(getText());
-		
-		Color whiteColor = getParent().getDisplay().getSystemColor(SWT.COLOR_WHITE);
-		Composite messageComposite = new Composite(shell, SWT.NONE);
-		GridData gridData = new GridData(SWT.FILL, SWT.FILL, true, true); 
-		messageComposite.setLayoutData(gridData);
-		RowLayout messageCompositeLayout = new RowLayout(SWT.HORIZONTAL);
-		messageCompositeLayout.marginHeight = 22;
-		messageCompositeLayout.marginWidth = 22;
-		messageCompositeLayout.spacing = 10;
-		messageCompositeLayout.center = true;
-		messageComposite.setLayout(messageCompositeLayout);
-		messageComposite.setBackground(whiteColor);
-		
-		Image errorImage = shell.getDisplay().getSystemImage(SWT.ICON_ERROR);
-		Label imageLabel = new Label(messageComposite, SWT.NONE);
-		imageLabel.setImage(errorImage);
-		imageLabel.setBackground(whiteColor);
-		Link link = new Link(messageComposite, SWT.WRAP);
+	@Override
+	protected void createWidgets() {
+		super.createWidgets();
+				
+		Link link = new Link(getMessageComposite(), SWT.WRAP);
 		link.setText(message);
-		link.setBackground(whiteColor);
+		link.setBackground(getMessageCompositeBackground());
 		link.addListener (SWT.Selection, new Listener () {
 			public void handleEvent(Event event) {
 				Program.launch(event.text);
 			}
 		});
 		
-		Composite okComposite = new Composite(shell, SWT.NONE);
-		gridData = new GridData(SWT.FILL, SWT.FILL, true, true);
-		okComposite.setLayoutData(gridData);
-		GridLayout okCompositeLayout = new GridLayout(1, false);
-		okCompositeLayout.marginHeight = 10;
-		okCompositeLayout.marginWidth = 10;
-		okComposite.setLayout(okCompositeLayout);
-		
-		Button ok = new Button(okComposite, SWT.PUSH);
+		Button ok = new Button(getButtonsComposite(), SWT.PUSH);
 		ok.setText("OK");
 		ok.addSelectionListener(new SelectionAdapter() {
 			@Override
 			public void widgetSelected(SelectionEvent e) {
-				shell.close();
+				getShell().close();
 			}
 		});
 		GridData okLayoutData = new GridData(SWT.END, SWT.CENTER, true, true);
 		okLayoutData.widthHint = 88;
 		ok.setLayoutData(okLayoutData);
-		shell.setDefaultButton(ok);
-
-		
-		shell.pack();
-		shell.open();
-		Display display = getParent().getDisplay();
-		while (!shell.isDisposed()) {
-			if (!display.readAndDispatch()) {
-				display.sleep();
-			}
-		}
+		getShell().setDefaultButton(ok);
+		getShell().pack();
 	}
 
 	public void setMessage(String message) {

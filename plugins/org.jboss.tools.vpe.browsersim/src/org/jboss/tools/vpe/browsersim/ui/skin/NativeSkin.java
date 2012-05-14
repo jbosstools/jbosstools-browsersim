@@ -230,24 +230,26 @@ public class NativeSkin implements BrowserSimSkin {
 	}
 	
 	@Override
-	public void setOrientationAndSize(Point maximumShellSize, int orientation, Point browserSize) {
+	public void setOrientationAndSize(int orientation, Point browserSize, ResizableSkinSizeAdvisor sizeAdvisor) {
 		GridData data = (GridData) browser.getLayoutData();
 		
 		int shellWidthHint = SWT.DEFAULT;
 		if (browserSize.x != Device.DEFAULT_SIZE) {
 			data.widthHint = browserSize.x;
-		} else if (data.widthHint == SWT.DEFAULT) {
-			shellWidthHint = maximumShellSize.x;
-		}
+		} 
+//		else if (data.widthHint == SWT.DEFAULT) {
+//			shellWidthHint = maximumShellSize.x;
+//		}
 		int shellHeightHint = SWT.DEFAULT;
 		if (browserSize.y != Device.DEFAULT_SIZE) {
 			data.heightHint =  browserSize.y;
-		} else if (data.heightHint == SWT.DEFAULT) {
-			shellHeightHint = maximumShellSize.y;
 		}
-		Point shellSize = shell.computeSize(shellWidthHint, shellHeightHint);
-		shellSize.x = Math.min(shellSize.x, maximumShellSize.x);
-		shellSize.y = Math.min(shellSize.y, maximumShellSize.y);
+//		else if (data.heightHint == SWT.DEFAULT) {
+//			shellHeightHint = maximumShellSize.y;
+//		}
+		Point prefferedShellSize = shell.computeSize(SWT.DEFAULT, SWT.DEFAULT);
+		
+		Point shellSize = sizeAdvisor.checkWindowSize(orientation, browserSize, prefferedShellSize);
 		shell.setSize(shellSize);
 	}
 	

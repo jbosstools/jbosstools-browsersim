@@ -15,13 +15,17 @@ import java.util.List;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
+import org.eclipse.swt.events.SelectionListener;
 import org.eclipse.swt.layout.FillLayout;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
+import org.eclipse.swt.layout.RowData;
+import org.eclipse.swt.layout.RowLayout;
 import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Dialog;
 import org.eclipse.swt.widgets.Display;
+import org.eclipse.swt.widgets.Group;
 import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Shell;
 import org.eclipse.swt.widgets.Table;
@@ -40,8 +44,14 @@ public class ManageDevicesDialog extends Dialog {
 	protected List<Device> devices;
 	protected int selectedDeviceIndex;
 	protected Shell shell;
-	private Table table;
-	private DevicesList resultDevicesList;
+	protected Table table;
+	protected DevicesList resultDevicesList;
+	protected boolean useSkins;
+	protected Boolean truncateWindow;
+	protected Button askBeforeTruncateRadio;
+	protected Button alwaysTruncateRadio;
+	protected Button neverTruncateRadio;
+	protected Button useSkinsCheckbox;
 
 	/**
 	 * Create the dialog.
@@ -55,6 +65,8 @@ public class ManageDevicesDialog extends Dialog {
 		this.oldDevicesList = oldDevicesList;
 		this.devices = new ArrayList<Device>(oldDevicesList.getDevices());
 		this.selectedDeviceIndex = oldDevicesList.getSelectedDeviceIndex();
+		this.useSkins = oldDevicesList.getUseSkins();
+		this.truncateWindow = oldDevicesList.getTruncateWindow();
 	} 
 
 	/**
@@ -81,17 +93,22 @@ public class ManageDevicesDialog extends Dialog {
 		shell = new Shell(getParent(), getStyle());
 		shell.setSize(650, 450);
 		shell.setText(getText());
-		shell.setLayout(new GridLayout(2, false));
+		shell.setLayout(new GridLayout(1, false));
+		
+		Group devicesGroup = new Group(shell, SWT.NONE);
+		devicesGroup.setText("Devices");
+		devicesGroup.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, true));
+		devicesGroup.setLayout(new GridLayout(2, false));
 
-		table = new Table(shell, SWT.BORDER | SWT.FULL_SELECTION);
+		table = new Table(devicesGroup, SWT.BORDER | SWT.FULL_SELECTION);
 		table.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, true, 1, 1));
 		table.setHeaderVisible(true);
-		table.setLinesVisible(true);
 		table.addSelectionListener(new SelectionAdapter() {
 			public void widgetSelected(SelectionEvent e) {
 				selectedDeviceIndex = ((Table)e.widget).getSelectionIndex();
 			}
 		});
+		
 		
 		TableColumn tableColumnName = new TableColumn(table, SWT.NONE);
 		tableColumnName.setWidth(100);
@@ -113,11 +130,12 @@ public class ManageDevicesDialog extends Dialog {
 		tableColumnSkin.setWidth(100);
 		tableColumnSkin.setText(Messages.ManageDevicesDialog_SKIN);
 		
-		Composite compositeControls = new Composite(shell, SWT.NONE);
+		Composite compositeControls = new Composite(devicesGroup, SWT.NONE);
 		compositeControls.setLayoutData(new GridData(SWT.LEFT, SWT.TOP, false, false, 1, 1));
 		compositeControls.setLayout(new FillLayout(SWT.VERTICAL));
 		
 		Button buttonAdd = new Button(compositeControls, SWT.NONE);
+		buttonAdd.setSize(88, SWT.DEFAULT);
 		buttonAdd.setText(Messages.ManageDevicesDialog_ADD);
 		buttonAdd.addSelectionListener(new SelectionAdapter() {
 			public void widgetSelected(SelectionEvent e) {
@@ -169,36 +187,90 @@ public class ManageDevicesDialog extends Dialog {
 				updateDevices();
 			}
 		});
-
-		new Label(compositeControls, SWT.NONE);
 		
-		Button buttonLoadDefaults = new Button(compositeControls, SWT.NONE);
+		Group useSkinsGroup = new Group(shell, SWT.NONE);
+		useSkinsGroup.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, true, false, 2, 1));
+		useSkinsGroup.setLayout(new RowLayout(SWT.VERTICAL));
+		useSkinsGroup.setText("Skins options");
+		useSkinsCheckbox = new Button(useSkinsGroup, SWT.CHECK);
+		useSkinsCheckbox.setText("Use skins");
+		useSkinsCheckbox.addSelectionListener(new SelectionAdapter() {
+			@Override
+			public void widgetSelected(SelectionEvent e) {
+				Button checkbox = (Button) e.widget;
+				useSkins = checkbox.getSelection();
+			}
+		});
+		
+		Group truncateWindowGroup = new Group(shell, SWT.NONE);
+		truncateWindowGroup.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, true, false, 2, 1));
+		truncateWindowGroup.setText("Truncate the browser window when it does not fit display");
+		truncateWindowGroup.setLayout(new RowLayout(SWT.HORIZONTAL));
+		
+		
+		alwaysTruncateRadio = new Button(truncateWindowGroup, SWT.RADIO);
+		alwaysTruncateRadio.setText("Always truncate");
+		
+		neverTruncateRadio = new Button(truncateWindowGroup, SWT.RADIO);
+		neverTruncateRadio.setText("Never truncate");
+
+		askBeforeTruncateRadio = new Button(truncateWindowGroup, SWT.RADIO);
+		askBeforeTruncateRadio.setText("Prompt");
+		
+		SelectionListener truncateSelectionListener = new SelectionAdapter() {
+			@Override
+			public void widgetSelected(SelectionEvent e) {
+				Button radio = (Button) e.widget;
+				if (radio.getSelection()) {
+					if (radio == askBeforeTruncateRadio) {
+						truncateWindow = null;
+					} else if (radio == alwaysTruncateRadio) {
+						truncateWindow = true;
+					} else if (radio == neverTruncateRadio) {
+						truncateWindow = false;
+					}
+				}
+			}
+		}; 
+		
+		askBeforeTruncateRadio.addSelectionListener(truncateSelectionListener);
+		alwaysTruncateRadio.addSelectionListener(truncateSelectionListener);
+		neverTruncateRadio.addSelectionListener(truncateSelectionListener);
+		
+		
+		Composite compositeOkCancel = new Composite(shell, SWT.NONE);
+		compositeOkCancel.setLayout(new GridLayout(2, true));
+		compositeOkCancel.setLayoutData(new GridData(SWT.RIGHT, SWT.CENTER, false, false, 2, 1));
+		
+		new Label(compositeOkCancel, SWT.NONE);
+		
+		Button buttonLoadDefaults = new Button(compositeOkCancel, SWT.NONE);
 		buttonLoadDefaults.setText(Messages.ManageDevicesDialog_LOAD_DEFAULTS);
 		buttonLoadDefaults.addSelectionListener(new SelectionAdapter() {
 			public void widgetSelected(SelectionEvent e) {
 				DevicesList defaultDevicesList = DevicesListStorage.loadDefaultDevicesList();
 				devices = defaultDevicesList.getDevices();
 				selectedDeviceIndex = defaultDevicesList.getSelectedDeviceIndex();
+				useSkins = defaultDevicesList.getUseSkins();
+				truncateWindow = defaultDevicesList.getTruncateWindow();
 				updateDevices();
 			}
 		});
 		
-		Composite compositeOkCancel = new Composite(shell, SWT.NONE);
-		compositeOkCancel.setLayout(new FillLayout(SWT.HORIZONTAL));
-		compositeOkCancel.setLayoutData(new GridData(SWT.RIGHT, SWT.CENTER, false, false, 2, 1));
-		
 		Button buttonOk = new Button(compositeOkCancel, SWT.NONE);
 		buttonOk.setText(Messages.ManageDevicesDialog_OK);
+		buttonOk.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, false, false));
 		shell.setDefaultButton(buttonOk);
 		buttonOk.addSelectionListener(new SelectionAdapter() {
 			public void widgetSelected(SelectionEvent e) {
-				resultDevicesList = new DevicesList(devices, selectedDeviceIndex, oldDevicesList.getUseSkins());
+				resultDevicesList = new DevicesList(devices, selectedDeviceIndex, useSkins, truncateWindow);
 				shell.close();
 			}
 		});
 		
 		Button buttonCancel = new Button(compositeOkCancel, SWT.NONE);
 		buttonCancel.setText(Messages.ManageDevicesDialog_CANCEL);
+		buttonCancel.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, false, false));
 		buttonCancel.addSelectionListener(new SelectionAdapter() {
 			public void widgetSelected(SelectionEvent e) {
 				resultDevicesList = null;
@@ -210,7 +282,7 @@ public class ManageDevicesDialog extends Dialog {
 		updateDevices();
 	}
 	
-	public void updateDevices() {
+	public void updateDevices() {//TODO
 		table.removeAll();
 		for (Device device : devices) {
 			TableItem tableItem = new TableItem(table, SWT.NONE);
@@ -223,5 +295,11 @@ public class ManageDevicesDialog extends Dialog {
 			});
 		}
 		table.setSelection(selectedDeviceIndex);
+		
+		useSkinsCheckbox.setSelection(useSkins);
+		
+		askBeforeTruncateRadio.setSelection(truncateWindow == null);
+		alwaysTruncateRadio.setSelection(truncateWindow != null && Boolean.TRUE.equals(truncateWindow));
+		neverTruncateRadio.setSelection(truncateWindow != null && Boolean.FALSE.equals(truncateWindow));
 	}
 }

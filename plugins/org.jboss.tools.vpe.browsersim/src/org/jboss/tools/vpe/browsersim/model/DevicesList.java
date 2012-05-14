@@ -22,11 +22,13 @@ public class DevicesList extends Observable {
 	private List<Device> devices;
 	private int selectedDeviceIndex;
 	private boolean useSkins;
+	private Boolean truncateWindow;
 
-	public DevicesList(List<Device> devices, int selectedDeviceIndex, boolean useSkins) {
+	public DevicesList(List<Device> devices, int selectedDeviceIndex, boolean useSkins, Boolean truncateWindow) {
 		this.devices = devices;
 		this.selectedDeviceIndex = selectedDeviceIndex;
 		this.useSkins = useSkins;
+		this.truncateWindow = truncateWindow;
 	}
 
 	public List<Device> getDevices() {
@@ -51,6 +53,18 @@ public class DevicesList extends Observable {
 	public void setUseSkins(boolean useSkins) {
 		if (this.useSkins != useSkins) {
 			this.useSkins = useSkins;
+			setChanged();
+		}
+	}
+
+	public Boolean getTruncateWindow() {
+		return truncateWindow;
+	}
+
+	public void setTruncateWindow(Boolean truncateWindow) {
+		if ( (this.truncateWindow != null && !this.truncateWindow.equals(truncateWindow))
+				|| (this.truncateWindow == null && truncateWindow != null)) {
+			this.truncateWindow = truncateWindow;
 			setChanged();
 		}
 	}

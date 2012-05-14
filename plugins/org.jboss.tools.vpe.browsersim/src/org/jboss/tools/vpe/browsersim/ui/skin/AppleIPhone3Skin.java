@@ -345,7 +345,7 @@ public class AppleIPhone3Skin implements BrowserSimSkin {
 
 
 	@Override
-	public void setOrientationAndSize(Point maximumShellSize, int orientation, Point browserSize) {
+	public void setOrientationAndSize(int orientation, Point browserSize, ResizableSkinSizeAdvisor sizeAdvisor) {
 		// browserSize is ignored by this skin
 		
 		if ((this.orientation == DeviceOrientation.PORTRAIT || this.orientation == DeviceOrientation.PORTRAIT_INVERTED) &&

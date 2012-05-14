@@ -21,6 +21,7 @@ import org.jboss.tools.vpe.browsersim.ui.skin.AppleIPhone3Skin;
 import org.jboss.tools.vpe.browsersim.ui.skin.DeviceComposite;
 import org.jboss.tools.vpe.browsersim.ui.skin.ImageDescriptor;
 import org.jboss.tools.vpe.browsersim.ui.skin.ResizableSkin;
+import org.jboss.tools.vpe.browsersim.ui.skin.ResizableSkinSizeAdvisor;
 
 public class AppleIPhone3ResizableSkin extends ResizableSkin {
 	private static final Point NORMAL_SKREEN_SIZE = new Point(320, 480);
@@ -234,7 +235,7 @@ public class AppleIPhone3ResizableSkin extends ResizableSkin {
 	}
 
 	@Override
-	public void setOrientationAndSize(Point maximumShellSize, int orientation, Point browserSize) {
+	public void setOrientationAndSize(int orientation, Point browserSize, ResizableSkinSizeAdvisor sizeAdvisor) {
 		vertical = (orientation == DeviceOrientation.PORTRAIT || orientation == DeviceOrientation.PORTRAIT_INVERTED);
 		String urlTextText = deviceComposite.getUrlText().getText();
 		String pageTitle = deviceComposite.getPageTitleStyledText() != null ? deviceComposite.getPageTitleStyledText().getText() : "";
@@ -252,20 +253,22 @@ public class AppleIPhone3ResizableSkin extends ResizableSkin {
 		browser.setParent(browserContainer);
 		oldDeviceComposite.dispose();
 		Point bordersSize = getBordersSize(vertical);
-		int shellWidth;
+		int shellWidthHint;
 		if (browserSize.x == SWT.DEFAULT) {
-			shellWidth = SWT.DEFAULT;
+			shellWidthHint = SWT.DEFAULT;
 		} else {
-			shellWidth = Math.min(bordersSize.x + browserSize.x, maximumShellSize.x);
+			shellWidthHint = bordersSize.x + browserSize.x;
 		}
-		int shellHeight;
+		int shellHeightHint;
 		if (browserSize.y == SWT.DEFAULT) {
-			shellHeight = SWT.DEFAULT;
+			shellHeightHint = SWT.DEFAULT;
 		} else {
-			shellHeight = Math.min(bordersSize.y + browserSize.y, maximumShellSize.y);
+			shellHeightHint = bordersSize.y + browserSize.y;
 		}
 
-		shell.setSize(shell.computeSize(shellWidth, shellHeight));
+		Point prefferedShellSize = shell.computeSize(shellWidthHint, shellHeightHint);
+		Point shellSize = sizeAdvisor.checkWindowSize(orientation, browserSize, prefferedShellSize);
+		shell.setSize(shellSize);
 		shell.layout(true);
 		setShellRegion();
 		

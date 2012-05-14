@@ -33,7 +33,7 @@ public interface BrowserSimSkin {
 	void pageTitleChanged(String newTitle);
 	void progressChanged(int percents); // -1 for completed
 	void statusTextChanged(String newStatusText);
-	void setOrientationAndSize(Point maximumShellSize, int orientation, Point browserSize);
+	void setOrientationAndSize(int orientation, Point browserSize, ResizableSkinSizeAdvisor sizeAdvisor);
 	void setAddressBarVisible(boolean visible);
 	void setContextMenu(Menu contextMenu);
 }

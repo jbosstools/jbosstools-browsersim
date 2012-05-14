@@ -58,7 +58,9 @@ import org.jboss.tools.vpe.browsersim.model.DevicesListHolder;
 import org.jboss.tools.vpe.browsersim.model.DevicesListStorage;
 import org.jboss.tools.vpe.browsersim.model.SkinMap;
 import org.jboss.tools.vpe.browsersim.ui.skin.BrowserSimSkin;
+import org.jboss.tools.vpe.browsersim.ui.skin.ResizableSkinSizeAdvisor;
 import org.jboss.tools.vpe.browsersim.util.ResourcesUtil;
+import org.w3c.dom.DOMConfiguration;
 
 /**
  * @author Yahor Radtsevich (yradtsevich)
@@ -79,6 +81,7 @@ public class BrowserSim {
 	private BrowserSimSkin skin;
 	private ControlHandler controlHandler;
 	private Image[] icons;
+	private ResizableSkinSizeAdvisor sizeAdvisor;
 
 	public static void main(String[] args) {
 		if (PlatformUtil.OS_MACOSX.equals(PlatformUtil.getOs())) {
@@ -478,9 +481,8 @@ public class BrowserSim {
 					? DeviceOrientation.PORTRAIT
 					: DeviceOrientation.LANDSCAPE);
 		Rectangle clientArea = getMonitorClientArea();
-		skin.setOrientationAndSize(new Point(clientArea.width, clientArea.height), 
-				deviceOrientation.getOrientationAngle(),
-				new Point(device.getWidth(), device.getHeight()));
+		skin.setOrientationAndSize(	deviceOrientation.getOrientationAngle(), new Point(device.getWidth(), device.getHeight()),
+				getSizeAdvisor());
 		fixShellLocation(clientArea);
 		deviceOrientation.addObserver(new Observer() {
 			public void update(Observable o, Object arg) {
@@ -520,7 +522,7 @@ public class BrowserSim {
 	
 	private void fireOrientationChangeEvent(int orientation, Point browserSize) {
 		Rectangle clientArea = getMonitorClientArea();
-		skin.setOrientationAndSize(new Point(clientArea.width, clientArea.height), orientation, browserSize);
+		skin.setOrientationAndSize(orientation, browserSize, getSizeAdvisor());
 		fixShellLocation(clientArea);
 		skin.getBrowser().execute("window.orientation = " + orientation + ";"
 				+ "(function(){"
@@ -630,5 +632,44 @@ public class BrowserSim {
 			browser.refresh();
 			browser.setFocus();
 		}
+	}
+	
+	private ResizableSkinSizeAdvisor getSizeAdvisor() {
+		if (sizeAdvisor == null) {
+			sizeAdvisor = new ResizableSkinSizeAdvisor() {
+				@Override
+				public Point checkWindowSize(int orientation, Point prefferedSize,
+						Point prefferedShellSize) {
+					DevicesList devicesList = devicesListHolder.getDevicesList();
+					Rectangle clientArea = getMonitorClientArea();
+
+					boolean truncateWindow = false;
+					if (devicesList.getTruncateWindow() == null) {
+						if (prefferedShellSize.x > clientArea.width || prefferedShellSize.y > clientArea.height) { 
+							SizeWarningDialog dialog = new SizeWarningDialog(skin.getShell(), new Point(clientArea.width, clientArea.height), prefferedShellSize, "[TODO]",
+									orientation == DeviceOrientation.PORTRAIT || orientation == DeviceOrientation.PORTRAIT_INVERTED);
+							dialog.open();
+							
+							truncateWindow = dialog.getTruncateWindow();
+							if (dialog.getRememberDecision()) {
+								devicesList.setTruncateWindow(truncateWindow);
+							}
+						}
+					} else {
+						truncateWindow = devicesList.getTruncateWindow();
+					}
+					
+					Point size = new Point(prefferedShellSize.x, prefferedShellSize.y);
+					if (truncateWindow) {
+						size.x = Math.min(prefferedShellSize.x, clientArea.width);
+						size.y = Math.min(prefferedShellSize.y, clientArea.height);
+					}
+					
+					return size;
+				}
+			};
+		}
+		
+		return sizeAdvisor;
 	}
 }
