@@ -48,7 +48,9 @@ class SizeWarningDialog extends CustomMessageBox {
 		super.createWidgets();
 		
 		Composite messageRow = new Composite(getMessageComposite(), SWT.NONE);
-		messageRow.setLayout(new RowLayout(SWT.VERTICAL));
+		RowLayout rowLayout = new RowLayout(SWT.VERTICAL);
+		rowLayout.spacing = 12;
+		messageRow.setLayout(rowLayout);
 		messageRow.setBackground(getMessageCompositeBackground());
 		
 		Label message = new Label(messageRow, SWT.WRAP);
