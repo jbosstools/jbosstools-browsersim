@@ -1,3 +1,13 @@
+/*******************************************************************************
+ * Copyright (c) 2007-2012 Red Hat, Inc.
+ * Distributed under license by Red Hat, Inc. All rights reserved.
+ * This program is made available under the terms of the
+ * Eclipse Public License v1.0 which accompanies this distribution,
+ * and is available at http://www.eclipse.org/legal/epl-v10.html
+ *
+ * Contributor:
+ *     Red Hat, Inc. - initial API and implementation
+ ******************************************************************************/
 package org.jboss.tools.vpe.browsersim.ui;
 
 import org.eclipse.swt.SWT;
@@ -12,6 +22,9 @@ import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Shell;
 
+/**
+ * @author Yahor Radtsevich (yradtsevich)
+ */
 class CustomMessageBox extends Dialog {
 	private Shell shell;
 	private Composite messageComposite;

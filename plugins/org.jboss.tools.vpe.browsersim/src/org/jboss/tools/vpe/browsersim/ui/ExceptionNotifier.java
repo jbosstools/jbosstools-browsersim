@@ -41,7 +41,7 @@ public class ExceptionNotifier {
 			message = Messages.ExceptionNotifier_ONLY_32_BIT_ECLIPSE_IS_SUPPORTED_ON_WINDOWS;
 		} else if (PlatformUtil.OS_WIN32.equals(os) && PlatformUtil.ARCH_X86.equals(arch) // Eclipse 32-bit on Windows and
 				&& error.getMessage() != null											  // Apple Application Support is not installed
-				&& error.getMessage().contains("Safari must be installed to use a SWT.WEBKIT-style Browser")) {
+				&& error.getMessage().contains("Safari must be installed to use a SWT.WEBKIT-style Browser")) { //$NON-NLS-1$
 			message = Messages.ExceptionNotifier_APPLE_APPLICATION_SUPPORT_IS_NOT_FOUND;
 		} else if (PlatformUtil.OS_LINUX.equals(os) && error.getMessage() != null) {    // Linux - probably WebKitGTK is not installed
 			message = MessageFormat.format(Messages.ExceptionNotifier_BROWSERSIM_IS_FAILED_TO_START_ON_LINUX, error.getMessage());
@@ -82,7 +82,7 @@ class ErrorMessageBoxWithLinks extends CustomMessageBox {
 
 	public ErrorMessageBoxWithLinks(Shell parent) {
 		super(parent, parent.getDisplay().getSystemImage(SWT.ICON_ERROR));
-		message = "";
+		message = ""; //$NON-NLS-1$
 	}
 
 	@Override
@@ -99,7 +99,7 @@ class ErrorMessageBoxWithLinks extends CustomMessageBox {
 		});
 		
 		Button ok = new Button(getButtonsComposite(), SWT.PUSH);
-		ok.setText("OK");
+		ok.setText(Messages.ExceptionNotifier_OK);
 		ok.addSelectionListener(new SelectionAdapter() {
 			@Override
 			public void widgetSelected(SelectionEvent e) {

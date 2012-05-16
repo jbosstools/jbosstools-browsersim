@@ -40,6 +40,7 @@ import org.jboss.tools.vpe.browsersim.eclipse.util.BrowserSimLauncher;
 /**
  * @author "Yahor Radtsevich (yradtsevich)"
  */
+@SuppressWarnings("restriction")
 public class RunBrowserSimAction implements IWorkbenchWindowActionDelegate {
 
 	@Override
@@ -103,13 +104,13 @@ public class RunBrowserSimAction implements IWorkbenchWindowActionDelegate {
 		if (part instanceof IViewPart) {
 			IViewSite viewSite = ((IViewPart) part).getViewSite();
 			if (WebBrowserView.WEB_BROWSER_VIEW_ID.equals(viewSite.getId()) && part instanceof WebBrowserView) {
-				browserViewer = getFieldValue(part, "viewer");
+				browserViewer = getFieldValue(part, "viewer"); //$NON-NLS-1$
 			}
 		} else if (part instanceof IEditorPart) {
 			IEditorPart editorPart = (IEditorPart) part;
 			IEditorSite editorSite = editorPart.getEditorSite();
 			if (WebBrowserEditor.WEB_BROWSER_EDITOR_ID.equals(editorSite.getId()) && part instanceof WebBrowserEditor) {
-				browserViewer = getFieldValue(part, "webBrowser");
+				browserViewer = getFieldValue(part, "webBrowser"); //$NON-NLS-1$
 			}
 		}
 		

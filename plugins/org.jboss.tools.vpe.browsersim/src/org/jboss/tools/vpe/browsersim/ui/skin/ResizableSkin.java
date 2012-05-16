@@ -101,7 +101,7 @@ public abstract class ResizableSkin implements BrowserSimSkin {
 			public void handleEvent(Event event) {
 				Control contol = event.display.getCursorControl();
 				Point displayPoint = event.display.getCursorLocation();
-				Image rotateImage = imageList.getImage("cursors/rotate.gif");
+				Image rotateImage = imageList.getImage("cursors/rotate.gif"); //$NON-NLS-1$
 				if (deviceComposite.isDeviceCorner(displayPoint) && deviceComposite.isDeviceBody(contol)) {
 					deviceComposite.setCursor(new Cursor(Display.getCurrent(), rotateImage.getImageData(), 0, 0));
 				} else {

@@ -1,3 +1,13 @@
+/*******************************************************************************
+ * Copyright (c) 2007-2012 Red Hat, Inc.
+ * Distributed under license by Red Hat, Inc. All rights reserved.
+ * This program is made available under the terms of the
+ * Eclipse Public License v1.0 which accompanies this distribution,
+ * and is available at http://www.eclipse.org/legal/epl-v10.html
+ *
+ * Contributor:
+ *     Red Hat, Inc. - initial API and implementation
+ ******************************************************************************/
 package org.jboss.tools.vpe.browsersim.ui;
 
 import java.text.MessageFormat;
@@ -13,6 +23,9 @@ import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Shell;
 
+/**
+ * @author Yahor Radtsevich (yradtsevich)
+ */
 class SizeWarningDialog extends CustomMessageBox {
 	private Point actualSize;
 	private Point requiredSize;
@@ -27,7 +40,7 @@ class SizeWarningDialog extends CustomMessageBox {
 		this.requiredSize = requiredSize;
 		this.deviceName = deviceName;
 		this.vertical = vertical;
-		setText("Device size will be truncated");
+		setText(Messages.SizeWarningDialog_DEVICE_SIZE_WILL_BE_TRUNCATED);
 	}
 	
 	@Override
@@ -41,19 +54,17 @@ class SizeWarningDialog extends CustomMessageBox {
 		Label message = new Label(messageRow, SWT.WRAP);
 		String messageText;
 		if (vertical) {
-			messageText = MessageFormat.format("Your desktop size ({0}x{1} pixels) is smaller than what {2} needs in vertical layout ({3}x{4}).\n" +
-					"Device size will be truncated to fit your desktop.",
+			messageText = MessageFormat.format(Messages.SizeWarningDialog_DESKTOP_SIZE_TOO_SMALL_VERTICAL,
 					actualSize.x, actualSize.y, deviceName, requiredSize.x, requiredSize.y);			
 		} else {
-			messageText = MessageFormat.format("Your desktop size ({0}x{1} pixels) is smaller than what {2} needs in horizontal layout ({3}x{4}).\n" +
-					"Device size will be truncated to fit your desktop.",
+			messageText = MessageFormat.format(Messages.SizeWarningDialog_DESKTOP_SIZE_TOO_SMALL_HORIZONTAL,
 					actualSize.x, actualSize.y, deviceName, requiredSize.x, requiredSize.y);			
 		}
 		message.setText(messageText);
 		message.setBackground(getMessageCompositeBackground());
 		
 		Button rememberDecisionCheckbox = new Button(messageRow, SWT.CHECK);
-		rememberDecisionCheckbox.setText("Remember my decision (this can be changed in the Preferences dialog later).");
+		rememberDecisionCheckbox.setText(Messages.SizeWarningDialog_REMEMBER_MY_DECISION);
 		rememberDecisionCheckbox.setBackground(getMessageCompositeBackground());
 		rememberDecisionCheckbox.setSelection(rememberDecision);
 		rememberDecisionCheckbox.addSelectionListener(new SelectionAdapter() {
@@ -69,7 +80,7 @@ class SizeWarningDialog extends CustomMessageBox {
 		buttonRow.setLayoutData(buttonRowLayoutData);
 		
 		Button okButton = new Button(buttonRow, SWT.PUSH);
-		okButton.setText("Yes (recommended)");
+		okButton.setText(Messages.SizeWarningDialog_OK);
 		okButton.addSelectionListener(new SelectionAdapter() {
 			@Override
 			public void widgetSelected(SelectionEvent e) {
@@ -79,7 +90,7 @@ class SizeWarningDialog extends CustomMessageBox {
 		});
 		
 		Button noButton = new Button(buttonRow, SWT.PUSH);
-		noButton.setText("No, show me actual size");
+		noButton.setText(Messages.SizeWarningDialog_CANCEL);
 		noButton.addSelectionListener(new SelectionAdapter() {
 			@Override
 			public void widgetSelected(SelectionEvent e) {

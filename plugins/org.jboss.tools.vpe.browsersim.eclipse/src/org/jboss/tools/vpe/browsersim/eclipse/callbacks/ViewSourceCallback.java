@@ -44,7 +44,7 @@ import org.jboss.tools.vpe.browsersim.eclipse.util.TransparentReader;
  * @author Yahor Radtsevich (yradtsevich)
  */
 public class ViewSourceCallback implements BrowserSimCallback {
-	private static final String VIEW_SOURCE_COMMAND = BrowserSimLauncher.BROWSERSIM_CLASS_NAME + ".command.viewSource:";
+	private static final String VIEW_SOURCE_COMMAND = BrowserSimLauncher.BROWSERSIM_CLASS_NAME + ".command.viewSource:"; //$NON-NLS-1$
 
 	/* (non-Javadoc)
 	 * @see org.jboss.tools.vpe.browsersim.eclipse.callbacks.BrowserSimCallback#getCallbackId()
@@ -77,16 +77,16 @@ public class ViewSourceCallback implements BrowserSimCallback {
 		if (page != null) {
 			try {
 				IEditorDescriptor editorDescriptor = PlatformUI.getWorkbench()
-						.getEditorRegistry().getDefaultEditor("view-source.html"); // get default editor for .html
+						.getEditorRegistry().getDefaultEditor("view-source.html"); // get default editor for .html //$NON-NLS-1$
 				String editorId;
 				if (editorDescriptor != null && editorDescriptor.isInternal()) {
 					editorId = editorDescriptor.getId();
 				} else {
-					editorId = "org.eclipse.ui.DefaultTextEditor";
+					editorId = "org.eclipse.ui.DefaultTextEditor"; //$NON-NLS-1$
 				}
 
-				IStorage storage = new StringStorage("", // see the long comment below to know why an empty storage is created
-						"view-source.html"); // .html extension is needed to enable code highlighting in the WTP HTML editor
+				IStorage storage = new StringStorage("", // see the long comment below to know why an empty storage is created //$NON-NLS-1$
+						"view-source.html"); // .html extension is needed to enable code highlighting in the WTP HTML editor //$NON-NLS-1$
 				IStorageEditorInput input = new StringInput(storage, name, toolTip);
 				IEditorPart editor = page.openEditor(input, editorId);
 				
@@ -100,7 +100,7 @@ public class ViewSourceCallback implements BrowserSimCallback {
 				IDocument doc = null;
 				
 				// this checking is needed to do not load jst.jsp plug-ins if it is unnecessary
-				if ("org.jboss.tools.jst.jsp.jspeditor.HTMLTextEditor".equals(editorId)) {
+				if ("org.jboss.tools.jst.jsp.jspeditor.HTMLTextEditor".equals(editorId)) { //$NON-NLS-1$
 					try {
 						if (editor instanceof JSPMultiPageEditor) {
 							JSPMultiPageEditor multiPageEditor = (JSPMultiPageEditor) editor;

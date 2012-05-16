@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2007-2011 Red Hat, Inc.
+ * Copyright (c) 2007-2012 Red Hat, Inc.
  * Distributed under license by Red Hat, Inc. All rights reserved.
  * This program is made available under the terms of the
  * Eclipse Public License v1.0 which accompanies this distribution,
@@ -24,10 +24,11 @@ public class Messages {
 	public static String BrowserSim_ERROR;
 	public static String BrowserSim_EXIT;
 	public static String BrowserSim_FILE;
-	public static String BrowserSim_MORE;
 	public static String BrowserSim_OPEN_IN_DEFAULT_BROWSER;
+	public static String BrowserSim_PREFERENCES;
 	public static String BrowserSim_TURN_LEFT;
 	public static String BrowserSim_TURN_RIGHT;
+	public static String BrowserSim_USE_SKINS;
 	public static String BrowserSim_VIEW_PAGE_SOURCE;
 	public static String EditDeviceDialog_CANCEL;
 	public static String EditDeviceDialog_EDIT_DEVICE;
@@ -54,13 +55,27 @@ public class Messages {
 	public static String ManageDevicesDialog_NEW_DEVICE;
 	public static String ManageDevicesDialog_NEW_USER_AGENT;
 	public static String ManageDevicesDialog_OK;
+	public static String ManageDevicesDialog_PREFERENCES;
 	public static String ManageDevicesDialog_REMOVE;
 	public static String ManageDevicesDialog_REVERT_ALL;
 	public static String ManageDevicesDialog_SKIN;
 	public static String ManageDevicesDialog_LOAD_DEFAULTS;
 	public static String ManageDevicesDialog_USER_AGENT;
 	public static String ManageDevicesDialog_WIDTH;
-	
+	public static String SizeWarningDialog_DEVICE_SIZE_WILL_BE_TRUNCATED;
+	public static String SizeWarningDialog_DESKTOP_SIZE_TOO_SMALL_VERTICAL;
+	public static String SizeWarningDialog_DESKTOP_SIZE_TOO_SMALL_HORIZONTAL;
+	public static String SizeWarningDialog_REMEMBER_MY_DECISION;
+	public static String SizeWarningDialog_OK;
+	public static String SizeWarningDialog_CANCEL;
+	public static String ManageDevicesDialog_SKINS_OPTIONS;
+	public static String ManageDevicesDialog_USE_SKINS;
+	public static String ManageDevicesDialog_TRUNCATE_THE_DEVICE_WINDOW;
+	public static String ManageDevicesDialog_ALWAYS_TRUNCATE;
+	public static String ManageDevicesDialog_NEVER_TRUNCATE;
+	public static String ManageDevicesDialog_PROMPT;
+	public static String ExceptionNotifier_OK;
+
 	static {
 		NLS.initializeMessages(BUNDLE_NAME, Messages.class);
 	}

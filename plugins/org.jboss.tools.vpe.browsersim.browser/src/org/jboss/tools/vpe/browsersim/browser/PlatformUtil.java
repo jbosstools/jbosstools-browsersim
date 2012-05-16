@@ -15,6 +15,7 @@ import org.eclipse.swt.SWT;
 /**
  * @author "Yahor Radtsevich (yradtsevich)"
  */
+@SuppressWarnings("nls")
 public class PlatformUtil {
 
 	public static final String ARCH_X86 = "x86";

@@ -169,8 +169,8 @@ public class EditDeviceDialog extends Dialog {
 		buttonOk.addSelectionListener(new SelectionAdapter() {
 			public void widgetSelected(SelectionEvent e) {
 				resultDevice = new Device(textName.getText(),
-						checkButtonWidth.getSelection() ? Integer.valueOf("0" + textWidth.getText()) : Device.DEFAULT_SIZE,
-						checkButtonHeight.getSelection() ? Integer.valueOf("0" + textHeight.getText()) : Device.DEFAULT_SIZE,
+						checkButtonWidth.getSelection() ? Integer.valueOf("0" + textWidth.getText()) : Device.DEFAULT_SIZE, //$NON-NLS-1$
+						checkButtonHeight.getSelection() ? Integer.valueOf("0" + textHeight.getText()) : Device.DEFAULT_SIZE, //$NON-NLS-1$
 						checkButtonUserAgent.getSelection() ? textUserAgent.getText() : null,
 						comboSkin.getSelectionIndex() == 0 ? null : skinIds.get(comboSkin.getSelectionIndex()));
 				shell.close();

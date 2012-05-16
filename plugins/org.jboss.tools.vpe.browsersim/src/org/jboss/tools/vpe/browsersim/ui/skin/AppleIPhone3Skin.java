@@ -36,6 +36,7 @@ import org.jboss.tools.vpe.browsersim.ui.ControlHandler;
 /**
  * @author Yahor Radtsevich (yradtsevich)
  */
+@SuppressWarnings("nls")
 public class AppleIPhone3Skin implements BrowserSimSkin {
 	private static final String[] SHELL_IMAGE = {"iphone_skin/iPhone3.png", "iphone_skin/iPhone3-horizontal.png"};
 	private static final String[] ADDRESS_BAR_IMAGE = {"iphone_skin/address-bar.png", "iphone_skin/address-bar-horizontal.png"};

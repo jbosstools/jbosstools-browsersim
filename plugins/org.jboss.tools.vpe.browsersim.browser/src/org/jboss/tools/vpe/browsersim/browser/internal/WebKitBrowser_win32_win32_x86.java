@@ -21,6 +21,7 @@ import org.jboss.tools.vpe.browsersim.browser.AbstractWebKitBrowser;
 /**
  * @author Yahor Radtsevich (yradtsevich)
  */
+@SuppressWarnings({"nls", "restriction"})
 public class WebKitBrowser_win32_win32_x86 extends AbstractWebKitBrowser {
 	public WebKitBrowser_win32_win32_x86(Composite parent, int style) {
 		super(parent, style);

@@ -20,6 +20,7 @@ import org.jboss.tools.vpe.browsersim.browser.internal.WebKitBrowser_win32_win32
 /**
  * @author "Yahor Radtsevich (yradtsevich)"
  */
+@SuppressWarnings("nls")
 public class WebKitBrowserFactory implements IBrowserSimBrowserFactory {
 	@Override
 	public AbstractWebKitBrowser createBrowser(Composite parent, int style) {

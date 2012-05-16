@@ -60,7 +60,6 @@ import org.jboss.tools.vpe.browsersim.model.SkinMap;
 import org.jboss.tools.vpe.browsersim.ui.skin.BrowserSimSkin;
 import org.jboss.tools.vpe.browsersim.ui.skin.ResizableSkinSizeAdvisor;
 import org.jboss.tools.vpe.browsersim.util.ResourcesUtil;
-import org.w3c.dom.DOMConfiguration;
 
 /**
  * @author Yahor Radtsevich (yradtsevich)
@@ -68,11 +67,11 @@ import org.w3c.dom.DOMConfiguration;
 public class BrowserSim {
 	private static final String DEFAULT_URL = "about:blank"; //"http://www.w3schools.com/js/tryit_view.asp?filename=try_nav_useragent"; //$NON-NLS-1$
 	private static final String[] BROWSERSIM_ICONS = {"icons/browsersim_16px.png", "icons/browsersim_32px.png", "icons/browsersim_64px.png", "icons/browsersim_128px.png", "icons/browsersim_256px.png", }; //$NON-NLS-1$//$NON-NLS-2$//$NON-NLS-3$//$NON-NLS-4$//$NON-NLS-5$
-	private static final String BROWSERSIM_CLASS_NAME = "org.jboss.tools.vpe.browsersim.ui.BrowserSim";
+	private static final String BROWSERSIM_CLASS_NAME = "org.jboss.tools.vpe.browsersim.ui.BrowserSim"; //$NON-NLS-1$
 	/** @see org.jboss.tools.vpe.browsersim.eclipse.callbacks.OpenFileCallback */
-	private static final String OPEN_FILE_COMMAND = BROWSERSIM_CLASS_NAME + ".command.openFile:";
+	private static final String OPEN_FILE_COMMAND = BROWSERSIM_CLASS_NAME + ".command.openFile:"; //$NON-NLS-1$
 	/** @see org.jboss.tools.vpe.browsersim.eclipse.callbacks.ViewSourceCallback */
-	private static final String VIEW_SOURCE_COMMAND = BROWSERSIM_CLASS_NAME + ".command.viewSource:";
+	private static final String VIEW_SOURCE_COMMAND = BROWSERSIM_CLASS_NAME + ".command.viewSource:"; //$NON-NLS-1$
 	
 	private Display display;
 	private String homeUrl;
@@ -231,6 +230,7 @@ public class BrowserSim {
 		
 		browser.addLocationListener(new LocationListener() {
 			private BrowserFunction scrollListener = null;
+			@SuppressWarnings("nls")
 			public void changed(LocationEvent event) {
 				if (scrollListener != null) {
 					scrollListener.dispose();
@@ -335,7 +335,7 @@ public class BrowserSim {
 		addDevicesListForMenu(devicesListHolder.getDevicesList(), devicesMenu);
 		
 		MenuItem manageDevicesMenuItem = new MenuItem(devicesMenu, SWT.PUSH);
-		manageDevicesMenuItem.setText(Messages.BrowserSim_MORE);
+		manageDevicesMenuItem.setText(Messages.BrowserSim_PREFERENCES);
 		manageDevicesMenuItem.addSelectionListener(new SelectionAdapter() {
 			public void widgetSelected(SelectionEvent e) {
 				DevicesList newDevicesList = new ManageDevicesDialog(e.display.getActiveShell(), SWT.APPLICATION_MODAL | SWT.SHELL_TRIM,
@@ -348,7 +348,7 @@ public class BrowserSim {
 		});
 		
 		MenuItem useSkinsMenuItem = new MenuItem(devicesMenu, SWT.CHECK);
-		useSkinsMenuItem.setText("Use Skins");
+		useSkinsMenuItem.setText(Messages.BrowserSim_USE_SKINS);
 		useSkinsMenuItem.setSelection(devicesListHolder.getDevicesList().getUseSkins());
 		useSkinsMenuItem.addSelectionListener(new SelectionAdapter() {
 			public void widgetSelected(SelectionEvent e) {
@@ -413,7 +413,7 @@ public class BrowserSim {
 		openInDefaultBrowser.setText(Messages.BrowserSim_VIEW_PAGE_SOURCE);
 		openInDefaultBrowser.addSelectionListener(new SelectionAdapter() {
 			public void widgetSelected(SelectionEvent e) {
-				if (skin.getBrowser().getUrl().startsWith("file:")) {
+				if (skin.getBrowser().getUrl().startsWith("file:")) { //$NON-NLS-1$
 					URI uri = null;
 					try {
 						uri = new URI(skin.getBrowser().getUrl());
@@ -515,11 +515,13 @@ public class BrowserSim {
 		return SkinMap.getInstance().getSkinClass(useSkins ? device.getSkinId() : null);
 	}
 
+	@SuppressWarnings("nls")
 	private void initOrientation(int orientation) {
 		skin.getBrowser().execute("window.onorientationchange = null;"
 				+ "window.orientation = " + orientation + ";");
 	}
 	
+	@SuppressWarnings("nls")
 	private void fireOrientationChangeEvent(int orientation, Point browserSize) {
 		Rectangle clientArea = getMonitorClientArea();
 		skin.setOrientationAndSize(orientation, browserSize, getSizeAdvisor());
@@ -646,7 +648,10 @@ public class BrowserSim {
 					boolean truncateWindow = false;
 					if (devicesList.getTruncateWindow() == null) {
 						if (prefferedShellSize.x > clientArea.width || prefferedShellSize.y > clientArea.height) { 
-							SizeWarningDialog dialog = new SizeWarningDialog(skin.getShell(), new Point(clientArea.width, clientArea.height), prefferedShellSize, "[TODO]",
+							String deviceName = devicesList.getDevices().get(devicesList.getSelectedDeviceIndex()).getName();
+							
+							SizeWarningDialog dialog = new SizeWarningDialog(skin.getShell(), new Point(clientArea.width, clientArea.height),
+									prefferedShellSize, deviceName,
 									orientation == DeviceOrientation.PORTRAIT || orientation == DeviceOrientation.PORTRAIT_INVERTED);
 							dialog.open();
 							

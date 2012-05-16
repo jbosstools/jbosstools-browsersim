@@ -18,6 +18,10 @@ import org.eclipse.swt.graphics.Font;
 import org.eclipse.swt.widgets.Composite;
 import org.jboss.tools.vpe.browsersim.ui.skin.ImageList;
 
+/**
+ * @author Yahor Radtsevich (yradtsevich)
+ */
+@SuppressWarnings("nls")
 public class IOSPageTitleStyledText extends StyledText {
 	private final String BD = "ios/";
 	private Font font;

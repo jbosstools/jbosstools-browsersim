@@ -1,3 +1,13 @@
+/*******************************************************************************
+ * Copyright (c) 2007-2012 Red Hat, Inc.
+ * Distributed under license by Red Hat, Inc. All rights reserved.
+ * This program is made available under the terms of the
+ * Eclipse Public License v1.0 which accompanies this distribution,
+ * and is available at http://www.eclipse.org/legal/epl-v10.html
+ *
+ * Contributor:
+ *     Red Hat, Inc. - initial API and implementation
+ ******************************************************************************/
 package org.jboss.tools.vpe.browsersim.ui.skin.ios;
 
 import java.util.Arrays;
@@ -23,7 +33,12 @@ import org.jboss.tools.vpe.browsersim.ui.skin.ImageDescriptor;
 import org.jboss.tools.vpe.browsersim.ui.skin.ResizableSkin;
 import org.jboss.tools.vpe.browsersim.ui.skin.ResizableSkinSizeAdvisor;
 
+/**
+ * @author Yahor Radtsevich (yradtsevich)
+ */
+@SuppressWarnings("nls")
 public class AppleIPhone3ResizableSkin extends ResizableSkin {
+	public static final String IPHONE3_SKIN_ID = "iPhone 3";
 	private static final Point NORMAL_SKREEN_SIZE = new Point(320, 480);
 	private static final Point NORMAL_SKIN_SIZE = new Point(384, 727);
 	private static final Point VERTICAL_BORDERS_SIZE = new Point(NORMAL_SKIN_SIZE.x - NORMAL_SKREEN_SIZE.x, NORMAL_SKIN_SIZE.y - NORMAL_SKREEN_SIZE.y);

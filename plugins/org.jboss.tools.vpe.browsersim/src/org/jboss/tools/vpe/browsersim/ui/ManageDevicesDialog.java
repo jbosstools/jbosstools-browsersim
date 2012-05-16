@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2007-2011 Red Hat, Inc.
+ * Copyright (c) 2007-2012 Red Hat, Inc.
  * Distributed under license by Red Hat, Inc. All rights reserved.
  * This program is made available under the terms of the
  * Eclipse Public License v1.0 which accompanies this distribution,
@@ -19,7 +19,6 @@ import org.eclipse.swt.events.SelectionListener;
 import org.eclipse.swt.layout.FillLayout;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
-import org.eclipse.swt.layout.RowData;
 import org.eclipse.swt.layout.RowLayout;
 import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Composite;
@@ -61,7 +60,7 @@ public class ManageDevicesDialog extends Dialog {
 	 */
 	public ManageDevicesDialog(Shell parent, int style, DevicesList oldDevicesList) {
 		super(parent, style);
-		setText(Messages.ManageDevicesDialog_DEVICES);
+		setText(Messages.ManageDevicesDialog_PREFERENCES);
 		this.oldDevicesList = oldDevicesList;
 		this.devices = new ArrayList<Device>(oldDevicesList.getDevices());
 		this.selectedDeviceIndex = oldDevicesList.getSelectedDeviceIndex();
@@ -96,7 +95,7 @@ public class ManageDevicesDialog extends Dialog {
 		shell.setLayout(new GridLayout(1, false));
 		
 		Group devicesGroup = new Group(shell, SWT.NONE);
-		devicesGroup.setText("Devices");
+		devicesGroup.setText(Messages.ManageDevicesDialog_DEVICES);
 		devicesGroup.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, true));
 		devicesGroup.setLayout(new GridLayout(2, false));
 
@@ -191,9 +190,9 @@ public class ManageDevicesDialog extends Dialog {
 		Group useSkinsGroup = new Group(shell, SWT.NONE);
 		useSkinsGroup.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, true, false, 2, 1));
 		useSkinsGroup.setLayout(new RowLayout(SWT.VERTICAL));
-		useSkinsGroup.setText("Skins options");
+		useSkinsGroup.setText(Messages.ManageDevicesDialog_SKINS_OPTIONS);
 		useSkinsCheckbox = new Button(useSkinsGroup, SWT.CHECK);
-		useSkinsCheckbox.setText("Use skins");
+		useSkinsCheckbox.setText(Messages.ManageDevicesDialog_USE_SKINS);
 		useSkinsCheckbox.addSelectionListener(new SelectionAdapter() {
 			@Override
 			public void widgetSelected(SelectionEvent e) {
@@ -204,18 +203,18 @@ public class ManageDevicesDialog extends Dialog {
 		
 		Group truncateWindowGroup = new Group(shell, SWT.NONE);
 		truncateWindowGroup.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, true, false, 2, 1));
-		truncateWindowGroup.setText("Truncate the browser window when it does not fit display");
+		truncateWindowGroup.setText(Messages.ManageDevicesDialog_TRUNCATE_THE_DEVICE_WINDOW);
 		truncateWindowGroup.setLayout(new RowLayout(SWT.HORIZONTAL));
 		
 		
 		alwaysTruncateRadio = new Button(truncateWindowGroup, SWT.RADIO);
-		alwaysTruncateRadio.setText("Always truncate");
+		alwaysTruncateRadio.setText(Messages.ManageDevicesDialog_ALWAYS_TRUNCATE);
 		
 		neverTruncateRadio = new Button(truncateWindowGroup, SWT.RADIO);
-		neverTruncateRadio.setText("Never truncate");
+		neverTruncateRadio.setText(Messages.ManageDevicesDialog_NEVER_TRUNCATE);
 
 		askBeforeTruncateRadio = new Button(truncateWindowGroup, SWT.RADIO);
-		askBeforeTruncateRadio.setText("Prompt");
+		askBeforeTruncateRadio.setText(Messages.ManageDevicesDialog_PROMPT);
 		
 		SelectionListener truncateSelectionListener = new SelectionAdapter() {
 			@Override

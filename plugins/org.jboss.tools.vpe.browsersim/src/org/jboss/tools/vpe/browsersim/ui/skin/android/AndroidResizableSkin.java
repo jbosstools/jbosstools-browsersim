@@ -1,3 +1,13 @@
+/*******************************************************************************
+ * Copyright (c) 2007-2012 Red Hat, Inc.
+ * Distributed under license by Red Hat, Inc. All rights reserved.
+ * This program is made available under the terms of the
+ * Eclipse Public License v1.0 which accompanies this distribution,
+ * and is available at http://www.eclipse.org/legal/epl-v10.html
+ *
+ * Contributor:
+ *     Red Hat, Inc. - initial API and implementation
+ ******************************************************************************/
 package org.jboss.tools.vpe.browsersim.ui.skin.android;
 
 import org.eclipse.swt.SWT;
@@ -10,7 +20,12 @@ import org.jboss.tools.vpe.browsersim.ui.skin.ImageDescriptor;
 import org.jboss.tools.vpe.browsersim.ui.skin.ios.AppleIPhone3ResizableSkin;
 import org.jboss.tools.vpe.browsersim.ui.skin.ios.ButtonDescriptor;
 
+/**
+ * @author Yahor Radtsevich (yradtsevich)
+ */
+@SuppressWarnings("nls")
 public class AndroidResizableSkin  extends AppleIPhone3ResizableSkin {
+	public static final String ANDROID_SKIN_ID = "Android";
 	private static final Point NORMAL_SKREEN_SIZE = new Point(240, 1);
 	private static final Point NORMAL_SKIN_SIZE = new Point(339, 156);
 	public static final int[] VISIBLE_REGION_VERTICAL =   {24, 0, 314, 0, 315, 1, 318, 1, 319, 2, 320, 2, 321, 3, 322,
@@ -41,7 +56,7 @@ public class AndroidResizableSkin  extends AppleIPhone3ResizableSkin {
 			FormData formData = new FormData();
 			formData.left = new FormAttachment(0, 61);
 			formData.bottom = new FormAttachment(100, -41);
-			backButtonDescriptor = new ButtonDescriptor(formData, bd2 + "back.png", bd2 + "back.png", bd2 + "back-selected.png");//XXX
+			backButtonDescriptor = new ButtonDescriptor(formData, bd2 + "back.png", bd2 + "back.png", bd2 + "back-selected.png");
 		}
 		
 		ButtonDescriptor forwardButtonDescriptor;
@@ -49,21 +64,21 @@ public class AndroidResizableSkin  extends AppleIPhone3ResizableSkin {
 			FormData formData = new FormData();
 			formData.left = new FormAttachment(33, 12);
 			formData.bottom = new FormAttachment(100, -41);
-			forwardButtonDescriptor = new ButtonDescriptor(formData, bd2 + "forward.png", bd2 + "forward.png", bd2 + "forward-selected.png");//XXX
+			forwardButtonDescriptor = new ButtonDescriptor(formData, bd2 + "forward.png", bd2 + "forward.png", bd2 + "forward-selected.png");
 		}
 		ButtonDescriptor homeButtonDescriptor;
 		{
 			FormData formData = new FormData();
 			formData.left = new FormAttachment(67, -45);
 			formData.bottom = new FormAttachment(100, -41);
-			homeButtonDescriptor = new ButtonDescriptor(formData, bd2 + "home.png", bd2 + "home.png", bd2 + "home-selected.png");//XXX
+			homeButtonDescriptor = new ButtonDescriptor(formData, bd2 + "home.png", bd2 + "home.png", bd2 + "home-selected.png");
 		}
 		ButtonDescriptor refreshButtonDescriptor;
 		{
 			FormData formData = new FormData();
 			formData.left = new FormAttachment(100, -61 - 28);
 			formData.bottom = new FormAttachment(100, -41);
-			refreshButtonDescriptor = new ButtonDescriptor(formData, bd2 + "refresh.png", bd2 + "refresh.png", bd2 + "refresh-selected.png");//XXX
+			refreshButtonDescriptor = new ButtonDescriptor(formData, bd2 + "refresh.png", bd2 + "refresh.png", bd2 + "refresh-selected.png");
 		}
 		VERTICAL_DESCRIPTOR = new AndroidSkinDescriptor(bodyGridSize, bodyGridImageDescriptors, iOsDescriptor, cornersSize,
 				backButtonDescriptor, forwardButtonDescriptor, homeButtonDescriptor, refreshButtonDescriptor);

@@ -31,28 +31,28 @@ import org.osgi.framework.Bundle;
  * @author "Yahor Radtsevich (yradtsevich)"
  */
 public class BrowserSimLauncher {
-	public static final String BROWSERSIM_CLASS_NAME = "org.jboss.tools.vpe.browsersim.ui.BrowserSim";
+	public static final String BROWSERSIM_CLASS_NAME = "org.jboss.tools.vpe.browsersim.ui.BrowserSim"; //$NON-NLS-1$
 	private static final BrowserSimCallback[] BROWSERSIM_CALLBACKS = { new ViewSourceCallback(), new OpenFileCallback() }; 
 
 	public static void launchBrowserSim(String initialUrl) {
-		String pathSeparator = System.getProperty("path.separator");
+		String pathSeparator = System.getProperty("path.separator"); //$NON-NLS-1$
 		try {
-			String classPath = getBundleLocation("org.jboss.tools.vpe.browsersim")
-					+ pathSeparator + getBundleLocation("org.jboss.tools.vpe.browsersim.browser")
-					+ pathSeparator + getBundleLocation("org.eclipse.swt")
-					+ pathSeparator + getBundleLocation("org.eclipse.swt." + PlatformUtil.CURRENT_PLATFORM);
-			String javaCommand = System.getProperty("java.home") + "/bin/java";
+			String classPath = getBundleLocation("org.jboss.tools.vpe.browsersim") //$NON-NLS-1$
+					+ pathSeparator + getBundleLocation("org.jboss.tools.vpe.browsersim.browser") //$NON-NLS-1$
+					+ pathSeparator + getBundleLocation("org.eclipse.swt") //$NON-NLS-1$
+					+ pathSeparator + getBundleLocation("org.eclipse.swt." + PlatformUtil.CURRENT_PLATFORM); //$NON-NLS-1$
+			String javaCommand = System.getProperty("java.home") + "/bin/java"; //$NON-NLS-1$ //$NON-NLS-2$
 			
 			List<String> commandElements = new ArrayList<String>();
 			commandElements.add(javaCommand);
 			if (Platform.OS_MACOSX.equals(Platform.getOS())) {
-				commandElements.add("-XstartOnFirstThread");
+				commandElements.add("-XstartOnFirstThread"); //$NON-NLS-1$
 				if (Platform.ARCH_X86.equals(Platform.getOSArch())) {
-					commandElements.add("-d32");
+					commandElements.add("-d32"); //$NON-NLS-1$
 				}
 			}
 			
-			commandElements.add("-cp");
+			commandElements.add("-cp"); //$NON-NLS-1$
 			commandElements.add(classPath);
 			commandElements.add(BROWSERSIM_CLASS_NAME);
 			if (initialUrl != null) {
@@ -110,7 +110,7 @@ public class BrowserSimLauncher {
 			File bundleLocation = FileLocator.getBundleFile(bundle);
 			
 			if (bundleLocation.isDirectory()) {
-				File binDirectory = new File(bundleLocation, "bin");
+				File binDirectory = new File(bundleLocation, "bin"); //$NON-NLS-1$
 				if (binDirectory.isDirectory()) {
 					bundleLocation = binDirectory;
 				}

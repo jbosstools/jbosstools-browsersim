@@ -21,6 +21,7 @@ import org.jboss.tools.vpe.browsersim.browser.AbstractWebKitBrowser;
 /**
  * @author Yahor Radtsevich (yradtsevich)
  */
+@SuppressWarnings("nls")
 public class WebKitBrowser_webkit_cocoa_macos extends AbstractWebKitBrowser {
 	
 	public WebKitBrowser_webkit_cocoa_macos(Composite parent, int style) {

@@ -18,9 +18,9 @@ public class SkinMap {
 	private SkinMap(){
 		map = new HashMap<String, Class<? extends BrowserSimSkin>>();
 		
-		map.put("iPhone 3", AppleIPhone3ResizableSkin.class);
-		map.put("iPhone 4", AppleIPhone4ResizableSkin.class);
-		map.put("Android", AndroidResizableSkin.class);
+		map.put(AppleIPhone3ResizableSkin.IPHONE3_SKIN_ID, AppleIPhone3ResizableSkin.class);
+		map.put(AppleIPhone4ResizableSkin.IPHONE4_SKIN_ID, AppleIPhone4ResizableSkin.class);
+		map.put(AndroidResizableSkin.ANDROID_SKIN_ID, AndroidResizableSkin.class);
 	}
 	
 	public static SkinMap getInstance() {

@@ -22,7 +22,7 @@ public class ResourcesUtil {
 	private static final String RESOURCES_ROOT_FOLDER = "/org/jboss/tools/vpe/browsersim/resources/"; //$NON-NLS-1$
 
 	public static InputStream getResourceAsStream(String name) {
-		if (name.startsWith("/")) {
+		if (name.startsWith("/")) { //$NON-NLS-1$
 			return BrowserSim.class.getResourceAsStream(name);
 		} else {
 			return BrowserSim.class.getResourceAsStream(RESOURCES_ROOT_FOLDER + name);

@@ -28,6 +28,7 @@ import org.jboss.tools.vpe.browsersim.util.ResourcesUtil;
 /**
  * @author Yahor Radtsevich (yradtsevich)
  */
+@SuppressWarnings("nls")
 public class DevicesListStorage {
 	
 	private static final String DEFAULT_PREFERENCES_RESOURCE = "config/devices.cfg";

@@ -21,6 +21,7 @@ import org.jboss.tools.vpe.browsersim.browser.AbstractWebKitBrowser;
 /**
  * @author Yahor Radtsevich (yradtsevich)
  */
+@SuppressWarnings("nls")
 public class WebKitBrowser_gtk_linux_x86 extends AbstractWebKitBrowser {
 	private static final byte[] USER_AGENT; // = WebKitGTK.user_agent
 	static {
