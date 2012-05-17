@@ -10,23 +10,35 @@
  ******************************************************************************/
 package org.jboss.tools.vpe.browsersim.model;
 
+import java.text.DecimalFormat;
+import java.text.DecimalFormatSymbols;
+
 
 /**
  * @author Yahor Radtsevich (yradtsevich)
  */
 public class Device {
 	public static final int DEFAULT_SIZE = -1;
+	public static final DecimalFormat PIXEL_RAIO_FORMAT = new DecimalFormat("0.###"); //$NON-NLS-1$
+	static {
+		DecimalFormatSymbols formatSymbols = new DecimalFormatSymbols();
+		formatSymbols.setDecimalSeparator('.');
+		PIXEL_RAIO_FORMAT.setDecimalFormatSymbols(formatSymbols);
+	}
 	
 	private String name;
 	private int width;
 	private int height;
+	private double pixelRatio;
 	private String userAgent;
 	private String skinId;
 
-	public Device(String name, int width, int height, String userAgent, String skinId) {
+
+	public Device(String name, int width, int height, double pixelRatio, String userAgent, String skinId) {
 		this.name = name;
 		this.width = width;
 		this.height = height;
+		this.pixelRatio = pixelRatio;
 		this.userAgent = userAgent;
 		this.skinId = skinId;
 	}
@@ -49,5 +61,9 @@ public class Device {
 
 	public String getSkinId() {
 		return skinId;
+	}
+
+	public double getPixelRatio() {
+		return pixelRatio;
 	}
 }

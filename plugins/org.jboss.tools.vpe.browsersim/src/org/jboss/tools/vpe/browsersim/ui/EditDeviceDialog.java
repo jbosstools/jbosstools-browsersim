@@ -10,6 +10,7 @@
  ******************************************************************************/
 package org.jboss.tools.vpe.browsersim.ui;
 
+import java.text.ParseException;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
@@ -46,6 +47,7 @@ public class EditDeviceDialog extends Dialog {
 	private Text textName;
 	private Text textWidth;
 	private Text textHeight;
+	private Text textPixelRatio;
 	private Text textUserAgent;
 	private Button checkButtonWidth;
 	private Button checkButtonHeight;
@@ -130,6 +132,15 @@ public class EditDeviceDialog extends Dialog {
 		}
 		attachCheckBoxToText(checkButtonHeight, textHeight);
 		
+		Label labelPixelRatio = new Label(shell, SWT.NONE);
+		labelPixelRatio.setText(Messages.EditDeviceDialog_PIXEL_RATIO);
+		textPixelRatio = new Text(shell, SWT.BORDER);
+		textPixelRatio.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, true, false, 1, 1));
+		textPixelRatio.setTextLimit(5);
+		textPixelRatio.addVerifyListener(new VerifyFloatListener());
+
+		textPixelRatio.setText(Device.PIXEL_RAIO_FORMAT.format(initialDevice.getPixelRatio()));
+		
 		checkButtonUserAgent = new Button(shell, SWT.CHECK);
 		checkButtonUserAgent.setText(Messages.EditDeviceDialog_USER_AGENT);
 		checkButtonUserAgent.setSelection(initialDevice.getUserAgent() != null);
@@ -168,9 +179,17 @@ public class EditDeviceDialog extends Dialog {
 		buttonOk.setText(Messages.EditDeviceDialog_OK);
 		buttonOk.addSelectionListener(new SelectionAdapter() {
 			public void widgetSelected(SelectionEvent e) {
+				double pixelRatio;
+				try {
+					pixelRatio = Device.PIXEL_RAIO_FORMAT.parse(textPixelRatio.getText()).doubleValue();
+				} catch (ParseException e1) {
+					pixelRatio = 1.0;
+				}
+				
 				resultDevice = new Device(textName.getText(),
 						checkButtonWidth.getSelection() ? Integer.valueOf("0" + textWidth.getText()) : Device.DEFAULT_SIZE, //$NON-NLS-1$
 						checkButtonHeight.getSelection() ? Integer.valueOf("0" + textHeight.getText()) : Device.DEFAULT_SIZE, //$NON-NLS-1$
+						pixelRatio,
 						checkButtonUserAgent.getSelection() ? textUserAgent.getText() : null,
 						comboSkin.getSelectionIndex() == 0 ? null : skinIds.get(comboSkin.getSelectionIndex()));
 				shell.close();
@@ -203,6 +222,34 @@ public class EditDeviceDialog extends Dialog {
 				}
 			}
 		});
+	}
+}
+
+final class VerifyFloatListener implements VerifyListener {
+	public void verifyText(VerifyEvent e) {
+		for (char c : e.text.toCharArray()) {
+			if (!('0' <= c && c <= '9') && c != ',' && c != '.') {
+				e.doit = false;
+				return;
+			}
+		}
+		
+		Text text = (Text) e.widget;
+		String oldText = text.getText();
+		String newText = oldText.substring(0, e.start) + e.text + oldText.substring(e.end);
+
+		int delimiterCounter = 0;
+		for (char c : newText.toCharArray()) {
+			if (c == ',' || c == '.') {
+				delimiterCounter++;
+			}
+		}
+		if (delimiterCounter > 1) {
+			e.doit = false;
+			return;
+		}
+		
+		e.text = e.text.replace(',', '.');
 	}
 }
 

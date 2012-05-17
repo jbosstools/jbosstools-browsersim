@@ -18,6 +18,7 @@ import java.io.FileWriter;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.text.ParseException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.regex.Matcher;
@@ -34,7 +35,7 @@ public class DevicesListStorage {
 	private static final String DEFAULT_PREFERENCES_RESOURCE = "config/devices.cfg";
 	private static final String USER_PREFERENCES_FOLDER = "org.jboss.tools.vpe.browsersim";
 	private static final String USER_PREFERENCES_FILE = "devices.cfg";
-	private static final int CURRENT_CONFIG_VERSION = 5;
+	private static final int CURRENT_CONFIG_VERSION = 6;
 
 	public static void saveUserDefinedDevicesList(DevicesList devicesList) {
 		File configFolder = new File(USER_PREFERENCES_FOLDER);
@@ -72,7 +73,7 @@ public class DevicesListStorage {
 		}
 		
 		if (devicesList == null) {
-			Device device = new Device("Default", 1024, 768, null, null);
+			Device device = new Device("Default", 1024, 768, 1.0, null, null);
 			List<Device> devices = new ArrayList<Device>();
 			devices.add(device);
 			devicesList = new DevicesList(devices, 0, true, null);
@@ -97,6 +98,8 @@ public class DevicesListStorage {
 			writer.write(encode( String.valueOf(device.getWidth()) ));
 			writer.write('\t');
 			writer.write(encode( String.valueOf(device.getHeight()) ));
+			writer.write('\t');
+			writer.write(encode( Device.PIXEL_RAIO_FORMAT.format(device.getPixelRatio()) ));
 			writer.write('\t');
 			if (device.getUserAgent() != null) {
 				writer.write( encode(device.getUserAgent() ));
@@ -164,21 +167,30 @@ public class DevicesListStorage {
 					}
 				}
 				
-				Pattern devicePattern = Pattern.compile("^(.*)\\t(\\-?[0-9]+)\\t(\\-?[0-9]+)\\t(.+)?\\t(.+)?$");
+				Pattern devicePattern = Pattern.compile("^(.*)\\t([0-9]+)\\t([0-9]+)\\t([0-9]*\\.?[0-9]*)\\t(.+)?\\t(.+)?$");
 				
 				devices = new ArrayList<Device>();
 				while ((nextLine = reader.readLine()) != null) {
 					Matcher deviceMatcher = devicePattern.matcher(nextLine);
 					if (deviceMatcher.matches()) {
+						double pixelRatio;
+						try {
+							pixelRatio = Device.PIXEL_RAIO_FORMAT.parse(deviceMatcher.group(4)).doubleValue();
+						} catch (ParseException e) {
+							pixelRatio = 1.0;
+							e.printStackTrace();
+						}
+
 						devices.add(new Device(
 								decode(deviceMatcher.group(1)),
 								Integer.parseInt(deviceMatcher.group(2)),
 								Integer.parseInt(deviceMatcher.group(3)),
-								deviceMatcher.group(4) != null 
-								? decode(deviceMatcher.group(4))
+								pixelRatio,
+								deviceMatcher.group(5) != null 
+								? decode(deviceMatcher.group(5))
 										: null,
-										deviceMatcher.group(5) != null 
-										? decode(deviceMatcher.group(5))
+										deviceMatcher.group(6) != null 
+										? decode(deviceMatcher.group(6))
 												: null
 								));
 					}

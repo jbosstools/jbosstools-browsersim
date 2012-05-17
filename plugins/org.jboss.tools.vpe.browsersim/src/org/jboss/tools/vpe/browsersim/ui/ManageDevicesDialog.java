@@ -90,7 +90,7 @@ public class ManageDevicesDialog extends Dialog {
 	 */
 	private void createContents() {
 		shell = new Shell(getParent(), getStyle());
-		shell.setSize(650, 450);
+		shell.setSize(750, 500);
 		shell.setText(getText());
 		shell.setLayout(new GridLayout(1, false));
 		
@@ -110,23 +110,27 @@ public class ManageDevicesDialog extends Dialog {
 		
 		
 		TableColumn tableColumnName = new TableColumn(table, SWT.NONE);
-		tableColumnName.setWidth(100);
+		tableColumnName.setWidth(175);
 		tableColumnName.setText(Messages.ManageDevicesDialog_NAME);
 		
 		TableColumn tableColumnWidth = new TableColumn(table, SWT.NONE);
-		tableColumnWidth.setWidth(100);
+		tableColumnWidth.setWidth(75);
 		tableColumnWidth.setText(Messages.ManageDevicesDialog_WIDTH);
 		
 		TableColumn tableColumnHeight = new TableColumn(table, SWT.NONE);
-		tableColumnHeight.setWidth(100);
+		tableColumnHeight.setWidth(75);
 		tableColumnHeight.setText(Messages.ManageDevicesDialog_HEIGHT);
 		
+		TableColumn tableColumnPixelRatio = new TableColumn(table, SWT.NONE);
+		tableColumnPixelRatio.setWidth(75);
+		tableColumnPixelRatio.setText(Messages.ManageDevicesDialog_PIXEL_RATIO);
+		
 		TableColumn tableColumnUseragent = new TableColumn(table, SWT.NONE);
-		tableColumnUseragent.setWidth(100);
+		tableColumnUseragent.setWidth(150);
 		tableColumnUseragent.setText(Messages.ManageDevicesDialog_USER_AGENT);
 		
 		TableColumn tableColumnSkin = new TableColumn(table, SWT.NONE);
-		tableColumnSkin.setWidth(100);
+		tableColumnSkin.setWidth(75);
 		tableColumnSkin.setText(Messages.ManageDevicesDialog_SKIN);
 		
 		Composite compositeControls = new Composite(devicesGroup, SWT.NONE);
@@ -139,7 +143,7 @@ public class ManageDevicesDialog extends Dialog {
 		buttonAdd.addSelectionListener(new SelectionAdapter() {
 			public void widgetSelected(SelectionEvent e) {
 				Device newDevice = new EditDeviceDialog(shell,  SWT.APPLICATION_MODAL | SWT.SHELL_TRIM,
-						new Device(Messages.ManageDevicesDialog_NEW_DEVICE, 480, 800, Messages.ManageDevicesDialog_NEW_USER_AGENT, null)).open();
+						new Device(Messages.ManageDevicesDialog_NEW_DEVICE, 320, 480, 1.0, Messages.ManageDevicesDialog_NEW_USER_AGENT, null)).open();
 				if (newDevice != null) {
 					devices.add(newDevice);
 					selectedDeviceIndex = devices.size() - 1;
@@ -281,7 +285,7 @@ public class ManageDevicesDialog extends Dialog {
 		updateDevices();
 	}
 	
-	public void updateDevices() {//TODO
+	public void updateDevices() {
 		table.removeAll();
 		for (Device device : devices) {
 			TableItem tableItem = new TableItem(table, SWT.NONE);
@@ -289,6 +293,7 @@ public class ManageDevicesDialog extends Dialog {
 					device.getName(), 
 					device.getWidth() == Device.DEFAULT_SIZE ? Messages.ManageDevicesDialog_DEFAULT : String.valueOf(device.getWidth()),
 					device.getHeight() == Device.DEFAULT_SIZE ? Messages.ManageDevicesDialog_DEFAULT : String.valueOf(device.getHeight()),
+					Device.PIXEL_RAIO_FORMAT.format(device.getPixelRatio()),
 					device.getUserAgent() == null ? Messages.ManageDevicesDialog_DEFAULT : device.getUserAgent(),
 					device.getSkinId() == null ?  Messages.ManageDevicesDialog_NONE : device.getSkinId()
 			});

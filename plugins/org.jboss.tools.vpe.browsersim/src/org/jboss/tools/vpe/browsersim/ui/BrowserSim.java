@@ -481,15 +481,17 @@ public class BrowserSim {
 					? DeviceOrientation.PORTRAIT
 					: DeviceOrientation.LANDSCAPE);
 		Rectangle clientArea = getMonitorClientArea();
-		skin.setOrientationAndSize(	deviceOrientation.getOrientationAngle(), new Point(device.getWidth(), device.getHeight()),
+		Point size = getSizeInDesktopPixels(device);
+		skin.setOrientationAndSize(	deviceOrientation.getOrientationAngle(), size,
 				getSizeAdvisor());
 		fixShellLocation(clientArea);
 		deviceOrientation.addObserver(new Observer() {
 			public void update(Observable o, Object arg) {
 				int orientationAngle = ((DeviceOrientation) o).getOrientationAngle();
-				
-				int minSize = Math.min(device.getWidth(), device.getHeight());
-				int maxSize = Math.max(device.getWidth(), device.getHeight());
+
+				Point size = getSizeInDesktopPixels(device);
+				int minSize = Math.min(size.x, size.y);
+				int maxSize = Math.max(size.x, size.y);
 				Point browserSize;
 				if (orientationAngle == DeviceOrientation.LANDSCAPE
 						|| orientationAngle == DeviceOrientation.LANDSCAPE_INVERTED) {
@@ -580,6 +582,22 @@ public class BrowserSim {
 	protected void rotateDevice(boolean counterclockwise) {
 		deviceOrientation.turnDevice(counterclockwise);
 		deviceOrientation.notifyObservers();
+	}
+	
+	/**
+	 * See JBIDE-11896	BrowserSim: pixel ratio problem.
+	 * 
+	 * On many mobile devices like iPhone 4 1 CSS pixel = 2 device pixels.
+	 */
+	protected Point getSizeInDesktopPixels(Device device) {
+		double pixelRatio = device.getPixelRatio();
+		if (device.getPixelRatio() == 0.0) {
+			pixelRatio = 1.0;
+			new RuntimeException("Pixel Ratio is 0.0").printStackTrace();
+		}
+		int width = (int) Math.round(device.getWidth() / pixelRatio);
+		int height = (int) Math.round(device.getHeight() / pixelRatio);
+		return new Point(width, height);
 	}
 	
 	class ControlHandlerImpl implements ControlHandler {

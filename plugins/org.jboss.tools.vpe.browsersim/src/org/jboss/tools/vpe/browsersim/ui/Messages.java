@@ -17,6 +17,7 @@ import org.jboss.tools.vpe.browsersim.util.NLS;
  */
 public class Messages {
 	private static final String BUNDLE_NAME = Messages.class.getName().toString().toLowerCase();
+
 	
 	public static String BrowserSim_ADDRESS;
 	public static String BrowserSim_BROWSER_SIM;
@@ -38,6 +39,7 @@ public class Messages {
 	public static String EditDeviceDialog_NAME;
 	public static String EditDeviceDialog_NONE;
 	public static String EditDeviceDialog_OK;
+	public static String EditDeviceDialog_PIXEL_RATIO;
 	public static String EditDeviceDialog_SKIN;
 	public static String EditDeviceDialog_USER_AGENT;
 	public static String EditDeviceDialog_WIDTH;
@@ -60,6 +62,7 @@ public class Messages {
 	public static String ManageDevicesDialog_NEW_USER_AGENT;
 	public static String ManageDevicesDialog_NONE;
 	public static String ManageDevicesDialog_OK;
+	public static String ManageDevicesDialog_PIXEL_RATIO;
 	public static String ManageDevicesDialog_PREFERENCES;
 	public static String ManageDevicesDialog_PROMPT;
 	public static String ManageDevicesDialog_REMOVE;
@@ -76,6 +79,7 @@ public class Messages {
 	public static String SizeWarningDialog_DEVICE_SIZE_WILL_BE_TRUNCATED;
 	public static String SizeWarningDialog_OK;
 	public static String SizeWarningDialog_REMEMBER_MY_DECISION;
+
 
 	static {
 		NLS.initializeMessages(BUNDLE_NAME, Messages.class);
