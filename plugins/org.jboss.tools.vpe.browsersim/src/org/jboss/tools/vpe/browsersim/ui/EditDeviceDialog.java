@@ -89,7 +89,7 @@ public class EditDeviceDialog extends Dialog {
 	 * Create contents of the dialog.
 	 */
 	private void createContents() {
-		shell = new Shell(getParent(), SWT.DIALOG_TRIM | SWT.MIN | SWT.MAX);
+		shell = new Shell(getParent(), getStyle());
 		shell.setSize(450, 300);
 		shell.setText(Messages.EditDeviceDialog_EDIT_DEVICE);
 		shell.setLayout(new GridLayout(2, false));
