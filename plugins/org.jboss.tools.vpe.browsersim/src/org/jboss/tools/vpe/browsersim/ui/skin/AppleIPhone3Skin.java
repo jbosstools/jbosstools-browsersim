@@ -257,7 +257,6 @@ public class AppleIPhone3Skin implements BrowserSimSkin {
 		
 		currentOrientationIndex = AppleIPhone3Skin.VERTICAL;
 		setWidgetsBounds(currentOrientationIndex);
-		shell.open();
 	}
 	
 	public void setAddressBarVisible(boolean visible) {

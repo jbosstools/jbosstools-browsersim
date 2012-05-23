@@ -118,8 +118,6 @@ public class NativeSkin implements BrowserSimSkin {
 		progressBar.setLayoutData(data);
 		
 		addControlListeners();
-
-		shell.open();
 	}
 		
 	private void addControlListeners() {
