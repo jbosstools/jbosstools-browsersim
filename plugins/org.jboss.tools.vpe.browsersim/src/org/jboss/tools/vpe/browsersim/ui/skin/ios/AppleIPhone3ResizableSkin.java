@@ -133,7 +133,6 @@ public class AppleIPhone3ResizableSkin extends ResizableSkin {
 		browser = browserFactory.createBrowser(browserContainer, SWT.NONE);
 		
 		shell.setSize(/*shell.computeSize(SWT.DEFAULT, SWT.DEFAULT)*/ 384, 727);
-		shell.open();
 		setShellRegion();
 	}
 

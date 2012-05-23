@@ -268,6 +268,7 @@ public class BrowserSim {
 				skin.pageTitleChanged(event.title);
 			}
 		});
+		shell.open();
 	}
 	
 	private void setShellAttibutes() {
