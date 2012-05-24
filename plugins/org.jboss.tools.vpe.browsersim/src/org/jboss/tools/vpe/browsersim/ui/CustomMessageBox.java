@@ -48,7 +48,7 @@ class CustomMessageBox extends Dialog {
 	}
 	
 	protected void createWidgets() {
-		shell = new Shell(getParent(), SWT.DIALOG_TRIM);
+		shell = new Shell(getParent(), SWT.APPLICATION_MODAL | SWT.DIALOG_TRIM);
 		GridLayout shellLayout = new GridLayout(1, true);
 		shellLayout.marginHeight = 0;
 		shellLayout.marginWidth = 0;
