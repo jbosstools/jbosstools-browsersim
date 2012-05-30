@@ -23,6 +23,7 @@ import org.eclipse.core.runtime.Platform;
 import org.eclipse.core.runtime.preferences.ConfigurationScope;
 import org.eclipse.osgi.framework.internal.core.BundleFragment;
 import org.eclipse.osgi.framework.internal.core.BundleHost;
+import org.jboss.tools.vpe.browsersim.browser.PlatformUtil;
 import org.jboss.tools.vpe.browsersim.eclipse.Activator;
 import org.jboss.tools.vpe.browsersim.eclipse.callbacks.BrowserSimCallback;
 import org.jboss.tools.vpe.browsersim.eclipse.callbacks.OpenFileCallback;
@@ -36,10 +37,17 @@ import org.osgi.framework.Bundle;
 public class BrowserSimLauncher {
 	public static final String BROWSERSIM_CLASS_NAME = "org.jboss.tools.vpe.browsersim.ui.BrowserSim"; //$NON-NLS-1$
 	private static final BrowserSimCallback[] BROWSERSIM_CALLBACKS = { new ViewSourceCallback(), new OpenFileCallback() };
-	private static final String[] REQUIRED_PLUGINS = {
+	private static final String[] REQUIRED_BUNDLES = {
 		"org.jboss.tools.vpe.browsersim",
 		"org.jboss.tools.vpe.browsersim.browser",
-		"org.eclipse.swt"};
+		"org.eclipse.swt"
+	};
+	private static final String[] OPTIONAL_BUNDLES = {
+		
+		// org.eclipse.swt plugin may contain this fragment in itself - that is why it is optional. See JBIDE-11923
+		"org.eclipse.swt." + PlatformUtil.CURRENT_PLATFORM 
+	};
+	
 
 	public static void launchBrowserSim(String initialUrl) {
 		try {
@@ -106,8 +114,19 @@ public class BrowserSimLauncher {
 
 	private static String getClassPathString() throws IOException {
 		List<Bundle> classPathBundles = new ArrayList<Bundle>();
-		for (String requiredPlugin : REQUIRED_PLUGINS) {
-			classPathBundles.addAll(getBundleAndFragments(requiredPlugin));
+		for (String bundleName : REQUIRED_BUNDLES) {
+			Bundle bundle = Platform.getBundle(bundleName);
+			if (bundle != null) {
+				classPathBundles.add(bundle);
+			} else {
+				throw new IOException("Cannot find bundle: " + bundleName);
+			}
+		}
+		for (String bundleName : OPTIONAL_BUNDLES) {
+			Bundle bundle = Platform.getBundle(bundleName);
+			if (bundle != null) {
+				classPathBundles.add(bundle);
+			}
 		}
 					
 		String pathSeparator = System.getProperty("path.separator"); //$NON-NLS-1$
@@ -123,22 +142,20 @@ public class BrowserSimLauncher {
 		return classPath.toString();
 	}
 	
-	private static List<Bundle> getBundleAndFragments(String symbolicName) throws IOException {
+	private static List<Bundle> getBundleAndFragments(String symbolicName) {
 		List<Bundle> bundles = new ArrayList<Bundle>();
 		Bundle bundle = Platform.getBundle(symbolicName);
 
-		if (bundle == null) {
-			throw new IOException("Cannot find bundle: " + symbolicName);
-		}
-		
-		bundles.add(bundle);
-		
-		if (bundle instanceof BundleHost) {
-			BundleFragment[] fragments = ((BundleHost) bundle).getFragments();
-			if (fragments != null) {
-				Collections.addAll(bundles, fragments);
-			}				
-		}
+		if (bundle != null) {
+			bundles.add(bundle);
+			
+			if (bundle instanceof BundleHost) {
+				BundleFragment[] fragments = ((BundleHost) bundle).getFragments();
+				if (fragments != null) {
+					Collections.addAll(bundles, fragments);
+				}				
+			}
+		}		
 		
 		return bundles;
 	}
