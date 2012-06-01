@@ -14,14 +14,6 @@ import java.text.MessageFormat;
 
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.SWTError;
-import org.eclipse.swt.events.SelectionAdapter;
-import org.eclipse.swt.events.SelectionEvent;
-import org.eclipse.swt.layout.GridData;
-import org.eclipse.swt.program.Program;
-import org.eclipse.swt.widgets.Button;
-import org.eclipse.swt.widgets.Event;
-import org.eclipse.swt.widgets.Link;
-import org.eclipse.swt.widgets.Listener;
 import org.eclipse.swt.widgets.MessageBox;
 import org.eclipse.swt.widgets.Shell;
 import org.jboss.tools.vpe.browsersim.browser.PlatformUtil;
@@ -50,70 +42,25 @@ public class ExceptionNotifier {
 		}
 		showErrorMessageWithLinks(parentShell, message);
 	}
-	
+
 	public static void showErrorMessage(Shell shell, String message) {
 		System.err.println(message);
-		
+
 		MessageBox messageBox = new MessageBox(shell, SWT.OK | SWT.ICON_ERROR);
 		messageBox.setText(Messages.BrowserSim_ERROR);
 		messageBox.setMessage(message);
 		messageBox.open();
 	}
-	
+
 	public static void showErrorMessageWithLinks(Shell shell, String message) {
 		System.err.println(message);
-		
-		ErrorMessageBoxWithLinks messageBox = new ErrorMessageBoxWithLinks(shell);
-		messageBox.setText(Messages.BrowserSim_ERROR);
-		messageBox.setMessage(message);
+
+		MessageBoxWithLinks messageBox = new MessageBoxWithLinks(shell,
+				message, shell.getDisplay().getSystemImage(SWT.ICON_ERROR),
+				Messages.BrowserSim_ERROR);
 		messageBox.open();
 	}
 }
 
 
-/**
- * Behaves like MessageBox with styles SWT.OK and SWT.ICON_ERROR, but allows HTML links is messages. 
- * @author Yahor Radtsevich (yradtsevich)
- *
- */
-class ErrorMessageBoxWithLinks extends CustomMessageBox {
 
-	private String message;
-
-	public ErrorMessageBoxWithLinks(Shell parent) {
-		super(parent, parent.getDisplay().getSystemImage(SWT.ICON_ERROR));
-		message = ""; //$NON-NLS-1$
-	}
-
-	@Override
-	protected void createWidgets() {
-		super.createWidgets();
-				
-		Link link = new Link(getMessageComposite(), SWT.WRAP);
-		link.setText(message);
-		link.setBackground(getMessageCompositeBackground());
-		link.addListener (SWT.Selection, new Listener () {
-			public void handleEvent(Event event) {
-				Program.launch(event.text);
-			}
-		});
-		
-		Button ok = new Button(getButtonsComposite(), SWT.PUSH);
-		ok.setText(Messages.ExceptionNotifier_OK);
-		ok.addSelectionListener(new SelectionAdapter() {
-			@Override
-			public void widgetSelected(SelectionEvent e) {
-				getShell().close();
-			}
-		});
-		GridData okLayoutData = new GridData(SWT.END, SWT.CENTER, true, true);
-		okLayoutData.widthHint = 88;
-		ok.setLayoutData(okLayoutData);
-		getShell().setDefaultButton(ok);
-		getShell().pack();
-	}
-
-	public void setMessage(String message) {
-		this.message = message;
-	}
-}

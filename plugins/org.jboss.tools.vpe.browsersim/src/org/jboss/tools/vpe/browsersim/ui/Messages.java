@@ -19,6 +19,8 @@ public class Messages {
 	private static final String BUNDLE_NAME = Messages.class.getName().toString().toLowerCase();
 
 	
+	public static String BrowserSim_ABOUT;
+	public static String BrowserSim_ABOUT_MESSAGE;
 	public static String BrowserSim_ADDRESS;
 	public static String BrowserSim_BROWSER_SIM;
 	public static String BrowserSim_COULD_NOT_OPEN_DEFAULT_BROWSER;
@@ -26,6 +28,7 @@ public class Messages {
 	public static String BrowserSim_ERROR;
 	public static String BrowserSim_EXIT;
 	public static String BrowserSim_FILE;
+	public static String BrowserSim_HELP;
 	public static String BrowserSim_OPEN_IN_DEFAULT_BROWSER;
 	public static String BrowserSim_PREFERENCES;
 	public static String BrowserSim_TURN_LEFT;
