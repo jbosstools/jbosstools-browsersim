@@ -89,6 +89,12 @@ public class BrowserSim {
 	private ResizableSkinSizeAdvisor sizeAdvisor;
 
 	public static void main(String[] args) {
+		//CocoaUIEnhancer handles connection between the About, Preferences and Quit menus in MAC OS X
+		CocoaUIEnhancer cocoaUIEnhancer = null;
+		if (PlatformUtil.OS_MACOSX.equals(PlatformUtil.getOs())) {
+			cocoaUIEnhancer = new CocoaUIEnhancer(Messages.BrowserSim_BROWSER_SIM);
+			cocoaUIEnhancer.initializeMacOSMenuBar();
+		}
 		String homeUrl;
 		if (args.length > 0) {
 			String lastArg = args[args.length - 1];
@@ -118,8 +124,8 @@ public class BrowserSim {
 		
 
 		// set event handlers for Mac OS X Menu-bar
-		if (PlatformUtil.OS_MACOSX.equals(PlatformUtil.getOs())) {
-			browserSim.addMacOsMenuApplicationHandler();
+		if (cocoaUIEnhancer != null) {
+			browserSim.addMacOsMenuApplicationHandler(cocoaUIEnhancer);
 		}
 
 
@@ -785,8 +791,7 @@ public class BrowserSim {
 	}
 
 	
-	private void addMacOsMenuApplicationHandler() {
-		CocoaUIEnhancer enhancer = new CocoaUIEnhancer(Messages.BrowserSim_BROWSER_SIM);
+	private void addMacOsMenuApplicationHandler(CocoaUIEnhancer enhancer) {
 		
 		Listener quitListener = new Listener() {
 			@Override

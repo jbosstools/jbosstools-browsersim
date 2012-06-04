@@ -1,8 +1,15 @@
+/*******************************************************************************
+ * This program is made available under the terms of the
+ * Eclipse Public License v1.0 which accompanies this distribution,
+ * and is available at http://www.eclipse.org/legal/epl-v10.html
+ * 
+ * Initial implementation:
+ *     http://www.transparentech.com/opensource/cocoauienhancer
+ ******************************************************************************/
 package org.jboss.tools.vpe.browsersim.ui;
 
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
-
 
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.internal.C;
@@ -52,6 +59,13 @@ public class CocoaUIEnhancer {
      */
     public CocoaUIEnhancer( String appName ) {
         this.appName = appName;
+    }
+    /**
+     * Must be invoked before a Display is created!
+	 */
+    public void initializeMacOSMenuBar(){
+    	System.setProperty("com.apple.mrj.application.apple.menu.about.name", appName);//$NON-NLS-1$
+    	
     }
 
     /**
@@ -167,9 +181,8 @@ public class CocoaUIEnhancer {
             invoke( nsmenuCls, appMenu, "itemAtIndex", new Object[] { wrapPointer( kAboutMenuItem ) } );
         
         /*  yradtsevich: The following lines in the original source are
-         *  replaced by the call of System.getProperty, which does the same job.
+         *  replaced by the call of initializeMacOSMenuBar(), which does the same job.
          *  See https://issues.jboss.org/browse/JBIDE-11048 */
-        System.setProperty("com.apple.mrj.application.apple.menu.about.name", appName);//$NON-NLS-1$
 //        if ( appName != null ) {
 //            Object nsStr = invoke( nsstringCls, "stringWith", new Object[] { "About " + appName } );
 //            invoke( nsmenuitemCls, aboutMenuItem, "setTitle", new Object[] { nsStr } );
