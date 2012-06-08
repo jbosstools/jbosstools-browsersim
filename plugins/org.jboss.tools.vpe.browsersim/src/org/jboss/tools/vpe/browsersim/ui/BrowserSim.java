@@ -255,7 +255,13 @@ public class BrowserSim {
 					public Object function(Object[] arguments) {
 						double pageYOffset = (Double) arguments[0];
 						if (pageYOffset > 0.0) {
-							skin.setAddressBarVisible(false);
+							display.asyncExec(new Runnable() {
+								public void run() {
+									if (skin != null && skin.getShell() != null && !skin.getShell().isDisposed()) {
+										skin.setAddressBarVisible(false);
+									}
+								}
+							});
 						}
 						return null;
 					}
