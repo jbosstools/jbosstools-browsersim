@@ -74,7 +74,9 @@
  <extension
        id="application"
        point="org.eclipse.core.runtime.applications">
-    <application>
+    <application
+          thread="any"
+          visible="true">
        <run
              class="org.jboss.tools.vpe.browsersim.eclipse.BrowsersimApplication">
        </run>
