@@ -10,19 +10,4 @@
 	<groupId>org.jboss.tools.vpe.browsersim</groupId>
 	<artifactId>org.jboss.tools.vpe.browsersim.eclipse</artifactId>
 	<packaging>eclipse-plugin</packaging>
-	
-	<build>
-		<plugins>
-			<plugin>
-				<groupId>org.eclipse.tycho</groupId>
-				<artifactId>target-platform-configuration</artifactId>
-				<version>${tychoVersion}</version>
-				<configuration>
-					<dependency-resolution>
-						<optionalDependencies>require</optionalDependencies>
-					</dependency-resolution>
-				</configuration>
-			</plugin>
-		</plugins>
-	</build>
 </project>
