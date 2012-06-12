@@ -105,35 +105,28 @@ public class ViewSourceCallback implements BrowserSimCallback {
 						if (editor instanceof JSPMultiPageEditor) {
 							JSPMultiPageEditor multiPageEditor = (JSPMultiPageEditor) editor;
 							doc = multiPageEditor.getSourceEditor().getTextViewer().getDocument();
+							doc.set(content);
+							editor.doSave(null); // reset resource-changed marker
 						}
 					} catch (NoClassDefFoundError e1) {
 						// this is OK - there are some optional dependencies
+						ITextEditor textEditor = null;
+						if (editor instanceof ITextEditor) {
+							textEditor = (ITextEditor) editor;
+						} else {
+							textEditor = (ITextEditor) editor.getAdapter(ITextEditor.class);
+						}
+						
+						if (textEditor != null) {
+							doc = textEditor.getDocumentProvider().getDocument(input);
+						}
 					}
-				}
-
-				if (doc == null) {
-					ITextEditor textEditor = null;
-					if (editor instanceof ITextEditor) {
-						textEditor = (ITextEditor) editor;
-					} else {
-						textEditor = (ITextEditor) editor.getAdapter(ITextEditor.class);
-					}
-					
-					if (textEditor != null) {
-						doc = textEditor.getDocumentProvider().getDocument(input);
-					}
-				}
-				
-				if (doc != null) {
-					doc.set(content);
-					editor.doSave(null); // reset resource-changed marker
 				}
 			} catch (PartInitException e) {
 				Activator.logError(e.getMessage(), e);
 			}
 		} else {
-			Exception e = new Exception("Cannot obtain workbench page");
-			Activator.logError(e.getMessage(), e);
+			Activator.logError("Cannot obtain workbench page", null);
 		}
 	}
 }
