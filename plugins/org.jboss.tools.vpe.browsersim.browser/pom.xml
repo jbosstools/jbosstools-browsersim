@@ -4,7 +4,7 @@
 	<parent>
 		<groupId>org.jboss.tools.vpe</groupId>
 		<artifactId>plugins</artifactId>
-		<version>3.3.0-SNAPSHOT</version>
+		<version>3.4.0-SNAPSHOT</version>
 	</parent>
 	<groupId>org.jboss.tools.vpe.browsersim</groupId>
 	<artifactId>org.jboss.tools.vpe.browsersim.browser</artifactId> 
