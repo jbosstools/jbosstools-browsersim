@@ -50,7 +50,7 @@ public class ManifestUtil {
 			if (version == null) {
 				// If Manifest Version is not in jar
 				URL browserSimBaseUrl = BrowserSim.class.getClassLoader().getResource("."); //$NON-NLS-1$
-				if ("file".equals(browserSimBaseUrl.getProtocol())) { //$NON-NLS-1$
+				if (browserSimBaseUrl != null && "file".equals(browserSimBaseUrl.getProtocol())) { //$NON-NLS-1$
 					File binDir = new File(browserSimBaseUrl.getFile());
 					File browsersimDir = binDir.getParentFile();
 					File manifestFile = new File(browsersimDir, JarFile.MANIFEST_NAME);
