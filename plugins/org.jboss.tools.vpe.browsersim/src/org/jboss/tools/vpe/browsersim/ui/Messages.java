@@ -17,7 +17,6 @@ import org.jboss.tools.vpe.browsersim.util.NLS;
  */
 public class Messages {
 	private static final String BUNDLE_NAME = Messages.class.getName().toString().toLowerCase();
-
 	
 	public static String BrowserSim_ABOUT;
 	public static String BrowserSim_ABOUT_MESSAGE;
@@ -49,6 +48,7 @@ public class Messages {
 	public static String ExceptionNotifier_APPLE_APPLICATION_SUPPORT_IS_NOT_FOUND;
 	public static String ExceptionNotifier_BROWSERSIM_IS_FAILED_TO_START;
 	public static String ExceptionNotifier_BROWSERSIM_IS_FAILED_TO_START_ON_LINUX;
+	public static String ExceptionNotifier_JRE_1_7_IS_NOT_SUPPORTED_ON_WINDOWS;
 	public static String ExceptionNotifier_OK;
 	public static String ExceptionNotifier_ONLY_32_BIT_ECLIPSE_IS_SUPPORTED_ON_WINDOWS;
 	public static String ManageDevicesDialog_ADD;

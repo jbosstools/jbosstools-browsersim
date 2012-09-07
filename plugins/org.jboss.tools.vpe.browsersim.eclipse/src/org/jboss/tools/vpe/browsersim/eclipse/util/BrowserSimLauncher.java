@@ -55,6 +55,20 @@ public class BrowserSimLauncher {
 			String classPath = getClassPathString();
 			String javaCommand = System.getProperty("java.home") + "/bin/java"; //$NON-NLS-1$ //$NON-NLS-2$
 			
+			// This is a workaround for JDK 7: JBIDE-12467 Unable to Run Browsersim in Windows7 64b + JRE7 32b
+			// On Windows and Java 7 the 'java.home' variable always points to JRE, but 'eclipse.vm' may point to JDK,
+			// if it is specified explicitly in the inclipse.ini.
+			boolean isJava1_7 = "1.7".equals(System.getProperty("java.specification.version")); //$NON-NLS-1$ //$NON-NLS-2$
+			if (Platform.OS_WIN32.equals(Platform.getOS()) && isJava1_7) {
+				String eclipseVm = System.getProperty("eclipse.vm");
+				if (eclipseVm != null) {
+					if (eclipseVm.endsWith("java") || eclipseVm.endsWith("java.exe") 
+							|| eclipseVm.endsWith("javaw") || eclipseVm.endsWith("javaw.exe")) {
+						javaCommand = eclipseVm;
+					}
+				}
+			}
+			
 			List<String> commandElements = new ArrayList<String>();
 			commandElements.add(javaCommand);
 			if (Platform.OS_MACOSX.equals(Platform.getOS())) {
