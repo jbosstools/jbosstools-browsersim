@@ -10,6 +10,9 @@
  ******************************************************************************/
 package org.jboss.tools.vpe.browsersim.browser;
 
+import java.io.File;
+import java.lang.reflect.Method;
+
 import org.eclipse.swt.SWTError;
 import org.eclipse.swt.widgets.Composite;
 import org.jboss.tools.vpe.browsersim.browser.internal.WebKitBrowser_gtk_linux_x86;
@@ -22,6 +25,8 @@ import org.jboss.tools.vpe.browsersim.browser.internal.WebKitBrowser_win32_win32
  */
 @SuppressWarnings("nls")
 public class WebKitBrowserFactory implements IBrowserSimBrowserFactory {
+	public static final String NO_SAFARI = "Safari must be installed to use a SWT.WEBKIT-style Browser"; 
+	
 	@Override
 	public AbstractWebKitBrowser createBrowser(Composite parent, int style) {
 		if (PlatformUtil.CURRENT_PLATFORM.equals("gtk.linux.x86")) {
@@ -31,6 +36,27 @@ public class WebKitBrowserFactory implements IBrowserSimBrowserFactory {
 		} else if (PlatformUtil.CURRENT_PLATFORM.startsWith("cocoa.macosx")) {
 			return new WebKitBrowser_webkit_cocoa_macos(parent, style);
 		} else if (PlatformUtil.CURRENT_PLATFORM.equals("win32.win32.x86")) {
+			//due to last changes Safari is needed to run brower sim(against QuickTime)
+			//to avoid JVM crash we need to check Safari existance before creating a browser.(JBIDE-13044)
+			String AASDirectory = null;
+			try {
+				Method method = Class.forName("org.eclipse.swt.browser.WebKit").getDeclaredMethod("readInstallDir", String.class);
+				method.setAccessible(true);
+				AASDirectory = (String) method.invoke(null, "SOFTWARE\\Apple Computer, Inc.\\Safari");//$NON-NLS-1$
+			} catch (Throwable e) {
+				throw new RuntimeException(e);
+			}
+			if (AASDirectory != null) {
+				AASDirectory += "\\Apple Application Support"; //$NON-NLS-1$
+				if (!new File(AASDirectory).exists()) {
+					AASDirectory = null;
+				}
+			}
+			
+			if (AASDirectory == null) {
+				throw new SWTError(NO_SAFARI);
+			}
+			
 			return new WebKitBrowser_win32_win32_x86(parent, style);
 		}
 

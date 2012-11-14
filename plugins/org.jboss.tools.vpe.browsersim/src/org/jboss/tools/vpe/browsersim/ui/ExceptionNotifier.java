@@ -32,7 +32,7 @@ public class ExceptionNotifier {
 		if (PlatformUtil.OS_WIN32.equals(os) && !PlatformUtil.ARCH_X86.equals(arch)) {// Eclipse 64-bit on Windows
 			message = Messages.ExceptionNotifier_ONLY_32_BIT_ECLIPSE_IS_SUPPORTED_ON_WINDOWS;
 		} else if (PlatformUtil.OS_WIN32.equals(os) && PlatformUtil.ARCH_X86.equals(arch) // Eclipse 32-bit on Windows and
-				&& error.getMessage() != null											  // Apple Application Support is not installed
+				&& error.getMessage() != null											  // Safari is not installed
 				&& error.getMessage().contains("Safari must be installed to use a SWT.WEBKIT-style Browser")) { //$NON-NLS-1$
 			message = Messages.ExceptionNotifier_APPLE_APPLICATION_SUPPORT_IS_NOT_FOUND;
 		} else if (PlatformUtil.OS_WIN32.equals(os) && PlatformUtil.ARCH_X86.equals(arch) // Eclipse 32-bit on Windows and
