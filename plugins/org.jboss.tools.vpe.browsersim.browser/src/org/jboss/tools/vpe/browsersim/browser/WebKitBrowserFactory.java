@@ -37,8 +37,10 @@ public class WebKitBrowserFactory implements IBrowserSimBrowserFactory {
 		} else if (PlatformUtil.CURRENT_PLATFORM.startsWith("cocoa.macosx")) {
 			return new WebKitBrowser_webkit_cocoa_macos(parent, style);
 		} else if (PlatformUtil.CURRENT_PLATFORM.equals("win32.win32.x86")) {
-			//due to last changes Safari is needed to run brower sim(against QuickTime)
-			//to avoid JVM crash we need to check Safari existance before creating a browser.(JBIDE-13044)
+			//due to last changes Safari is needed to run BrowerSim (against QuickTime)
+			//to avoid JVM crash we need to check Safari existance before creating a browser.(JBIDE-13044).
+			//If an exception is thrown during org.eclipse.swt.browser.WebKit.readInstallDir() invocation,
+			//this means that SWT internal API is changed and we just log it to the console.
 			try {
 				Method method = Class.forName("org.eclipse.swt.browser.WebKit").getDeclaredMethod("readInstallDir", String.class);
 				method.setAccessible(true);
