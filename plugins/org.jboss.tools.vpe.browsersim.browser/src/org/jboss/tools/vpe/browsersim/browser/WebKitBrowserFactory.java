@@ -11,6 +11,7 @@
 package org.jboss.tools.vpe.browsersim.browser;
 
 import java.io.File;
+import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 
 import org.eclipse.swt.SWTError;
@@ -38,24 +39,34 @@ public class WebKitBrowserFactory implements IBrowserSimBrowserFactory {
 		} else if (PlatformUtil.CURRENT_PLATFORM.equals("win32.win32.x86")) {
 			//due to last changes Safari is needed to run brower sim(against QuickTime)
 			//to avoid JVM crash we need to check Safari existance before creating a browser.(JBIDE-13044)
-			String AASDirectory = null;
 			try {
 				Method method = Class.forName("org.eclipse.swt.browser.WebKit").getDeclaredMethod("readInstallDir", String.class);
 				method.setAccessible(true);
-				AASDirectory = (String) method.invoke(null, "SOFTWARE\\Apple Computer, Inc.\\Safari");//$NON-NLS-1$
-			} catch (Throwable e) {
-				throw new RuntimeException(e);
-			}
-			if (AASDirectory != null) {
-				AASDirectory += "\\Apple Application Support"; //$NON-NLS-1$
-				if (!new File(AASDirectory).exists()) {
-					AASDirectory = null;
+				String AASDirectory = (String) method.invoke(null, "SOFTWARE\\Apple Computer, Inc.\\Safari");//$NON-NLS-1$
+				
+				if (AASDirectory != null) {
+					AASDirectory += "\\Apple Application Support"; //$NON-NLS-1$
+					if (!new File(AASDirectory).exists()) {
+						AASDirectory = null;
+					}
 				}
-			}
-			
-			if (AASDirectory == null) {
-				throw new SWTError(NO_SAFARI);
-			}
+				
+				if (AASDirectory == null) {
+					throw new SWTError(NO_SAFARI);
+				}
+			} catch(IllegalAccessException e) {
+				e.printStackTrace();
+			} catch (SecurityException e) {
+				e.printStackTrace();
+			} catch (NoSuchMethodException e) {
+				e.printStackTrace();
+			} catch (ClassNotFoundException e) {
+				e.printStackTrace();
+			} catch (IllegalArgumentException e) {
+				e.printStackTrace();
+			} catch (InvocationTargetException e) {
+				e.printStackTrace();
+			} 
 			
 			return new WebKitBrowser_win32_win32_x86(parent, style);
 		}
