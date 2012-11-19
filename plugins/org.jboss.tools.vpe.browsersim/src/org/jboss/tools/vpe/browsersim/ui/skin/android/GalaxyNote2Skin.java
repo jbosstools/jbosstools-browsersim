@@ -23,8 +23,8 @@ import org.jboss.tools.vpe.browsersim.ui.skin.ios.ButtonDescriptor;
 @SuppressWarnings("nls")
 public class GalaxyNote2Skin  extends AppleIPhone3ResizableSkin {
 	public static final String ANDROID_SKIN_ID = "Galaxy Note II";
-	private static final Point NORMAL_SKREEN_SIZE = new Point(240, 1);
-	private static final Point NORMAL_SKIN_SIZE = new Point(372, 281);
+	private static final Point NORMAL_SKREEN_SIZE = new Point(213, 285);
+	private static final Point NORMAL_SKIN_SIZE = new Point(267, 453);
 	public static final int[] VISIBLE_REGION_VERTICAL = { 60, 0, 206, 0, 207, 1, 216, 1, 217, 2, 223, 2, 224, 3, 227,
 			3, 228, 4, 231, 4, 232, 5, 233, 5, 234, 6, 236, 6, 238, 8, 239, 8, 239, 9, 240, 10, 242, 10, 243, 11, 244,
 			11, 248, 15, 249, 15, 253, 19, 253, 20, 257, 24, 257, 25, 258, 26, 258, 27, 260, 29, 260, 30, 261, 31, 261,
