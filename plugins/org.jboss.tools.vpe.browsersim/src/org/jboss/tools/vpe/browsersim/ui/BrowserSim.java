@@ -16,6 +16,8 @@ import java.net.URI;
 import java.net.URISyntaxException;
 import java.net.URL;
 import java.text.MessageFormat;
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Observable;
 import java.util.Observer;
@@ -38,12 +40,18 @@ import org.eclipse.swt.browser.TitleListener;
 import org.eclipse.swt.events.DisposeEvent;
 import org.eclipse.swt.events.DisposeListener;
 import org.eclipse.swt.events.MenuAdapter;
+import org.eclipse.swt.events.MenuDetectEvent;
+import org.eclipse.swt.events.MenuDetectListener;
 import org.eclipse.swt.events.MenuEvent;
 import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
+import org.eclipse.swt.events.VerifyEvent;
+import org.eclipse.swt.events.VerifyListener;
+import org.eclipse.swt.graphics.Color;
 import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.graphics.Point;
 import org.eclipse.swt.graphics.Rectangle;
+import org.eclipse.swt.layout.FillLayout;
 import org.eclipse.swt.program.Program;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Event;
@@ -52,6 +60,7 @@ import org.eclipse.swt.widgets.Menu;
 import org.eclipse.swt.widgets.MenuItem;
 import org.eclipse.swt.widgets.Monitor;
 import org.eclipse.swt.widgets.Shell;
+import org.eclipse.swt.widgets.Text;
 import org.jboss.tools.vpe.browsersim.browser.BrowserSimBrowser;
 import org.jboss.tools.vpe.browsersim.browser.PlatformUtil;
 import org.jboss.tools.vpe.browsersim.browser.WebKitBrowserFactory;
@@ -80,6 +89,8 @@ public class BrowserSim {
 	/** @see org.jboss.tools.vpe.browsersim.eclipse.callbacks.ViewSourceCallback */
 	private static final String VIEW_SOURCE_COMMAND = BROWSERSIM_CLASS_NAME + ".command.viewSource:"; //$NON-NLS-1$
 	
+	public static final String NOT_STANDALONE = "-not-standalone"; //$NON-NLS-1$
+	
 	private Display display;
 	private String homeUrl;
 	private DevicesListHolder devicesListHolder;
@@ -88,6 +99,8 @@ public class BrowserSim {
 	private ControlHandler controlHandler;
 	private Image[] icons;
 	private ResizableSkinSizeAdvisor sizeAdvisor;
+	
+	private boolean isStandalone;
 
 	public static void main(String[] args) {
 		//CocoaUIEnhancer handles connection between the About, Preferences and Quit menus in MAC OS X
@@ -96,9 +109,16 @@ public class BrowserSim {
 			cocoaUIEnhancer = new CocoaUIEnhancer(Messages.BrowserSim_BROWSER_SIM);
 			cocoaUIEnhancer.initializeMacOSMenuBar();
 		}
+		
+		List<String> params = new ArrayList<String>(Arrays.asList(args));
+		boolean standalone = params.contains(NOT_STANDALONE);
+		if (standalone) {
+			params.remove(NOT_STANDALONE);
+		}
+
 		String homeUrl;
-		if (args.length > 0) {
-			String lastArg = args[args.length - 1];
+		if (params.size() > 0) {
+			String lastArg = params.get(params.size());
 			try {
 				new URI(lastArg); // validate URL
 				homeUrl = lastArg;
@@ -116,7 +136,7 @@ public class BrowserSim {
 		}
 		Device defaultDevice = devicesList.getDevices().get(devicesList.getSelectedDeviceIndex());
 		Display display = new Display();
-		BrowserSim browserSim = new BrowserSim(display, homeUrl);		
+		BrowserSim browserSim = new BrowserSim(display, homeUrl, standalone);		
 		browserSim.initSkin(getSkinClass(defaultDevice, devicesList.getUseSkins()));
 		browserSim.initDevicesListHolder();
 		browserSim.devicesListHolder.setDevicesList(devicesList);
@@ -138,9 +158,10 @@ public class BrowserSim {
 		display.dispose();
 	}
 
-	public BrowserSim(Display display, String homeUrl) {
+	public BrowserSim(Display display, String homeUrl, boolean isStandalone) {
 		this.display = display;
 		this.homeUrl = homeUrl;
+		this.isStandalone = isStandalone;
 		
 		this.icons = new Image[BROWSERSIM_ICONS.length];
 		for (int i = 0; i < BROWSERSIM_ICONS.length; i++) {
@@ -242,7 +263,7 @@ public class BrowserSim {
 				initOrientation(deviceOrientation.getOrientationAngle());
 			}
 		});
-
+				
 		//JBIDE-12191 - custom scrollbars work satisfactorily on windows only
 		if (PlatformUtil.OS_WIN32.equals(PlatformUtil.getOs())) {
 			browser.addLocationListener(new LocationAdapter() {
@@ -254,6 +275,7 @@ public class BrowserSim {
 				
 				@SuppressWarnings("nls")
 				private void setCustomScrollbarStyles(Browser browser) {
+				
 					browser.execute(
 						"if (window._browserSim_customScrollBarStylesSetter === undefined) {"
 							+"window._browserSim_customScrollBarStylesSetter = function () {"
@@ -487,20 +509,24 @@ public class BrowserSim {
 		openInDefaultBrowser.setText(Messages.BrowserSim_VIEW_PAGE_SOURCE);
 		openInDefaultBrowser.addSelectionListener(new SelectionAdapter() {
 			public void widgetSelected(SelectionEvent e) {
-				if (skin.getBrowser().getUrl().startsWith("file:")) { //$NON-NLS-1$
-					URI uri = null;
-					try {
-						uri = new URI(skin.getBrowser().getUrl());
-						File sourceFile = new File(uri);
-						System.out.println(OPEN_FILE_COMMAND + sourceFile.getAbsolutePath()); // send command to Eclipse
-					} catch (URISyntaxException e1) {
-						e1.printStackTrace();
-					}
+				if (isStandalone) {
+					BrowserSimEditor.show(skin.getBrowser().getText());
 				} else {
-					System.out.println(VIEW_SOURCE_COMMAND + skin.getBrowser().getUrl()); // send command to Eclipse
-					String source = skin.getBrowser().getText();
-					String base64Source = DatatypeConverter.printBase64Binary(source.getBytes());
-					System.out.println(base64Source);
+					if (skin.getBrowser().getUrl().startsWith("file:")) { //$NON-NLS-1$
+						URI uri = null;
+						try {
+							uri = new URI(skin.getBrowser().getUrl());
+							File sourceFile = new File(uri);
+							System.out.println(OPEN_FILE_COMMAND + sourceFile.getAbsolutePath()); // send command to Eclipse
+						} catch (URISyntaxException e1) {
+							e1.printStackTrace();
+						}
+					} else {
+						System.out.println(VIEW_SOURCE_COMMAND + skin.getBrowser().getUrl()); // send command to Eclipse
+						String source = skin.getBrowser().getText();
+						String base64Source = DatatypeConverter.printBase64Binary(source.getBytes());
+						System.out.println(base64Source);
+					}
 				}
 			}
 		});

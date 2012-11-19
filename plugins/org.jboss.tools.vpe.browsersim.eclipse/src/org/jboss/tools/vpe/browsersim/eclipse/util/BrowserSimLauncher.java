@@ -28,6 +28,7 @@ import org.jboss.tools.vpe.browsersim.eclipse.Activator;
 import org.jboss.tools.vpe.browsersim.eclipse.callbacks.BrowserSimCallback;
 import org.jboss.tools.vpe.browsersim.eclipse.callbacks.OpenFileCallback;
 import org.jboss.tools.vpe.browsersim.eclipse.callbacks.ViewSourceCallback;
+import org.jboss.tools.vpe.browsersim.ui.BrowserSim;
 import org.osgi.framework.Bundle;
 
 /**
@@ -71,6 +72,7 @@ public class BrowserSimLauncher {
 			
 			List<String> commandElements = new ArrayList<String>();
 			commandElements.add(javaCommand);
+			
 			if (Platform.OS_MACOSX.equals(Platform.getOS())) {
 				commandElements.add("-XstartOnFirstThread"); //$NON-NLS-1$
 				if (Platform.ARCH_X86.equals(Platform.getOSArch())) {
@@ -84,7 +86,7 @@ public class BrowserSimLauncher {
 			if (initialUrl != null) {
 				commandElements.add(initialUrl);
 			}
-
+			commandElements.add(BrowserSim.NOT_STANDALONE);
 			ProcessBuilder processBuilder = new ProcessBuilder(commandElements);
 			processBuilder.directory(ConfigurationScope.INSTANCE.getLocation().toFile());
 			
