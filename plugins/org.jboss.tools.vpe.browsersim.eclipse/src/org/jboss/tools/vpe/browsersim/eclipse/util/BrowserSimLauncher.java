@@ -48,6 +48,8 @@ public class BrowserSimLauncher {
 		// org.eclipse.swt plugin may contain this fragment in itself - that is why it is optional. See JBIDE-11923
 		"org.eclipse.swt." + PlatformUtil.CURRENT_PLATFORM 
 	};
+	//if you change this parameter, see also @org.jbosstools.browsersim.ui.BrowserSim
+	private static final String NOT_STANDALONE = "-not-standalone"; //$NON-NLS-1$
 	
 
 	public static void launchBrowserSim(String initialUrl) {
@@ -83,10 +85,13 @@ public class BrowserSimLauncher {
 			commandElements.add("-cp"); //$NON-NLS-1$
 			commandElements.add(classPath);
 			commandElements.add(BROWSERSIM_CLASS_NAME);
+			
+			//optional parameters
+			commandElements.add(NOT_STANDALONE);
 			if (initialUrl != null) {
 				commandElements.add(initialUrl);
 			}
-			commandElements.add(BrowserSim.NOT_STANDALONE);
+			
 			ProcessBuilder processBuilder = new ProcessBuilder(commandElements);
 			processBuilder.directory(ConfigurationScope.INSTANCE.getLocation().toFile());
 			

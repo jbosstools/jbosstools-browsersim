@@ -89,7 +89,7 @@ public class BrowserSim {
 	/** @see org.jboss.tools.vpe.browsersim.eclipse.callbacks.ViewSourceCallback */
 	private static final String VIEW_SOURCE_COMMAND = BROWSERSIM_CLASS_NAME + ".command.viewSource:"; //$NON-NLS-1$
 	
-	public static final String NOT_STANDALONE = "-not-standalone"; //$NON-NLS-1$
+	private static final String NOT_STANDALONE = "-not-standalone"; //$NON-NLS-1$
 	
 	private Display display;
 	private String homeUrl;
@@ -111,14 +111,14 @@ public class BrowserSim {
 		}
 		
 		List<String> params = new ArrayList<String>(Arrays.asList(args));
-		boolean standalone = params.contains(NOT_STANDALONE);
-		if (standalone) {
+		boolean standalone = !params.contains(NOT_STANDALONE);
+		if (!standalone) {
 			params.remove(NOT_STANDALONE);
 		}
 
 		String homeUrl;
 		if (params.size() > 0) {
-			String lastArg = params.get(params.size());
+			String lastArg = params.get(params.size() - 1);
 			try {
 				new URI(lastArg); // validate URL
 				homeUrl = lastArg;
