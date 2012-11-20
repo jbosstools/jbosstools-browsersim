@@ -1,3 +1,13 @@
+/*******************************************************************************
+ * Copyright (c) 2007-2012 Red Hat, Inc.
+ * Distributed under license by Red Hat, Inc. All rights reserved.
+ * This program is made available under the terms of the
+ * Eclipse Public License v1.0 which accompanies this distribution,
+ * and is available at http://www.eclipse.org/legal/epl-v10.html
+ *
+ * Contributor:
+ *     Red Hat, Inc. - initial API and implementation
+ ******************************************************************************/
 package org.jboss.tools.vpe.browsersim.ui;
 
 import org.eclipse.swt.SWT;
@@ -11,13 +21,21 @@ import org.eclipse.swt.widgets.MenuItem;
 import org.eclipse.swt.widgets.Shell;
 import org.eclipse.swt.widgets.Text;
 
-public class BrowserSimEditor {
-	public static void show(String pageSource) {
-		Shell shell = new Shell(SWT.SHELL_TRIM);
+/**
+ * Simple text viewer to show page source.
+ *
+ * @author Konstantin Marmalyukov (kmarmalyukov)
+ * @author Yahor Radtsevich (yradtsevich)
+ */
+public class BrowserSimSourceViewer {
+	private Text text;
+	private Shell shell;
+
+	public BrowserSimSourceViewer() {
+		shell = new Shell(SWT.SHELL_TRIM);
 	    shell.setLayout(new FillLayout());
 	    			    
-	    final Text text = new Text(shell, SWT.MULTI | SWT.WRAP | SWT.V_SCROLL|SWT.FULL_SELECTION);
-	    text.setText(pageSource);
+	    text = new Text(shell, SWT.MULTI | SWT.WRAP | SWT.V_SCROLL|SWT.FULL_SELECTION);
 	    text.addVerifyListener(new VerifyListener() {
 	        public void verifyText(VerifyEvent event) {
 	            event.doit = false;
@@ -58,7 +76,13 @@ public class BrowserSimEditor {
 		// you will need to call Text.copy(), Text.paste() and Text.cut()
 		// from the Selection callback for the accelerator when the 
 		// text widget has focus.
-	    
+	}
+	
+	public void setText(String textString) {
+	    text.setText(textString);
+	}
+	
+	public void open() {
 	    shell.open();
 	}
 }

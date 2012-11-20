@@ -510,7 +510,9 @@ public class BrowserSim {
 		openInDefaultBrowser.addSelectionListener(new SelectionAdapter() {
 			public void widgetSelected(SelectionEvent e) {
 				if (isStandalone) {
-					BrowserSimEditor.show(skin.getBrowser().getText());
+					BrowserSimSourceViewer sourceViewer = new BrowserSimSourceViewer();
+					sourceViewer.setText(skin.getBrowser().getText());
+					sourceViewer.open();
 				} else {
 					if (skin.getBrowser().getUrl().startsWith("file:")) { //$NON-NLS-1$
 						URI uri = null;
