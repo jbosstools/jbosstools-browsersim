@@ -11,8 +11,6 @@
 package org.jboss.tools.vpe.browsersim.ui;
 
 import org.eclipse.swt.SWT;
-import org.eclipse.swt.events.VerifyEvent;
-import org.eclipse.swt.events.VerifyListener;
 import org.eclipse.swt.layout.FillLayout;
 import org.eclipse.swt.widgets.Event;
 import org.eclipse.swt.widgets.Listener;
@@ -35,12 +33,9 @@ public class BrowserSimSourceViewer {
 		shell = new Shell(SWT.SHELL_TRIM);
 	    shell.setLayout(new FillLayout());
 	    			    
-	    text = new Text(shell, SWT.MULTI | SWT.WRAP | SWT.V_SCROLL|SWT.FULL_SELECTION);
-	    text.addVerifyListener(new VerifyListener() {
-	        public void verifyText(VerifyEvent event) {
-	            event.doit = false;
-	        };
-	    });
+	    text = new Text(shell, SWT.MULTI | SWT.WRAP | SWT.V_SCROLL
+	    		| SWT.FULL_SELECTION | SWT.READ_ONLY);
+	    text.setBackground(text.getDisplay().getSystemColor(SWT.COLOR_LIST_BACKGROUND));
 	    
 	    Menu bar = new Menu (shell, SWT.BAR);
 		shell.setMenuBar (bar);
