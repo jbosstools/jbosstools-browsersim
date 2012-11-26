@@ -31,27 +31,23 @@ import org.eclipse.swt.browser.BrowserFunction;
 import org.eclipse.swt.browser.LocationAdapter;
 import org.eclipse.swt.browser.LocationEvent;
 import org.eclipse.swt.browser.LocationListener;
+import org.eclipse.swt.browser.OpenWindowListener;
 import org.eclipse.swt.browser.ProgressEvent;
 import org.eclipse.swt.browser.ProgressListener;
 import org.eclipse.swt.browser.StatusTextEvent;
 import org.eclipse.swt.browser.StatusTextListener;
 import org.eclipse.swt.browser.TitleEvent;
 import org.eclipse.swt.browser.TitleListener;
+import org.eclipse.swt.browser.WindowEvent;
 import org.eclipse.swt.events.DisposeEvent;
 import org.eclipse.swt.events.DisposeListener;
 import org.eclipse.swt.events.MenuAdapter;
-import org.eclipse.swt.events.MenuDetectEvent;
-import org.eclipse.swt.events.MenuDetectListener;
 import org.eclipse.swt.events.MenuEvent;
 import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
-import org.eclipse.swt.events.VerifyEvent;
-import org.eclipse.swt.events.VerifyListener;
-import org.eclipse.swt.graphics.Color;
 import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.graphics.Point;
 import org.eclipse.swt.graphics.Rectangle;
-import org.eclipse.swt.layout.FillLayout;
 import org.eclipse.swt.program.Program;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Event;
@@ -60,7 +56,6 @@ import org.eclipse.swt.widgets.Menu;
 import org.eclipse.swt.widgets.MenuItem;
 import org.eclipse.swt.widgets.Monitor;
 import org.eclipse.swt.widgets.Shell;
-import org.eclipse.swt.widgets.Text;
 import org.jboss.tools.vpe.browsersim.browser.BrowserSimBrowser;
 import org.jboss.tools.vpe.browsersim.browser.PlatformUtil;
 import org.jboss.tools.vpe.browsersim.browser.WebKitBrowserFactory;
@@ -150,9 +145,10 @@ public class BrowserSim {
 		}
 
 
-		while (browserSim.skin!= null && browserSim.skin.getShell() != null && !browserSim.skin.getShell().isDisposed()) {//XXX
-			if (!display.readAndDispatch())
+		while (display.getShells().length > 0) {
+			if (!display.readAndDispatch()) {
 				display.sleep();
+			}
 		}
 		browserSim.dispose();
 		display.dispose();
@@ -319,6 +315,30 @@ public class BrowserSim {
 				}
 			});
 		};
+		
+		browser.addOpenWindowListener(new OpenWindowListener() {
+			public void open(WindowEvent event) {
+				DevicesList devicesList = DevicesListStorage.loadUserDefinedDevicesList();
+				if (devicesList == null) {
+					devicesList = DevicesListStorage.loadDefaultDevicesList();
+				}
+				
+				Device defaultDevice = devicesList.getDevices().get(devicesList.getSelectedDeviceIndex());
+
+				BrowserSim browserSim = new BrowserSim(display, homeUrl, isStandalone);	
+				browserSim.initSkin(getSkinClass(defaultDevice, devicesList.getUseSkins()));
+				browserSim.initDevicesListHolder();
+				browserSim.devicesListHolder.setDevicesList(devicesList);
+				browserSim.devicesListHolder.notifyObservers();
+				
+				// set event handlers for Mac OS X Menu-bar
+//				if (cocoaUIEnhancer != null) {
+//					browserSim.addMacOsMenuApplicationHandler(cocoaUIEnhancer);
+//				}
+				
+				event.browser = browserSim.skin.getBrowser();
+			}
+		});
 		
 		browser.addLocationListener(new LocationListener() {
 			private BrowserFunction scrollListener = null;
@@ -582,7 +602,7 @@ public class BrowserSim {
 		exit.setText(Messages.BrowserSim_EXIT);
 		exit.addSelectionListener(new SelectionAdapter() {
 			public void widgetSelected(SelectionEvent e) {
-				display.dispose();
+				display.getActiveShell().dispose();
 			};
 		});	
 	}
