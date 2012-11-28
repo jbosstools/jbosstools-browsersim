@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd" xmlns="http://maven.apache.org/POM/4.0.0"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">	
+	<properties>
+		<tycho-version>0.16.0</tycho-version>
+	</properties>
+	<modelVersion>4.0.0</modelVersion>
+	<groupId>org.jboss.tools</groupId>
+	<artifactId>org.jboss.tools.vpe.products</artifactId>
+	<version>3.4.0-SNAPSHOT</version>
+	<packaging>pom</packaging>
+
+	<modules>
+		<module>browsersim-standalone</module>
+	</modules>
+
+	
+	<profiles>
+		<profile>
+			<id>bootstrap</id>
+			<modules>
+				<module>../plugins/org.jboss.tools.vpe.browsersim</module>
+				<module>../plugins/org.jboss.tools.vpe.browsersim.browser</module>
+			</modules>
+		</profile>
+	</profiles>
+
+</project>

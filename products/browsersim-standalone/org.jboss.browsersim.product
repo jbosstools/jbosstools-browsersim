@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?pde version="3.5"?>
+
+<product name="JBoss Tools Mobile Browser Simulator" uid="org.jboss.tools.browsersim" application="org.jboss.tools.vpe.browsersim.eclipse.application" version="1.0.0.qualifier" useFeatures="false" includeLaunchers="false">
+   <plugins>
+      <plugin id="org.eclipse.swt"/>
+      <plugin id="org.jboss.tools.vpe.browsersim"/>
+      <plugin id="org.jboss.tools.vpe.browsersim.browser"/>
+   </plugins>
+</product>
