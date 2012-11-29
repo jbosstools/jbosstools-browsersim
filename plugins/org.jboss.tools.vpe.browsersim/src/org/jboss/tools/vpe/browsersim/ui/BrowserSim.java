@@ -602,7 +602,7 @@ public class BrowserSim {
 		exit.setText(Messages.BrowserSim_EXIT);
 		exit.addSelectionListener(new SelectionAdapter() {
 			public void widgetSelected(SelectionEvent e) {
-				display.getActiveShell().dispose();
+				skin.getShell().dispose();
 			};
 		});	
 	}
@@ -890,13 +890,13 @@ public class BrowserSim {
 	 * @return skin shell instance or new shell if there are no skin shell. Never returns {@code null}
 	 */
 	private Shell getParentShell() {
-		Shell shell;
-		if (skin != null && skin.getShell() != null) {
-			shell = skin.getShell();
-		} else {
-			shell = new Shell();
+		if (display != null && display.getActiveShell() != null) {
+			return display.getActiveShell();
 		}
-		return shell;
+		else if (skin != null && skin.getShell() != null) {
+			return skin.getShell();
+		}
+		return new Shell();
 	}
 
 	
