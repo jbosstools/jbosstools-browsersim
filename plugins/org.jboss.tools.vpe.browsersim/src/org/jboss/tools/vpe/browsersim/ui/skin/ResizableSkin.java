@@ -29,6 +29,8 @@ public abstract class ResizableSkin implements BrowserSimSkin {
 	protected DeviceComposite deviceComposite;
 	protected ControlHandler controlHandler;
 	
+	//protected Point location;
+	
 	protected void bindDeviceCompositeControls() {
 		deviceComposite.getBackButtonComposite().addMouseListener(new MouseAdapter() {
 			public void mouseDown(MouseEvent e) {
@@ -94,7 +96,8 @@ public abstract class ResizableSkin implements BrowserSimSkin {
 					case SWT.MouseMove:
 						if (origin != null) {
 							Point p = e.display.map(shell, null, e.x, e.y);
-							shell.setLocation(shellOrigin.x + p.x - origin.x, shellOrigin.y + p.y - origin.y);
+							Point location = new Point(shellOrigin.x + p.x - origin.x, shellOrigin.y + p.y - origin.y);
+							shell.setLocation(location.x, location.y);
 						}
 						break;
 					}

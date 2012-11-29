@@ -120,13 +120,18 @@ public class AppleIPhone3ResizableSkin extends ResizableSkin {
 	}
 
 	@Override
-	public void createControls(Display display) {
+	public void createControls(Display display, Point location) {
 		this.display = display;
 		shell = new Shell(display, SWT.NO_TRIM | SWT.NO_BACKGROUND);
 		shell.setLayout(new FillLayout());
+
+		if (location != null && display.getClientArea().contains(location)) {
+			shell.setLocation(location);
+		}
 		
-		deviceComposite = new AppleIPhoneComposite(shell, VERTICAL_IPHONE3_DESCRIPTOR);
 		vertical = true;
+		deviceComposite = createDeviceComposite(shell, vertical);
+		
 		bindDeviceCompositeControls();
 		Composite browserContainer = deviceComposite.getBrowserContainer();
 		browserContainer.setLayout(new FillLayout());
@@ -134,6 +139,7 @@ public class AppleIPhone3ResizableSkin extends ResizableSkin {
 		
 		shell.setSize(/*shell.computeSize(SWT.DEFAULT, SWT.DEFAULT)*/ 384, 727);
 		setShellRegion();
+			
 	}
 
 	private void setShellRegion() {
