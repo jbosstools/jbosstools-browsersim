@@ -133,18 +133,14 @@ public class BrowserSim {
 		Display display = new Display();
 		BrowserSim browserSim = new BrowserSim(display, homeUrl, standalone);		
 		
-		
-		browserSim.initSkin(getSkinClass(defaultDevice, devicesList.getUseSkins()), null);//XXX
-		
 		browserSim.initDevicesListHolder();
 		browserSim.devicesListHolder.setDevicesList(devicesList);
+
+		browserSim.initSkin(getSkinClass(defaultDevice, devicesList.getUseSkins()),
+				browserSim.devicesListHolder.getDevicesList().getLocation());
+		
 		browserSim.devicesListHolder.notifyObservers();
 		browserSim.controlHandler.goHome();
-		
-		Point location = browserSim.devicesListHolder.getDevicesList().getLocation();
-		if (location != null && display.getClientArea().contains(location)) { 
-			browserSim.skin.getShell().setLocation(location);
-		}
 
 		// set event handlers for Mac OS X Menu-bar
 		if (cocoaUIEnhancer != null) {
@@ -335,10 +331,13 @@ public class BrowserSim {
 				
 				Device defaultDevice = devicesList.getDevices().get(devicesList.getSelectedDeviceIndex());
 
-				BrowserSim browserSim = new BrowserSim(display, homeUrl, isStandalone);	
-				browserSim.initSkin(getSkinClass(defaultDevice, devicesList.getUseSkins()), null);
+				BrowserSim browserSim = new BrowserSim(display, homeUrl, isStandalone);
+				
 				browserSim.initDevicesListHolder();
 				browserSim.devicesListHolder.setDevicesList(devicesList);
+				
+				browserSim.initSkin(getSkinClass(defaultDevice, devicesList.getUseSkins()), null);
+				
 				browserSim.devicesListHolder.notifyObservers();
 				
 				// set event handlers for Mac OS X Menu-bar
