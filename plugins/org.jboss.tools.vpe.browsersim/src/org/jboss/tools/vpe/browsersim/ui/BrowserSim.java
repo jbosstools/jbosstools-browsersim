@@ -324,15 +324,15 @@ public class BrowserSim {
 
 		browser.addOpenWindowListener(new OpenWindowListener() {
 			public void open(WindowEvent event) {
+				BrowserSim browserSim = new BrowserSim(display, homeUrl, isStandalone);
+				int parentDeviceIndex = devicesListHolder.getDevicesList().getSelectedDeviceIndex();
+
 				DevicesList devicesList = DevicesListStorage.loadUserDefinedDevicesList();
 				if (devicesList == null) {
 					devicesList = DevicesListStorage.loadDefaultDevicesList();
 				}
-				
-				Device defaultDevice = devicesList.getDevices().get(devicesList.getSelectedDeviceIndex());
-
-				BrowserSim browserSim = new BrowserSim(display, homeUrl, isStandalone);
-				
+				devicesList.setSelectedDeviceIndex(parentDeviceIndex);
+				Device defaultDevice = devicesList.getDevices().get(parentDeviceIndex);
 				browserSim.initDevicesListHolder();
 				browserSim.devicesListHolder.setDevicesList(devicesList);
 				
