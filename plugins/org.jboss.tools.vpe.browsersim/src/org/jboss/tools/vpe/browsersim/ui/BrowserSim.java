@@ -39,6 +39,8 @@ import org.eclipse.swt.browser.StatusTextListener;
 import org.eclipse.swt.browser.TitleEvent;
 import org.eclipse.swt.browser.TitleListener;
 import org.eclipse.swt.browser.WindowEvent;
+import org.eclipse.swt.events.ControlAdapter;
+import org.eclipse.swt.events.ControlEvent;
 import org.eclipse.swt.events.DisposeEvent;
 import org.eclipse.swt.events.DisposeListener;
 import org.eclipse.swt.events.MenuAdapter;
@@ -96,6 +98,8 @@ public class BrowserSim {
 	private ResizableSkinSizeAdvisor sizeAdvisor;
 	
 	private boolean isStandalone;
+	
+	private Point currentLocation;
 
 	public static void main(String[] args) {
 		//CocoaUIEnhancer handles connection between the About, Preferences and Quit menus in MAC OS X
@@ -136,8 +140,7 @@ public class BrowserSim {
 		browserSim.initDevicesListHolder();
 		browserSim.devicesListHolder.setDevicesList(devicesList);
 
-		browserSim.initSkin(getSkinClass(defaultDevice, devicesList.getUseSkins()),
-				browserSim.devicesListHolder.getDevicesList().getLocation());
+		browserSim.initSkin(getSkinClass(defaultDevice, devicesList.getUseSkins()), devicesList.getLocation());
 		
 		browserSim.devicesListHolder.notifyObservers();
 		browserSim.controlHandler.goHome();
@@ -192,6 +195,7 @@ public class BrowserSim {
 		skin.setBrowserFactory(new WebKitBrowserFactory());
 		try {
 			skin.createControls(display, location);
+			currentLocation = location;
 		} catch (SWTError e) {
 			e.printStackTrace();
 			ExceptionNotifier.showWebKitLoadError(new Shell(display), e);
@@ -200,12 +204,18 @@ public class BrowserSim {
 		}
 		
 		final Shell shell = skin.getShell();
+		shell.addControlListener(new ControlAdapter() {
+			@Override
+			public void controlMoved(ControlEvent e) {
+				currentLocation = shell.getLocation();
+				super.controlMoved(e);
+			}
+		});
 		shell.addDisposeListener(new DisposeListener() {
 			public void widgetDisposed(DisposeEvent e) {
 				
 				if (devicesListHolder != null) {
-					Rectangle bounds = ((Shell)e.getSource()).getBounds();
-					DevicesListStorage.saveUserDefinedDevicesList(devicesListHolder.getDevicesList(), new Point(bounds.x, bounds.y));
+					DevicesListStorage.saveUserDefinedDevicesList(devicesListHolder.getDevicesList(), currentLocation);
 				}
 			}
 		});
