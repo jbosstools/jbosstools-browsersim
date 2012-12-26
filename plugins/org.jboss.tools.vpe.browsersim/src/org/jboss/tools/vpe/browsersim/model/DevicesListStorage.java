@@ -24,6 +24,7 @@ import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import org.eclipse.swt.graphics.Point;
 import org.jboss.tools.vpe.browsersim.util.ResourcesUtil;
 
 /**
@@ -35,15 +36,15 @@ public class DevicesListStorage {
 	private static final String DEFAULT_PREFERENCES_RESOURCE = "config/devices.cfg";
 	private static final String USER_PREFERENCES_FOLDER = "org.jboss.tools.vpe.browsersim";
 	private static final String USER_PREFERENCES_FILE = "devices.cfg";
-	private static final int CURRENT_CONFIG_VERSION = 6;
+	private static final int CURRENT_CONFIG_VERSION = 7;
 
-	public static void saveUserDefinedDevicesList(DevicesList devicesList) {
+	public static void saveUserDefinedDevicesList(DevicesList devicesList, Point location) {
 		File configFolder = new File(USER_PREFERENCES_FOLDER);
 		configFolder.mkdir();
 		File configFile = new File(configFolder, USER_PREFERENCES_FILE);
 		
 		try {
-			saveDevicesList(devicesList, configFile);
+			saveDevicesList(devicesList, configFile, location);
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
@@ -76,16 +77,17 @@ public class DevicesListStorage {
 			Device device = new Device("Default", 1024, 768, 1.0, null, null);
 			List<Device> devices = new ArrayList<Device>();
 			devices.add(device);
-			devicesList = new DevicesList(devices, 0, true, null);
+			devicesList = new DevicesList(devices, 0, true, null, null);
 		}
 
 		return devicesList;
 	}
 
-	private static void saveDevicesList(DevicesList devicesList, File file) throws IOException {
+	private static void saveDevicesList(DevicesList devicesList, File file, Point location) throws IOException {
 		BufferedWriter writer = new BufferedWriter(new FileWriter(file));
 		
 		writer.write("ConfigVersion=" + String.valueOf(CURRENT_CONFIG_VERSION) + "\n");
+		writer.write("Location=" + location.x + " " + location.y + "\n");
 		writer.write("SelectedDeviceIndex=" + String.valueOf(devicesList.getSelectedDeviceIndex()) + "\n");
 		writer.write("UseSkins=" + String.valueOf(devicesList.getUseSkins()) + "\n");
 		Boolean truncateWindow = devicesList.getTruncateWindow();
@@ -124,6 +126,7 @@ public class DevicesListStorage {
 		
 		List<Device> devices = null;
 		int selectedDeviceIndex = 0;
+		Point location = null;
 		boolean useSkins = true;
 		Boolean truncateWindow = true;
 		try {
@@ -139,6 +142,14 @@ public class DevicesListStorage {
 			}
 			
 			if (configVersion == CURRENT_CONFIG_VERSION) {
+				if ((nextLine = reader.readLine()) != null) {
+					Pattern pattern = Pattern.compile("Location=(\\-?[0-9]+) (\\-?[0-9]+)");
+					Matcher matcher = pattern.matcher(nextLine);
+					if (matcher.matches()) {
+						location = new Point(Integer.parseInt(matcher.group(1)), Integer.parseInt(matcher.group(2)));
+					}
+				}
+				
 				if ((nextLine = reader.readLine()) != null) {
 					Pattern pattern = Pattern.compile("SelectedDeviceIndex=([0-9]+)");
 					Matcher matcher = pattern.matcher(nextLine);
@@ -203,7 +214,7 @@ public class DevicesListStorage {
 		if (devices == null || devices.size() <= selectedDeviceIndex) {
 			return null;
 		} else { 
-			return new DevicesList(devices, selectedDeviceIndex, useSkins, truncateWindow);
+			return new DevicesList(devices, selectedDeviceIndex, useSkins, truncateWindow, location);
 		}
 	}
 

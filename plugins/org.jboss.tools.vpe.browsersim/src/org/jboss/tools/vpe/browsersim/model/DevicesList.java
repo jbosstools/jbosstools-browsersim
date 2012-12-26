@@ -13,6 +13,8 @@ package org.jboss.tools.vpe.browsersim.model;
 import java.util.List;
 import java.util.Observable;
 
+import org.eclipse.swt.graphics.Point;
+
 /**
  * An unmodifiable list of {@link Device}s, with modifiable {@link #selectedDeviceIndex}.
  * 
@@ -23,12 +25,15 @@ public class DevicesList extends Observable {
 	private int selectedDeviceIndex;
 	private boolean useSkins;
 	private Boolean truncateWindow;
+	private Point location;
 
-	public DevicesList(List<Device> devices, int selectedDeviceIndex, boolean useSkins, Boolean truncateWindow) {
+	public DevicesList(List<Device> devices, int selectedDeviceIndex, boolean useSkins, Boolean truncateWindow, 
+			Point location) {
 		this.devices = devices;
 		this.selectedDeviceIndex = selectedDeviceIndex;
 		this.useSkins = useSkins;
 		this.truncateWindow = truncateWindow;
+		this.location = location;
 	}
 
 	public List<Device> getDevices() {
@@ -67,5 +72,13 @@ public class DevicesList extends Observable {
 			this.truncateWindow = truncateWindow;
 			setChanged();
 		}
+	}
+
+	public Point getLocation() {
+		return location;
+	}
+
+	public void setLocation(Point location) {
+		this.location = location;
 	}
 }

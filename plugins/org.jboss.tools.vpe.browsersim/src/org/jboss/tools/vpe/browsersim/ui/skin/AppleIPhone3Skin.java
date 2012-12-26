@@ -121,9 +121,12 @@ public class AppleIPhone3Skin implements BrowserSimSkin {
 	}
 
 	@Override
-	public void createControls(Display display) {
+	public void createControls(Display display, Point location) {
 		this.display = display;
 		shell = new Shell(display, SWT.NO_TRIM | SWT.NO_BACKGROUND);
+		if (location != null) {
+			shell.setLocation(location);
+		}
 		imageList = new ImageList(shell);
 
 		Image backImage = imageList.getImage("iphone_skin/back.png");

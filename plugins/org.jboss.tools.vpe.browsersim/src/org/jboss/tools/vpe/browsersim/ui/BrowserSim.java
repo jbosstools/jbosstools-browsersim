@@ -39,6 +39,8 @@ import org.eclipse.swt.browser.StatusTextListener;
 import org.eclipse.swt.browser.TitleEvent;
 import org.eclipse.swt.browser.TitleListener;
 import org.eclipse.swt.browser.WindowEvent;
+import org.eclipse.swt.events.ControlAdapter;
+import org.eclipse.swt.events.ControlEvent;
 import org.eclipse.swt.events.DisposeEvent;
 import org.eclipse.swt.events.DisposeListener;
 import org.eclipse.swt.events.MenuAdapter;
@@ -96,6 +98,8 @@ public class BrowserSim {
 	private ResizableSkinSizeAdvisor sizeAdvisor;
 	
 	private boolean isStandalone;
+	
+	private Point currentLocation;
 
 	public static void main(String[] args) {
 		//CocoaUIEnhancer handles connection between the About, Preferences and Quit menus in MAC OS X
@@ -132,19 +136,22 @@ public class BrowserSim {
 		Device defaultDevice = devicesList.getDevices().get(devicesList.getSelectedDeviceIndex());
 		Display display = new Display();
 		BrowserSim browserSim = new BrowserSim(display, homeUrl, standalone);		
-		browserSim.initSkin(getSkinClass(defaultDevice, devicesList.getUseSkins()));
+		
 		browserSim.initDevicesListHolder();
 		browserSim.devicesListHolder.setDevicesList(devicesList);
+
+		browserSim.initSkin(getSkinClass(defaultDevice, devicesList.getUseSkins()), devicesList.getLocation());
+		
 		browserSim.devicesListHolder.notifyObservers();
 		browserSim.controlHandler.goHome();
-		
 
 		// set event handlers for Mac OS X Menu-bar
 		if (cocoaUIEnhancer != null) {
 			browserSim.addMacOsMenuApplicationHandler(cocoaUIEnhancer);
 		}
 
-
+		browserSim.skin.getShell().open();
+		
 		while (display.getShells().length > 0) {
 			if (!display.readAndDispatch()) {
 				display.sleep();
@@ -174,7 +181,7 @@ public class BrowserSim {
 		icons = null;
 	}
 	
-	public void initSkin(Class<? extends BrowserSimSkin> skinClass) {
+	public void initSkin(Class<? extends BrowserSimSkin> skinClass, Point location) {
 		try {
 			skin = skinClass.newInstance();//new AppleIPhone3Skin();//new NativeSkin();
 		} catch (InstantiationException e1) {
@@ -187,7 +194,8 @@ public class BrowserSim {
 		
 		skin.setBrowserFactory(new WebKitBrowserFactory());
 		try {
-			skin.createControls(display);
+			skin.createControls(display, location);
+			currentLocation = location;
 		} catch (SWTError e) {
 			e.printStackTrace();
 			ExceptionNotifier.showWebKitLoadError(new Shell(display), e);
@@ -195,16 +203,24 @@ public class BrowserSim {
 			return;
 		}
 		
-		Shell shell = skin.getShell();
+		final Shell shell = skin.getShell();
+		shell.addControlListener(new ControlAdapter() {
+			@Override
+			public void controlMoved(ControlEvent e) {
+				currentLocation = shell.getLocation();
+				super.controlMoved(e);
+			}
+		});
 		shell.addDisposeListener(new DisposeListener() {
 			public void widgetDisposed(DisposeEvent e) {
+				
 				if (devicesListHolder != null) {
-					DevicesListStorage.saveUserDefinedDevicesList(devicesListHolder.getDevicesList());
+					DevicesListStorage.saveUserDefinedDevicesList(devicesListHolder.getDevicesList(), currentLocation);
 				}
 			}
 		});
 		setShellAttibutes();
-		
+				
 		BrowserSimBrowser browser = skin.getBrowser();
 		controlHandler = new ControlHandlerImpl(browser);
 		skin.setControlHandler(controlHandler);
@@ -315,20 +331,23 @@ public class BrowserSim {
 				}
 			});
 		};
-		
+
 		browser.addOpenWindowListener(new OpenWindowListener() {
 			public void open(WindowEvent event) {
+				BrowserSim browserSim = new BrowserSim(display, homeUrl, isStandalone);
+				int parentDeviceIndex = devicesListHolder.getDevicesList().getSelectedDeviceIndex();
+
 				DevicesList devicesList = DevicesListStorage.loadUserDefinedDevicesList();
 				if (devicesList == null) {
 					devicesList = DevicesListStorage.loadDefaultDevicesList();
 				}
-				
-				Device defaultDevice = devicesList.getDevices().get(devicesList.getSelectedDeviceIndex());
-
-				BrowserSim browserSim = new BrowserSim(display, homeUrl, isStandalone);	
-				browserSim.initSkin(getSkinClass(defaultDevice, devicesList.getUseSkins()));
+				devicesList.setSelectedDeviceIndex(parentDeviceIndex);
+				Device defaultDevice = devicesList.getDevices().get(parentDeviceIndex);
 				browserSim.initDevicesListHolder();
 				browserSim.devicesListHolder.setDevicesList(devicesList);
+				
+				browserSim.initSkin(getSkinClass(defaultDevice, devicesList.getUseSkins()), null);
+				
 				browserSim.devicesListHolder.notifyObservers();
 				
 				// set event handlers for Mac OS X Menu-bar
@@ -337,6 +356,8 @@ public class BrowserSim {
 //				}
 				
 				event.browser = browserSim.skin.getBrowser();
+				
+				browserSim.skin.getShell().open();
 			}
 		});
 		
@@ -387,7 +408,7 @@ public class BrowserSim {
 				skin.pageTitleChanged(event.title);
 			}
 		});
-		shell.open();
+//		shell.open();
 	}
 	
 	private void setShellAttibutes() {
@@ -648,8 +669,9 @@ public class BrowserSim {
 		String oldSkinUrl = null;
 		if (newSkinClass != skin.getClass()) {
 			oldSkinUrl = skin.getBrowser().getUrl();
+			Point currentLocation = skin.getShell().getLocation();
 			skin.getBrowser().getShell().dispose();//XXX
-			initSkin(newSkinClass);
+			initSkin(newSkinClass, currentLocation);
 		}
 		
 		deviceOrientation = new DeviceOrientation(device.getWidth() < device.getHeight()
@@ -686,6 +708,8 @@ public class BrowserSim {
 		} else {
 			skin.getBrowser().refresh(); // only user agent and size of the browser is changed
 		}
+		
+		skin.getShell().open();
 	}
 	
 	private static Class<? extends BrowserSimSkin> getSkinClass(Device device, boolean useSkins) {

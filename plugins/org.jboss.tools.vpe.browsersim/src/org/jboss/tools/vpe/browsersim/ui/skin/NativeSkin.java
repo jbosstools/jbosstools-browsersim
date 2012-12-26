@@ -66,9 +66,12 @@ public class NativeSkin implements BrowserSimSkin {
 	};
 	
 	@Override
-	public void createControls(Display display) {
+	public void createControls(Display display, Point location) {
 		shell = new Shell(display);
 		shell.setLayout(new FillLayout(SWT.VERTICAL | SWT.HORIZONTAL));
+		if (location != null) {
+			shell.setLocation(location);
+		}
 		
 		menuBar = display.getMenuBar();
 		if (menuBar == null) {

@@ -266,7 +266,8 @@ public class ManageDevicesDialog extends Dialog {
 		shell.setDefaultButton(buttonOk);
 		buttonOk.addSelectionListener(new SelectionAdapter() {
 			public void widgetSelected(SelectionEvent e) {
-				resultDevicesList = new DevicesList(devices, selectedDeviceIndex, useSkins, truncateWindow);
+				resultDevicesList = new DevicesList(devices, selectedDeviceIndex, useSkins, truncateWindow,
+						oldDevicesList.getLocation());
 				shell.close();
 			}
 		});
