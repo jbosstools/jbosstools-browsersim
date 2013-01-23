@@ -129,7 +129,7 @@ public class BrowserSim {
 		}
 		
 		
-		DevicesList devicesList = DevicesListStorage.loadUserDefinedDevicesList();
+		DevicesList devicesList = DevicesListStorage.loadUserDefinedDevicesList(standalone);
 		if (devicesList == null) {
 			devicesList = DevicesListStorage.loadDefaultDevicesList();
 		}
@@ -215,7 +215,7 @@ public class BrowserSim {
 			public void widgetDisposed(DisposeEvent e) {
 				
 				if (devicesListHolder != null) {
-					DevicesListStorage.saveUserDefinedDevicesList(devicesListHolder.getDevicesList(), currentLocation);
+					DevicesListStorage.saveUserDefinedDevicesList(devicesListHolder.getDevicesList(), currentLocation, isStandalone);
 				}
 			}
 		});
@@ -339,7 +339,7 @@ public class BrowserSim {
 				BrowserSim browserSim = new BrowserSim(display, homeUrl, isStandalone);
 				int parentDeviceIndex = devicesListHolder.getDevicesList().getSelectedDeviceIndex();
 
-				DevicesList devicesList = DevicesListStorage.loadUserDefinedDevicesList();
+				DevicesList devicesList = DevicesListStorage.loadUserDefinedDevicesList(isStandalone);
 				if (devicesList == null) {
 					devicesList = DevicesListStorage.loadDefaultDevicesList();
 				}
