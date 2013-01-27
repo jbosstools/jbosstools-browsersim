@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2007-2011 Red Hat, Inc.
+ * Copyright (c) 2007-2013 Red Hat, Inc.
  * Distributed under license by Red Hat, Inc. All rights reserved.
  * This program is made available under the terms of the
  * Eclipse Public License v1.0 which accompanies this distribution,
@@ -67,6 +67,7 @@ import org.jboss.tools.vpe.browsersim.model.DevicesList;
 import org.jboss.tools.vpe.browsersim.model.DevicesListHolder;
 import org.jboss.tools.vpe.browsersim.model.DevicesListStorage;
 import org.jboss.tools.vpe.browsersim.model.SkinMap;
+import org.jboss.tools.vpe.browsersim.ui.debug.firebug.FireBugLiteLoader;
 import org.jboss.tools.vpe.browsersim.ui.skin.BrowserSimSkin;
 import org.jboss.tools.vpe.browsersim.ui.skin.ResizableSkinSizeAdvisor;
 import org.jboss.tools.vpe.browsersim.util.ManifestUtil;
@@ -336,30 +337,34 @@ public class BrowserSim {
 
 		browser.addOpenWindowListener(new OpenWindowListener() {
 			public void open(WindowEvent event) {
-				BrowserSim browserSim = new BrowserSim(display, homeUrl, isStandalone);
-				int parentDeviceIndex = devicesListHolder.getDevicesList().getSelectedDeviceIndex();
-
-				DevicesList devicesList = DevicesListStorage.loadUserDefinedDevicesList(isStandalone);
-				if (devicesList == null) {
-					devicesList = DevicesListStorage.loadDefaultDevicesList();
+				if (FireBugLiteLoader.isFireBugPopUp(event)) {
+					FireBugLiteLoader.processFireBugPopUp(event);
+				} else {
+					BrowserSim browserSim = new BrowserSim(display, homeUrl, isStandalone);
+					int parentDeviceIndex = devicesListHolder.getDevicesList().getSelectedDeviceIndex();
+	
+					DevicesList devicesList = DevicesListStorage.loadUserDefinedDevicesList(isStandalone);
+					if (devicesList == null) {
+						devicesList = DevicesListStorage.loadDefaultDevicesList();
+					}
+					devicesList.setSelectedDeviceIndex(parentDeviceIndex);
+					Device defaultDevice = devicesList.getDevices().get(parentDeviceIndex);
+					browserSim.initDevicesListHolder();
+					browserSim.devicesListHolder.setDevicesList(devicesList);
+					
+					browserSim.initSkin(getSkinClass(defaultDevice, devicesList.getUseSkins()), null);
+					
+					browserSim.devicesListHolder.notifyObservers();
+					
+					// set event handlers for Mac OS X Menu-bar
+//					if (cocoaUIEnhancer != null) {
+//						browserSim.addMacOsMenuApplicationHandler(cocoaUIEnhancer);
+//					}
+				
+					event.browser = browserSim.skin.getBrowser();
+					
+					browserSim.skin.getShell().open();
 				}
-				devicesList.setSelectedDeviceIndex(parentDeviceIndex);
-				Device defaultDevice = devicesList.getDevices().get(parentDeviceIndex);
-				browserSim.initDevicesListHolder();
-				browserSim.devicesListHolder.setDevicesList(devicesList);
-				
-				browserSim.initSkin(getSkinClass(defaultDevice, devicesList.getUseSkins()), null);
-				
-				browserSim.devicesListHolder.notifyObservers();
-				
-				// set event handlers for Mac OS X Menu-bar
-//				if (cocoaUIEnhancer != null) {
-//					browserSim.addMacOsMenuApplicationHandler(cocoaUIEnhancer);
-//				}
-				
-				event.browser = browserSim.skin.getBrowser();
-				
-				browserSim.skin.getShell().open();
 			}
 		});
 		
@@ -455,6 +460,9 @@ public class BrowserSim {
 				addTurnMenuItems(contextMenu);
 
 				new MenuItem(contextMenu, SWT.BAR);
+				addToolsMenuItems(contextMenu);
+				
+				new MenuItem(contextMenu, SWT.BAR);
 				addFileMenuItems(contextMenu);
 				
 				new MenuItem(contextMenu, SWT.BAR);
@@ -496,6 +504,9 @@ public class BrowserSim {
 			}
 		});
 		
+		Menu toolsMenu = createDropDownMenu(appMenuBar, Messages.BrowserSim_TOOLS);
+		addToolsMenuItems(toolsMenu);
+		
 		// If Platform is Mac OS X, application will have no duplicated menu items (About) 
 		if (!PlatformUtil.OS_MACOSX.equals(PlatformUtil.getOs())) {
 			Menu help = createDropDownMenu(appMenuBar, Messages.BrowserSim_HELP);
@@ -510,6 +521,10 @@ public class BrowserSim {
 	private void addFileMenuItems(Menu menu) {
 		addOpenInDefaultBrowserItem(menu);
 		addViewSourceItem(menu);
+	}
+	
+	private void addToolsMenuItems(Menu menu) {
+		addFireBugLiteItem(menu);
 	}
 	
 	private void addTurnMenuItems(Menu menu) {
@@ -601,6 +616,16 @@ public class BrowserSim {
 					devicesListHolder.notifyObservers();
 				}
 		
+			}
+		});
+	}
+	
+	public void addFireBugLiteItem(Menu menu) {
+		MenuItem fireBugLite = new MenuItem(menu, SWT.PUSH);
+		fireBugLite.setText(Messages.BrowserSim_FIREBUG_LITE);
+		fireBugLite.addSelectionListener(new SelectionAdapter() {
+			public void widgetSelected(SelectionEvent e) {
+				FireBugLiteLoader.startFireBugOpening(skin.getBrowser());
 			}
 		});
 	}

@@ -17,6 +17,7 @@ import org.jboss.tools.vpe.browsersim.util.NLS;
  */
 public class Messages {
 	private static final String BUNDLE_NAME = Messages.class.getName().toString().toLowerCase();
+
 	
 	public static String BrowserSim_ABOUT;
 	public static String BrowserSim_ABOUT_MESSAGE;
@@ -27,9 +28,11 @@ public class Messages {
 	public static String BrowserSim_ERROR;
 	public static String BrowserSim_EXIT;
 	public static String BrowserSim_FILE;
+	public static String BrowserSim_FIREBUG_LITE;
 	public static String BrowserSim_HELP;
 	public static String BrowserSim_OPEN_IN_DEFAULT_BROWSER;
 	public static String BrowserSim_PREFERENCES;
+	public static String BrowserSim_TOOLS;
 	public static String BrowserSim_TURN_LEFT;
 	public static String BrowserSim_TURN_RIGHT;
 	public static String BrowserSim_USE_SKINS;
