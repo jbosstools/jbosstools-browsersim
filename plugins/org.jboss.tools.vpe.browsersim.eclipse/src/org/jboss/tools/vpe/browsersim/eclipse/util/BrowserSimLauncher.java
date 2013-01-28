@@ -23,12 +23,13 @@ import org.eclipse.core.runtime.Platform;
 import org.eclipse.core.runtime.preferences.ConfigurationScope;
 import org.eclipse.osgi.framework.internal.core.BundleFragment;
 import org.eclipse.osgi.framework.internal.core.BundleHost;
+import org.eclipse.ui.IWorkbenchListener;
+import org.eclipse.ui.PlatformUI;
 import org.jboss.tools.vpe.browsersim.browser.PlatformUtil;
 import org.jboss.tools.vpe.browsersim.eclipse.Activator;
 import org.jboss.tools.vpe.browsersim.eclipse.callbacks.BrowserSimCallback;
 import org.jboss.tools.vpe.browsersim.eclipse.callbacks.OpenFileCallback;
 import org.jboss.tools.vpe.browsersim.eclipse.callbacks.ViewSourceCallback;
-import org.jboss.tools.vpe.browsersim.ui.BrowserSim;
 import org.osgi.framework.Bundle;
 
 /**
@@ -96,7 +97,9 @@ public class BrowserSimLauncher {
 			processBuilder.directory(ConfigurationScope.INSTANCE.getLocation().toFile());
 			
 			Process browserSimProcess = processBuilder.start();
-
+			final IWorkbenchListener browserSimPostShutDownDestroyer = new BrowserSimPostShutDownDestroyer(browserSimProcess);
+			PlatformUI.getWorkbench().addWorkbenchListener(browserSimPostShutDownDestroyer);
+			
 			final InputStreamReader errorReader = new InputStreamReader(browserSimProcess.getErrorStream());
 			final Reader inputReader = new InputStreamReader(browserSimProcess.getInputStream());
 			new Thread() {
@@ -113,6 +116,8 @@ public class BrowserSimLauncher {
 						}
 					} catch (IOException e) {
 						e.printStackTrace();
+					}  finally {
+						PlatformUI.getWorkbench().removeWorkbenchListener(browserSimPostShutDownDestroyer);
 					}
 				};
 			}.start();
