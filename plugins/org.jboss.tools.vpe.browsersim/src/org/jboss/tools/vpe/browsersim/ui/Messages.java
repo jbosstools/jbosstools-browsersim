@@ -79,6 +79,13 @@ public class Messages {
 	public static String ManageDevicesDialog_USE_SKINS;
 	public static String ManageDevicesDialog_USER_AGENT;
 	public static String ManageDevicesDialog_WIDTH;
+	public static String ScreenshotDialog_Screenshot;
+	public static String ScreenshotDialog_Save;
+	public static String ScreenshotDialog_SaveAndOpen;
+	public static String ScreenshotDialog_SaveAs;
+	public static String ScreenshotDialog_SaveAsAndOpen;
+	public static String ScreenshotDialog_CopyPath;
+	public static String ScreenshotDialog_CopyImage;
 	public static String SizeWarningDialog_CANCEL;
 	public static String SizeWarningDialog_DESKTOP_SIZE_TOO_SMALL_HORIZONTAL;
 	public static String SizeWarningDialog_DESKTOP_SIZE_TOO_SMALL_VERTICAL;

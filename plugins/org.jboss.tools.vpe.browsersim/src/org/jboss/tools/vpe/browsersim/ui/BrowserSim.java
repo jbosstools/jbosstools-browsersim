@@ -521,8 +521,9 @@ public class BrowserSim {
 	private void addFileMenuItems(Menu menu) {
 		addOpenInDefaultBrowserItem(menu);
 		addViewSourceItem(menu);
+		addScreenshotMenuItem(menu);
 	}
-	
+
 	private void addToolsMenuItems(Menu menu) {
 		addFireBugLiteItem(menu);
 	}
@@ -535,7 +536,7 @@ public class BrowserSim {
 				controlHandler.rotate(true);
 			}
 		});
-		
+
 		MenuItem turnRight = new MenuItem(menu, SWT.PUSH);
 		turnRight.setText(Messages.BrowserSim_TURN_RIGHT);
 		turnRight.addSelectionListener(new SelectionAdapter() {
@@ -543,6 +544,12 @@ public class BrowserSim {
 				controlHandler.rotate(false);
 			}
 		});
+	}
+
+	private void addScreenshotMenuItem(Menu menu) {
+		MenuItem screenshot = new MenuItem(menu, SWT.PUSH);
+		screenshot.setText("Screenshot");
+		screenshot.addListener(SWT.Selection, new ScreenshotListener(display, skin.getShell(), isStandalone));
 	}
 
 	public void addOpenInDefaultBrowserItem(Menu menu) {

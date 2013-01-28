@@ -33,18 +33,16 @@ import org.jboss.tools.vpe.browsersim.util.ResourcesUtil;
 @SuppressWarnings("nls")
 public class DevicesListStorage {
 	
+	public static final String SEPARATOR = "/";
 	private static final String DEFAULT_PREFERENCES_RESOURCE = "config/devices.cfg";
 	private static final String USER_HOME = System.getProperty("user.home");
-	private static final String SEPARATOR = "/";
 	private static final String STANDALONE_PREFERENCES_FOLDER = ".browsersim";
 	private static final String USER_PREFERENCES_FOLDER = "org.jboss.tools.vpe.browsersim";
 	private static final String PREFERENCES_FILE = "devices.cfg";
 	private static final int CURRENT_CONFIG_VERSION = 7;
 
 	public static void saveUserDefinedDevicesList(DevicesList devicesList, Point location, boolean isStandalone) {
-		File configFolder = new File(isStandalone
-									? USER_HOME + SEPARATOR + STANDALONE_PREFERENCES_FOLDER
-									: USER_PREFERENCES_FOLDER);
+		File configFolder = new File(getConfigFolderPath(isStandalone));
 		configFolder.mkdir();
 		File configFile = new File(configFolder, PREFERENCES_FILE);
 		
@@ -56,9 +54,7 @@ public class DevicesListStorage {
 	}
 
 	public static DevicesList loadUserDefinedDevicesList(boolean isStandalone) {
-		String folder = isStandalone
-						? USER_HOME + SEPARATOR + STANDALONE_PREFERENCES_FOLDER
-						: USER_PREFERENCES_FOLDER;
+		String folder = getConfigFolderPath(isStandalone);
 		File customConfigFile = new File(folder + SEPARATOR + PREFERENCES_FILE);
 		DevicesList devicesList = null;
 		if (customConfigFile.exists()) {
@@ -91,6 +87,10 @@ public class DevicesListStorage {
 		return devicesList;
 	}
 
+	public static String getConfigFolderPath(boolean isStandalone) {
+		return isStandalone	? USER_HOME + SEPARATOR + STANDALONE_PREFERENCES_FOLDER : USER_PREFERENCES_FOLDER;
+	}
+	
 	private static void saveDevicesList(DevicesList devicesList, File file, Point location) throws IOException {
 		BufferedWriter writer = new BufferedWriter(new FileWriter(file));
 		
