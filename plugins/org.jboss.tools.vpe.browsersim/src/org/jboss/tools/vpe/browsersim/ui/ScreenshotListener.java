@@ -1,5 +1,22 @@
+/*******************************************************************************
+ * Copyright (c) 2007-2013 Red Hat, Inc.
+ * Distributed under license by Red Hat, Inc. All rights reserved.
+ * This program is made available under the terms of the
+ * Eclipse Public License v1.0 which accompanies this distribution,
+ * and is available at http://www.eclipse.org/legal/epl-v10.html
+ *
+ * Contributor:
+ *     Red Hat, Inc. - initial API and implementation
+ ******************************************************************************/
 package org.jboss.tools.vpe.browsersim.ui;
 
+import java.awt.Toolkit;
+import java.awt.datatransfer.DataFlavor;
+import java.awt.datatransfer.Transferable;
+import java.awt.datatransfer.UnsupportedFlavorException;
+import java.awt.image.BufferedImage;
+import java.awt.image.ColorModel;
+import java.awt.image.DirectColorModel;
 import java.io.File;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
@@ -17,7 +34,9 @@ import org.eclipse.swt.graphics.GC;
 import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.graphics.ImageData;
 import org.eclipse.swt.graphics.ImageLoader;
+import org.eclipse.swt.graphics.PaletteData;
 import org.eclipse.swt.graphics.Point;
+import org.eclipse.swt.graphics.RGB;
 import org.eclipse.swt.graphics.Rectangle;
 import org.eclipse.swt.graphics.Region;
 import org.eclipse.swt.layout.GridData;
@@ -30,7 +49,14 @@ import org.eclipse.swt.widgets.Event;
 import org.eclipse.swt.widgets.FileDialog;
 import org.eclipse.swt.widgets.Listener;
 import org.eclipse.swt.widgets.Shell;
+import org.jboss.tools.vpe.browsersim.browser.PlatformUtil;
 import org.jboss.tools.vpe.browsersim.model.DevicesListStorage;
+
+/**
+ * 
+ * @author Konstantin Marmalyukov (kmarmaliykov)
+ *
+ */
 
 public class ScreenshotListener implements Listener {
 	private static final String EXTENSION = ".png";
@@ -206,10 +232,19 @@ public class ScreenshotListener implements Listener {
 		addButton(buttonsComposite,Messages.ScreenshotDialog_CopyImage, new Listener() {
 			@Override
 			public void handleEvent(Event event) {
-				Clipboard cl = new Clipboard(display);
-				cl.setContents(new Object[] { image.getImageData() }, new Transfer[] { ImageTransfer.getInstance() });
-
-				cl.dispose();
+				//on Linux SWT dnd canot copy image to clipboard, that's why we need to do it using AWT
+				if (PlatformUtil.OS_LINUX.equals(PlatformUtil.getOs())) {
+					java.awt.datatransfer.Clipboard clipboard = Toolkit.getDefaultToolkit().getSystemClipboard();
+					java.awt.Image awtImage = convertToAWT(image.getImageData());
+					ImageSelection selection = new ImageSelection(awtImage);
+		            clipboard.setContents(selection, null);
+		            awtImage.flush();
+				} else {
+					Clipboard cl = new Clipboard(display);
+					cl.setContents(new Object[] {image.getImageData()}, new Transfer[] {ImageTransfer.getInstance()});
+					cl.dispose();					
+				}
+							
 				popup.dispose();
 			}
 		});
@@ -247,4 +282,45 @@ public class ScreenshotListener implements Listener {
 		loader.save(path + DevicesListStorage.SEPARATOR + fileName, SWT.IMAGE_PNG);
 	}
 	
+	private BufferedImage convertToAWT(ImageData data) {
+		ColorModel colorModel = null;
+		PaletteData palette = data.palette;
+		colorModel = ColorModel.getRGBdefault();
+		BufferedImage bufferedImage = new BufferedImage(colorModel, colorModel.createCompatibleWritableRaster(
+				data.width, data.height), false, null);
+		for (int y = 0; y < data.height; y++) {
+			for (int x = 0; x < data.width; x++) {
+				int pixel = data.getPixel(x, y);
+				RGB rgb = palette.getRGB(pixel);
+				byte alpha = (byte) data.getAlpha(x, y);
+				bufferedImage.setRGB(x, y, alpha <<24 | rgb.red << 16 | rgb.green << 8 | rgb.blue);
+			}
+		}
+		return bufferedImage;
+	}
+	
+	private class ImageSelection implements Transferable {
+		private java.awt.Image theImage;
+		
+		public ImageSelection(java.awt.Image image) {
+			theImage = image;
+		}
+
+		public DataFlavor[] getTransferDataFlavors() {
+			return new DataFlavor[] { DataFlavor.imageFlavor };
+		}
+
+		public boolean isDataFlavorSupported(DataFlavor flavor) {
+			return flavor.equals(DataFlavor.imageFlavor);
+		}
+
+		public Object getTransferData(DataFlavor flavor) throws UnsupportedFlavorException {
+			if (flavor.equals(DataFlavor.imageFlavor)) {
+				return theImage;
+			} else {
+				throw new UnsupportedFlavorException(flavor);
+			}
+		}
+	}
+
 }
