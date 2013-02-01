@@ -25,6 +25,7 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import org.eclipse.swt.graphics.Point;
+import org.jboss.tools.vpe.browsersim.ui.BrowserSim;
 import org.jboss.tools.vpe.browsersim.util.ResourcesUtil;
 
 /**
@@ -32,17 +33,16 @@ import org.jboss.tools.vpe.browsersim.util.ResourcesUtil;
  */
 @SuppressWarnings("nls")
 public class DevicesListStorage {
-	
-	public static final String SEPARATOR = "/";
+	public static final String SEPARATOR = System.getProperty("file.separator");
 	private static final String DEFAULT_PREFERENCES_RESOURCE = "config/devices.cfg";
 	private static final String USER_HOME = System.getProperty("user.home");
 	private static final String STANDALONE_PREFERENCES_FOLDER = ".browsersim";
 	private static final String USER_PREFERENCES_FOLDER = "org.jboss.tools.vpe.browsersim";
 	private static final String PREFERENCES_FILE = "devices.cfg";
-	private static final int CURRENT_CONFIG_VERSION = 7;
+	private static final int CURRENT_CONFIG_VERSION = 8;
 
-	public static void saveUserDefinedDevicesList(DevicesList devicesList, Point location, boolean isStandalone) {
-		File configFolder = new File(getConfigFolderPath(isStandalone));
+	public static void saveUserDefinedDevicesList(DevicesList devicesList, Point location) {
+		File configFolder = new File(getConfigFolderPath());
 		configFolder.mkdir();
 		File configFile = new File(configFolder, PREFERENCES_FILE);
 		
@@ -53,8 +53,8 @@ public class DevicesListStorage {
 		}
 	}
 
-	public static DevicesList loadUserDefinedDevicesList(boolean isStandalone) {
-		String folder = getConfigFolderPath(isStandalone);
+	public static DevicesList loadUserDefinedDevicesList() {
+		String folder = getConfigFolderPath();
 		File customConfigFile = new File(folder + SEPARATOR + PREFERENCES_FILE);
 		DevicesList devicesList = null;
 		if (customConfigFile.exists()) {
@@ -81,14 +81,18 @@ public class DevicesListStorage {
 			Device device = new Device("Default", 1024, 768, 1.0, null, null);
 			List<Device> devices = new ArrayList<Device>();
 			devices.add(device);
-			devicesList = new DevicesList(devices, 0, true, null, null);
+			devicesList = new DevicesList(devices, 0, true, null, null, getDefaultScreenshotsFolderPath());
 		}
 
 		return devicesList;
 	}
 
-	public static String getConfigFolderPath(boolean isStandalone) {
-		return isStandalone	? USER_HOME + SEPARATOR + STANDALONE_PREFERENCES_FOLDER : USER_PREFERENCES_FOLDER;
+	public static String getConfigFolderPath() {
+		return BrowserSim.isStandalone	? USER_HOME + SEPARATOR + STANDALONE_PREFERENCES_FOLDER : USER_PREFERENCES_FOLDER;
+	}
+	
+	private static String getDefaultScreenshotsFolderPath() {
+		return USER_HOME;
 	}
 	
 	private static void saveDevicesList(DevicesList devicesList, File file, Point location) throws IOException {
@@ -101,6 +105,7 @@ public class DevicesListStorage {
 		Boolean truncateWindow = devicesList.getTruncateWindow();
 		String truncateWindowString = truncateWindow == null ? "" : truncateWindow.toString();
 		writer.write("TruncateWindow=" + truncateWindowString + "\n");
+		writer.write("ScreenshotsFolder=" + devicesList.getScreenshotsFolder() + "\n");
 		
 		for (Device device : devicesList.getDevices()) {
 			writer.write( encode(device.getName() ));
@@ -137,9 +142,9 @@ public class DevicesListStorage {
 		Point location = null;
 		boolean useSkins = true;
 		Boolean truncateWindow = true;
+		String screenshotsFolder = "";
 		try {
 			String nextLine;
-			
 			int configVersion = 0;
 			if ((nextLine = reader.readLine()) != null) {
 				Pattern pattern = Pattern.compile("ConfigVersion=([0-9]+)");
@@ -186,6 +191,18 @@ public class DevicesListStorage {
 					}
 				}
 				
+				if ((nextLine = reader.readLine()) != null) {
+					Pattern pattern = Pattern.compile("ScreenshotsFolder=(.*)");
+					Matcher matcher = pattern.matcher(nextLine);
+					if (matcher.matches()) {
+						if ( "".equals(matcher.group(1)) ) {
+							screenshotsFolder = getDefaultScreenshotsFolderPath();
+						} else {							
+							screenshotsFolder = matcher.group(1);
+						}
+					}
+				}
+				
 				Pattern devicePattern = Pattern.compile("^(.*)\\t([0-9]+)\\t([0-9]+)\\t([0-9]*\\.?[0-9]*)\\t(.+)?\\t(.+)?$");
 				
 				devices = new ArrayList<Device>();
@@ -222,7 +239,7 @@ public class DevicesListStorage {
 		if (devices == null || devices.size() <= selectedDeviceIndex) {
 			return null;
 		} else { 
-			return new DevicesList(devices, selectedDeviceIndex, useSkins, truncateWindow, location);
+			return new DevicesList(devices, selectedDeviceIndex, useSkins, truncateWindow, location, screenshotsFolder);
 		}
 	}
 

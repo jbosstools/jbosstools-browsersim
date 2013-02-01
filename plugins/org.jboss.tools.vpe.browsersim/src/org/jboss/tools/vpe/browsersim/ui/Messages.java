@@ -56,12 +56,14 @@ public class Messages {
 	public static String ExceptionNotifier_ONLY_32_BIT_ECLIPSE_IS_SUPPORTED_ON_WINDOWS;
 	public static String ManageDevicesDialog_ADD;
 	public static String ManageDevicesDialog_ALWAYS_TRUNCATE;
+	public static String ManageDevicesDialog_BROWSE;
 	public static String ManageDevicesDialog_CANCEL;
 	public static String ManageDevicesDialog_DEFAULT;
 	public static String ManageDevicesDialog_DEVICES;
 	public static String ManageDevicesDialog_EDIT;
 	public static String ManageDevicesDialog_HEIGHT;
 	public static String ManageDevicesDialog_LOAD_DEFAULTS;
+	public static String ManageDevicesDialog_LOCATION;
 	public static String ManageDevicesDialog_NAME;
 	public static String ManageDevicesDialog_NEVER_TRUNCATE;
 	public static String ManageDevicesDialog_NEW_DEVICE;
@@ -73,6 +75,8 @@ public class Messages {
 	public static String ManageDevicesDialog_PROMPT;
 	public static String ManageDevicesDialog_REMOVE;
 	public static String ManageDevicesDialog_REVERT_ALL;
+	public static String ManageDevicesDialog_SCREENSHOTS;
+	public static String ManageDevicesDialog_SELECT_FOLDER;
 	public static String ManageDevicesDialog_SKIN;
 	public static String ManageDevicesDialog_SKINS_OPTIONS;
 	public static String ManageDevicesDialog_TRUNCATE_THE_DEVICE_WINDOW;

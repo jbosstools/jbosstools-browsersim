@@ -26,14 +26,16 @@ public class DevicesList extends Observable {
 	private boolean useSkins;
 	private Boolean truncateWindow;
 	private Point location;
+	private String screenshotsFolder;
 
 	public DevicesList(List<Device> devices, int selectedDeviceIndex, boolean useSkins, Boolean truncateWindow, 
-			Point location) {
+			Point location, String screenshotsFolder) {
 		this.devices = devices;
 		this.selectedDeviceIndex = selectedDeviceIndex;
 		this.useSkins = useSkins;
 		this.truncateWindow = truncateWindow;
 		this.location = location;
+		this.screenshotsFolder = screenshotsFolder;
 	}
 
 	public List<Device> getDevices() {
@@ -80,5 +82,15 @@ public class DevicesList extends Observable {
 
 	public void setLocation(Point location) {
 		this.location = location;
+		setChanged();
+	}
+
+	public String getScreenshotsFolder() {
+		return screenshotsFolder;
+	}
+
+	public void setScreenshotsFolder(String screenshotsFolder) {
+		this.screenshotsFolder = screenshotsFolder;
+		setChanged();
 	}
 }

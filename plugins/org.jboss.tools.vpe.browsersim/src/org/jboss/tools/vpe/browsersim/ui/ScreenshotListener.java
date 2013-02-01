@@ -62,18 +62,17 @@ public class ScreenshotListener implements Listener {
 	private static final String EXTENSION = ".png";
 	private Display display;
 	private Shell parent;
-	private boolean isStandalone;
 	
-	private String folderPath;
+	private String defaultScreenshotFolder;
 	private String imgName;
 
 	private Shell popup;
 	private final Color white;
 
-	public ScreenshotListener(Display display, Shell shell, boolean isStandalone) {
+	public ScreenshotListener(Display display, Shell shell, String defaultFolder) {
 		this.display = display;
-		this.parent = shell;
-		this.isStandalone = isStandalone;		
+		this.parent = shell;		
+		this.defaultScreenshotFolder = defaultFolder;
 		
 		this.white = display.getSystemColor(SWT.COLOR_WHITE);
 	}
@@ -86,7 +85,6 @@ public class ScreenshotListener implements Listener {
 		popup.setText(Messages.ScreenshotDialog_Screenshot);
 		popup.setSize(400, 400);
 		
-		this.folderPath = DevicesListStorage.getConfigFolderPath(isStandalone) + DevicesListStorage.SEPARATOR + "screenshots";
 		DateFormat df = new SimpleDateFormat("yyyy-MM-dd_hh-mm-ss");  
 		this.imgName = df.format(new Date()) + EXTENSION;
 		
@@ -171,7 +169,7 @@ public class ScreenshotListener implements Listener {
 		addButton(buttonsComposite, Messages.ScreenshotDialog_Save, new Listener() {
 			@Override
 			public void handleEvent(Event event) {
-				saveImage(image, folderPath, imgName);
+				saveImage(image, imgName);
 				popup.dispose();
 			}
 		});
@@ -179,10 +177,10 @@ public class ScreenshotListener implements Listener {
 		addButton(buttonsComposite, Messages.ScreenshotDialog_SaveAndOpen, new Listener() {
 			@Override
 			public void handleEvent(Event event) {
-				saveImage(image, folderPath, imgName);
+				saveImage(image, imgName);
 
 				popup.dispose();
-				Program.launch(folderPath + DevicesListStorage.SEPARATOR + imgName);
+				Program.launch(defaultScreenshotFolder + DevicesListStorage.SEPARATOR + imgName);
 			}
 		});
 
@@ -218,10 +216,10 @@ public class ScreenshotListener implements Listener {
 		addButton(buttonsComposite, Messages.ScreenshotDialog_CopyPath, new Listener() {
 			@Override
 			public void handleEvent(Event event) {
-				saveImage(image, folderPath, imgName);
+				saveImage(image, imgName);
 
 				Clipboard cb = new Clipboard(display);
-				String textData = folderPath + DevicesListStorage.SEPARATOR + imgName;
+				String textData = defaultScreenshotFolder + DevicesListStorage.SEPARATOR + imgName;
 				cb.setContents(new Object[] { textData }, new Transfer[] { TextTransfer.getInstance() });
 
 				cb.dispose();
@@ -274,12 +272,20 @@ public class ScreenshotListener implements Listener {
 		b.addListener(SWT.Selection, listener);
 	}
 
-	private void saveImage(Image image, String path, String fileName) {
-		File f = new File(path);
+	private void saveImage(Image image, String fileName) {
+		File f = new File(defaultScreenshotFolder);
 		f.mkdirs();
 		ImageLoader loader = new ImageLoader();
 		loader.data = new ImageData[] { image.getImageData() };
-		loader.save(path + DevicesListStorage.SEPARATOR + fileName, SWT.IMAGE_PNG);
+		loader.save(defaultScreenshotFolder + DevicesListStorage.SEPARATOR + fileName, SWT.IMAGE_PNG);
+	}
+	
+	private void saveImage(Image image, String folder, String fileName) {
+		File f = new File(folder);
+		f.mkdirs();
+		ImageLoader loader = new ImageLoader();
+		loader.data = new ImageData[] { image.getImageData() };
+		loader.save(f.getAbsolutePath() + DevicesListStorage.SEPARATOR + fileName, SWT.IMAGE_PNG);
 	}
 	
 	private BufferedImage convertToAWT(ImageData data) {
