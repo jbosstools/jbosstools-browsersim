@@ -44,11 +44,11 @@ public class IOSPageTitleStyledText extends StyledText {
 	
 	static Font createFont(Device device, int style) {
 		Font font;
-		if(SWT.getPlatform() == "win32") {
+		if(SWT.getPlatform().equals("win32")) {
 			font = new Font(device, "Arial", 9, style);	
-		} else if (SWT.getPlatform() == "gtk") {
+		} else if (SWT.getPlatform().equals("gtk")) {
 			font = new Font(device, "Helvetica", 9, style);		
-		} else if (SWT.getPlatform() == "cocoa") {
+		} else if (SWT.getPlatform().equals("cocoa")) {
 			font = new Font(device, "Helvetica", 12, style);
 		} else {
 			font = new Font(device, "Verdana", 9, style);

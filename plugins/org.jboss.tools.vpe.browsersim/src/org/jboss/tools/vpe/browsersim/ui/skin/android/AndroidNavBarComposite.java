@@ -19,6 +19,7 @@ import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.ProgressBar;
 import org.eclipse.swt.widgets.Text;
+import org.jboss.tools.vpe.browsersim.ui.AdressBarText;
 import org.jboss.tools.vpe.browsersim.ui.skin.ImageButtonComposite;
 import org.jboss.tools.vpe.browsersim.ui.skin.ImageDescriptor;
 import org.jboss.tools.vpe.browsersim.ui.skin.ImageList;
@@ -46,13 +47,13 @@ public class AndroidNavBarComposite extends Composite {
 
 		this.setLayout(new FormLayout());
 		
-		urlText = new Text(this, SWT.SINGLE);
+		urlText = new AdressBarText(this, SWT.SINGLE);
 		
 		FormData formData = new FormData();
 		formData.left = new FormAttachment(0, 17);
 		formData.right = new FormAttachment(100, -55);
-		formData.top = new FormAttachment(0, 22);
-		formData.bottom = new FormAttachment(100, -20);
+		formData.top = new FormAttachment(0, 22 - AdressBarText.adressBarUrlOffset);
+		formData.height = 16;
 		urlText.setLayoutData(formData);
 		
 		stopButtonComposite = new ImageButtonComposite(this, imageList.getImage(BD + "stop.png"), imageList.getImage(BD + "stop.png"), imageList.getImage(BD + "stop-selected.png"));

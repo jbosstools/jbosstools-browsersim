@@ -19,6 +19,7 @@ import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.ProgressBar;
 import org.eclipse.swt.widgets.Text;
+import org.jboss.tools.vpe.browsersim.ui.AdressBarText;
 import org.jboss.tools.vpe.browsersim.ui.skin.ImageButtonComposite;
 import org.jboss.tools.vpe.browsersim.ui.skin.ImageDescriptor;
 import org.jboss.tools.vpe.browsersim.ui.skin.ImageList;
@@ -58,12 +59,12 @@ public class IOSNavBarComposite extends Composite {
 		formData.height = 27;
 		pageTitleStyledText.setLayoutData(formData);
 		
-		urlText = new Text(this, SWT.SINGLE);
+		urlText = new AdressBarText(this, SWT.SINGLE);
 		formData = new FormData();
 		formData.left = new FormAttachment(0, 12);
 		formData.right = new FormAttachment(100, -58);
-		formData.top = new FormAttachment(0, 33);
-		formData.bottom = new FormAttachment(100, -8);
+		formData.top = new FormAttachment(0, 33 - AdressBarText.adressBarUrlOffset);
+		formData.height = 16;
 		urlText.setLayoutData(formData);
 		
 		refreshButtonComposite = new ImageButtonComposite(this, imageList.getImage(BD + "refresh.png"), imageList.getImage(BD + "refresh.png"), imageList.getImage(BD + "refresh-selected.png"));
