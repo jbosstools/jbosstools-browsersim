@@ -271,6 +271,23 @@ public class ManageDevicesDialog extends Dialog {
 			}
 		});
 		
+		Group weinreGroup = new Group(shell, SWT.NONE);
+		weinreGroup.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, true, false, 1, 1));
+		weinreGroup.setText("Weinre");
+		weinreGroup.setLayout(new GridLayout(2, false));
+		
+		Label weinreScriptUrlLabel = new Label(weinreGroup, SWT.NONE);
+		weinreScriptUrlLabel.setText("Script URL:");
+		final Text weinreScriptUrlText = new Text(weinreGroup, SWT.BORDER);
+		weinreScriptUrlText.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, true, true));
+		weinreScriptUrlText.setText(oldDevicesList.getWeinreScriptUrl());
+		
+		Label weinreClientUrlLabel = new Label(weinreGroup, SWT.NONE);
+		weinreClientUrlLabel.setText("Client URL:");
+		final Text weinreClientUrlText = new Text(weinreGroup, SWT.BORDER);
+		weinreClientUrlText.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, true, true));
+		weinreClientUrlText.setText(oldDevicesList.getWeinreClientUrl());
+		
 		Composite compositeOkCancel = new Composite(shell, SWT.NONE);
 		compositeOkCancel.setLayout(new GridLayout(2, true));
 		compositeOkCancel.setLayoutData(new GridData(SWT.RIGHT, SWT.CENTER, false, false, 2, 1));
@@ -287,6 +304,8 @@ public class ManageDevicesDialog extends Dialog {
 				useSkins = defaultDevicesList.getUseSkins();
 				truncateWindow = defaultDevicesList.getTruncateWindow();
 				screenshotsPath.setText(defaultDevicesList.getScreenshotsFolder());
+				weinreScriptUrlText.setText(defaultDevicesList.getWeinreScriptUrl());
+				weinreClientUrlText.setText(defaultDevicesList.getWeinreClientUrl());
 				updateDevices();
 			}
 		});
@@ -298,7 +317,7 @@ public class ManageDevicesDialog extends Dialog {
 		buttonOk.addSelectionListener(new SelectionAdapter() {
 			public void widgetSelected(SelectionEvent e) {
 				resultDevicesList = new DevicesList(devices, selectedDeviceIndex, useSkins, truncateWindow,
-						oldDevicesList.getLocation(), screenshotsPath.getText());
+						oldDevicesList.getLocation(), screenshotsPath.getText(), weinreScriptUrlText.getText(), weinreClientUrlText.getText());
 				shell.close();
 			}
 		});

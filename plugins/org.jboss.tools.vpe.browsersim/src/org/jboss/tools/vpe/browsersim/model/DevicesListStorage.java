@@ -39,7 +39,9 @@ public class DevicesListStorage {
 	private static final String STANDALONE_PREFERENCES_FOLDER = ".browsersim";
 	private static final String USER_PREFERENCES_FOLDER = "org.jboss.tools.vpe.browsersim";
 	private static final String PREFERENCES_FILE = "devices.cfg";
-	private static final int CURRENT_CONFIG_VERSION = 8;
+	private static final String DEFAULT_WEINRE_SCRIPT_URL = "http://debug.phonegap.com/target/target-script-min.js";
+	private static final String DEFAULT_WEINRE_CLIENT_URL = "http://debug.phonegap.com/client/";
+	private static final int CURRENT_CONFIG_VERSION = 9;
 
 	public static void saveUserDefinedDevicesList(DevicesList devicesList, Point location) {
 		File configFolder = new File(getConfigFolderPath());
@@ -81,7 +83,8 @@ public class DevicesListStorage {
 			Device device = new Device("Default", 1024, 768, 1.0, null, null);
 			List<Device> devices = new ArrayList<Device>();
 			devices.add(device);
-			devicesList = new DevicesList(devices, 0, true, null, null, getDefaultScreenshotsFolderPath());
+			devicesList = new DevicesList(devices, 0, true, null, null, getDefaultScreenshotsFolderPath(),
+					getDefaultWeinreScriptUrl(), getDefaultWeinreClientUrl());
 		}
 
 		return devicesList;
@@ -95,6 +98,14 @@ public class DevicesListStorage {
 		return USER_HOME;
 	}
 	
+	private static String getDefaultWeinreScriptUrl() {
+		return DEFAULT_WEINRE_SCRIPT_URL;	
+	}
+	
+	private static String getDefaultWeinreClientUrl() {
+		return DEFAULT_WEINRE_CLIENT_URL;
+	}
+	
 	private static void saveDevicesList(DevicesList devicesList, File file, Point location) throws IOException {
 		BufferedWriter writer = new BufferedWriter(new FileWriter(file));
 		
@@ -106,6 +117,8 @@ public class DevicesListStorage {
 		String truncateWindowString = truncateWindow == null ? "" : truncateWindow.toString();
 		writer.write("TruncateWindow=" + truncateWindowString + "\n");
 		writer.write("ScreenshotsFolder=" + devicesList.getScreenshotsFolder() + "\n");
+		writer.write("WeinreScriptUrl=" + devicesList.getWeinreScriptUrl() + "\n");
+		writer.write("WeinreClientUrl=" + devicesList.getWeinreClientUrl() + "\n");
 		
 		for (Device device : devicesList.getDevices()) {
 			writer.write( encode(device.getName() ));
@@ -143,6 +156,8 @@ public class DevicesListStorage {
 		boolean useSkins = true;
 		Boolean truncateWindow = true;
 		String screenshotsFolder = "";
+		String weinreScriptUrl = "";
+		String weinreClientUrl = "";
 		try {
 			String nextLine;
 			int configVersion = 0;
@@ -203,6 +218,30 @@ public class DevicesListStorage {
 					}
 				}
 				
+				if ((nextLine = reader.readLine()) != null) {
+					Pattern pattern = Pattern.compile("WeinreScriptUrl=(.*)");
+					Matcher matcher = pattern.matcher(nextLine);
+					if (matcher.matches()) {
+						if ( "".equals(matcher.group(1)) ) {
+							weinreScriptUrl = getDefaultWeinreScriptUrl();
+						} else {							
+							weinreScriptUrl = matcher.group(1);
+						}
+					}
+				}
+				
+				if ((nextLine = reader.readLine()) != null) {
+					Pattern pattern = Pattern.compile("WeinreClientUrl=(.*)");
+					Matcher matcher = pattern.matcher(nextLine);
+					if (matcher.matches()) {
+						if ( "".equals(matcher.group(1)) ) {
+							weinreClientUrl = getDefaultWeinreClientUrl();
+						} else {							
+							weinreClientUrl = matcher.group(1);
+						}
+					}
+				}
+				
 				Pattern devicePattern = Pattern.compile("^(.*)\\t([0-9]+)\\t([0-9]+)\\t([0-9]*\\.?[0-9]*)\\t(.+)?\\t(.+)?$");
 				
 				devices = new ArrayList<Device>();
@@ -239,7 +278,8 @@ public class DevicesListStorage {
 		if (devices == null || devices.size() <= selectedDeviceIndex) {
 			return null;
 		} else { 
-			return new DevicesList(devices, selectedDeviceIndex, useSkins, truncateWindow, location, screenshotsFolder);
+			return new DevicesList(devices, selectedDeviceIndex, useSkins, truncateWindow, location, screenshotsFolder,
+					weinreScriptUrl, weinreClientUrl);
 		}
 	}
 

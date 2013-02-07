@@ -467,9 +467,6 @@ public class BrowserSim {
 				addFileMenuItems(contextMenu);
 				
 				new MenuItem(contextMenu, SWT.BAR);
-				addWeinreItem(contextMenu);
-				
-				new MenuItem(contextMenu, SWT.BAR);
 				addAboutItem(contextMenu);
 				
 				new MenuItem(contextMenu, SWT.BAR);
@@ -529,6 +526,7 @@ public class BrowserSim {
 
 	private void addToolsMenuItems(Menu menu) {
 		addFireBugLiteItem(menu);
+		addWeinreItem(menu);
 		addScreenshotMenuItem(menu);
 	}
 	
@@ -617,9 +615,9 @@ public class BrowserSim {
 					skin.getBrowser().execute("var head = document.head;"
 							+	"var script = document.createElement('script');"
 							+	"head.appendChild(script);" 
-							+	"script.src='http://debug.phonegap.com/target/target-script-min.js#" + id + "'");
+							+	"script.src='" + devicesListHolder.getDevicesList().getWeinreScriptUrl() + "#" + id + "'");
 					
-					url = "http://debug.phonegap.com/client/#" + id;
+					url = devicesListHolder.getDevicesList().getWeinreClientUrl() + "#" + id;
 				}
 				
 				Display display = skin.getBrowser().getDisplay();

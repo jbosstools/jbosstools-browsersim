@@ -27,15 +27,19 @@ public class DevicesList extends Observable {
 	private Boolean truncateWindow;
 	private Point location;
 	private String screenshotsFolder;
+	private String weinreScriptUrl;
+	private String weinreClientUrl;
 
 	public DevicesList(List<Device> devices, int selectedDeviceIndex, boolean useSkins, Boolean truncateWindow, 
-			Point location, String screenshotsFolder) {
+			Point location, String screenshotsFolder, String weinreScriptUrl, String weinreClientUrl) {
 		this.devices = devices;
 		this.selectedDeviceIndex = selectedDeviceIndex;
 		this.useSkins = useSkins;
 		this.truncateWindow = truncateWindow;
 		this.location = location;
 		this.screenshotsFolder = screenshotsFolder;
+		this.weinreScriptUrl = weinreScriptUrl;
+		this.weinreClientUrl = weinreClientUrl;
 	}
 
 	public List<Device> getDevices() {
@@ -92,5 +96,21 @@ public class DevicesList extends Observable {
 	public void setScreenshotsFolder(String screenshotsFolder) {
 		this.screenshotsFolder = screenshotsFolder;
 		setChanged();
+	}
+
+	public String getWeinreScriptUrl() {
+		return weinreScriptUrl;
+	}
+
+	public void setWeinreScriptUrl(String weinreServer) {
+		this.weinreScriptUrl = weinreServer;
+	}
+
+	public String getWeinreClientUrl() {
+		return weinreClientUrl;
+	}
+
+	public void setWeinreClientUrl(String weinreClientUrl) {
+		this.weinreClientUrl = weinreClientUrl;
 	}
 }
