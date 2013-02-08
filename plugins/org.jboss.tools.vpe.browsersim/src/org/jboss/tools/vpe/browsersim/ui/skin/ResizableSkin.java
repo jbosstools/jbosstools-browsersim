@@ -39,13 +39,15 @@ public abstract class ResizableSkin implements BrowserSimSkin {
 				}
 			}
 		});
-		deviceComposite.getForwardButtonComposite().addMouseListener(new MouseAdapter() {
-			public void mouseDown(MouseEvent e) {
-				if (e.button == 1) {
-					controlHandler.goForward();
+		if (deviceComposite.getForwardButtonComposite() != null) {
+			deviceComposite.getForwardButtonComposite().addMouseListener(new MouseAdapter() {
+				public void mouseDown(MouseEvent e) {
+					if (e.button == 1) {
+						controlHandler.goForward();
+					}
 				}
-			}
-		});
+			});
+		}
 		deviceComposite.getStopButtonComposite().addMouseListener(new MouseAdapter() {
 			public void mouseDown(MouseEvent e) {
 				if (e.button == 1) {

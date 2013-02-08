@@ -226,7 +226,9 @@ public class AppleIPhone3ResizableSkin extends ResizableSkin {
 			boolean forwardEnabled) {
 		deviceComposite.getUrlText().setText(newLocation);
 		deviceComposite.getBackButtonComposite().setEnabled(backEnabled);
-		deviceComposite.getForwardButtonComposite().setEnabled(forwardEnabled);
+		if (deviceComposite.getForwardButtonComposite() != null) {
+			deviceComposite.getForwardButtonComposite().setEnabled(forwardEnabled);
+		}
 	}
 	
 
@@ -260,7 +262,10 @@ public class AppleIPhone3ResizableSkin extends ResizableSkin {
 		String urlTextText = deviceComposite.getUrlText().getText();
 		String pageTitle = deviceComposite.getPageTitleStyledText() != null ? deviceComposite.getPageTitleStyledText().getText() : "";
 		boolean backEnabled = deviceComposite.getBackButtonComposite().getEnabled();
-		boolean forwardEnabled = deviceComposite.getForwardButtonComposite().getEnabled();
+		boolean forwardEnabled = false;
+		if (deviceComposite.getForwardButtonComposite() != null) {
+			forwardEnabled = deviceComposite.getForwardButtonComposite().getEnabled();
+		}
 		boolean navBarVisible = deviceComposite.isNavBarCompositeVisible();
 		Menu contextMenu = deviceComposite.getMenu();
 		deviceComposite.setMenu(null);
@@ -297,7 +302,9 @@ public class AppleIPhone3ResizableSkin extends ResizableSkin {
 			deviceComposite.getPageTitleStyledText().setText(pageTitle);
 		}
 		deviceComposite.getBackButtonComposite().setEnabled(backEnabled);
-		deviceComposite.getForwardButtonComposite().setEnabled(forwardEnabled);
+		if (deviceComposite.getForwardButtonComposite() != null) {
+			deviceComposite.getForwardButtonComposite().setEnabled(forwardEnabled);
+		}
 		deviceComposite.setNavBarCompositeVisible(navBarVisible);
 		deviceComposite.setMenu(contextMenu);
 	}

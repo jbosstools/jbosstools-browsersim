@@ -61,7 +61,9 @@ public class AndroidComposite extends DeviceComposite {
 		setLayout(new FormLayout());
 		
 		backButtonComposite = new ImageButtonComposite(this, imageList, skinDescriptor.getBackButton());
-		forwardButtonComposite = new ImageButtonComposite(this, imageList, skinDescriptor.getForwardButton());
+		if (skinDescriptor.getForwardButton() != null) {
+			forwardButtonComposite = new ImageButtonComposite(this, imageList, skinDescriptor.getForwardButton());
+		}
 		refreshButtonComposite = new ImageButtonComposite(this, imageList, skinDescriptor.getRefreshButton());
 		homeButtonComposite = new ImageButtonComposite(this, imageList, skinDescriptor.getHomeButton());
 		
