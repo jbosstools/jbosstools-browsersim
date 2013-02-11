@@ -91,6 +91,8 @@ public class BrowserSim {
 	
 	private static final String NOT_STANDALONE = "-not-standalone"; //$NON-NLS-1$
 	
+	private static List<BrowserSim> instances;
+	
 	private Display display;
 	private String homeUrl;
 	private DevicesListHolder devicesListHolder;
@@ -99,14 +101,18 @@ public class BrowserSim {
 	private ControlHandler controlHandler;
 	private Image[] icons;
 	private ResizableSkinSizeAdvisor sizeAdvisor;
+	private static CocoaUIEnhancer cocoaUIEnhancer;
 	
 	public static boolean isStandalone;
 	private Point currentLocation;
 	private ProgressListener progressListener;
 
+	static {
+		instances = new ArrayList<BrowserSim>();
+	}
+	
 	public static void main(String[] args) {
 		//CocoaUIEnhancer handles connection between the About, Preferences and Quit menus in MAC OS X
-		CocoaUIEnhancer cocoaUIEnhancer = null;
 		if (PlatformUtil.OS_MACOSX.equals(PlatformUtil.getOs())) {
 			cocoaUIEnhancer = new CocoaUIEnhancer(Messages.BrowserSim_BROWSER_SIM);
 			cocoaUIEnhancer.initializeMacOSMenuBar();
@@ -131,7 +137,6 @@ public class BrowserSim {
 			homeUrl = DEFAULT_URL;
 		}
 		
-		
 		DevicesList devicesList = DevicesListStorage.loadUserDefinedDevicesList();
 		if (devicesList == null) {
 			devicesList = DevicesListStorage.loadDefaultDevicesList();
@@ -153,6 +158,7 @@ public class BrowserSim {
 			browserSim.addMacOsMenuApplicationHandler(cocoaUIEnhancer);
 		}
 
+		instances.add(browserSim);
 		browserSim.skin.getShell().open();
 		
 		while (display.getShells().length > 0) {
@@ -215,7 +221,7 @@ public class BrowserSim {
 		});
 		shell.addDisposeListener(new DisposeListener() {
 			public void widgetDisposed(DisposeEvent e) {
-				
+				instances.remove(BrowserSim.this);
 				if (devicesListHolder != null) {
 					DevicesListStorage.saveUserDefinedDevicesList(devicesListHolder.getDevicesList(), currentLocation);
 				}
@@ -223,7 +229,7 @@ public class BrowserSim {
 		});
 		setShellAttibutes();
 				
-		BrowserSimBrowser browser = skin.getBrowser();
+		final BrowserSimBrowser browser = skin.getBrowser();
 		controlHandler = new ControlHandlerImpl(browser);
 		skin.setControlHandler(controlHandler);
 		
@@ -335,36 +341,14 @@ public class BrowserSim {
 				}
 			});
 		};
+		
 
 		browser.addOpenWindowListener(new OpenWindowListener() {
 			public void open(WindowEvent event) {
 				if (FireBugLiteLoader.isFireBugPopUp(event)) {
 					FireBugLiteLoader.processFireBugPopUp(event);
 				} else {
-					BrowserSim browserSim = new BrowserSim(display, homeUrl);
-					int parentDeviceIndex = devicesListHolder.getDevicesList().getSelectedDeviceIndex();
-	
-					DevicesList devicesList = DevicesListStorage.loadUserDefinedDevicesList();
-					if (devicesList == null) {
-						devicesList = DevicesListStorage.loadDefaultDevicesList();
-					}
-					devicesList.setSelectedDeviceIndex(parentDeviceIndex);
-					Device defaultDevice = devicesList.getDevices().get(parentDeviceIndex);
-					browserSim.initDevicesListHolder();
-					browserSim.devicesListHolder.setDevicesList(devicesList);
-					
-					browserSim.initSkin(getSkinClass(defaultDevice, devicesList.getUseSkins()), null);
-					
-					browserSim.devicesListHolder.notifyObservers();
-					
-					// set event handlers for Mac OS X Menu-bar
-//					if (cocoaUIEnhancer != null) {
-//						browserSim.addMacOsMenuApplicationHandler(cocoaUIEnhancer);
-//					}
-				
-					event.browser = browserSim.skin.getBrowser();
-					
-					browserSim.skin.getShell().open();
+					event.browser = browser;
 				}
 			}
 		});
@@ -407,6 +391,19 @@ public class BrowserSim {
 			}
 			public void changing(LocationEvent event) {
 				skin.setAddressBarVisible(true);
+			}
+		});
+		
+		browser.addLocationListener(new LocationAdapter() {
+			@Override
+			public void changed(LocationEvent event) {
+				if (skin.getBrowser().equals(display.getFocusControl()) && event.top) {
+					for (BrowserSim bs : instances) {
+						if (bs.skin != skin) {
+							bs.skin.getBrowser().setUrl(event.location);
+						}
+					}
+				}
 			}
 		});
 		
@@ -528,6 +525,7 @@ public class BrowserSim {
 		addFireBugLiteItem(menu);
 		addWeinreItem(menu);
 		addScreenshotMenuItem(menu);
+		addSyncronizedWindowItem(menu);
 	}
 	
 	private void addTurnMenuItems(Menu menu) {
@@ -674,6 +672,57 @@ public class BrowserSim {
 				FireBugLiteLoader.startFireBugOpening(skin.getBrowser());
 			}
 		});
+	}
+	
+	public void addSyncronizedWindowItem(Menu menu) {
+		MenuItem syncWindow = new MenuItem(menu, SWT.CASCADE);
+		syncWindow.setText("Open Syncronized Window");
+		Menu subMenu = new Menu (menu);
+		syncWindow.setMenu(subMenu);
+		final DevicesList devicesList = devicesListHolder.getDevicesList();
+		for (final Device device : devicesList.getDevices()) {
+			MenuItem deviceMenuItem = new MenuItem(subMenu, SWT.RADIO);
+			deviceMenuItem.setText(device.getName());
+			deviceMenuItem.setData(device);
+
+			deviceMenuItem.addSelectionListener(new SelectionAdapter() {
+				public void widgetSelected(SelectionEvent e) {
+					
+					DevicesList devicesList1 = DevicesListStorage.loadUserDefinedDevicesList();
+					if (devicesList1 == null) {
+						devicesList1 = DevicesListStorage.loadDefaultDevicesList();
+					}
+					
+					MenuItem menuItem = (MenuItem)e.widget;
+					if (menuItem.getSelection()) {
+						int selectedDeviceIndex = devicesList.getDevices().indexOf(menuItem.getData());
+						if (selectedDeviceIndex < 0) {
+							selectedDeviceIndex = 0;
+						}
+						Device defaultDevice1 = devicesList1.getDevices().get(selectedDeviceIndex);
+						devicesList1.setSelectedDeviceIndex(selectedDeviceIndex);
+						
+						BrowserSim browserSim1 = new BrowserSim(display, homeUrl);		
+						
+						browserSim1.initDevicesListHolder();
+						browserSim1.devicesListHolder.setDevicesList(devicesList1);
+
+						browserSim1.initSkin(getSkinClass(defaultDevice1, devicesList1.getUseSkins()), null);
+						
+						browserSim1.devicesListHolder.notifyObservers();
+						browserSim1.controlHandler.goToAddress(BrowserSim.this.skin.getBrowser().getUrl());
+
+						// set event handlers for Mac OS X Menu-bar
+						if (cocoaUIEnhancer != null) {
+							browserSim1.addMacOsMenuApplicationHandler(cocoaUIEnhancer);
+						}
+
+						instances.add(browserSim1);
+						browserSim1.skin.getShell().open();
+					}
+				};
+			});
+		}
 	}
 	
 	public void addUseSkinsItem(Menu menu){
