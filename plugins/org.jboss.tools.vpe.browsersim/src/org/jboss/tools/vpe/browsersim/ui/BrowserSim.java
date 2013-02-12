@@ -520,11 +520,11 @@ public class BrowserSim {
 	private void addFileMenuItems(Menu menu) {
 		addOpenInDefaultBrowserItem(menu);
 		addViewSourceItem(menu);
-		addScreenshotMenuItem(menu);
 	}
 
 	private void addToolsMenuItems(Menu menu) {
 		addFireBugLiteItem(menu);
+		addScreenshotMenuItem(menu);
 	}
 	
 	private void addTurnMenuItems(Menu menu) {
@@ -546,11 +546,12 @@ public class BrowserSim {
 	}
 
 	private void addScreenshotMenuItem(Menu menu) {
-		MenuItem screenshot = new MenuItem(menu, SWT.PUSH);
-		screenshot.setText("Screenshot");
+		MenuItem screenshot = new MenuItem(menu, SWT.CASCADE);
+		screenshot.setText(Messages.Screenshots_Screenshot);
 		
-		screenshot.addListener(SWT.Selection, new ScreenshotListener(display, skin.getShell(),
-				devicesListHolder.getDevicesList().getScreenshotsFolder()));
+		Menu subMenu = ScreenshotMenuCreator.createScreenshotsMenu(menu, display, skin.getShell(),
+				devicesListHolder.getDevicesList().getScreenshotsFolder());
+		screenshot.setMenu(subMenu);
 	}
 
 	public void addOpenInDefaultBrowserItem(Menu menu) {
