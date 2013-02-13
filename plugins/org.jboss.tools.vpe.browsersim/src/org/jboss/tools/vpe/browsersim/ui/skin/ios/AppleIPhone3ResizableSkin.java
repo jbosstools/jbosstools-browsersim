@@ -13,6 +13,8 @@ package org.jboss.tools.vpe.browsersim.ui.skin.ios;
 import java.util.Arrays;
 
 import org.eclipse.swt.SWT;
+import org.eclipse.swt.events.DisposeEvent;
+import org.eclipse.swt.events.DisposeListener;
 import org.eclipse.swt.graphics.Point;
 import org.eclipse.swt.graphics.Region;
 import org.eclipse.swt.layout.FillLayout;
@@ -168,10 +170,15 @@ public class AppleIPhone3ResizableSkin extends ResizableSkin {
 				shellRegion[i + 1] += regionIncrement.y;
 			}
 		}
-		Region region = new Region();
+		final Region region = new Region();
 		region.add(shellRegion);
 		shell.setRegion(region);
-		region.dispose();
+		shell.addDisposeListener(new DisposeListener() {
+			@Override
+			public void widgetDisposed(DisposeEvent e) {
+				region.dispose();
+			}
+		});
 		////////////////////////////////
 //		shell.setRegion(null);
 //		display.asyncExec(new Runnable() {

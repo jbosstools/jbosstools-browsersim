@@ -98,7 +98,7 @@ public class BrowserSim {
 	private Image[] icons;
 	private ResizableSkinSizeAdvisor sizeAdvisor;
 	
-	private boolean isStandalone;
+	public static boolean isStandalone;
 	private Point currentLocation;
 	private ProgressListener progressListener;
 
@@ -111,8 +111,8 @@ public class BrowserSim {
 		}
 		
 		List<String> params = new ArrayList<String>(Arrays.asList(args));
-		boolean standalone = !params.contains(NOT_STANDALONE);
-		if (!standalone) {
+		isStandalone = !params.contains(NOT_STANDALONE);
+		if (!isStandalone) {
 			params.remove(NOT_STANDALONE);
 		}
 
@@ -130,13 +130,13 @@ public class BrowserSim {
 		}
 		
 		
-		DevicesList devicesList = DevicesListStorage.loadUserDefinedDevicesList(standalone);
+		DevicesList devicesList = DevicesListStorage.loadUserDefinedDevicesList();
 		if (devicesList == null) {
 			devicesList = DevicesListStorage.loadDefaultDevicesList();
 		}
 		Device defaultDevice = devicesList.getDevices().get(devicesList.getSelectedDeviceIndex());
 		Display display = new Display();
-		BrowserSim browserSim = new BrowserSim(display, homeUrl, standalone);		
+		BrowserSim browserSim = new BrowserSim(display, homeUrl);		
 		
 		browserSim.initDevicesListHolder();
 		browserSim.devicesListHolder.setDevicesList(devicesList);
@@ -162,10 +162,9 @@ public class BrowserSim {
 		display.dispose();
 	}
 
-	public BrowserSim(Display display, String homeUrl, boolean isStandalone) {
+	public BrowserSim(Display display, String homeUrl) {
 		this.display = display;
 		this.homeUrl = homeUrl;
-		this.isStandalone = isStandalone;
 		
 		this.icons = new Image[BROWSERSIM_ICONS.length];
 		for (int i = 0; i < BROWSERSIM_ICONS.length; i++) {
@@ -216,7 +215,7 @@ public class BrowserSim {
 			public void widgetDisposed(DisposeEvent e) {
 				
 				if (devicesListHolder != null) {
-					DevicesListStorage.saveUserDefinedDevicesList(devicesListHolder.getDevicesList(), currentLocation, isStandalone);
+					DevicesListStorage.saveUserDefinedDevicesList(devicesListHolder.getDevicesList(), currentLocation);
 				}
 			}
 		});
@@ -340,10 +339,10 @@ public class BrowserSim {
 				if (FireBugLiteLoader.isFireBugPopUp(event)) {
 					FireBugLiteLoader.processFireBugPopUp(event);
 				} else {
-					BrowserSim browserSim = new BrowserSim(display, homeUrl, isStandalone);
+					BrowserSim browserSim = new BrowserSim(display, homeUrl);
 					int parentDeviceIndex = devicesListHolder.getDevicesList().getSelectedDeviceIndex();
 	
-					DevicesList devicesList = DevicesListStorage.loadUserDefinedDevicesList(isStandalone);
+					DevicesList devicesList = DevicesListStorage.loadUserDefinedDevicesList();
 					if (devicesList == null) {
 						devicesList = DevicesListStorage.loadDefaultDevicesList();
 					}
@@ -522,9 +521,10 @@ public class BrowserSim {
 		addOpenInDefaultBrowserItem(menu);
 		addViewSourceItem(menu);
 	}
-	
+
 	private void addToolsMenuItems(Menu menu) {
 		addFireBugLiteItem(menu);
+		addScreenshotMenuItem(menu);
 	}
 	
 	private void addTurnMenuItems(Menu menu) {
@@ -535,7 +535,7 @@ public class BrowserSim {
 				controlHandler.rotate(true);
 			}
 		});
-		
+
 		MenuItem turnRight = new MenuItem(menu, SWT.PUSH);
 		turnRight.setText(Messages.BrowserSim_TURN_RIGHT);
 		turnRight.addSelectionListener(new SelectionAdapter() {
@@ -543,6 +543,15 @@ public class BrowserSim {
 				controlHandler.rotate(false);
 			}
 		});
+	}
+
+	private void addScreenshotMenuItem(Menu menu) {
+		MenuItem screenshot = new MenuItem(menu, SWT.CASCADE);
+		screenshot.setText(Messages.Screenshots_Screenshot);
+		
+		Menu subMenu = ScreenshotMenuCreator.createScreenshotsMenu(menu, display, skin.getShell(),
+				devicesListHolder.getDevicesList().getScreenshotsFolder());
+		screenshot.setMenu(subMenu);
 	}
 
 	public void addOpenInDefaultBrowserItem(Menu menu) {

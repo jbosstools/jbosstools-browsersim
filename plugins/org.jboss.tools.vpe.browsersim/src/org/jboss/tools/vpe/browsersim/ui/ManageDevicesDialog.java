@@ -23,13 +23,17 @@ import org.eclipse.swt.layout.RowLayout;
 import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Dialog;
+import org.eclipse.swt.widgets.DirectoryDialog;
 import org.eclipse.swt.widgets.Display;
+import org.eclipse.swt.widgets.Event;
 import org.eclipse.swt.widgets.Group;
 import org.eclipse.swt.widgets.Label;
+import org.eclipse.swt.widgets.Listener;
 import org.eclipse.swt.widgets.Shell;
 import org.eclipse.swt.widgets.Table;
 import org.eclipse.swt.widgets.TableColumn;
 import org.eclipse.swt.widgets.TableItem;
+import org.eclipse.swt.widgets.Text;
 import org.jboss.tools.vpe.browsersim.model.Device;
 import org.jboss.tools.vpe.browsersim.model.DevicesList;
 import org.jboss.tools.vpe.browsersim.model.DevicesListStorage;
@@ -240,6 +244,32 @@ public class ManageDevicesDialog extends Dialog {
 		alwaysTruncateRadio.addSelectionListener(truncateSelectionListener);
 		neverTruncateRadio.addSelectionListener(truncateSelectionListener);
 		
+		Group screnshotGroup = new Group(shell, SWT.NONE);
+		screnshotGroup.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, true, false, 1, 1));
+		screnshotGroup.setText(Messages.ManageDevicesDialog_SCREENSHOTS);
+		screnshotGroup.setLayout(new GridLayout(3, false));
+		
+		Label screenshotsLabel = new Label(screnshotGroup, SWT.NONE);
+		screenshotsLabel.setText(Messages.ManageDevicesDialog_LOCATION);		
+		final Text screenshotsPath = new Text(screnshotGroup, SWT.BORDER);
+		screenshotsPath.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, true, true));
+		screenshotsPath.setText(oldDevicesList.getScreenshotsFolder());
+		
+		Button selectFolder = new Button(screnshotGroup, SWT.PUSH);
+		selectFolder.setText(Messages.ManageDevicesDialog_BROWSE);
+		selectFolder.addListener(SWT.Selection, new Listener() {
+			@Override
+			public void handleEvent(Event event) {
+				DirectoryDialog dd = new DirectoryDialog(shell);
+				dd.setText(Messages.ManageDevicesDialog_SELECT_FOLDER);
+				dd.setFilterPath(screenshotsPath.getText());
+				
+				String selectedFolder = dd.open(); 
+				if(selectedFolder != null) {
+					screenshotsPath.setText(selectedFolder);
+				}
+			}
+		});
 		
 		Composite compositeOkCancel = new Composite(shell, SWT.NONE);
 		compositeOkCancel.setLayout(new GridLayout(2, true));
@@ -256,6 +286,7 @@ public class ManageDevicesDialog extends Dialog {
 				selectedDeviceIndex = defaultDevicesList.getSelectedDeviceIndex();
 				useSkins = defaultDevicesList.getUseSkins();
 				truncateWindow = defaultDevicesList.getTruncateWindow();
+				screenshotsPath.setText(defaultDevicesList.getScreenshotsFolder());
 				updateDevices();
 			}
 		});
@@ -267,7 +298,7 @@ public class ManageDevicesDialog extends Dialog {
 		buttonOk.addSelectionListener(new SelectionAdapter() {
 			public void widgetSelected(SelectionEvent e) {
 				resultDevicesList = new DevicesList(devices, selectedDeviceIndex, useSkins, truncateWindow,
-						oldDevicesList.getLocation());
+						oldDevicesList.getLocation(), screenshotsPath.getText());
 				shell.close();
 			}
 		});
