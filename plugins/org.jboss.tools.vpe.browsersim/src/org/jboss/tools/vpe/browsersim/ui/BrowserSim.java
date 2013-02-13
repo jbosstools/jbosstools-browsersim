@@ -21,6 +21,7 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Observable;
 import java.util.Observer;
+import java.util.UUID;
 
 import javax.xml.bind.DatatypeConverter;
 
@@ -50,6 +51,7 @@ import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.graphics.Point;
 import org.eclipse.swt.graphics.Rectangle;
+import org.eclipse.swt.layout.FillLayout;
 import org.eclipse.swt.program.Program;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Event;
@@ -454,7 +456,7 @@ public class BrowserSim {
 				addDevicesMenuItems(contextMenu);
 				addUseSkinsItem(contextMenu);
 				addPreferencesItem(contextMenu);
-					
+				
 				new MenuItem(contextMenu, SWT.BAR);
 				addTurnMenuItems(contextMenu);
 
@@ -524,6 +526,7 @@ public class BrowserSim {
 
 	private void addToolsMenuItems(Menu menu) {
 		addFireBugLiteItem(menu);
+		addWeinreItem(menu);
 		addScreenshotMenuItem(menu);
 	}
 	
@@ -597,6 +600,40 @@ public class BrowserSim {
 						System.out.println(base64Source);
 					}
 				}
+			}
+		});
+	}
+	
+	public void addWeinreItem(Menu menu) {
+		MenuItem weinre = new MenuItem(menu, SWT.PUSH);
+		weinre.setText(Messages.BrowserSim_WEINRE);
+		weinre.addSelectionListener(new SelectionAdapter() {
+			public void widgetSelected(SelectionEvent e) {
+				String url = (String) skin.getBrowser().evaluate("if(window.WeinreServerURL && window.WeinreServerId) {return window.WeinreServerURL + 'client/#' + window.WeinreServerId} else {return null}");
+				if (url == null) {
+					String id = UUID.randomUUID().toString();
+					skin.getBrowser().execute("var head = document.head;"
+							+	"var script = document.createElement('script');"
+							+	"head.appendChild(script);" 
+							+	"script.src='" + devicesListHolder.getDevicesList().getWeinreScriptUrl() + "#" + id + "'");
+					
+					url = devicesListHolder.getDevicesList().getWeinreClientUrl() + "#" + id;
+				}
+				
+				Display display = skin.getBrowser().getDisplay();
+				Shell shell = new Shell(display);
+				shell.setLayout(new FillLayout());
+				shell.setText("Weinre Inspector");
+				final Browser browser;
+				try {
+					browser = new Browser(shell, SWT.WEBKIT);
+				} catch (SWTError e2) {
+					System.out.println("Could not instantiate Browser: " + e2.getMessage());
+					display.dispose();
+					return;
+				}
+				shell.open();
+				browser.setUrl(url);
 			}
 		});
 	}
@@ -959,7 +996,6 @@ public class BrowserSim {
 		}
 		return new Shell();
 	}
-
 	
 	private void addMacOsMenuApplicationHandler(CocoaUIEnhancer enhancer) {
 		
