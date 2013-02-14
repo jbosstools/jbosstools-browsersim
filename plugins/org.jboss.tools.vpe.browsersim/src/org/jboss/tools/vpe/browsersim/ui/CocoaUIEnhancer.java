@@ -47,6 +47,10 @@ public class CocoaUIEnhancer {
 
     static Callback proc3Args;
 
+    private Listener quitListener;
+    private Runnable aboutAction;
+    private Runnable preferencesAction;
+    
     final private String appName;
 
     /**
@@ -81,8 +85,7 @@ public class CocoaUIEnhancer {
      * @param preferencesAction
      *            The action to run when the Preferences menu is invoked.
      */
-    public void hookApplicationMenu( Display display, Listener quitListener, final Runnable aboutAction,
-                                     final Runnable preferencesAction ) {
+    public void hookApplicationMenu( Display display) {
         // This is our callbackObject whose 'actionProc' method will be called when the About or
         // Preferences menuItem is invoked.
         //
@@ -98,9 +101,13 @@ public class CocoaUIEnhancer {
         	/** 64-bit version of the callback*/
             long actionProc(long id, long sel, long arg0) {
                 if ( sel == sel_aboutMenuItemSelected_ ) {
-                    aboutAction.run();
+                    if (aboutAction != null) {
+                    	aboutAction.run();
+                    }
                 } else if ( sel == sel_preferencesMenuItemSelected_ ) {
-                    preferencesAction.run();
+                    if (preferencesAction != null) {
+                    	preferencesAction.run();
+                    }
                 } else {
                     // Unknown selection!
                 }
@@ -305,4 +312,16 @@ public class CocoaUIEnhancer {
             throw new IllegalStateException( e );
         }
     }
+
+	public void setQuitListener(Listener quitListener) {
+		this.quitListener = quitListener;
+	}
+
+	public void setAboutAction(Runnable aboutAction) {
+		this.aboutAction = aboutAction;
+	}
+
+	public void setPreferencesAction(Runnable preferencesAction) {
+		this.preferencesAction = preferencesAction;
+	}
 }

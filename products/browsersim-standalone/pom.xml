@@ -108,7 +108,7 @@
 								
 								<!-- Package cross platform SWT Jar -->
 								<taskdef name="swtjar" classname="org.swtjar.ant.SWTJarTask" classpath="ant/swtjar.jar"/>
-								<swtjar jarfile="target/application/browsersim.jar" targetmainclass="org.jboss.tools.vpe.browsersim.ui.BrowserSim" swtversion="${org.eclipse.swt.version}">
+								<swtjar jarfile="target/application/browsersim.jar" targetmainclass="org.jboss.tools.vpe.browsersim.BrowserSimRunner" swtversion="${org.eclipse.swt.version}">
 									<!--fileset dir="build/classes" includes="**/*" /-->
 									<fileset dir="target/application/temp/swt" includes="*.jar" />
 									<zipfileset excludes="META-INF/*.MF" src="${org.jboss.tools.vpe.browsersim.browser.file}"/>
