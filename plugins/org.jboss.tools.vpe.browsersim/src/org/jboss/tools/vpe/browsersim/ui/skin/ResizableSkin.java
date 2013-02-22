@@ -24,6 +24,8 @@ import org.eclipse.swt.widgets.Listener;
 import org.eclipse.swt.widgets.Shell;
 import org.eclipse.swt.widgets.Text;
 import org.jboss.tools.vpe.browsersim.ui.ControlHandler;
+import org.jboss.tools.vpe.browsersim.util.BrowserSimUtil;
+import org.jboss.tools.vpe.browsersim.util.ImageList;
 
 public abstract class ResizableSkin implements BrowserSimSkin {
 	protected DeviceComposite deviceComposite;
@@ -119,6 +121,7 @@ public abstract class ResizableSkin implements BrowserSimSkin {
 				Image rotateImage = imageList.getImage("cursors/rotate.gif"); //$NON-NLS-1$
 				if (deviceComposite.isDeviceCorner(displayPoint) && deviceComposite.isDeviceBody(contol)) {
 					deviceComposite.setCursor(new Cursor(Display.getCurrent(), rotateImage.getImageData(), 0, 0));
+					BrowserSimUtil.addDisposeListener(deviceComposite, deviceComposite.getCursor());
 				} else {
 					deviceComposite.setCursor(null);					
 				}

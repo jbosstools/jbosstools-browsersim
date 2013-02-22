@@ -10,21 +10,11 @@
  ******************************************************************************/
 package org.jboss.tools.vpe.browsersim.ui;
 
-import java.io.File;
-import java.net.MalformedURLException;
-import java.net.URI;
-import java.net.URISyntaxException;
-import java.net.URL;
-import java.text.MessageFormat;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Observable;
 import java.util.Observer;
-import java.util.UUID;
 
-import javax.xml.bind.DatatypeConverter;
-
-import org.eclipse.swt.SWT;
 import org.eclipse.swt.SWTError;
 import org.eclipse.swt.browser.Browser;
 import org.eclipse.swt.browser.BrowserFunction;
@@ -43,23 +33,13 @@ import org.eclipse.swt.events.ControlAdapter;
 import org.eclipse.swt.events.ControlEvent;
 import org.eclipse.swt.events.DisposeEvent;
 import org.eclipse.swt.events.DisposeListener;
-import org.eclipse.swt.events.MenuAdapter;
-import org.eclipse.swt.events.MenuEvent;
-import org.eclipse.swt.events.SelectionAdapter;
-import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.events.ShellEvent;
 import org.eclipse.swt.events.ShellListener;
 import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.graphics.Point;
 import org.eclipse.swt.graphics.Rectangle;
-import org.eclipse.swt.layout.FillLayout;
-import org.eclipse.swt.program.Program;
 import org.eclipse.swt.widgets.Display;
-import org.eclipse.swt.widgets.Event;
-import org.eclipse.swt.widgets.Listener;
 import org.eclipse.swt.widgets.Menu;
-import org.eclipse.swt.widgets.MenuItem;
-import org.eclipse.swt.widgets.Monitor;
 import org.eclipse.swt.widgets.Shell;
 import org.jboss.tools.vpe.browsersim.browser.BrowserSimBrowser;
 import org.jboss.tools.vpe.browsersim.browser.PlatformUtil;
@@ -69,99 +49,65 @@ import org.jboss.tools.vpe.browsersim.model.DeviceOrientation;
 import org.jboss.tools.vpe.browsersim.model.DevicesList;
 import org.jboss.tools.vpe.browsersim.model.DevicesListHolder;
 import org.jboss.tools.vpe.browsersim.model.DevicesListStorage;
-import org.jboss.tools.vpe.browsersim.model.SkinMap;
 import org.jboss.tools.vpe.browsersim.ui.debug.firebug.FireBugLiteLoader;
+import org.jboss.tools.vpe.browsersim.ui.menu.BrowserSimMenuCreator;
 import org.jboss.tools.vpe.browsersim.ui.skin.BrowserSimSkin;
 import org.jboss.tools.vpe.browsersim.ui.skin.ResizableSkinSizeAdvisor;
-import org.jboss.tools.vpe.browsersim.util.ManifestUtil;
-import org.jboss.tools.vpe.browsersim.util.ResourcesUtil;
+import org.jboss.tools.vpe.browsersim.ui.skin.ResizableSkinSizeAdvisorImpl;
+import org.jboss.tools.vpe.browsersim.util.BrowserSimUtil;
+import org.jboss.tools.vpe.browsersim.util.ImageList;
 
 /**
  * @author Yahor Radtsevich (yradtsevich)
+ * @author Konstantin Marmalyukov (kmarmaliykov)
  */
 public class BrowserSim {
 	public static final String BROWSERSIM_PLUGIN_ID = "org.jboss.tools.vpe.browsersim"; //$NON-NLS-1$
 	private static final String[] BROWSERSIM_ICONS = {"icons/browsersim_16px.png", "icons/browsersim_32px.png", "icons/browsersim_64px.png", "icons/browsersim_128px.png", "icons/browsersim_256px.png", }; //$NON-NLS-1$//$NON-NLS-2$//$NON-NLS-3$//$NON-NLS-4$//$NON-NLS-5$
-	private static int BROWSERSIM_ICON_32PX_INDEX = 2;
-	private static final String BROWSERSIM_CLASS_NAME = "org.jboss.tools.vpe.browsersim.ui.BrowserSim"; //$NON-NLS-1$
-	/** @see org.jboss.tools.vpe.browsersim.eclipse.callbacks.OpenFileCallback */
-	private static final String OPEN_FILE_COMMAND = BROWSERSIM_CLASS_NAME + ".command.openFile:"; //$NON-NLS-1$
-	/** @see org.jboss.tools.vpe.browsersim.eclipse.callbacks.ViewSourceCallback */
-	private static final String VIEW_SOURCE_COMMAND = BROWSERSIM_CLASS_NAME + ".command.viewSource:"; //$NON-NLS-1$
 
-	private static CocoaUIEnhancer cocoaUIEnhancer;
 	public static boolean isStandalone;
 	private static List<BrowserSim> instances;
 
-	private static Display display;
 	private String homeUrl;
 	private DevicesListHolder devicesListHolder;
 	private DeviceOrientation deviceOrientation;
+	private ResizableSkinSizeAdvisor resizableSkinSizeAdvisor;
 	private BrowserSimSkin skin;
 	private ControlHandler controlHandler;
+	private ImageList imageList;
 	private Image[] icons;
-	private ResizableSkinSizeAdvisor sizeAdvisor;
 	private Point currentLocation;
 	private ProgressListener progressListener;
 
 	static {
-		// CocoaUIEnhancer handles connection between the About, Preferences and Quit menus in MAC OS X
-		if (cocoaUIEnhancer == null && PlatformUtil.OS_MACOSX.equals(PlatformUtil.getOs())) {
-			cocoaUIEnhancer = new CocoaUIEnhancer(Messages.BrowserSim_BROWSER_SIM);
-			cocoaUIEnhancer.initializeMacOSMenuBar();
-		}
-		
-		display = Display.getDefault();
 		instances = new ArrayList<BrowserSim>();
 	}
 
 	public BrowserSim(String homeUrl) {
 		this.homeUrl = homeUrl;
-		this.icons = new Image[BROWSERSIM_ICONS.length];
-		for (int i = 0; i < BROWSERSIM_ICONS.length; i++) {
-			String iconLocation = BROWSERSIM_ICONS[i];
-			icons[i] = new Image(display, ResourcesUtil.getResourceAsStream(iconLocation));
-		}
 	}
 
-	public void dispose() {
-		for (Image icon : icons) {
-			icon.dispose();
-		}
-		icons = null;
-	}
-
-	public void open(String URL) {
+	public void open() {
 		DevicesList devicesList = DevicesListStorage.loadUserDefinedDevicesList();
 		if (devicesList == null) {
 			devicesList = DevicesListStorage.loadDefaultDevicesList();
 		}
 
-		init(devicesList, URL);
+		open(devicesList, null);
 	}
 
-	private void init(DevicesList devicesList, String URL) {
+	public void open(DevicesList devicesList, String url) {
+		if (url == null) {
+			url = homeUrl;
+		}
 		Device defaultDevice = devicesList.getDevices().get(devicesList.getSelectedDeviceIndex());
 
 		initDevicesListHolder();
 		devicesListHolder.setDevicesList(devicesList);
 
-		initSkin(getSkinClass(defaultDevice, devicesList.getUseSkins()), devicesList.getLocation());
-
+		initSkin(BrowserSimUtil.getSkinClass(defaultDevice, devicesList.getUseSkins()), devicesList.getLocation());
 		devicesListHolder.notifyObservers();
-		controlHandler.goToAddress(URL);
-
-		// set event handlers for Mac OS X Menu-bar
-		if (cocoaUIEnhancer != null) {
-			cocoaUIEnhancer.hookApplicationMenu(display);
-		}
-		
-		display.addListener(SWT.Dispose, new Listener() {
-			@Override
-			public void handleEvent(Event event) {
-				dispose();
-			}
-		});
+		controlHandler.goToAddress(url);
 		
 		skin.getShell().open();
 	}
@@ -178,6 +124,10 @@ public class BrowserSim {
 		}
 
 		skin.setBrowserFactory(new WebKitBrowserFactory());
+		
+		BrowserSimMenuCreator.initCocoaUIEnhancer();
+		Display display = Display.getDefault();
+		
 		try {
 			skin.createControls(display, location);
 			currentLocation = location;
@@ -187,8 +137,9 @@ public class BrowserSim {
 			display.dispose();
 			return;
 		}
-
+		
 		final Shell shell = skin.getShell();
+		resizableSkinSizeAdvisor = new ResizableSkinSizeAdvisorImpl(devicesListHolder.getDevicesList(), shell);
 		shell.addControlListener(new ControlAdapter() {
 			@Override
 			public void controlMoved(ControlEvent e) {
@@ -205,6 +156,8 @@ public class BrowserSim {
 			}
 		});
 
+		final BrowserSimMenuCreator menuCreator = new BrowserSimMenuCreator(skin, devicesListHolder, controlHandler, homeUrl);
+		
 		shell.addShellListener(new ShellListener() {
 			@Override
 			public void shellIconified(ShellEvent e) {
@@ -225,19 +178,19 @@ public class BrowserSim {
 			@Override
 			public void shellActivated(ShellEvent e) {
 				//adding menu on activation to make it working properly on every sync window
-				addMenuBar();
+				menuCreator.addMenuBar();
 			}
 		});
-		addMenuBar();
+		menuCreator.addMenuBar();
 		setShellAttibutes();
 		
 		final BrowserSimBrowser browser = skin.getBrowser();
 		controlHandler = new ControlHandlerImpl(browser);
 		skin.setControlHandler(controlHandler);
-
+		
 		Menu contextMenu = new Menu(shell);
 		skin.setContextMenu(contextMenu);
-		createMenuItemsForContextMenu(contextMenu);
+		menuCreator.createMenuItemsForContextMenu(contextMenu);
 
 		progressListener = new ProgressListener() {
 			public void changed(ProgressEvent event) {
@@ -357,7 +310,7 @@ public class BrowserSim {
 					public Object function(Object[] arguments) {
 						double pageYOffset = (Double) arguments[0];
 						if (pageYOffset > 0.0) {
-							display.asyncExec(new Runnable() {
+							skin.getShell().getDisplay().asyncExec(new Runnable() {
 								public void run() {
 									if (skin != null && skin.getShell() != null && !skin.getShell().isDisposed()) {
 										skin.setAddressBarVisible(false);
@@ -392,7 +345,7 @@ public class BrowserSim {
 		browser.addLocationListener(new LocationAdapter() {
 			@Override
 			public void changed(LocationEvent event) {
-				if (skin.getBrowser().equals(display.getFocusControl()) && event.top) {
+				if (skin.getBrowser().equals(getDisplay().getFocusControl()) && event.top) {
 					for (BrowserSim bs : instances) {
 						if (bs.skin != skin) {
 							bs.skin.getBrowser().setUrl(event.location);
@@ -411,24 +364,19 @@ public class BrowserSim {
 
 		instances.add(BrowserSim.this);
 	}
-
-	private void addMenuBar() {
-		Menu appMenuBar = skin.getMenuBar();
-		if (appMenuBar != null) {
-			// delete all existing items, if any (necessary for systems like MacOS
-			// that have system (non-shell) menu bar), to do not create duplicate items while changing skins
-			for (MenuItem item : appMenuBar.getItems()) {
-				item.dispose();
-			}
-			
-			createMenusForMenuBar(appMenuBar);
+	
+	private void initImages() {
+		imageList = new ImageList(skin.getShell());
+		this.icons = new Image[BROWSERSIM_ICONS.length];
+		for (int i = 0; i < BROWSERSIM_ICONS.length; i++) {
+			icons[i] = imageList.getImage(BROWSERSIM_ICONS[i]);
 		}
-		addMacOsMenuApplicationHandler();
 	}
 	
 	private void setShellAttibutes() {
 		Shell shell = skin.getShell();
 		if (shell != null) {
+			initImages();
 			shell.setImages(icons);
 			shell.setText(Messages.BrowserSim_BROWSER_SIM);
 		}
@@ -452,337 +400,9 @@ public class BrowserSim {
 		});
 	}
 
-	private void createMenuItemsForContextMenu(Menu contextMenu) {
-		contextMenu.addMenuListener(new MenuAdapter() {
-			public void menuShown(MenuEvent e) {
-				Menu contextMenu = (Menu) e.widget;
-				for (MenuItem item : contextMenu.getItems()) {
-					item.dispose();
-				}
-
-				addDevicesMenuItems(contextMenu);
-				addUseSkinsItem(contextMenu);
-				addPreferencesItem(contextMenu);
-
-				new MenuItem(contextMenu, SWT.BAR);
-				addTurnMenuItems(contextMenu);
-
-				new MenuItem(contextMenu, SWT.BAR);
-				addToolsMenuItems(contextMenu);
-
-				new MenuItem(contextMenu, SWT.BAR);
-				addFileMenuItems(contextMenu);
-
-				new MenuItem(contextMenu, SWT.BAR);
-				addAboutItem(contextMenu);
-
-				new MenuItem(contextMenu, SWT.BAR);
-				addExitItem(contextMenu);
-			}
-		});
-	}
-
-	private void createMenusForMenuBar(Menu appMenuBar) {
-		Menu file = createDropDownMenu(appMenuBar, Messages.BrowserSim_FILE);
-		addFileMenuItems(file);
-		
-		// If Platform is Mac OS X, application will have no duplicated menu items (Exit/Quit BrowserSim)
-		if (!PlatformUtil.OS_MACOSX.equals(PlatformUtil.getOs())) {
-			addExitItem(file);
-		}
-
-		Menu devicesMenu = createDropDownMenu(appMenuBar, Messages.BrowserSim_DEVICES);
-		devicesMenu.addMenuListener(new MenuAdapter() {
-			public void menuShown(MenuEvent e) {
-				Menu devicesMenu = (Menu)e.widget;
-				for (MenuItem item : devicesMenu.getItems()) {
-					item.dispose();
-				}
-
-				addDevicesMenuItems(devicesMenu);
-				addUseSkinsItem(devicesMenu);
-
-				// If Platform is Mac OS X, application will have no duplicated menu items (Preferences)
-				if (!PlatformUtil.OS_MACOSX.equals(PlatformUtil.getOs())) {
-					addPreferencesItem(devicesMenu);
-				}
-
-				new MenuItem(devicesMenu, SWT.BAR);
-				addTurnMenuItems(devicesMenu);
-			}
-		});
-
-		Menu toolsMenu = createDropDownMenu(appMenuBar, Messages.BrowserSim_TOOLS);
-		addToolsMenuItems(toolsMenu);
-
-		// If Platform is Mac OS X, application will have no duplicated menu items (About)
-		if (!PlatformUtil.OS_MACOSX.equals(PlatformUtil.getOs())) {
-			Menu help = createDropDownMenu(appMenuBar, Messages.BrowserSim_HELP);
-			addAboutItem(help);
-		}
-	}
-
-	private void addDevicesMenuItems(final Menu devicesMenu) {
-		addDevicesListForMenu(devicesListHolder.getDevicesList(), devicesMenu);
-	}
-
-	private void addFileMenuItems(Menu menu) {
-		addOpenInDefaultBrowserItem(menu);
-		addViewSourceItem(menu);
-	}
-
-	private void addToolsMenuItems(Menu menu) {
-		addFireBugLiteItem(menu);
-		addWeinreItem(menu);
-		addScreenshotMenuItem(menu);
-		addSyncronizedWindowItem(menu);
-	}
-
-	private void addTurnMenuItems(Menu menu) {
-		MenuItem turnLeft = new MenuItem(menu, SWT.PUSH);
-		turnLeft.setText(Messages.BrowserSim_TURN_LEFT);
-		turnLeft.addSelectionListener(new SelectionAdapter() {
-			public void widgetSelected(SelectionEvent e) {
-				controlHandler.rotate(true);
-			}
-		});
-
-		MenuItem turnRight = new MenuItem(menu, SWT.PUSH);
-		turnRight.setText(Messages.BrowserSim_TURN_RIGHT);
-		turnRight.addSelectionListener(new SelectionAdapter() {
-			public void widgetSelected(SelectionEvent e) {
-				controlHandler.rotate(false);
-			}
-		});
-	}
-
-	private void addScreenshotMenuItem(Menu menu) {
-		MenuItem screenshot = new MenuItem(menu, SWT.CASCADE);
-		screenshot.setText(Messages.Screenshots_Screenshot);
-
-		Menu subMenu = ScreenshotMenuCreator.createScreenshotsMenu(menu, display, skin.getShell(),
-				devicesListHolder.getDevicesList().getScreenshotsFolder());
-		screenshot.setMenu(subMenu);
-	}
-
-	private void addOpenInDefaultBrowserItem(Menu menu) {
-		MenuItem openInDefaultBrowser = new MenuItem(menu, SWT.PUSH);
-		openInDefaultBrowser.setText(Messages.BrowserSim_OPEN_IN_DEFAULT_BROWSER);
-		openInDefaultBrowser.addSelectionListener(new SelectionAdapter() {
-			public void widgetSelected(SelectionEvent e) {
-				URL url;
-				try {
-					url = new URL(skin.getBrowser().getUrl());// validate URL (to do not open 'about:blank' and similar)
-					Program.launch(url.toString());
-				} catch (MalformedURLException e1) {
-					e1.printStackTrace();
-					ExceptionNotifier.showErrorMessage(skin.getShell(), Messages.BrowserSim_COULD_NOT_OPEN_DEFAULT_BROWSER + e1.getMessage());
-				}
-			}
-		});
-	}
-
-	private void addViewSourceItem(Menu menu) {
-		MenuItem openInDefaultBrowser = new MenuItem(menu, SWT.PUSH);
-		openInDefaultBrowser.setText(Messages.BrowserSim_VIEW_PAGE_SOURCE);
-		openInDefaultBrowser.addSelectionListener(new SelectionAdapter() {
-			public void widgetSelected(SelectionEvent e) {
-				if (isStandalone) {
-					BrowserSimSourceViewer sourceViewer = new BrowserSimSourceViewer();
-					sourceViewer.setText(skin.getBrowser().getText());
-					sourceViewer.open();
-				} else {
-					if (skin.getBrowser().getUrl().startsWith("file:")) { //$NON-NLS-1$
-						URI uri = null;
-						try {
-							uri = new URI(skin.getBrowser().getUrl());
-							File sourceFile = new File(uri);
-							System.out.println(OPEN_FILE_COMMAND + sourceFile.getAbsolutePath()); // send command to Eclipse
-						} catch (URISyntaxException e1) {
-							e1.printStackTrace();
-						}
-					} else {
-						System.out.println(VIEW_SOURCE_COMMAND + skin.getBrowser().getUrl()); // send command to Eclipse
-						String source = skin.getBrowser().getText();
-						String base64Source = DatatypeConverter.printBase64Binary(source.getBytes());
-						System.out.println(base64Source);
-					}
-				}
-			}
-		});
-	}
-
-	private void addWeinreItem(Menu menu) {
-		MenuItem weinre = new MenuItem(menu, SWT.PUSH);
-		weinre.setText(Messages.BrowserSim_WEINRE);
-		weinre.addSelectionListener(new SelectionAdapter() {
-			public void widgetSelected(SelectionEvent e) {
-				String url = (String) skin.getBrowser().evaluate("if(window.WeinreServerURL && window.WeinreServerId) {return window.WeinreServerURL + 'client/#' + window.WeinreServerId} else {return null}");
-				if (url == null) {
-					String id = UUID.randomUUID().toString();
-					skin.getBrowser().execute("var head = document.head;"
-									+		"var script = document.createElement('script');"
-									+		"head.appendChild(script);"
-									+		"script.src='" + devicesListHolder.getDevicesList().getWeinreScriptUrl() + "#" + id + "'");
-
-					url = devicesListHolder.getDevicesList().getWeinreClientUrl() + "#" + id;
-				}
-
-				Display display = skin.getBrowser().getDisplay();
-				Shell shell = new Shell(display);
-				shell.setLayout(new FillLayout());
-				shell.setText("Weinre Inspector");
-				final Browser browser;
-				try {
-					browser = new Browser(shell, SWT.WEBKIT);
-				} catch (SWTError e2) {
-					System.out.println("Could not instantiate Browser: " + e2.getMessage());
-					display.dispose();
-					return;
-				}
-				shell.open();
-				browser.setUrl(url);
-			}
-		});
-	}
-
-	private void addAboutItem(Menu menu) {
-		MenuItem about = new MenuItem(menu, SWT.PUSH);
-		about.setText(Messages.BrowserSim_ABOUT);
-		about.addSelectionListener(new SelectionAdapter() {
-			public void widgetSelected(SelectionEvent e) {
-				showAboutDialog(e.display.getActiveShell());
-			}
-
-		});
-	}
-
-	private void addPreferencesItem(Menu menu) {
-		MenuItem preferences = new MenuItem(menu, SWT.PUSH);
-		preferences.setText(Messages.BrowserSim_PREFERENCES);
-		preferences.addSelectionListener(new SelectionAdapter() {
-			public void widgetSelected(SelectionEvent e) {
-				DevicesList newDevicesList = new ManageDevicesDialog(e.display.getActiveShell(),
-						SWT.APPLICATION_MODAL | SWT.SHELL_TRIM,
-						devicesListHolder.getDevicesList()).open();
-				if (newDevicesList != null) {
-					devicesListHolder.setDevicesList(newDevicesList);
-					devicesListHolder.notifyObservers();
-				}
-
-			}
-		});
-	}
-
-	private void addFireBugLiteItem(Menu menu) {
-		MenuItem fireBugLite = new MenuItem(menu, SWT.PUSH);
-		fireBugLite.setText(Messages.BrowserSim_FIREBUG_LITE);
-		fireBugLite.addSelectionListener(new SelectionAdapter() {
-			public void widgetSelected(SelectionEvent e) {
-				FireBugLiteLoader.startFireBugOpening(skin.getBrowser());
-			}
-		});
-	}
-
-	private void addSyncronizedWindowItem(Menu menu) {
-		MenuItem syncWindow = new MenuItem(menu, SWT.CASCADE);
-		syncWindow.setText("Open Syncronized Window");
-		Menu subMenu = new Menu(menu);
-		syncWindow.setMenu(subMenu);
-		final DevicesList devicesList = devicesListHolder.getDevicesList();
-		for (final Device device : devicesList.getDevices()) {
-			MenuItem deviceMenuItem = new MenuItem(subMenu, SWT.RADIO);
-			deviceMenuItem.setText(device.getName());
-			deviceMenuItem.setData(device);
-
-			deviceMenuItem.addSelectionListener(new SelectionAdapter() {
-				public void widgetSelected(SelectionEvent e) {
-
-					DevicesList devicesList1 = DevicesListStorage.loadUserDefinedDevicesList();
-					if (devicesList1 == null) {
-						devicesList1 = DevicesListStorage.loadDefaultDevicesList();
-					}
-
-					MenuItem menuItem = (MenuItem) e.widget;
-					if (menuItem.getSelection()) {
-						int selectedDeviceIndex = devicesList.getDevices().indexOf(menuItem.getData());
-						if (selectedDeviceIndex < 0) {
-							selectedDeviceIndex = 0;
-						}
-						devicesList1.setSelectedDeviceIndex(selectedDeviceIndex);
-						devicesList1.setLocation(null);
-
-						BrowserSim browserSim1 = new BrowserSim(homeUrl);
-						browserSim1.init(devicesList1, skin.getBrowser().getUrl());
-					}
-				};
-			});
-		}
-	}
-
-	private void addUseSkinsItem(Menu menu) {
-		MenuItem useSkinsMenuItem = new MenuItem(menu, SWT.CHECK);
-		useSkinsMenuItem.setText(Messages.BrowserSim_USE_SKINS);
-		useSkinsMenuItem.setSelection(devicesListHolder.getDevicesList().getUseSkins());
-		useSkinsMenuItem.addSelectionListener(new SelectionAdapter() {
-			public void widgetSelected(SelectionEvent e) {
-				MenuItem menuItem = (MenuItem) e.widget;
-				DevicesList devicesList = devicesListHolder.getDevicesList();
-				devicesList.setUseSkins(menuItem.getSelection());
-				devicesList.notifyObservers();
-			}
-		});
-
-	}
-
-	private void addExitItem(Menu menu) {
-		MenuItem exit = new MenuItem(menu, SWT.PUSH);
-		exit.setText(Messages.BrowserSim_EXIT);
-		exit.addSelectionListener(new SelectionAdapter() {
-			public void widgetSelected(SelectionEvent e) {
-				skin.getShell().dispose();
-			};
-		});
-	}
-
-	private void addDevicesListForMenu(final DevicesList devicesList, Menu devicesMenu) {
-		List<Device> devices = devicesList.getDevices();
-		for (int i = 0; i < devices.size(); i++) {
-			Device device = devices.get(i);
-			MenuItem deviceMenuItem = new MenuItem(devicesMenu, SWT.RADIO);
-			deviceMenuItem.setText(device.getName());
-			deviceMenuItem.setData(device);
-			if (i == devicesList.getSelectedDeviceIndex()) {
-				deviceMenuItem.setSelection(true);
-			}
-
-			deviceMenuItem.addSelectionListener(new SelectionAdapter() {
-				public void widgetSelected(SelectionEvent e) {
-					MenuItem menuItem = (MenuItem) e.widget;
-					if (menuItem.getSelection()) {
-						int selectedDeviceIndex = devicesList.getDevices().indexOf(menuItem.getData());
-						if (selectedDeviceIndex < 0) {
-							selectedDeviceIndex = 0;
-						}
-						devicesList.setSelectedDeviceIndex(selectedDeviceIndex);
-						devicesList.notifyObservers();
-					}
-				};
-			});
-		}
-	}
-
-	private Menu createDropDownMenu(Menu menuBar, String name) {
-		MenuItem menuItem = new MenuItem(menuBar, SWT.CASCADE);
-		menuItem.setText(name);
-		Menu dropdown = new Menu(menuBar);
-		menuItem.setMenu(dropdown);
-		return dropdown;
-	}
-
 	private void setSelectedDevice(DevicesList devicesList) {
 		final Device device = devicesList.getDevices().get(devicesList.getSelectedDeviceIndex());
-		Class<? extends BrowserSimSkin> newSkinClass = getSkinClass(device, devicesList.getUseSkins());
+		Class<? extends BrowserSimSkin> newSkinClass = BrowserSimUtil.getSkinClass(device, devicesList.getUseSkins());
 		String oldSkinUrl = null;
 		if (newSkinClass != skin.getClass()) {
 			oldSkinUrl = skin.getBrowser().getUrl();
@@ -795,15 +415,15 @@ public class BrowserSim {
 		deviceOrientation = new DeviceOrientation(device.getWidth() < device.getHeight()
 								? DeviceOrientation.PORTRAIT
 								: DeviceOrientation.LANDSCAPE);
-		Rectangle clientArea = getMonitorClientArea();
-		Point size = getSizeInDesktopPixels(device);
-		skin.setOrientationAndSize(deviceOrientation.getOrientationAngle(), size, getSizeAdvisor());
-		fixShellLocation(clientArea);
+		Rectangle clientArea = BrowserSimUtil.getMonitorClientArea(skin.getShell().getMonitor());
+		Point size = BrowserSimUtil.getSizeInDesktopPixels(device);
+		skin.setOrientationAndSize(deviceOrientation.getOrientationAngle(), size, resizableSkinSizeAdvisor);
+		BrowserSimUtil.fixShellLocation(skin.getShell(), clientArea);
 		deviceOrientation.addObserver(new Observer() {
 			public void update(Observable o, Object arg) {
 				int orientationAngle = ((DeviceOrientation) o).getOrientationAngle();
 
-				Point size = getSizeInDesktopPixels(device);
+				Point size = BrowserSimUtil.getSizeInDesktopPixels(device);
 				int minSize = Math.min(size.x, size.y);
 				int maxSize = Math.max(size.x, size.y);
 				Point browserSize;
@@ -829,20 +449,21 @@ public class BrowserSim {
 		skin.getShell().open();
 	}
 
-	private static Class<? extends BrowserSimSkin> getSkinClass(Device device, boolean useSkins) {
-		return SkinMap.getInstance().getSkinClass(useSkins ? device.getSkinId() : null);
-	}
-
 	@SuppressWarnings("nls")
 	private void initOrientation(int orientation) {
 		skin.getBrowser().execute("window.onorientationchange = null;" + "window.orientation = " + orientation + ";");
 	}
 
+	private void rotateDevice(boolean counterclockwise) {
+		deviceOrientation.turnDevice(counterclockwise);
+		deviceOrientation.notifyObservers();
+	}
+	
 	@SuppressWarnings("nls")
 	private void fireOrientationChangeEvent(int orientation, Point browserSize) {
-		Rectangle clientArea = getMonitorClientArea();
-		skin.setOrientationAndSize(orientation, browserSize, getSizeAdvisor());
-		fixShellLocation(clientArea);
+		Rectangle clientArea = BrowserSimUtil.getMonitorClientArea(skin.getShell().getMonitor());
+		skin.setOrientationAndSize(orientation, browserSize, resizableSkinSizeAdvisor);
+		BrowserSimUtil.fixShellLocation(skin.getShell(), clientArea);
 		skin.getBrowser().execute("window.orientation = " + orientation + ";"
 				+ "(function(){"
 				+ 		"var event = document.createEvent('Event');"
@@ -855,67 +476,11 @@ public class BrowserSim {
 		);
 	}
 
-	private void fixShellLocation(Rectangle clientArea) {
-		Shell shell = skin.getShell();
-		Point shellLocation = shell.getLocation();
-		Point shellSize = shell.getSize();
-		int bottomOverlap = shellLocation.y + shellSize.y - (clientArea.y + clientArea.height);
-		if (bottomOverlap > 0) {
-			if (shellLocation.y > bottomOverlap) {
-				shellLocation.y -= bottomOverlap;
-			} else {
-				shellLocation.y = 0;
-			}
-		}
-
-		int rightOverlap = shellLocation.x + shellSize.x - (clientArea.x + clientArea.width);
-		if (rightOverlap > 0) {
-			if (shellLocation.x > rightOverlap) {
-				shellLocation.x -= rightOverlap;
-			} else {
-				shellLocation.x = 0;
-			}
-		}
-
-		shell.setLocation(shellLocation);
+	public Display getDisplay() {
+		return skin.getShell().getDisplay();
 	}
-
-	private Rectangle getMonitorClientArea() {
-		Monitor monitor = skin.getShell().getMonitor();
-		Rectangle clientArea = monitor.getClientArea();
-
-		/* on Linux returned monitor client area may be bigger
-		 * than the monitor bounds when multiple monitors are used.
-		 * The following code fixes this */
-		Rectangle bounds = monitor.getBounds();
-		clientArea.width = Math.min(clientArea.width, bounds.width);
-		clientArea.height = Math.min(clientArea.height, bounds.height);
-
-		return clientArea;
-	}
-
-	private void rotateDevice(boolean counterclockwise) {
-		deviceOrientation.turnDevice(counterclockwise);
-		deviceOrientation.notifyObservers();
-	}
-
-	/**
-	 * See JBIDE-11896	BrowserSim: pixel ratio problem.
-	 * 
-	 * On many mobile devices like iPhone 4 1 CSS pixel = 2 device pixels.
-	 */
-	private Point getSizeInDesktopPixels(Device device) {
-		double pixelRatio = device.getPixelRatio();
-		if (device.getPixelRatio() == 0.0) {
-			pixelRatio = 1.0;
-			new RuntimeException("Pixel Ratio is 0.0").printStackTrace();
-		}
-		int width = (int) Math.round(device.getWidth() / pixelRatio);
-		int height = (int) Math.round(device.getHeight() / pixelRatio);
-		return new Point(width, height);
-	}
-
-	class ControlHandlerImpl implements ControlHandler {
+	
+	public class ControlHandlerImpl implements ControlHandler {
 		private Browser browser;
 
 		public ControlHandlerImpl(Browser browser) {
@@ -953,7 +518,7 @@ public class BrowserSim {
 
 		@Override
 		public void rotate(boolean counterclockwise) {
-			BrowserSim.this.rotateDevice(counterclockwise);
+			rotateDevice(counterclockwise);
 		}
 
 		@Override
@@ -967,109 +532,5 @@ public class BrowserSim {
 			browser.refresh();
 			browser.setFocus();
 		}
-	}
-
-	private void showAboutDialog(Shell shell) {
-		String message;
-		String version = ManifestUtil.getManifestVersion();
-		if (version != null) {
-			message = MessageFormat.format(Messages.BrowserSim_ABOUT_MESSAGE, ManifestUtil.getManifestVersion());
-		} else {
-			message = MessageFormat.format(Messages.BrowserSim_ABOUT_MESSAGE, ""); //$NON-NLS-1$
-		}
-		new MessageBoxWithLinks(shell, message, icons[BROWSERSIM_ICON_32PX_INDEX], Messages.BrowserSim_ABOUT).open();
-	}
-
-	private ResizableSkinSizeAdvisor getSizeAdvisor() {
-		if (sizeAdvisor == null) {
-			sizeAdvisor = new ResizableSkinSizeAdvisor() {
-				@Override
-				public Point checkWindowSize(int orientation, Point prefferedSize, Point prefferedShellSize) {
-					DevicesList devicesList = devicesListHolder.getDevicesList();
-					Rectangle clientArea = getMonitorClientArea();
-
-					boolean truncateWindow = false;
-					if (devicesList.getTruncateWindow() == null) {
-						if (prefferedShellSize.x > clientArea.width || prefferedShellSize.y > clientArea.height) { 
-							String deviceName = devicesList.getDevices().get(devicesList.getSelectedDeviceIndex()).getName();
-							
-							SizeWarningDialog dialog = new SizeWarningDialog(skin.getShell(), new Point(clientArea.width, clientArea.height),
-									prefferedShellSize, deviceName,
-									orientation == DeviceOrientation.PORTRAIT || orientation == DeviceOrientation.PORTRAIT_INVERTED);
-							dialog.open();
-
-							truncateWindow = dialog.getTruncateWindow();
-							if (dialog.getRememberDecision()) {
-								devicesList.setTruncateWindow(truncateWindow);
-							}
-						}
-					} else {
-						truncateWindow = devicesList.getTruncateWindow();
-					}
-
-					Point size = new Point(prefferedShellSize.x, prefferedShellSize.y);
-					if (truncateWindow) {
-						size.x = Math.min(prefferedShellSize.x, clientArea.width);
-						size.y = Math.min(prefferedShellSize.y, clientArea.height);
-					}
-
-					return size;
-				}
-			};
-		}
-
-		return sizeAdvisor;
-	}
-
-	/**
-	 * @return skin shell instance or new shell if there are no skin shell. Never returns {@code null}
-	 */
-	private Shell getParentShell() {
-		if (display != null && display.getActiveShell() != null) {
-			return display.getActiveShell();
-		} else if (skin != null && skin.getShell() != null) {
-			return skin.getShell();
-		}
-		return new Shell();
-	}
-
-	private void addMacOsMenuApplicationHandler() {
-		if (cocoaUIEnhancer != null) {
-			cocoaUIEnhancer.setQuitListener(new Listener() {
-				@Override
-				public void handleEvent(Event event) {
-					// Quit Listener has no implementation, cause quit event is handled by controlHandler,
-					// but it must be in CocoaUIEnchancer released by EPL
-				}
-			});
-	
-			cocoaUIEnhancer.setAboutAction(new Runnable() {
-				@Override
-				public void run() {
-					Shell shell = getParentShell();
-	
-					showAboutDialog(shell);
-				}
-			});
-	
-			cocoaUIEnhancer.setPreferencesAction(new Runnable() {
-				@Override
-				public void run() {
-					Shell shell = getParentShell();
-	
-					DevicesList newDevicesList = new ManageDevicesDialog(shell, SWT.APPLICATION_MODAL | SWT.SHELL_TRIM,
-							devicesListHolder.getDevicesList()).open();
-					if (newDevicesList != null) {
-						devicesListHolder.setDevicesList(newDevicesList);
-						devicesListHolder.notifyObservers();
-					}
-	
-				}
-			});
-		}
-	}
-
-	public static Display getDisplay() {
-		return display;
 	}
 }

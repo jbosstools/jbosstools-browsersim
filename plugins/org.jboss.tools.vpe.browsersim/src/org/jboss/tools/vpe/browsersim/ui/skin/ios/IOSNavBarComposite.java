@@ -22,7 +22,7 @@ import org.eclipse.swt.widgets.Text;
 import org.jboss.tools.vpe.browsersim.ui.AdressBarText;
 import org.jboss.tools.vpe.browsersim.ui.skin.ImageButtonComposite;
 import org.jboss.tools.vpe.browsersim.ui.skin.ImageDescriptor;
-import org.jboss.tools.vpe.browsersim.ui.skin.ImageList;
+import org.jboss.tools.vpe.browsersim.util.ImageList;
 
 
 /**

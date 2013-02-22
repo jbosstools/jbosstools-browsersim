@@ -15,6 +15,7 @@ import org.eclipse.swt.graphics.Device;
 import org.eclipse.swt.graphics.Font;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Text;
+import org.jboss.tools.vpe.browsersim.util.BrowserSimUtil;
 
 public class AdressBarText extends Text {
 	private Font font;
@@ -23,6 +24,7 @@ public class AdressBarText extends Text {
 		super(parent, style);
 		font = createFont(this.getDisplay(), SWT.NORMAL);
 		setFont(font);
+		BrowserSimUtil.addDisposeListener(this, font);
 	}
 
 	public static Font createFont(Device device, int style) {
@@ -43,11 +45,5 @@ public class AdressBarText extends Text {
 	@Override
 	protected void checkSubclass() {
 		// Disable the check that prevents subclassing of SWT components
-	}
-
-	@Override
-	public void dispose() {
-		super.dispose();
-		font.dispose();
 	}
 }

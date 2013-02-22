@@ -15,6 +15,7 @@ import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Listener;
+import org.jboss.tools.vpe.browsersim.util.ImageList;
 
 public abstract class AbstractTimeComposite extends Composite {
 

@@ -14,7 +14,7 @@ import org.eclipse.swt.SWT;
 import org.eclipse.swt.widgets.Composite;
 import org.jboss.tools.vpe.browsersim.ui.skin.AbstractTimeComposite;
 import org.jboss.tools.vpe.browsersim.ui.skin.ImageDescriptor;
-import org.jboss.tools.vpe.browsersim.ui.skin.ImageList;
+import org.jboss.tools.vpe.browsersim.util.ImageList;
 
 /**
  * @author Yahor Radtsevich (yradtsevich)

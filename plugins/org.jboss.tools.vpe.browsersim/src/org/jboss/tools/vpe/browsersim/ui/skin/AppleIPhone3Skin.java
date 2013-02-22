@@ -32,6 +32,7 @@ import org.jboss.tools.vpe.browsersim.browser.BrowserSimBrowser;
 import org.jboss.tools.vpe.browsersim.browser.IBrowserSimBrowserFactory;
 import org.jboss.tools.vpe.browsersim.model.DeviceOrientation;
 import org.jboss.tools.vpe.browsersim.ui.ControlHandler;
+import org.jboss.tools.vpe.browsersim.util.ImageList;
 
 /**
  * @author Yahor Radtsevich (yradtsevich)

@@ -8,7 +8,7 @@
  * Contributor:
  *     Red Hat, Inc. - initial API and implementation
  ******************************************************************************/
-package org.jboss.tools.vpe.browsersim.ui;
+package org.jboss.tools.vpe.browsersim.ui.menu;
 
 import java.awt.Toolkit;
 import java.awt.datatransfer.DataFlavor;
@@ -41,6 +41,7 @@ import org.eclipse.swt.widgets.MenuItem;
 import org.eclipse.swt.widgets.Shell;
 import org.jboss.tools.vpe.browsersim.browser.PlatformUtil;
 import org.jboss.tools.vpe.browsersim.model.DevicesListStorage;
+import org.jboss.tools.vpe.browsersim.ui.Messages;
 
 /**
  * 

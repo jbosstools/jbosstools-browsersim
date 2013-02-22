@@ -48,9 +48,9 @@ public class BrowserSimRunner {
 		}
 		
 		BrowserSim browserSim = new BrowserSim(homeUrl);		
-		browserSim.open(homeUrl);
+		browserSim.open();
 
-		Display display = BrowserSim.getDisplay();
+		Display display = Display.getDefault();
 		while (!display.isDisposed() && display.getShells().length > 0) {
 			if (!display.readAndDispatch()) {
 				display.sleep();

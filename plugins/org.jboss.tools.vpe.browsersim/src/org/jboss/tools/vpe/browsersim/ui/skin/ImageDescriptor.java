@@ -15,6 +15,7 @@ import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.graphics.Rectangle;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.widgets.Composite;
+import org.jboss.tools.vpe.browsersim.util.ImageList;
 
 
 public class ImageDescriptor extends WidgetDescriptor {

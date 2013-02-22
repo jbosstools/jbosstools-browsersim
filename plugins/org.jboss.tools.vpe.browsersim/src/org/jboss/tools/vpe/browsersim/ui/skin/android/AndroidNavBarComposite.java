@@ -22,7 +22,7 @@ import org.eclipse.swt.widgets.Text;
 import org.jboss.tools.vpe.browsersim.ui.AdressBarText;
 import org.jboss.tools.vpe.browsersim.ui.skin.ImageButtonComposite;
 import org.jboss.tools.vpe.browsersim.ui.skin.ImageDescriptor;
-import org.jboss.tools.vpe.browsersim.ui.skin.ImageList;
+import org.jboss.tools.vpe.browsersim.util.ImageList;
 
 /**
  * @author Yahor Radtsevich (yradtsevich)
@@ -110,5 +110,10 @@ public class AndroidNavBarComposite extends Composite {
 
 	public ProgressBar getProgressBar() {
 		return progressBar;
+	}
+	
+	@Override
+	public void dispose() {
+		super.dispose();
 	}
 }

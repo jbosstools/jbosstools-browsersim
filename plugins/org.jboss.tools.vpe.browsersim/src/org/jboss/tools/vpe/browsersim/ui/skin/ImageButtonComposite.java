@@ -17,6 +17,7 @@ import org.eclipse.swt.graphics.Rectangle;
 import org.eclipse.swt.layout.FormData;
 import org.eclipse.swt.widgets.Composite;
 import org.jboss.tools.vpe.browsersim.ui.skin.ios.ButtonDescriptor;
+import org.jboss.tools.vpe.browsersim.util.ImageList;
 
 
 public class ImageButtonComposite extends Composite {

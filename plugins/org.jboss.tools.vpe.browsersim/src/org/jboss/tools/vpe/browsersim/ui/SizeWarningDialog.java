@@ -26,7 +26,7 @@ import org.eclipse.swt.widgets.Shell;
 /**
  * @author Yahor Radtsevich (yradtsevich)
  */
-class SizeWarningDialog extends CustomMessageBox {
+public class SizeWarningDialog extends CustomMessageBox {
 	private Point actualSize;
 	private Point requiredSize;
 	private String deviceName;

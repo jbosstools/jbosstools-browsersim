@@ -16,7 +16,8 @@ import org.eclipse.swt.graphics.Color;
 import org.eclipse.swt.graphics.Device;
 import org.eclipse.swt.graphics.Font;
 import org.eclipse.swt.widgets.Composite;
-import org.jboss.tools.vpe.browsersim.ui.skin.ImageList;
+import org.jboss.tools.vpe.browsersim.util.BrowserSimUtil;
+import org.jboss.tools.vpe.browsersim.util.ImageList;
 
 /**
  * @author Yahor Radtsevich (yradtsevich)
@@ -38,8 +39,10 @@ public class IOSPageTitleStyledText extends StyledText {
 		setLineSpacing(27);
 		font = createFont(this.getDisplay(), SWT.BOLD);
 		setFont(font);
+		BrowserSimUtil.addDisposeListener(this, font);		
 		foregroundColor = new Color(this.getDisplay(), 64, 64, 64);
 		setForeground(foregroundColor);
+		BrowserSimUtil.addDisposeListener(this, foregroundColor);
 	}
 	
 	static Font createFont(Device device, int style) {
