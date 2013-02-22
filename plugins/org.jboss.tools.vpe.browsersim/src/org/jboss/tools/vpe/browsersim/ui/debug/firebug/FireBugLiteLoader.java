@@ -15,8 +15,11 @@ import org.eclipse.swt.browser.Browser;
 import org.eclipse.swt.browser.CloseWindowListener;
 import org.eclipse.swt.browser.VisibilityWindowListener;
 import org.eclipse.swt.browser.WindowEvent;
+import org.eclipse.swt.events.ShellAdapter;
+import org.eclipse.swt.events.ShellEvent;
 import org.eclipse.swt.layout.FillLayout;
 import org.eclipse.swt.widgets.Shell;
+import org.jboss.tools.vpe.browsersim.browser.PlatformUtil;
 
 /**
  * @author "Yahor Radtsevich (yradtsevich)"
@@ -49,7 +52,7 @@ public class FireBugLiteLoader {
 	}
 	
 	public static void processFireBugPopUp(WindowEvent openWindowEvent) {
-		Browser parentBrowser = (Browser) openWindowEvent.widget;
+		final Browser parentBrowser = (Browser) openWindowEvent.widget;
 		parentBrowser.execute("window._fireBugLiteLoading = false;");
 		Shell shell = new Shell(parentBrowser.getDisplay());
 		shell.setLayout(new FillLayout());
@@ -76,6 +79,18 @@ public class FireBugLiteLoader {
 			}
 		});
 		
+		// yradtsevich: fix for JBIDE-13625 Browsersim closes unexpectively when closing Firebug Lite
+		if (PlatformUtil.OS_MACOSX.equals(PlatformUtil.getOs())) {
+			shell.addShellListener(new ShellAdapter() {
+				@Override
+				public void shellClosed(ShellEvent e) {
+					if (!parentBrowser.isDisposed()) {
+						parentBrowser.execute("window.Firebug.chrome.close();");
+					}
+				}
+			});
+		}
+
 		fireBugBrowser.addCloseWindowListener(new CloseWindowListener() {
 			public void close(WindowEvent event) {
 				Browser browser = (Browser)event.widget;
