@@ -37,7 +37,7 @@ import org.osgi.framework.Bundle;
  */
 @SuppressWarnings("restriction")
 public class BrowserSimLauncher {
-	public static final String BROWSERSIM_CLASS_NAME = "org.jboss.tools.vpe.browsersim.ui.BrowserSim"; //$NON-NLS-1$
+	public static final String BROWSERSIM_CLASS_NAME = "org.jboss.tools.vpe.browsersim.BrowserSimRunner"; //$NON-NLS-1$
 	private static final BrowserSimCallback[] BROWSERSIM_CALLBACKS = { new ViewSourceCallback(), new OpenFileCallback() };
 	private static final String[] REQUIRED_BUNDLES = {
 		"org.jboss.tools.vpe.browsersim",
