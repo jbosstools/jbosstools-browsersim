@@ -46,9 +46,10 @@ import org.jboss.tools.vpe.browsersim.browser.PlatformUtil;
 import org.jboss.tools.vpe.browsersim.browser.WebKitBrowserFactory;
 import org.jboss.tools.vpe.browsersim.model.Device;
 import org.jboss.tools.vpe.browsersim.model.DeviceOrientation;
-import org.jboss.tools.vpe.browsersim.model.DevicesList;
-import org.jboss.tools.vpe.browsersim.model.DevicesListHolder;
-import org.jboss.tools.vpe.browsersim.model.DevicesListStorage;
+import org.jboss.tools.vpe.browsersim.model.preferences.CommonPreferences;
+import org.jboss.tools.vpe.browsersim.model.preferences.CommonPreferencesStorage;
+import org.jboss.tools.vpe.browsersim.model.preferences.SpecificPreferences;
+import org.jboss.tools.vpe.browsersim.model.preferences.SpecificPreferencesStorage;
 import org.jboss.tools.vpe.browsersim.ui.debug.firebug.FireBugLiteLoader;
 import org.jboss.tools.vpe.browsersim.ui.menu.BrowserSimMenuCreator;
 import org.jboss.tools.vpe.browsersim.ui.skin.BrowserSimSkin;
@@ -69,7 +70,8 @@ public class BrowserSim {
 	private static List<BrowserSim> instances;
 
 	private String homeUrl;
-	private DevicesListHolder devicesListHolder;
+	private static CommonPreferences commonPreferences;
+	private SpecificPreferences specificPreferences;
 	private DeviceOrientation deviceOrientation;
 	private ResizableSkinSizeAdvisor resizableSkinSizeAdvisor;
 	private BrowserSimSkin skin;
@@ -78,35 +80,40 @@ public class BrowserSim {
 	private Image[] icons;
 	private Point currentLocation;
 	private ProgressListener progressListener;
+	private Observer commonPreferencesObserver;
 
 	static {
 		instances = new ArrayList<BrowserSim>();
+		commonPreferences = (CommonPreferences) CommonPreferencesStorage.INSTANCE.load();
+		if (commonPreferences == null) {
+			commonPreferences = (CommonPreferences) CommonPreferencesStorage.INSTANCE.loadDefault();
+		}
 	}
 
 	public BrowserSim(String homeUrl) {
 		this.homeUrl = homeUrl;
+		
 	}
 
 	public void open() {
-		DevicesList devicesList = DevicesListStorage.loadUserDefinedDevicesList();
-		if (devicesList == null) {
-			devicesList = DevicesListStorage.loadDefaultDevicesList();
+		SpecificPreferences sp = (SpecificPreferences) SpecificPreferencesStorage.INSTANCE.load();
+		if (sp == null) {
+			sp = (SpecificPreferences) SpecificPreferencesStorage.INSTANCE.loadDefault();
 		}
-
-		open(devicesList, null);
+		
+		open(sp, null);
 	}
 
-	public void open(DevicesList devicesList, String url) {
+	public void open(SpecificPreferences sp, String url) {
 		if (url == null) {
 			url = homeUrl;
 		}
-		Device defaultDevice = devicesList.getDevices().get(devicesList.getSelectedDeviceIndex());
-
-		initDevicesListHolder();
-		devicesListHolder.setDevicesList(devicesList);
-
-		initSkin(BrowserSimUtil.getSkinClass(defaultDevice, devicesList.getUseSkins()), devicesList.getLocation());
-		devicesListHolder.notifyObservers();
+		
+		specificPreferences = sp;
+		initObservers();
+		Device defaultDevice = getSelectedDevice(); 
+		initSkin(BrowserSimUtil.getSkinClass(defaultDevice, specificPreferences.getUseSkins()), specificPreferences.getLocation());
+		setSelectedDevice();
 		controlHandler.goToAddress(url);
 		
 		skin.getShell().open();
@@ -139,7 +146,7 @@ public class BrowserSim {
 		}
 		
 		final Shell shell = skin.getShell();
-		resizableSkinSizeAdvisor = new ResizableSkinSizeAdvisorImpl(devicesListHolder.getDevicesList(), shell);
+		resizableSkinSizeAdvisor = new ResizableSkinSizeAdvisorImpl(commonPreferences, specificPreferences, shell);
 		shell.addControlListener(new ControlAdapter() {
 			@Override
 			public void controlMoved(ControlEvent e) {
@@ -150,13 +157,17 @@ public class BrowserSim {
 		shell.addDisposeListener(new DisposeListener() {
 			public void widgetDisposed(DisposeEvent e) {
 				instances.remove(BrowserSim.this);
-				if (devicesListHolder != null) {
-					DevicesListStorage.saveUserDefinedDevicesList(devicesListHolder.getDevicesList(), currentLocation);
+				specificPreferences.setLocation(currentLocation);
+				SpecificPreferencesStorage.INSTANCE.save(specificPreferences);
+				if(instances.isEmpty()) {
+					CommonPreferencesStorage.INSTANCE.save(commonPreferences);
 				}
+				commonPreferences.deleteObserver(commonPreferencesObserver);
 			}
 		});
 
-		final BrowserSimMenuCreator menuCreator = new BrowserSimMenuCreator(skin, devicesListHolder, controlHandler, homeUrl);
+		final BrowserSimMenuCreator menuCreator = new BrowserSimMenuCreator(skin, commonPreferences,
+				specificPreferences, controlHandler, homeUrl);
 		
 		shell.addShellListener(new ShellListener() {
 			@Override
@@ -345,7 +356,7 @@ public class BrowserSim {
 		browser.addLocationListener(new LocationAdapter() {
 			@Override
 			public void changed(LocationEvent event) {
-				if (skin.getBrowser().equals(getDisplay().getFocusControl()) && event.top) {
+				if (skin.getBrowser().equals(Display.getDefault().getFocusControl()) && event.top) {
 					for (BrowserSim bs : instances) {
 						if (bs.skin != skin) {
 							bs.skin.getBrowser().setUrl(event.location);
@@ -382,27 +393,38 @@ public class BrowserSim {
 		}
 	}
 
-	private void initDevicesListHolder() {
-		devicesListHolder = new DevicesListHolder();
-		devicesListHolder.addObserver(new Observer() {
+	private void initObservers() {
+		commonPreferencesObserver = new Observer() {
+			@Override
 			public void update(Observable o, Object arg) {
-				DevicesListHolder devicesManager = (DevicesListHolder) o;
-				DevicesList devicesList = devicesManager.getDevicesList();
-				if (devicesList.getSelectedDeviceIndex() < devicesList.getDevices().size()) {
-					setSelectedDevice(devicesList);
+				setSelectedDeviceAsync();
+			}
+		};
+		commonPreferences.addObserver(commonPreferencesObserver);
+		specificPreferences.addObserver(new Observer() {
+			public void update(Observable o, Object arg) {
+				setSelectedDeviceAsync();
+			}
+		});
+	}
+	
+	private boolean deviceUpdateRequired = false;
+	private void setSelectedDeviceAsync() {
+		deviceUpdateRequired = true;
+		Display.getDefault().asyncExec(new Runnable() {
+			@Override
+			public void run() {
+				if (deviceUpdateRequired) {
+					setSelectedDevice();
+					deviceUpdateRequired = false;
 				}
-				devicesList.addObserver(new Observer() {
-					public void update(Observable o, Object arg) {
-						setSelectedDevice((DevicesList)o);
-					}
-				});
 			}
 		});
 	}
 
-	private void setSelectedDevice(DevicesList devicesList) {
-		final Device device = devicesList.getDevices().get(devicesList.getSelectedDeviceIndex());
-		Class<? extends BrowserSimSkin> newSkinClass = BrowserSimUtil.getSkinClass(device, devicesList.getUseSkins());
+	private void setSelectedDevice() {
+		final Device device = getSelectedDevice();
+		Class<? extends BrowserSimSkin> newSkinClass = BrowserSimUtil.getSkinClass(device, specificPreferences.getUseSkins());
 		String oldSkinUrl = null;
 		if (newSkinClass != skin.getClass()) {
 			oldSkinUrl = skin.getBrowser().getUrl();
@@ -448,6 +470,17 @@ public class BrowserSim {
 
 		skin.getShell().open();
 	}
+	
+	private Device getSelectedDevice() {
+		int index = 0;
+		if (specificPreferences.getSelectedDeviceIndex() < commonPreferences.getDevices().size()) {
+			index = specificPreferences.getSelectedDeviceIndex();
+		}
+		specificPreferences.setSelectedDeviceIndex(index);
+		specificPreferences.notifyObservers();
+		
+		return commonPreferences.getDevices().get(index);
+	}
 
 	@SuppressWarnings("nls")
 	private void initOrientation(int orientation) {
@@ -474,10 +507,6 @@ public class BrowserSim {
 				+ 		"}"
 				+	"})();"
 		);
-	}
-
-	public Display getDisplay() {
-		return skin.getShell().getDisplay();
 	}
 	
 	public class ControlHandlerImpl implements ControlHandler {

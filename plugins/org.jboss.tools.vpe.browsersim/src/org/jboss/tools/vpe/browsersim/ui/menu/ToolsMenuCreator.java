@@ -10,6 +10,7 @@
  ******************************************************************************/
 package org.jboss.tools.vpe.browsersim.ui.menu;
 
+import java.util.List;
 import java.util.UUID;
 
 import org.eclipse.swt.SWT;
@@ -23,9 +24,8 @@ import org.eclipse.swt.widgets.Menu;
 import org.eclipse.swt.widgets.MenuItem;
 import org.eclipse.swt.widgets.Shell;
 import org.jboss.tools.vpe.browsersim.model.Device;
-import org.jboss.tools.vpe.browsersim.model.DevicesList;
-import org.jboss.tools.vpe.browsersim.model.DevicesListHolder;
-import org.jboss.tools.vpe.browsersim.model.DevicesListStorage;
+import org.jboss.tools.vpe.browsersim.model.preferences.CommonPreferences;
+import org.jboss.tools.vpe.browsersim.model.preferences.SpecificPreferences;
 import org.jboss.tools.vpe.browsersim.ui.BrowserSim;
 import org.jboss.tools.vpe.browsersim.ui.Messages;
 import org.jboss.tools.vpe.browsersim.ui.debug.firebug.FireBugLiteLoader;
@@ -37,11 +37,12 @@ import org.jboss.tools.vpe.browsersim.ui.skin.BrowserSimSkin;
  */
 
 public class ToolsMenuCreator {
-	public static void addItems(Menu menu, final BrowserSimSkin skin, final DevicesListHolder devicesListHolder, final String homeUrl) {
+	public static void addItems(Menu menu, final BrowserSimSkin skin, final CommonPreferences cp,
+			final SpecificPreferences sp, final String homeUrl) {
 		addFireBugLiteItem(menu, skin);
-		addWeinreItem(menu, skin, devicesListHolder);
-		addScreenshotMenuItem(menu, skin, devicesListHolder);
-		addSyncronizedWindowItem(menu, skin, devicesListHolder, homeUrl);
+		addWeinreItem(menu, skin, cp.getWeinreScriptUrl(), cp.getWeinreClientUrl());
+		addScreenshotMenuItem(menu, skin, cp.getScreenshotsFolder());
+		addSyncronizedWindowItem(menu, skin, cp.getDevices(), sp.getUseSkins(), homeUrl);
 	}
 	
 	private static void addFireBugLiteItem(Menu menu, final BrowserSimSkin skin) {
@@ -54,7 +55,8 @@ public class ToolsMenuCreator {
 		});
 	}
 	
-	private static void addWeinreItem(Menu menu, final BrowserSimSkin skin, final DevicesListHolder devicesListHolder) {
+	private static void addWeinreItem(Menu menu, final BrowserSimSkin skin, final String weinreScriptUrl,
+			final String weinreClientUrl) {
 		MenuItem weinre = new MenuItem(menu, SWT.PUSH);
 		weinre.setText(Messages.BrowserSim_WEINRE);
 		weinre.addSelectionListener(new SelectionAdapter() {
@@ -65,9 +67,9 @@ public class ToolsMenuCreator {
 					skin.getBrowser().execute("var head = document.head;"
 									+		"var script = document.createElement('script');"
 									+		"head.appendChild(script);"
-									+		"script.src='" + devicesListHolder.getDevicesList().getWeinreScriptUrl() + "#" + id + "'");
+									+		"script.src='" + weinreScriptUrl + "#" + id + "'");
 
-					url = devicesListHolder.getDevicesList().getWeinreClientUrl() + "#" + id;
+					url = weinreClientUrl + "#" + id;
 				}
 
 				Display display = skin.getBrowser().getDisplay();
@@ -88,47 +90,38 @@ public class ToolsMenuCreator {
 		});
 	}
 	
-	private static void addScreenshotMenuItem(Menu menu, final BrowserSimSkin skin,
-			final DevicesListHolder devicesListHolder) {
+	private static void addScreenshotMenuItem(Menu menu, final BrowserSimSkin skin, final String path) {
 		MenuItem screenshot = new MenuItem(menu, SWT.CASCADE);
 		screenshot.setText(Messages.Screenshots_Screenshot);
 
-		Menu subMenu = ScreenshotMenuCreator.createScreenshotsMenu(menu, Display.getDefault(), skin.getShell(),
-				devicesListHolder.getDevicesList().getScreenshotsFolder());
+		Menu subMenu = ScreenshotMenuCreator.createScreenshotsMenu(menu, Display.getDefault(), skin.getShell(), path);
 		screenshot.setMenu(subMenu);
 	}
 	
 	private static void addSyncronizedWindowItem(Menu menu, final BrowserSimSkin skin,
-			final DevicesListHolder devicesListHolder, final String homeUrl) {
+			final List<Device> devices, final Boolean useSkins, final String homeUrl) {
 		MenuItem syncWindow = new MenuItem(menu, SWT.CASCADE);
 		syncWindow.setText("Open Syncronized Window");
 		Menu subMenu = new Menu(menu);
 		syncWindow.setMenu(subMenu);
-		final DevicesList devicesList = devicesListHolder.getDevicesList();
-		for (final Device device : devicesList.getDevices()) {
+
+		for (final Device device : devices) {
 			MenuItem deviceMenuItem = new MenuItem(subMenu, SWT.RADIO);
 			deviceMenuItem.setText(device.getName());
 			deviceMenuItem.setData(device);
 
 			deviceMenuItem.addSelectionListener(new SelectionAdapter() {
 				public void widgetSelected(SelectionEvent e) {
-
-					DevicesList devicesList1 = DevicesListStorage.loadUserDefinedDevicesList();
-					if (devicesList1 == null) {
-						devicesList1 = DevicesListStorage.loadDefaultDevicesList();
-					}
-
 					MenuItem menuItem = (MenuItem) e.widget;
 					if (menuItem.getSelection()) {
-						int selectedDeviceIndex = devicesList.getDevices().indexOf(menuItem.getData());
+						int selectedDeviceIndex = devices.indexOf(menuItem.getData());
 						if (selectedDeviceIndex < 0) {
 							selectedDeviceIndex = 0;
 						}
-						devicesList1.setSelectedDeviceIndex(selectedDeviceIndex);
-						devicesList1.setLocation(null);
+						SpecificPreferences sp = new SpecificPreferences(selectedDeviceIndex, useSkins, null);
 
 						BrowserSim browserSim1 = new BrowserSim(homeUrl);
-						browserSim1.open(devicesList1, skin.getBrowser().getUrl());
+						browserSim1.open(sp, skin.getBrowser().getUrl());
 					}
 				};
 			});

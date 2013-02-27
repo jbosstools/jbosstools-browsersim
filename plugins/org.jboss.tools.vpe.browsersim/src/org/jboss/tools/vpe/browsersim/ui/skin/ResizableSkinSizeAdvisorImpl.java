@@ -18,17 +18,21 @@ import org.eclipse.swt.graphics.Point;
 import org.eclipse.swt.graphics.Rectangle;
 import org.eclipse.swt.widgets.Shell;
 import org.jboss.tools.vpe.browsersim.model.DeviceOrientation;
-import org.jboss.tools.vpe.browsersim.model.DevicesList;
+import org.jboss.tools.vpe.browsersim.model.TruncateWindow;
+import org.jboss.tools.vpe.browsersim.model.preferences.CommonPreferences;
+import org.jboss.tools.vpe.browsersim.model.preferences.SpecificPreferences;
 import org.jboss.tools.vpe.browsersim.ui.SizeWarningDialog;
 import org.jboss.tools.vpe.browsersim.util.BrowserSimUtil;
 
 public class ResizableSkinSizeAdvisorImpl implements ResizableSkinSizeAdvisor{
-	private DevicesList devicesList;
+	private CommonPreferences commonPreferences;
+	private SpecificPreferences specificPreferences;
 	private Shell shell;
 	
-	public ResizableSkinSizeAdvisorImpl(DevicesList devicesList, Shell shell) {
+	public ResizableSkinSizeAdvisorImpl(CommonPreferences cp, SpecificPreferences sp, Shell shell) {
 		super();
-		this.devicesList = devicesList;
+		this.commonPreferences = cp;
+		this.specificPreferences = sp;
 		this.shell = shell;
 	}
 
@@ -36,10 +40,10 @@ public class ResizableSkinSizeAdvisorImpl implements ResizableSkinSizeAdvisor{
 	public Point checkWindowSize(int orientation, Point prefferedSize, Point prefferedShellSize) {
 		Rectangle clientArea = BrowserSimUtil.getMonitorClientArea(shell.getMonitor());
 
-		boolean truncateWindow = false;
-		if (devicesList.getTruncateWindow() == null) {
+		TruncateWindow truncateWindow = null;
+		if (commonPreferences.getTruncateWindow() == TruncateWindow.PROMPT) {
 			if (prefferedShellSize.x > clientArea.width || prefferedShellSize.y > clientArea.height) { 
-				String deviceName = devicesList.getDevices().get(devicesList.getSelectedDeviceIndex()).getName();
+				String deviceName = commonPreferences.getDevices().get(specificPreferences.getSelectedDeviceIndex()).getName();
 				
 				SizeWarningDialog dialog = new SizeWarningDialog(shell, new Point(clientArea.width, clientArea.height),
 						prefferedShellSize, deviceName,
@@ -48,15 +52,15 @@ public class ResizableSkinSizeAdvisorImpl implements ResizableSkinSizeAdvisor{
 
 				truncateWindow = dialog.getTruncateWindow();
 				if (dialog.getRememberDecision()) {
-					devicesList.setTruncateWindow(truncateWindow);
+					commonPreferences.setTruncateWindow(truncateWindow);
 				}
 			}
 		} else {
-			truncateWindow = devicesList.getTruncateWindow();
+			truncateWindow = commonPreferences.getTruncateWindow();
 		}
 
 		Point size = new Point(prefferedShellSize.x, prefferedShellSize.y);
-		if (truncateWindow) {
+		if (TruncateWindow.ALWAYS_TRUNCATE.equals(truncateWindow)) {
 			size.x = Math.min(prefferedShellSize.x, clientArea.width);
 			size.y = Math.min(prefferedShellSize.y, clientArea.height);
 		}

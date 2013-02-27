@@ -35,22 +35,27 @@ import org.eclipse.swt.widgets.TableColumn;
 import org.eclipse.swt.widgets.TableItem;
 import org.eclipse.swt.widgets.Text;
 import org.jboss.tools.vpe.browsersim.model.Device;
-import org.jboss.tools.vpe.browsersim.model.DevicesList;
-import org.jboss.tools.vpe.browsersim.model.DevicesListStorage;
+import org.jboss.tools.vpe.browsersim.model.TruncateWindow;
+import org.jboss.tools.vpe.browsersim.model.preferences.CommonPreferences;
+import org.jboss.tools.vpe.browsersim.model.preferences.CommonPreferencesStorage;
+import org.jboss.tools.vpe.browsersim.model.preferences.SpecificPreferences;
+import org.jboss.tools.vpe.browsersim.model.preferences.SpecificPreferencesStorage;
 
 /**
  * @author Yahor Radtsevich (yradtsevich)
  */
 public class ManageDevicesDialog extends Dialog {
 
-	protected DevicesList oldDevicesList;
+	protected CommonPreferences oldCommonPreferences;
+	protected SpecificPreferences oldSpecificPreferences;
 	protected List<Device> devices;
 	protected int selectedDeviceIndex;
 	protected Shell shell;
 	protected Table table;
-	protected DevicesList resultDevicesList;
+	protected CommonPreferences newCommonPreferences;
+	protected SpecificPreferences newSpecificPreferences;
 	protected boolean useSkins;
-	protected Boolean truncateWindow;
+	protected TruncateWindow truncateWindow;
 	protected Button askBeforeTruncateRadio;
 	protected Button alwaysTruncateRadio;
 	protected Button neverTruncateRadio;
@@ -62,21 +67,22 @@ public class ManageDevicesDialog extends Dialog {
 	 * @param style
 	 * @param oldDevicesList 
 	 */
-	public ManageDevicesDialog(Shell parent, int style, DevicesList oldDevicesList) {
+	public ManageDevicesDialog(Shell parent, int style, CommonPreferences oldCommonPreferences, SpecificPreferences oldSpecificPreferences) {
 		super(parent, style);
 		setText(Messages.ManageDevicesDialog_PREFERENCES);
-		this.oldDevicesList = oldDevicesList;
-		this.devices = new ArrayList<Device>(oldDevicesList.getDevices());
-		this.selectedDeviceIndex = oldDevicesList.getSelectedDeviceIndex();
-		this.useSkins = oldDevicesList.getUseSkins();
-		this.truncateWindow = oldDevicesList.getTruncateWindow();
+		this.oldCommonPreferences = oldCommonPreferences;
+		this.oldSpecificPreferences = oldSpecificPreferences;
+		this.devices = new ArrayList<Device>(oldCommonPreferences.getDevices());
+		this.selectedDeviceIndex = oldSpecificPreferences.getSelectedDeviceIndex();
+		this.useSkins = oldSpecificPreferences.getUseSkins();
+		this.truncateWindow = oldCommonPreferences.getTruncateWindow();
 	} 
 
 	/**
 	 * Open the dialog.
 	 * @return the newDevicesList
 	 */
-	public DevicesList open() {
+	public PreferencesWrapper open() {
 		createContents();
 		shell.open();
 		shell.layout();
@@ -86,7 +92,11 @@ public class ManageDevicesDialog extends Dialog {
 				display.sleep();
 			}
 		}
-		return resultDevicesList;
+		if (newCommonPreferences == null || newSpecificPreferences == null) {
+			return null;
+		} else {
+			return new PreferencesWrapper(newCommonPreferences, newSpecificPreferences);
+		}
 	}
 
 	/**
@@ -189,8 +199,8 @@ public class ManageDevicesDialog extends Dialog {
 		
 		buttonReset.addSelectionListener(new SelectionAdapter() {
 			public void widgetSelected(SelectionEvent e) {
-				devices  = new ArrayList<Device>(oldDevicesList.getDevices());
-				selectedDeviceIndex = oldDevicesList.getSelectedDeviceIndex();
+				devices  = new ArrayList<Device>(oldCommonPreferences.getDevices());
+				selectedDeviceIndex = oldSpecificPreferences.getSelectedDeviceIndex();
 				updateDevices();
 			}
 		});
@@ -216,26 +226,30 @@ public class ManageDevicesDialog extends Dialog {
 		
 		
 		alwaysTruncateRadio = new Button(truncateWindowGroup, SWT.RADIO);
-		alwaysTruncateRadio.setText(Messages.ManageDevicesDialog_ALWAYS_TRUNCATE);
+		alwaysTruncateRadio.setText(TruncateWindow.ALWAYS_TRUNCATE.getMessage());
+		alwaysTruncateRadio.setData(TruncateWindow.ALWAYS_TRUNCATE);
 		
 		neverTruncateRadio = new Button(truncateWindowGroup, SWT.RADIO);
-		neverTruncateRadio.setText(Messages.ManageDevicesDialog_NEVER_TRUNCATE);
+		neverTruncateRadio.setText(TruncateWindow.NEVER_TRUNCATE.getMessage());
+		neverTruncateRadio.setData(TruncateWindow.NEVER_TRUNCATE);
 
 		askBeforeTruncateRadio = new Button(truncateWindowGroup, SWT.RADIO);
-		askBeforeTruncateRadio.setText(Messages.ManageDevicesDialog_PROMPT);
+		askBeforeTruncateRadio.setText(TruncateWindow.PROMPT.getMessage());
+		askBeforeTruncateRadio.setData(TruncateWindow.PROMPT);
 		
 		SelectionListener truncateSelectionListener = new SelectionAdapter() {
 			@Override
 			public void widgetSelected(SelectionEvent e) {
 				Button radio = (Button) e.widget;
 				if (radio.getSelection()) {
-					if (radio == askBeforeTruncateRadio) {
-						truncateWindow = null;
-					} else if (radio == alwaysTruncateRadio) {
-						truncateWindow = true;
-					} else if (radio == neverTruncateRadio) {
-						truncateWindow = false;
-					}
+					truncateWindow = (TruncateWindow) radio.getData();
+//					if (radio == askBeforeTruncateRadio) {
+//						truncateWindow = TruncateWindow.PROMPT;
+//					} else if (radio == alwaysTruncateRadio) {
+//						truncateWindow = TruncateWindow.ALWAYS_TRUNCATE;
+//					} else if (radio == neverTruncateRadio) {
+//						truncateWindow = TruncateWindow.NEVER_TRUNCATE;
+//					}
 				}
 			}
 		}; 
@@ -253,7 +267,7 @@ public class ManageDevicesDialog extends Dialog {
 		screenshotsLabel.setText(Messages.ManageDevicesDialog_LOCATION);		
 		final Text screenshotsPath = new Text(screnshotGroup, SWT.BORDER);
 		screenshotsPath.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, true, true));
-		screenshotsPath.setText(oldDevicesList.getScreenshotsFolder());
+		screenshotsPath.setText(oldCommonPreferences.getScreenshotsFolder());
 		
 		Button selectFolder = new Button(screnshotGroup, SWT.PUSH);
 		selectFolder.setText(Messages.ManageDevicesDialog_BROWSE);
@@ -280,13 +294,13 @@ public class ManageDevicesDialog extends Dialog {
 		weinreScriptUrlLabel.setText("Script URL:");
 		final Text weinreScriptUrlText = new Text(weinreGroup, SWT.BORDER);
 		weinreScriptUrlText.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, true, true));
-		weinreScriptUrlText.setText(oldDevicesList.getWeinreScriptUrl());
+		weinreScriptUrlText.setText(oldCommonPreferences.getWeinreScriptUrl());
 		
 		Label weinreClientUrlLabel = new Label(weinreGroup, SWT.NONE);
 		weinreClientUrlLabel.setText("Client URL:");
 		final Text weinreClientUrlText = new Text(weinreGroup, SWT.BORDER);
 		weinreClientUrlText.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, true, true));
-		weinreClientUrlText.setText(oldDevicesList.getWeinreClientUrl());
+		weinreClientUrlText.setText(oldCommonPreferences.getWeinreClientUrl());
 		
 		Composite compositeOkCancel = new Composite(shell, SWT.NONE);
 		compositeOkCancel.setLayout(new GridLayout(2, true));
@@ -298,14 +312,15 @@ public class ManageDevicesDialog extends Dialog {
 		buttonLoadDefaults.setText(Messages.ManageDevicesDialog_LOAD_DEFAULTS);
 		buttonLoadDefaults.addSelectionListener(new SelectionAdapter() {
 			public void widgetSelected(SelectionEvent e) {
-				DevicesList defaultDevicesList = DevicesListStorage.loadDefaultDevicesList();
-				devices = defaultDevicesList.getDevices();
-				selectedDeviceIndex = defaultDevicesList.getSelectedDeviceIndex();
-				useSkins = defaultDevicesList.getUseSkins();
-				truncateWindow = defaultDevicesList.getTruncateWindow();
-				screenshotsPath.setText(defaultDevicesList.getScreenshotsFolder());
-				weinreScriptUrlText.setText(defaultDevicesList.getWeinreScriptUrl());
-				weinreClientUrlText.setText(defaultDevicesList.getWeinreClientUrl());
+				CommonPreferences cp = CommonPreferencesStorage.INSTANCE.loadDefault();
+				SpecificPreferences sp = SpecificPreferencesStorage.INSTANCE.loadDefault();
+				devices = cp.getDevices();
+				selectedDeviceIndex = sp.getSelectedDeviceIndex();
+				useSkins = sp.getUseSkins();
+				truncateWindow = cp.getTruncateWindow();
+				screenshotsPath.setText(cp.getScreenshotsFolder());
+				weinreScriptUrlText.setText(cp.getWeinreScriptUrl());
+				weinreClientUrlText.setText(cp.getWeinreClientUrl());
 				updateDevices();
 			}
 		});
@@ -316,8 +331,8 @@ public class ManageDevicesDialog extends Dialog {
 		shell.setDefaultButton(buttonOk);
 		buttonOk.addSelectionListener(new SelectionAdapter() {
 			public void widgetSelected(SelectionEvent e) {
-				resultDevicesList = new DevicesList(devices, selectedDeviceIndex, useSkins, truncateWindow,
-						oldDevicesList.getLocation(), screenshotsPath.getText(), weinreScriptUrlText.getText(), weinreClientUrlText.getText());
+				newCommonPreferences = new CommonPreferences(devices, truncateWindow, screenshotsPath.getText(), weinreScriptUrlText.getText(), weinreClientUrlText.getText());
+				newSpecificPreferences = new SpecificPreferences(selectedDeviceIndex, useSkins, oldSpecificPreferences.getLocation());
 				shell.close();
 			}
 		});
@@ -327,7 +342,8 @@ public class ManageDevicesDialog extends Dialog {
 		buttonCancel.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, false, false));
 		buttonCancel.addSelectionListener(new SelectionAdapter() {
 			public void widgetSelected(SelectionEvent e) {
-				resultDevicesList = null;
+				newCommonPreferences = null;
+				newSpecificPreferences = null;
 				shell.close();
 			}
 		});

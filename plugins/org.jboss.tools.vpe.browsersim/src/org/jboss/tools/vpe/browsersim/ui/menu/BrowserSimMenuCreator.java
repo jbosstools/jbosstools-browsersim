@@ -25,12 +25,13 @@ import org.eclipse.swt.widgets.MenuItem;
 import org.eclipse.swt.widgets.Shell;
 import org.jboss.tools.vpe.browsersim.browser.PlatformUtil;
 import org.jboss.tools.vpe.browsersim.model.Device;
-import org.jboss.tools.vpe.browsersim.model.DevicesList;
-import org.jboss.tools.vpe.browsersim.model.DevicesListHolder;
+import org.jboss.tools.vpe.browsersim.model.preferences.CommonPreferences;
+import org.jboss.tools.vpe.browsersim.model.preferences.SpecificPreferences;
 import org.jboss.tools.vpe.browsersim.ui.CocoaUIEnhancer;
 import org.jboss.tools.vpe.browsersim.ui.ControlHandler;
 import org.jboss.tools.vpe.browsersim.ui.ManageDevicesDialog;
 import org.jboss.tools.vpe.browsersim.ui.Messages;
+import org.jboss.tools.vpe.browsersim.ui.PreferencesWrapper;
 import org.jboss.tools.vpe.browsersim.ui.skin.BrowserSimSkin;
 import org.jboss.tools.vpe.browsersim.util.BrowserSimUtil;
 
@@ -41,15 +42,17 @@ import org.jboss.tools.vpe.browsersim.util.BrowserSimUtil;
 
 public class BrowserSimMenuCreator {
 	private BrowserSimSkin skin;
-	private DevicesListHolder devicesListHolder;
+	private static CommonPreferences commonPreferences;
+	private SpecificPreferences specificPreferences;
 	private ControlHandler controlHandler;
 	private String homeUrl;
 	private static CocoaUIEnhancer cocoaUIEnhancer;
 	
-	public BrowserSimMenuCreator(BrowserSimSkin skin, DevicesListHolder devicesListHolder,
+	public BrowserSimMenuCreator(BrowserSimSkin skin, CommonPreferences cp, SpecificPreferences sp,
 			ControlHandler controlHandler, String homeUrl) {
 		this.skin = skin;
-		this.devicesListHolder = devicesListHolder;
+		commonPreferences = cp;
+		this.specificPreferences = sp;
 		this.controlHandler = controlHandler;
 		this.homeUrl = homeUrl;
 	}
@@ -92,7 +95,7 @@ public class BrowserSimMenuCreator {
 					item.dispose();
 				}
 
-				addDevicesListForMenu(contextMenu, devicesListHolder.getDevicesList());
+				addDevicesListForMenu(contextMenu);
 				addUseSkinsItem(contextMenu);
 				addPreferencesItem(contextMenu);
 
@@ -100,7 +103,7 @@ public class BrowserSimMenuCreator {
 				addTurnMenuItems(contextMenu, controlHandler);
 
 				new MenuItem(contextMenu, SWT.BAR);
-				ToolsMenuCreator.addItems(contextMenu, skin, devicesListHolder, homeUrl);
+				ToolsMenuCreator.addItems(contextMenu, skin, commonPreferences, specificPreferences, homeUrl);
 
 				new MenuItem(contextMenu, SWT.BAR);
 				FileMenuCreator.addItems(contextMenu, skin);
@@ -131,7 +134,7 @@ public class BrowserSimMenuCreator {
 					item.dispose();
 				}
 
-				addDevicesListForMenu(devicesMenu, devicesListHolder.getDevicesList());
+				addDevicesListForMenu(devicesMenu);
 				addUseSkinsItem(devicesMenu);
 				
 				// If Platform is Mac OS X, application will have no duplicated menu items (Preferences)
@@ -145,7 +148,7 @@ public class BrowserSimMenuCreator {
 		});
 
 		Menu toolsMenu = createDropDownMenu(appMenuBar, Messages.BrowserSim_TOOLS);
-		ToolsMenuCreator.addItems(toolsMenu, skin, devicesListHolder, homeUrl);
+		ToolsMenuCreator.addItems(toolsMenu, skin, commonPreferences, specificPreferences, homeUrl);
 
 		// If Platform is Mac OS X, application will have no duplicated menu items (About)
 		if (!PlatformUtil.OS_MACOSX.equals(PlatformUtil.getOs())) {
@@ -162,14 +165,14 @@ public class BrowserSimMenuCreator {
 		return dropdown;
 	}
 
-	private void addDevicesListForMenu(Menu devicesMenu, final DevicesList devicesList) {
-		List<Device> devices = devicesList.getDevices();
+	private void addDevicesListForMenu(Menu devicesMenu) {
+		List<Device> devices = commonPreferences.getDevices();
 		for (int i = 0; i < devices.size(); i++) {
 			Device device = devices.get(i);
 			MenuItem deviceMenuItem = new MenuItem(devicesMenu, SWT.RADIO);
 			deviceMenuItem.setText(device.getName());
 			deviceMenuItem.setData(device);
-			if (i == devicesList.getSelectedDeviceIndex()) {
+			if (i == specificPreferences.getSelectedDeviceIndex()) {
 				deviceMenuItem.setSelection(true);
 			}
 
@@ -177,12 +180,12 @@ public class BrowserSimMenuCreator {
 				public void widgetSelected(SelectionEvent e) {
 					MenuItem menuItem = (MenuItem) e.widget;
 					if (menuItem.getSelection()) {
-						int selectedDeviceIndex = devicesList.getDevices().indexOf(menuItem.getData());
+						int selectedDeviceIndex = commonPreferences.getDevices().indexOf(menuItem.getData());
 						if (selectedDeviceIndex < 0) {
 							selectedDeviceIndex = 0;
 						}
-						devicesList.setSelectedDeviceIndex(selectedDeviceIndex);
-						devicesList.notifyObservers();
+						specificPreferences.setSelectedDeviceIndex(selectedDeviceIndex);
+						specificPreferences.notifyObservers();
 					}
 				};
 			});
@@ -192,12 +195,12 @@ public class BrowserSimMenuCreator {
 	private void addUseSkinsItem(Menu menu) {
 		MenuItem useSkinsMenuItem = new MenuItem(menu, SWT.CHECK);
 		useSkinsMenuItem.setText(Messages.BrowserSim_USE_SKINS);
-		useSkinsMenuItem.setSelection(devicesListHolder.getDevicesList().getUseSkins());
+		useSkinsMenuItem.setSelection(specificPreferences.getUseSkins());
 		useSkinsMenuItem.addSelectionListener(new SelectionAdapter() {
 			public void widgetSelected(SelectionEvent e) {
 				MenuItem menuItem = (MenuItem) e.widget;
-				devicesListHolder.getDevicesList().setUseSkins(menuItem.getSelection());
-				devicesListHolder.getDevicesList().notifyObservers();
+				specificPreferences.setUseSkins(menuItem.getSelection());
+				specificPreferences.notifyObservers();
 			}
 		});
 	}
@@ -207,13 +210,14 @@ public class BrowserSimMenuCreator {
 		preferences.setText(Messages.BrowserSim_PREFERENCES);
 		preferences.addSelectionListener(new SelectionAdapter() {
 			public void widgetSelected(SelectionEvent e) {
-				DevicesList newDevicesList = new ManageDevicesDialog(e.display.getActiveShell(), SWT.APPLICATION_MODAL
-						| SWT.SHELL_TRIM, devicesListHolder.getDevicesList()).open();
-				if (newDevicesList != null) {
-					devicesListHolder.setDevicesList(newDevicesList);
-					devicesListHolder.notifyObservers();
+				PreferencesWrapper pw = new ManageDevicesDialog(Display.getDefault().getActiveShell(), SWT.APPLICATION_MODAL
+						| SWT.SHELL_TRIM, commonPreferences, specificPreferences).open();
+				if (pw != null) {
+					commonPreferences.copyProperties(pw.getCommonPreferences());
+					specificPreferences.copyProperties(pw.getSpecificPreferences());
+					commonPreferences.notifyObservers();
+					specificPreferences.notifyObservers();
 				}
-
 			}
 		});
 	}
@@ -277,12 +281,13 @@ public class BrowserSimMenuCreator {
 				@Override
 				public void run() {
 					Shell shell = getParentShell();
-
-					DevicesList newDevicesList = new ManageDevicesDialog(shell, SWT.APPLICATION_MODAL | SWT.SHELL_TRIM,
-							devicesListHolder.getDevicesList()).open();
-					if (newDevicesList != null) {
-						devicesListHolder.setDevicesList(newDevicesList);
-						devicesListHolder.notifyObservers();
+					PreferencesWrapper pw = new ManageDevicesDialog(shell, SWT.APPLICATION_MODAL | SWT.SHELL_TRIM,
+							commonPreferences, specificPreferences).open();
+					if (pw != null) {
+						commonPreferences.copyProperties(pw.getCommonPreferences());
+						specificPreferences.copyProperties(pw.getSpecificPreferences());
+						commonPreferences.notifyObservers();
+						specificPreferences.notifyObservers();
 					}
 				}
 			});

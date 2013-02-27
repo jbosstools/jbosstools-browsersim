@@ -22,6 +22,7 @@ import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Shell;
+import org.jboss.tools.vpe.browsersim.model.TruncateWindow;
 
 /**
  * @author Yahor Radtsevich (yradtsevich)
@@ -31,7 +32,7 @@ public class SizeWarningDialog extends CustomMessageBox {
 	private Point requiredSize;
 	private String deviceName;
 	private boolean vertical;
-	private boolean truncateWindow = false;
+	private TruncateWindow truncateWindow = TruncateWindow.NEVER_TRUNCATE;
 	private boolean rememberDecision = false;
 	
 	public SizeWarningDialog(Shell parent, Point actualSize, Point requiredSize, String deviceName, boolean vertical) {
@@ -86,7 +87,7 @@ public class SizeWarningDialog extends CustomMessageBox {
 		okButton.addSelectionListener(new SelectionAdapter() {
 			@Override
 			public void widgetSelected(SelectionEvent e) {
-				truncateWindow = true;
+				truncateWindow = TruncateWindow.ALWAYS_TRUNCATE;
 				getShell().close();
 			}
 		});
@@ -104,7 +105,7 @@ public class SizeWarningDialog extends CustomMessageBox {
 		getShell().pack();
 	}
 	
-	public boolean getTruncateWindow() {
+	public TruncateWindow getTruncateWindow() {
 		return truncateWindow;
 	}
 	
