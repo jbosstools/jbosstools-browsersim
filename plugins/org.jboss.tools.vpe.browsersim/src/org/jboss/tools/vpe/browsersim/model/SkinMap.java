@@ -18,6 +18,7 @@ import org.jboss.tools.vpe.browsersim.ui.skin.BrowserSimSkin;
 import org.jboss.tools.vpe.browsersim.ui.skin.NativeSkin;
 import org.jboss.tools.vpe.browsersim.ui.skin.android.GalaxyNote2Skin;
 import org.jboss.tools.vpe.browsersim.ui.skin.android.GalaxyS3Skin;
+import org.jboss.tools.vpe.browsersim.ui.skin.ios.AppleIPadMiniResizableSkin;
 import org.jboss.tools.vpe.browsersim.ui.skin.ios.AppleIPadResizableSkin;
 import org.jboss.tools.vpe.browsersim.ui.skin.ios.AppleIPhone3ResizableSkin;
 import org.jboss.tools.vpe.browsersim.ui.skin.ios.AppleIPhone4ResizableSkin;
@@ -35,6 +36,7 @@ public class SkinMap {
 		map.put(GalaxyNote2Skin.ANDROID_SKIN_ID, GalaxyNote2Skin.class);
 		map.put(GalaxyS3Skin.ANDROID_SKIN_ID, GalaxyS3Skin.class);
 		map.put(AppleIPadResizableSkin.IPAD_SKIN_ID, AppleIPadResizableSkin.class);
+		map.put(AppleIPadMiniResizableSkin.IPAD_MINI_SKIN_ID, AppleIPadMiniResizableSkin.class);
 	}
 	
 	public static SkinMap getInstance() {
