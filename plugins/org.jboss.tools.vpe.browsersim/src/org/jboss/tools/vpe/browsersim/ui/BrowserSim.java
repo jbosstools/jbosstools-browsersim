@@ -84,10 +84,6 @@ public class BrowserSim {
 
 	static {
 		instances = new ArrayList<BrowserSim>();
-		commonPreferences = (CommonPreferences) CommonPreferencesStorage.INSTANCE.load();
-		if (commonPreferences == null) {
-			commonPreferences = (CommonPreferences) CommonPreferencesStorage.INSTANCE.loadDefault();
-		}
 	}
 
 	public BrowserSim(String homeUrl) {
@@ -96,6 +92,11 @@ public class BrowserSim {
 	}
 
 	public void open() {
+		commonPreferences = (CommonPreferences) CommonPreferencesStorage.INSTANCE.load();
+		if (commonPreferences == null) {
+			commonPreferences = (CommonPreferences) CommonPreferencesStorage.INSTANCE.loadDefault();
+		}
+		
 		SpecificPreferences sp = (SpecificPreferences) SpecificPreferencesStorage.INSTANCE.load();
 		if (sp == null) {
 			sp = (SpecificPreferences) SpecificPreferencesStorage.INSTANCE.loadDefault();

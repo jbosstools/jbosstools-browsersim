@@ -40,8 +40,8 @@ import org.eclipse.swt.widgets.Menu;
 import org.eclipse.swt.widgets.MenuItem;
 import org.eclipse.swt.widgets.Shell;
 import org.jboss.tools.vpe.browsersim.browser.PlatformUtil;
-import org.jboss.tools.vpe.browsersim.model.preferences.PreferencesUtil;
 import org.jboss.tools.vpe.browsersim.ui.Messages;
+import org.jboss.tools.vpe.browsersim.util.PreferencesUtil;
 
 /**
  * 

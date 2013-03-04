@@ -10,23 +10,31 @@
  ******************************************************************************/
 package org.jboss.tools.vpe.browsersim.model.preferences;
 
-import java.io.BufferedReader;
-import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileInputStream;
-import java.io.FileWriter;
 import java.io.IOException;
 import java.io.InputStream;
-import java.io.InputStreamReader;
 import java.text.ParseException;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
+
+import javax.xml.parsers.DocumentBuilder;
+import javax.xml.parsers.DocumentBuilderFactory;
+import javax.xml.parsers.ParserConfigurationException;
+import javax.xml.transform.TransformerException;
+import javax.xml.transform.TransformerFactory;
+import javax.xml.transform.dom.DOMSource;
+import javax.xml.transform.stream.StreamResult;
 
 import org.jboss.tools.vpe.browsersim.model.Device;
 import org.jboss.tools.vpe.browsersim.model.TruncateWindow;
+import org.jboss.tools.vpe.browsersim.util.PreferencesUtil;
 import org.jboss.tools.vpe.browsersim.util.ResourcesUtil;
+import org.w3c.dom.Document;
+import org.w3c.dom.Element;
+import org.w3c.dom.Node;
+import org.w3c.dom.NodeList;
+import org.xml.sax.SAXException;
 
 /**
  * 
@@ -35,12 +43,29 @@ import org.jboss.tools.vpe.browsersim.util.ResourcesUtil;
  */
 
 public class CommonPreferencesStorage implements PreferencesStorage{
-	private static final String DEFAULT_COMMON_PREFERENCES_RESOURCE = "config/commonPreferences.cfg";
-	private static final String COMMON_PREFERENCES_FILE = "commonPreferences.cfg";
+	private static final String PREFERENCES_DEVICE = "device";
+	private static final String PREFERENCES_DEVICE_HEIGHT = "height";
+	private static final String PREFERENCES_DEVICE_WIDTH = "width";
+	private static final String PREFERENCES_DEVICE_NAME = "name";
+	private static final String PREFERENCES_DEVICE_SKIN = "skin";
+	private static final String PREFERENCES_DEVICE_USER_AGENT = "userAgent";
+	private static final String PREFERENCES_DEVICE_PIXEL_RATIO = "pixelRatio";
+	private static final String PREFERENCES_DEVICES = "devices";
+	private static final String PREFERENCES_WEINRE_CLIENT_URL = "clientUrl";
+	private static final String PREFERENCES_WEINRE_SCRIPT_URL = "scriptUrl";
+	private static final String PREFERENCES_WEINRE = "weinre";
+	private static final String PREFERENCES_SCREENSHOTS_FOLDER = "screenshotsFolder";
+	private static final String PREFERENCES_TRUNCATE_WINDOW = "truncateWindow";
+	private static final String PREFERENCES_VERSION = "version";
+
+	
+	private static final String DEFAULT_COMMON_PREFERENCES_RESOURCE = "config/commonPreferences.xml";
+	private static final String COMMON_PREFERENCES_FILE = "commonPreferences.xml";
+	
 	private static final String DEFAULT_WEINRE_SCRIPT_URL = "http://debug.phonegap.com/target/target-script-min.js";
 	private static final String DEFAULT_WEINRE_CLIENT_URL = "http://debug.phonegap.com/client/";
 	
-	private static final int CURRENT_CONFIG_VERSION = 9;
+	private static final int CURRENT_CONFIG_VERSION = 10;
 	
 	public static final CommonPreferencesStorage INSTANCE = new CommonPreferencesStorage();
 	
@@ -86,7 +111,7 @@ public class CommonPreferencesStorage implements PreferencesStorage{
 			Device device = new Device("Default", 1024, 768, 1.0, null, null);
 			List<Device> devices = new ArrayList<Device>();
 			devices.add(device);
-			commonPreferences = new CommonPreferences(devices, null, getDefaultScreenshotsFolderPath(),
+			commonPreferences = new CommonPreferences(devices, TruncateWindow.PROMPT, getDefaultScreenshotsFolderPath(),
 					getDefaultWeinreScriptUrl(), getDefaultWeinreClientUrl());
 		}
 
@@ -94,104 +119,84 @@ public class CommonPreferencesStorage implements PreferencesStorage{
 	}
 	
 	private CommonPreferences load(InputStream is) throws IOException{
-		BufferedReader reader = new BufferedReader(new InputStreamReader(is));
-		
 		List<Device> devices = null;
 		TruncateWindow truncateWindow = TruncateWindow.PROMPT;
-		String screenshotsFolder = "";
-		String weinreScriptUrl = "";
-		String weinreClientUrl = "";
-		try {
-			String nextLine;
-			int configVersion = 0;
-			if ((nextLine = reader.readLine()) != null) {
-				Pattern pattern = Pattern.compile("ConfigVersion=([0-9]+)");
-				Matcher matcher = pattern.matcher(nextLine);
-				if (matcher.matches()) {
-					configVersion = Integer.parseInt(matcher.group(1));
-				}
-			}
-			
-			if (configVersion == CURRENT_CONFIG_VERSION) {
-				if ((nextLine = reader.readLine()) != null) {
-					Pattern pattern = Pattern.compile("TruncateWindow=(.*)");
-					Matcher matcher = pattern.matcher(nextLine);
-					if (matcher.matches()) {
-						if ( "".equals(matcher.group(1)) ) {
-							truncateWindow = null;
-						} else {							
-							truncateWindow = TruncateWindow.valueOf(matcher.group(1));
-						}
-					}
-				}
-				
-				if ((nextLine = reader.readLine()) != null) {
-					Pattern pattern = Pattern.compile("ScreenshotsFolder=(.*)");
-					Matcher matcher = pattern.matcher(nextLine);
-					if (matcher.matches()) {
-						if ( "".equals(matcher.group(1)) ) {
-							screenshotsFolder = getDefaultScreenshotsFolderPath();
-						} else {							
-							screenshotsFolder = matcher.group(1);
-						}
-					}
-				}
-				
-				if ((nextLine = reader.readLine()) != null) {
-					Pattern pattern = Pattern.compile("WeinreScriptUrl=(.*)");
-					Matcher matcher = pattern.matcher(nextLine);
-					if (matcher.matches()) {
-						if ( "".equals(matcher.group(1)) ) {
-							weinreScriptUrl = getDefaultWeinreScriptUrl();
-						} else {							
-							weinreScriptUrl = matcher.group(1);
-						}
-					}
-				}
-				
-				if ((nextLine = reader.readLine()) != null) {
-					Pattern pattern = Pattern.compile("WeinreClientUrl=(.*)");
-					Matcher matcher = pattern.matcher(nextLine);
-					if (matcher.matches()) {
-						if ( "".equals(matcher.group(1)) ) {
-							weinreClientUrl = getDefaultWeinreClientUrl();
-						} else {							
-							weinreClientUrl = matcher.group(1);
-						}
-					}
-				}
-				
-				Pattern devicePattern = Pattern.compile("^(.*)\\t([0-9]+)\\t([0-9]+)\\t([0-9]*\\.?[0-9]*)\\t(.+)?\\t(.+)?$");
-				
-				devices = new ArrayList<Device>();
-				while ((nextLine = reader.readLine()) != null) {
-					Matcher deviceMatcher = devicePattern.matcher(nextLine);
-					if (deviceMatcher.matches()) {
-						double pixelRatio;
-						try {
-							pixelRatio = Device.PIXEL_RAIO_FORMAT.parse(deviceMatcher.group(4)).doubleValue();
-						} catch (ParseException e) {
-							pixelRatio = 1.0;
-							e.printStackTrace();
-						}
+		String screenshotsFolder = getDefaultScreenshotsFolderPath();
+		String weinreScriptUrl = getDefaultWeinreScriptUrl();
+		String weinreClientUrl = getDefaultWeinreClientUrl();
 
-						devices.add(new Device(
-								PreferencesUtil.decode(deviceMatcher.group(1)),
-								Integer.parseInt(deviceMatcher.group(2)),
-								Integer.parseInt(deviceMatcher.group(3)),
-								pixelRatio,
-								deviceMatcher.group(5) != null 
-									? PreferencesUtil.decode(deviceMatcher.group(5))
-									: null,
-								deviceMatcher.group(6) != null 
-									? PreferencesUtil.decode(deviceMatcher.group(6))
-									: null
-								));
+		try {
+			DocumentBuilderFactory dbFactory = DocumentBuilderFactory.newInstance();
+			DocumentBuilder dBuilder = dbFactory.newDocumentBuilder();
+			Document document = dBuilder.parse(is);
+
+			// optional, but recommended
+			// see http://stackoverflow.com/questions/13786607/normalization-in-dom-parsing-with-java-how-does-it-work
+			document.getDocumentElement().normalize();
+
+			int configVersion = Integer.parseInt(document.getDocumentElement().getAttribute(PREFERENCES_VERSION));
+			if (configVersion == CURRENT_CONFIG_VERSION) {
+				Node node = document.getElementsByTagName(PREFERENCES_TRUNCATE_WINDOW).item(0);
+				if (!PreferencesUtil.isNullOrEmpty(node)) {
+					truncateWindow = TruncateWindow.valueOf(node.getTextContent());
+				}
+				
+				node = document.getElementsByTagName(PREFERENCES_SCREENSHOTS_FOLDER).item(0);
+				if (!PreferencesUtil.isNullOrEmpty(node)) {
+					screenshotsFolder = node.getTextContent();
+				}
+				
+				node = document.getElementsByTagName(PREFERENCES_WEINRE).item(0);
+				if (!PreferencesUtil.isNullOrEmpty(node) && node.getNodeType() == Node.ELEMENT_NODE) {
+					Element weinre = (Element) node;
+					Node scriptUrl = weinre.getElementsByTagName(PREFERENCES_WEINRE_SCRIPT_URL).item(0);
+					Node clientUrl = weinre.getElementsByTagName(PREFERENCES_WEINRE_CLIENT_URL).item(0);
+					
+					if (!PreferencesUtil.isNullOrEmpty(scriptUrl)) {
+						weinreScriptUrl = scriptUrl.getTextContent();
+					}
+					if (!PreferencesUtil.isNullOrEmpty(clientUrl)) {
+						weinreClientUrl = clientUrl.getTextContent();
 					}
 				}
-			}	
-		} finally {
-			reader.close();
+				
+				node = document.getElementsByTagName(PREFERENCES_DEVICES).item(0);
+				if (!PreferencesUtil.isNullOrEmpty(node) && node.hasChildNodes()) {
+					NodeList devicesList = node.getChildNodes();
+					devices = new ArrayList<Device>();
+					for (int i = 0; i < devicesList.getLength();i++) {
+						Node item = devicesList.item(i);
+						if (!PreferencesUtil.isNullOrEmpty(item) && item.getNodeType() == Node.ELEMENT_NODE) {
+							 
+							Element device = (Element) item;
+							
+							double pixelRatio;
+							try {
+								pixelRatio = Device.PIXEL_RAIO_FORMAT.parse(
+										device.getElementsByTagName(PREFERENCES_DEVICE_PIXEL_RATIO).item(0)
+												.getTextContent()).doubleValue();
+							} catch (ParseException e) {
+								pixelRatio = 1.0;
+								e.printStackTrace();
+							}
+							
+							String userAgent = device.getElementsByTagName(PREFERENCES_DEVICE_USER_AGENT).item(0).getTextContent();
+							String skin = device.getElementsByTagName(PREFERENCES_DEVICE_SKIN).item(0).getTextContent(); 
+							devices.add(new Device(device.getElementsByTagName(PREFERENCES_DEVICE_NAME).item(0).getTextContent(),
+									Integer.parseInt(device.getElementsByTagName(PREFERENCES_DEVICE_WIDTH).item(0).getTextContent()),
+									Integer.parseInt(device.getElementsByTagName(PREFERENCES_DEVICE_HEIGHT).item(0).getTextContent()),
+									pixelRatio,
+									PreferencesUtil.isNullOrEmpty(userAgent) ? null : userAgent,
+									PreferencesUtil.isNullOrEmpty(skin) ? null : skin));
+						}
+					}
+				}
+				
+			}
+		} catch (ParserConfigurationException pce) {
+			pce.printStackTrace();
+		} catch (SAXException e1) {
+			e1.printStackTrace();
 		}
 		
 		if (devices == null) {
@@ -202,36 +207,73 @@ public class CommonPreferencesStorage implements PreferencesStorage{
 	}
 
 	private void saveCommonPreferences(CommonPreferences cp, File file) throws IOException {
-		BufferedWriter writer = new BufferedWriter(new FileWriter(file));
-		
-		writer.write("ConfigVersion=" + String.valueOf(CURRENT_CONFIG_VERSION) + "\n");
-		TruncateWindow truncateWindow = cp.getTruncateWindow();
-		String truncateWindowString = truncateWindow == null ? "" : truncateWindow.toString();
-		writer.write("TruncateWindow=" + truncateWindowString + "\n");
-		writer.write("ScreenshotsFolder=" + cp.getScreenshotsFolder() + "\n");
-		writer.write("WeinreScriptUrl=" + cp.getWeinreScriptUrl() + "\n");
-		writer.write("WeinreClientUrl=" + cp.getWeinreClientUrl() + "\n");
-		
-		for (Device device : cp.getDevices()) {
-			writer.write(PreferencesUtil.encode(device.getName() ));
-			writer.write('\t');
-			writer.write(PreferencesUtil.encode( String.valueOf(device.getWidth()) ));
-			writer.write('\t');
-			writer.write(PreferencesUtil.encode( String.valueOf(device.getHeight()) ));
-			writer.write('\t');
-			writer.write(PreferencesUtil.encode( Device.PIXEL_RAIO_FORMAT.format(device.getPixelRatio()) ));
-			writer.write('\t');
-			if (device.getUserAgent() != null) {
-				writer.write(PreferencesUtil.encode(device.getUserAgent() ));
+		try {
+			DocumentBuilderFactory docFactory = DocumentBuilderFactory.newInstance();
+			DocumentBuilder docBuilder = docFactory.newDocumentBuilder();
+			Document doc = docBuilder.newDocument();
+			
+			Element rootElement = doc.createElement("browserSim");
+			rootElement.setAttribute(PREFERENCES_VERSION, String.valueOf(CURRENT_CONFIG_VERSION));
+			doc.appendChild(rootElement);
+
+			Element truncateWindow = doc.createElement(PREFERENCES_TRUNCATE_WINDOW);
+			truncateWindow.setTextContent(String.valueOf(cp.getTruncateWindow()));
+			rootElement.appendChild(truncateWindow);
+
+			Element screenshotsFolder = doc.createElement(PREFERENCES_SCREENSHOTS_FOLDER);
+			screenshotsFolder.setTextContent(cp.getScreenshotsFolder());
+			rootElement.appendChild(screenshotsFolder);
+			
+			Element weinre = doc.createElement(PREFERENCES_WEINRE);
+			Element weinreScriptUrl = doc.createElement(PREFERENCES_WEINRE_SCRIPT_URL);
+			Element weinreClientUrl = doc.createElement(PREFERENCES_WEINRE_CLIENT_URL);
+			weinreScriptUrl.setTextContent(cp.getWeinreScriptUrl());
+			weinreClientUrl.setTextContent(cp.getWeinreClientUrl());
+			weinre.appendChild(weinreScriptUrl);
+			weinre.appendChild(weinreClientUrl);
+			rootElement.appendChild(weinre);
+			
+			Element devices = doc.createElement(PREFERENCES_DEVICES);
+			for (Device device : cp.getDevices()) {
+				Element deviceElement = doc.createElement(PREFERENCES_DEVICE);
+				
+				Element name = doc.createElement(PREFERENCES_DEVICE_NAME);
+				name.setTextContent(device.getName());
+				deviceElement.appendChild(name);
+				
+				Element width = doc.createElement(PREFERENCES_DEVICE_WIDTH);
+				width.setTextContent(String.valueOf(device.getWidth()));
+				deviceElement.appendChild(width);
+				
+				Element height = doc.createElement(PREFERENCES_DEVICE_HEIGHT);
+				height.setTextContent(String.valueOf(device.getHeight()));
+				deviceElement.appendChild(height);
+				
+				Element pixelRatio = doc.createElement(PREFERENCES_DEVICE_PIXEL_RATIO);
+				pixelRatio.setTextContent(String.valueOf(device.getPixelRatio()));
+				deviceElement.appendChild(pixelRatio);
+				
+				Element userAgent = doc.createElement(PREFERENCES_DEVICE_USER_AGENT);
+				userAgent.setTextContent(device.getUserAgent());
+				deviceElement.appendChild(userAgent);
+				
+				Element skin = doc.createElement(PREFERENCES_DEVICE_SKIN);
+				skin.setTextContent(device.getSkinId());
+				deviceElement.appendChild(skin);
+				
+				devices.appendChild(deviceElement);
 			}
-			writer.write('\t');
-			if (device.getSkinId() != null) {
-				writer.write(PreferencesUtil.encode(device.getSkinId() ));
-			}
-			writer.write('\n');
+			rootElement.appendChild(devices);
+			
+			// write the content into xml file
+			TransformerFactory transformerFactory = TransformerFactory.newInstance();
+			transformerFactory.newTransformer().transform(new DOMSource(doc), new StreamResult(file));
+
+		} catch (ParserConfigurationException pce) {
+			pce.printStackTrace();
+		} catch (TransformerException tfe) {
+			tfe.printStackTrace();
 		}
-		
-		writer.close();
 	}
 	
 	private static String getDefaultScreenshotsFolderPath() {

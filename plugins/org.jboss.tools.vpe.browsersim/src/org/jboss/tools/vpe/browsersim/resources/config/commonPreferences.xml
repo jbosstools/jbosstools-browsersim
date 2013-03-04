@@ -1,0 +1,107 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<browserSim version="10">
+	<truncateWindow>PROMPT</truncateWindow>
+	<screenshotsFolder></screenshotsFolder>
+	<weinre>
+		<scriptUrl></scriptUrl>
+		<clientUrl></clientUrl>
+	</weinre>
+	<devices>
+		<device>
+			<name>Desktop (Default User-Agent)</name>
+			<width>1024</width>
+			<height>768</height>
+			<pixelRatio>1</pixelRatio>
+			<userAgent></userAgent>
+			<skin></skin>
+		</device>		
+		<device>
+			<name>Apple iPad 4 Retina</name>
+			<width>768</width>
+			<height>1024</height>
+			<pixelRatio>1</pixelRatio>
+			<userAgent>Mozilla/5.0 (iPad; U; CPU OS 4_3_1 like Mac OS X; en-us) AppleWebKit/533.17.9 (KHTML, like Gecko) Version/5.0.2 Mobile/8G4 Safari/6533.18.5</userAgent>
+			<skin>iPad</skin>
+		</device>
+		<device>
+			<name>Apple iPad mini</name>
+			<width>768</width>
+			<height>1024</height>
+			<pixelRatio>1</pixelRatio>
+			<userAgent>Mozilla/5.0 (iPad; U; CPU OS 4_3_1 like Mac OS X; en-us) AppleWebKit/533.17.9 (KHTML, like Gecko) Version/5.0.2 Mobile/8G4 Safari/6533.18.5</userAgent>
+			<skin>iPad mini</skin>
+		</device>
+		<device>
+			<name>Apple iPhone 3</name>
+			<width>320</width>
+			<height>480</height>
+			<pixelRatio>1</pixelRatio>
+			<userAgent>Mozilla/5.0 (iPhone; U; CPU iPhone OS 4_0 like Mac OS X; en-us) AppleWebKit/532.9 (KHTML, like Gecko) Version/4.0.5 Mobile/8A293 Safari/6531.22.7</userAgent>
+			<skin>iPhone 3</skin>
+		</device>
+		<device>
+			<name>Apple iPhone 4</name>
+			<width>640</width>
+			<height>960</height>
+			<pixelRatio>2</pixelRatio>
+			<userAgent>Mozilla/5.0 (iPhone; U; CPU iPhone OS 4_0 like Mac OS X; en-us) AppleWebKit/532.9 (KHTML, like Gecko) Version/4.0.5 Mobile/8A293 Safari/6531.22.7</userAgent>
+			<skin>iPhone 4</skin>
+		</device>
+		<device>
+			<name>Apple iPhone 5</name>
+			<width>640</width>
+			<height>1136</height>
+			<pixelRatio>2</pixelRatio>
+			<userAgent>Mozilla/5.0 (iPhone; CPU iPhone OS 6_0 like Mac OS X) AppleWebKit/536.26 (KHTML, like Gecko) Version/6.0 Mobile/10A403 Safari/8536.25</userAgent>
+			<skin>iPhone 4</skin>
+		</device>
+		<device>
+			<name>RIM BlackBerry Bold Touch 9900</name>
+			<width>640</width>
+			<height>480</height>
+			<pixelRatio>1</pixelRatio>
+			<userAgent>Mozilla/5.0 (BlackBerry; U; BlackBerry 9900; en-US) AppleWebKit/534.1+ (KHTML, like Gecko) Version/6.0.0.246 Mobile Safari/534.1+</userAgent>
+			<skin>iPhone 3</skin>
+		</device>
+		<device>
+			<name>Samsung Galaxy S II</name>
+			<width>480</width>
+			<height>800</height>
+			<pixelRatio>1.5</pixelRatio>
+			<userAgent>Mozilla/5.0 (Linux; U; Android 2.3; en-us; GT-I9100 Build/GRH78) AppleWebKit/533.1 (KHTML, like Gecko) Version/4.0 Mobile Safari/533.1</userAgent>
+			<skin>Galaxy Note II</skin>
+		</device>
+		<device>
+			<name>Samsung Galaxy Nexus</name>
+			<width>720</width>
+			<height>1280</height>
+			<pixelRatio>2</pixelRatio>
+			<userAgent>Mozilla/5.0 (Linux; U; Android 4.0.2; en-us; Galaxy Nexus Build/ICL53F) AppleWebKit/534.30 (KHTML like Gecko) Version/4.0 Mobile Safari/534.30</userAgent>
+			<skin>Galaxy Note II</skin>
+		</device>
+		<device>
+			<name>Galaxy Note II</name>
+			<width>800</width>
+			<height>1280</height>
+			<pixelRatio>2</pixelRatio>
+			<userAgent>Mozilla/5.0 (Linux; Android 4.1.1; GT-N7100 Build/JRO03C) AppleWebKit/535.19 (KHTML, like Gecko) Chrome/18.0.1025.166 Mobile Safari/535.19</userAgent>
+			<skin>Galaxy Note II</skin>
+		</device>
+		<device>
+			<name>Galaxy S III</name>
+			<width>720</width>
+			<height>1280</height>
+			<pixelRatio>2</pixelRatio>
+			<userAgent>Mozilla/5.0 (Linux; Android 4.1.1; GT-N7100 Build/JRO03C) AppleWebKit/535.19 (KHTML, like Gecko) Chrome/18.0.1025.166 Mobile Safari/535.19</userAgent>
+			<skin>Galaxy S III</skin>
+		</device>
+		<device>
+			<name>Samsung Galaxy Tab 10.1</name>
+			<width>800</width>
+			<height>1280</height>
+			<pixelRatio>1.5</pixelRatio>
+			<userAgent>Mozilla/5.0 (Linux; U; Android 3.0.1; en-us; GT-P7100 Build/HRI83) AppleWebKit/534.13 (KHTML, like Gecko) Version/4.0 MobileSafari/534.13</userAgent>
+			<skin>Galaxy Note II</skin>
+		</device>
+	</devices>
+</browserSim>

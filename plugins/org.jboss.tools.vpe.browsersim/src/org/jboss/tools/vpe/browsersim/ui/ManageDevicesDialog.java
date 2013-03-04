@@ -243,13 +243,6 @@ public class ManageDevicesDialog extends Dialog {
 				Button radio = (Button) e.widget;
 				if (radio.getSelection()) {
 					truncateWindow = (TruncateWindow) radio.getData();
-//					if (radio == askBeforeTruncateRadio) {
-//						truncateWindow = TruncateWindow.PROMPT;
-//					} else if (radio == alwaysTruncateRadio) {
-//						truncateWindow = TruncateWindow.ALWAYS_TRUNCATE;
-//					} else if (radio == neverTruncateRadio) {
-//						truncateWindow = TruncateWindow.NEVER_TRUNCATE;
-//					}
 				}
 			}
 		}; 
@@ -369,8 +362,8 @@ public class ManageDevicesDialog extends Dialog {
 		
 		useSkinsCheckbox.setSelection(useSkins);
 		
-		askBeforeTruncateRadio.setSelection(truncateWindow == null);
-		alwaysTruncateRadio.setSelection(truncateWindow != null && Boolean.TRUE.equals(truncateWindow));
-		neverTruncateRadio.setSelection(truncateWindow != null && Boolean.FALSE.equals(truncateWindow));
+		askBeforeTruncateRadio.setSelection(TruncateWindow.PROMPT.equals(truncateWindow));
+		alwaysTruncateRadio.setSelection(TruncateWindow.ALWAYS_TRUNCATE.equals(truncateWindow));
+		neverTruncateRadio.setSelection(TruncateWindow.NEVER_TRUNCATE.equals(truncateWindow));
 	}
 }

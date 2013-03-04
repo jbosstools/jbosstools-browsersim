@@ -10,19 +10,26 @@
  ******************************************************************************/
 package org.jboss.tools.vpe.browsersim.model.preferences;
 
-import java.io.BufferedReader;
-import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileInputStream;
-import java.io.FileWriter;
 import java.io.IOException;
 import java.io.InputStream;
-import java.io.InputStreamReader;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
+
+import javax.xml.parsers.DocumentBuilder;
+import javax.xml.parsers.DocumentBuilderFactory;
+import javax.xml.parsers.ParserConfigurationException;
+import javax.xml.transform.TransformerException;
+import javax.xml.transform.TransformerFactory;
+import javax.xml.transform.dom.DOMSource;
+import javax.xml.transform.stream.StreamResult;
 
 import org.eclipse.swt.graphics.Point;
+import org.jboss.tools.vpe.browsersim.util.PreferencesUtil;
 import org.jboss.tools.vpe.browsersim.util.ResourcesUtil;
+import org.w3c.dom.Document;
+import org.w3c.dom.Element;
+import org.w3c.dom.Node;
+import org.xml.sax.SAXException;
 
 /**
  * 
@@ -31,10 +38,18 @@ import org.jboss.tools.vpe.browsersim.util.ResourcesUtil;
  */
 
 public class SpecificPreferencesStorage implements PreferencesStorage{
-	private static final String SPECIFIC_PREFERENCES_FILE = "specificPreferences.cfg";
-	private static final String DEFAULT_SPECIFIC_PREFERENCES_RESOURCE = "config/specificPreferences.cfg";
+	private static final String PREFERENCES_LOCATION_Y = "y";
+	private static final String PREFERENCES_LOCATION_X = "x";
+	private static final String PREFERENCES_LOCATION = "location";
+	private static final String PREFERENCES_USE_SKINS = "useSkins";
+	private static final String PREFERENCES_SELECTED_DEVICE = "selectedDevice";
+	private static final String PREFERENCES_VERSION = "version";
 
-	private static final int CURRENT_CONFIG_VERSION = 9;
+	
+	private static final String SPECIFIC_PREFERENCES_FILE = "specificPreferences.xml";
+	private static final String DEFAULT_SPECIFIC_PREFERENCES_RESOURCE = "config/specificPreferences.xml";
+
+	private static final int CURRENT_CONFIG_VERSION = 10;
 
 	public static SpecificPreferencesStorage INSTANCE = new SpecificPreferencesStorage();
 	
@@ -84,65 +99,89 @@ public class SpecificPreferencesStorage implements PreferencesStorage{
 	}
 	
 	private SpecificPreferences load(InputStream is) throws IOException {
-		BufferedReader reader = new BufferedReader(new InputStreamReader(is));
-		
+		int configVersion = 0;
 		int selectedDeviceIndex = 0;
-		Point location = null;
+		Point currentlocation = null;
 		boolean useSkins = true;
+
 		try {
-			String nextLine;
-			int configVersion = 0;
-			if ((nextLine = reader.readLine()) != null) {
-				Pattern pattern = Pattern.compile("ConfigVersion=([0-9]+)");
-				Matcher matcher = pattern.matcher(nextLine);
-				if (matcher.matches()) {
-					configVersion = Integer.parseInt(matcher.group(1));
-				}
-			}
-			
+			DocumentBuilderFactory dbFactory = DocumentBuilderFactory.newInstance();
+			DocumentBuilder dBuilder = dbFactory.newDocumentBuilder();
+			Document document = dBuilder.parse(is);
+
+			// optional, but recommended
+			// see http://stackoverflow.com/questions/13786607/normalization-in-dom-parsing-with-java-how-does-it-work
+			document.getDocumentElement().normalize();
+
+			configVersion = Integer.parseInt(document.getDocumentElement().getAttribute(PREFERENCES_VERSION));
 			if (configVersion == CURRENT_CONFIG_VERSION) {
-				if ((nextLine = reader.readLine()) != null) {
-					Pattern pattern = Pattern.compile("Location=(\\-?[0-9]+) (\\-?[0-9]+)");
-					Matcher matcher = pattern.matcher(nextLine);
-					if (matcher.matches()) {
-						location = new Point(Integer.parseInt(matcher.group(1)), Integer.parseInt(matcher.group(2)));
-					}
+				Node node = document.getElementsByTagName(PREFERENCES_SELECTED_DEVICE).item(0);
+				if (!PreferencesUtil.isNullOrEmpty(node)) {
+					selectedDeviceIndex = Integer.parseInt(node.getTextContent());
 				}
 				
-				if ((nextLine = reader.readLine()) != null) {
-					Pattern pattern = Pattern.compile("SelectedDeviceIndex=([0-9]+)");
-					Matcher matcher = pattern.matcher(nextLine);
-					if (matcher.matches()) {
-						selectedDeviceIndex = Integer.parseInt(matcher.group(1));
-					}
+				node = document.getElementsByTagName(PREFERENCES_USE_SKINS).item(0);
+				if (!PreferencesUtil.isNullOrEmpty(node)) {
+					useSkins = Boolean.parseBoolean(node.getTextContent());
 				}
 				
-				if ((nextLine = reader.readLine()) != null) {
-					Pattern pattern = Pattern.compile("UseSkins=(true|false)");
-					Matcher matcher = pattern.matcher(nextLine);
-					if (matcher.matches()) {
-						useSkins = Boolean.parseBoolean(matcher.group(1));
+				node = document.getElementsByTagName(PREFERENCES_LOCATION).item(0);
+				if (!PreferencesUtil.isNullOrEmpty(node) && node.getNodeType() == Node.ELEMENT_NODE) {
+					Element location = (Element) node;
+					Node x = location.getElementsByTagName(PREFERENCES_LOCATION_X).item(0);
+					Node y = location.getElementsByTagName(PREFERENCES_LOCATION_Y).item(0);
+					
+					if (!PreferencesUtil.isNullOrEmpty(x) && !PreferencesUtil.isNullOrEmpty(y)) {
+						currentlocation = new Point(Integer.parseInt(x.getTextContent()), Integer.parseInt(y
+								.getTextContent()));
 					}
 				}
-			}	
-		} finally {
-			if (reader != null) {
-				reader.close();
 			}
+		} catch (SAXException e) {
+			e.printStackTrace();
+		} catch (ParserConfigurationException e) {
+			e.printStackTrace();
 		}
-		
-		return new SpecificPreferences(selectedDeviceIndex, useSkins, location);
+
+		return new SpecificPreferences(selectedDeviceIndex, useSkins, currentlocation);
 	}
 
 	private void save(SpecificPreferences sp, File file) throws IOException {
-		BufferedWriter writer = new BufferedWriter(new FileWriter(file));
-		
-		writer.write("ConfigVersion=" + String.valueOf(CURRENT_CONFIG_VERSION) + "\n");
-		Point location = sp.getLocation();
-		writer.write("Location=" + location.x + " " + location.y + "\n");
-		writer.write("SelectedDeviceIndex=" + String.valueOf(sp.getSelectedDeviceIndex()) + "\n");
-		writer.write("UseSkins=" + String.valueOf(sp.getUseSkins()) + "\n");
-		
-		writer.close();
+		try {
+			DocumentBuilderFactory docFactory = DocumentBuilderFactory.newInstance();
+			DocumentBuilder docBuilder = docFactory.newDocumentBuilder();
+			Document doc = docBuilder.newDocument();
+			
+			Element rootElement = doc.createElement("browserSim");
+			rootElement.setAttribute(PREFERENCES_VERSION, String.valueOf(CURRENT_CONFIG_VERSION));
+			doc.appendChild(rootElement);
+
+			Element selectedDevice = doc.createElement(PREFERENCES_SELECTED_DEVICE);
+			selectedDevice.setTextContent(String.valueOf(sp.getSelectedDeviceIndex()));
+			rootElement.appendChild(selectedDevice);
+
+			Element location = doc.createElement(PREFERENCES_LOCATION);
+			Element locationX = doc.createElement(PREFERENCES_LOCATION_X);
+			Element locationY = doc.createElement(PREFERENCES_LOCATION_Y);
+			Point currentLocation = sp.getLocation();
+			locationX.setTextContent(String.valueOf(currentLocation.x));
+			locationY.setTextContent(String.valueOf(currentLocation.y));
+			location.appendChild(locationX);
+			location.appendChild(locationY);
+			rootElement.appendChild(location);
+			
+			Element useSkins = doc.createElement(PREFERENCES_USE_SKINS);
+			useSkins.setTextContent(String.valueOf(sp.getUseSkins()));
+			rootElement.appendChild(useSkins);
+			
+			// write the content into xml file
+			TransformerFactory transformerFactory = TransformerFactory.newInstance();
+			transformerFactory.newTransformer().transform(new DOMSource(doc), new StreamResult(file));
+
+		} catch (ParserConfigurationException pce) {
+			pce.printStackTrace();
+		} catch (TransformerException tfe) {
+			tfe.printStackTrace();
+		}
 	}
 }
