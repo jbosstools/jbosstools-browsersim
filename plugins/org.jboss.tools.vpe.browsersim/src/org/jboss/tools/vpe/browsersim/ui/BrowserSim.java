@@ -51,6 +51,8 @@ import org.jboss.tools.vpe.browsersim.model.preferences.CommonPreferencesStorage
 import org.jboss.tools.vpe.browsersim.model.preferences.SpecificPreferences;
 import org.jboss.tools.vpe.browsersim.model.preferences.SpecificPreferencesStorage;
 import org.jboss.tools.vpe.browsersim.ui.debug.firebug.FireBugLiteLoader;
+import org.jboss.tools.vpe.browsersim.ui.events.SkinChangeEvent;
+import org.jboss.tools.vpe.browsersim.ui.events.SkinChangeListener;
 import org.jboss.tools.vpe.browsersim.ui.menu.BrowserSimMenuCreator;
 import org.jboss.tools.vpe.browsersim.ui.skin.BrowserSimSkin;
 import org.jboss.tools.vpe.browsersim.ui.skin.ResizableSkinSizeAdvisor;
@@ -65,10 +67,9 @@ import org.jboss.tools.vpe.browsersim.util.ImageList;
 public class BrowserSim {
 	public static final String BROWSERSIM_PLUGIN_ID = "org.jboss.tools.vpe.browsersim"; //$NON-NLS-1$
 	private static final String[] BROWSERSIM_ICONS = {"icons/browsersim_16px.png", "icons/browsersim_32px.png", "icons/browsersim_64px.png", "icons/browsersim_128px.png", "icons/browsersim_256px.png", }; //$NON-NLS-1$//$NON-NLS-2$//$NON-NLS-3$//$NON-NLS-4$//$NON-NLS-5$
-
+	
 	public static boolean isStandalone;
 	private static List<BrowserSim> instances;
-
 	private String homeUrl;
 	private static CommonPreferences commonPreferences;
 	private SpecificPreferences specificPreferences;
@@ -80,6 +81,7 @@ public class BrowserSim {
 	private Point currentLocation;
 	private ProgressListener progressListener;
 	private Observer commonPreferencesObserver;
+	private List<SkinChangeListener> skinChangeListenerList = new ArrayList<SkinChangeListener>();
 
 	static {
 		instances = new ArrayList<BrowserSim>();
@@ -89,7 +91,7 @@ public class BrowserSim {
 		this.homeUrl = homeUrl;
 		
 	}
-
+	
 	public void open() {
 		commonPreferences = (CommonPreferences) CommonPreferencesStorage.INSTANCE.load();
 		if (commonPreferences == null) {
@@ -374,6 +376,7 @@ public class BrowserSim {
 				skin.pageTitleChanged(event.title);
 			}
 		});
+		fireSkinChangeEvent();
 	}
 	
 	private void initImages() {
@@ -442,7 +445,7 @@ public class BrowserSim {
 		} else {
 			getBrowser().refresh(); // only user agent and size of the browser is changed
 		}
-
+		
 		skin.getShell().open();
 	}
 	
@@ -492,13 +495,24 @@ public class BrowserSim {
 		return skin != null ? skin.getBrowser() : null;
 	}
 	
+	public void addSkinChangeListener(SkinChangeListener listener) {
+		skinChangeListenerList.add(listener);
+	}
+	
+	public void fireSkinChangeEvent() {
+		SkinChangeEvent event = new SkinChangeEvent(this, skin);
+		for (SkinChangeListener listener : skinChangeListenerList) {
+			listener.skinChanged(event);
+		}
+	}
+
 	/**
 	 * {@link ControlHandler} factory method.
 	 * 
 	 * Override this method if you need a custom {@link ControlHandler}
 	 */
-	protected ControlHandler createControlHandler(BrowserSimBrowser browser,
-			String homeUrl, SpecificPreferences specificPreferences) {
+	protected ControlHandler createControlHandler(BrowserSimBrowser browser, String homeUrl, SpecificPreferences specificPreferences) {
 		return new BrowserSimControlHandler(browser, homeUrl, specificPreferences);
 	}
+
 }
