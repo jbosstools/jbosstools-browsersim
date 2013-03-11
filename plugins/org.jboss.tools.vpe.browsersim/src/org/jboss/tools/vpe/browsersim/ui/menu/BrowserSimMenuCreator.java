@@ -47,6 +47,7 @@ public class BrowserSimMenuCreator {
 	private ControlHandler controlHandler;
 	private String homeUrl;
 	
+
 	public BrowserSimMenuCreator(BrowserSimSkin skin, CommonPreferences cp, SpecificPreferences sp,
 			ControlHandler controlHandler, String homeUrl) {
 		this.skin = skin;
@@ -245,7 +246,7 @@ public class BrowserSimMenuCreator {
 		exit.addSelectionListener(new SelectionAdapter() {
 			public void widgetSelected(SelectionEvent e) {
 				shell.close();
-			};
+			}
 		});
 	}
 

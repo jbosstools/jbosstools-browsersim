@@ -51,6 +51,7 @@ import org.jboss.tools.vpe.browsersim.model.preferences.CommonPreferencesStorage
 import org.jboss.tools.vpe.browsersim.model.preferences.SpecificPreferences;
 import org.jboss.tools.vpe.browsersim.model.preferences.SpecificPreferencesStorage;
 import org.jboss.tools.vpe.browsersim.ui.debug.firebug.FireBugLiteLoader;
+import org.jboss.tools.vpe.browsersim.ui.events.ExitListener;
 import org.jboss.tools.vpe.browsersim.ui.events.SkinChangeEvent;
 import org.jboss.tools.vpe.browsersim.ui.events.SkinChangeListener;
 import org.jboss.tools.vpe.browsersim.ui.menu.BrowserSimMenuCreator;
@@ -82,7 +83,8 @@ public class BrowserSim {
 	private ProgressListener progressListener;
 	private Observer commonPreferencesObserver;
 	private List<SkinChangeListener> skinChangeListenerList = new ArrayList<SkinChangeListener>();
-
+	private List<ExitListener> exitListenerList = new ArrayList<ExitListener>();
+	
 	static {
 		instances = new ArrayList<BrowserSim>();
 	}
@@ -169,11 +171,19 @@ public class BrowserSim {
 				commonPreferences.deleteObserver(commonPreferencesObserver);
 			}
 		});
+		shell.addListener(SWT.Close, new Listener() {
+
+			@Override
+			public void handleEvent(Event event) {
+				for (ExitListener e : exitListenerList) {
+					e.exit();
+				}
+			}
+		});
 
 		final BrowserSimBrowser browser = getBrowser();
 		controlHandler = createControlHandler(browser, homeUrl, specificPreferences);
-		final BrowserSimMenuCreator menuCreator = new BrowserSimMenuCreator(skin, commonPreferences,
-				specificPreferences, controlHandler, homeUrl);
+		final BrowserSimMenuCreator menuCreator = new BrowserSimMenuCreator(skin, commonPreferences, specificPreferences, controlHandler, homeUrl);
 		
 		shell.addShellListener(new ShellListener() {
 			@Override
@@ -495,8 +505,13 @@ public class BrowserSim {
 		return skin != null ? skin.getBrowser() : null;
 	}
 	
+	
 	public void addSkinChangeListener(SkinChangeListener listener) {
 		skinChangeListenerList.add(listener);
+	}
+	
+	public void addExitListener(ExitListener listener){
+		exitListenerList.add(listener);
 	}
 	
 	public void fireSkinChangeEvent() {
