@@ -324,8 +324,10 @@ public class ManageDevicesDialog extends Dialog {
 		shell.setDefaultButton(buttonOk);
 		buttonOk.addSelectionListener(new SelectionAdapter() {
 			public void widgetSelected(SelectionEvent e) {
-				newCommonPreferences = new CommonPreferences(devices, truncateWindow, screenshotsPath.getText(), weinreScriptUrlText.getText(), weinreClientUrlText.getText());
-				newSpecificPreferences = new SpecificPreferences(selectedDeviceIndex, useSkins, oldSpecificPreferences.getLocation());
+				newCommonPreferences = new CommonPreferences(devices, truncateWindow, screenshotsPath.getText(),
+						weinreScriptUrlText.getText(), weinreClientUrlText.getText());
+				newSpecificPreferences = new SpecificPreferences(selectedDeviceIndex, useSkins,
+						oldSpecificPreferences.getOrientationAngle(), oldSpecificPreferences.getLocation());
 				shell.close();
 			}
 		});

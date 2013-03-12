@@ -30,7 +30,7 @@ import org.eclipse.swt.widgets.Shell;
 import org.eclipse.swt.widgets.Text;
 import org.jboss.tools.vpe.browsersim.browser.BrowserSimBrowser;
 import org.jboss.tools.vpe.browsersim.browser.IBrowserSimBrowserFactory;
-import org.jboss.tools.vpe.browsersim.model.DeviceOrientation;
+import org.jboss.tools.vpe.browsersim.model.preferences.SpecificPreferences;
 import org.jboss.tools.vpe.browsersim.ui.ControlHandler;
 import org.jboss.tools.vpe.browsersim.util.ImageList;
 
@@ -352,12 +352,12 @@ public class AppleIPhone3Skin implements BrowserSimSkin {
 	public void setOrientationAndSize(int orientation, Point browserSize, ResizableSkinSizeAdvisor sizeAdvisor) {
 		// browserSize is ignored by this skin
 		
-		if ((this.orientation == DeviceOrientation.PORTRAIT || this.orientation == DeviceOrientation.PORTRAIT_INVERTED) &&
-				(orientation == DeviceOrientation.LANDSCAPE || orientation == DeviceOrientation.LANDSCAPE_INVERTED)) {
+		if ((this.orientation == SpecificPreferences.ORIENTATION_PORTRAIT || this.orientation == SpecificPreferences.ORIENTATION_PORTRAIT_INVERTED) &&
+				(orientation == SpecificPreferences.ORIENTATION_LANDSCAPE || orientation == SpecificPreferences.ORIENTATION_LANDSCAPE_INVERTED)) {
 			//changed from portrait to landscape
 			currentOrientationIndex = HORIZONTAL;
-		} else if ((this.orientation == DeviceOrientation.LANDSCAPE || this.orientation == DeviceOrientation.LANDSCAPE_INVERTED) &&
-					(orientation == DeviceOrientation.PORTRAIT || orientation == DeviceOrientation.PORTRAIT_INVERTED)) {
+		} else if ((this.orientation == SpecificPreferences.ORIENTATION_LANDSCAPE || this.orientation == SpecificPreferences.ORIENTATION_LANDSCAPE_INVERTED) &&
+					(orientation == SpecificPreferences.ORIENTATION_PORTRAIT || orientation == SpecificPreferences.ORIENTATION_PORTRAIT_INVERTED)) {
 			//changed from landscape to portrait
 			currentOrientationIndex = VERTICAL;
 		}

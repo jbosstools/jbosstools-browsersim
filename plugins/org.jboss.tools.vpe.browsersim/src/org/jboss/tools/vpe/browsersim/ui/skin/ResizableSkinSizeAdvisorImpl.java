@@ -17,7 +17,6 @@ package org.jboss.tools.vpe.browsersim.ui.skin;
 import org.eclipse.swt.graphics.Point;
 import org.eclipse.swt.graphics.Rectangle;
 import org.eclipse.swt.widgets.Shell;
-import org.jboss.tools.vpe.browsersim.model.DeviceOrientation;
 import org.jboss.tools.vpe.browsersim.model.TruncateWindow;
 import org.jboss.tools.vpe.browsersim.model.preferences.CommonPreferences;
 import org.jboss.tools.vpe.browsersim.model.preferences.SpecificPreferences;
@@ -47,7 +46,7 @@ public class ResizableSkinSizeAdvisorImpl implements ResizableSkinSizeAdvisor{
 				
 				SizeWarningDialog dialog = new SizeWarningDialog(shell, new Point(clientArea.width, clientArea.height),
 						prefferedShellSize, deviceName,
-						orientation == DeviceOrientation.PORTRAIT || orientation == DeviceOrientation.PORTRAIT_INVERTED);
+						orientation == SpecificPreferences.ORIENTATION_PORTRAIT || orientation == SpecificPreferences.ORIENTATION_PORTRAIT_INVERTED);
 				dialog.open();
 
 				truncateWindow = dialog.getTruncateWindow();

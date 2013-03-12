@@ -42,7 +42,7 @@ public class ToolsMenuCreator {
 		addFireBugLiteItem(menu, skin);
 		addWeinreItem(menu, skin, cp.getWeinreScriptUrl(), cp.getWeinreClientUrl());
 		addScreenshotMenuItem(menu, skin, cp.getScreenshotsFolder());
-		addSyncronizedWindowItem(menu, skin, cp.getDevices(), sp.getUseSkins(), homeUrl);
+		addSyncronizedWindowItem(menu, skin, cp.getDevices(), sp.getUseSkins(), sp.getOrientationAngle(), homeUrl);
 	}
 	
 	private static void addFireBugLiteItem(Menu menu, final BrowserSimSkin skin) {
@@ -99,7 +99,7 @@ public class ToolsMenuCreator {
 	}
 	
 	private static void addSyncronizedWindowItem(Menu menu, final BrowserSimSkin skin,
-			final List<Device> devices, final Boolean useSkins, final String homeUrl) {
+			final List<Device> devices, final Boolean useSkins, final int orientationAngle, final String homeUrl) {
 		MenuItem syncWindow = new MenuItem(menu, SWT.CASCADE);
 		syncWindow.setText("Open Syncronized Window");
 		Menu subMenu = new Menu(menu);
@@ -118,7 +118,8 @@ public class ToolsMenuCreator {
 						if (selectedDeviceIndex < 0) {
 							selectedDeviceIndex = 0;
 						}
-						SpecificPreferences sp = new SpecificPreferences(selectedDeviceIndex, useSkins, null);
+						SpecificPreferences sp = new SpecificPreferences(selectedDeviceIndex, useSkins,
+								orientationAngle, null);
 
 						BrowserSim browserSim1 = new BrowserSim(homeUrl);
 						browserSim1.open(sp, skin.getBrowser().getUrl());

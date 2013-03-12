@@ -27,7 +27,7 @@ import org.eclipse.swt.widgets.ProgressBar;
 import org.eclipse.swt.widgets.Shell;
 import org.jboss.tools.vpe.browsersim.browser.BrowserSimBrowser;
 import org.jboss.tools.vpe.browsersim.browser.IBrowserSimBrowserFactory;
-import org.jboss.tools.vpe.browsersim.model.DeviceOrientation;
+import org.jboss.tools.vpe.browsersim.model.preferences.SpecificPreferences;
 import org.jboss.tools.vpe.browsersim.ui.ControlHandler;
 import org.jboss.tools.vpe.browsersim.ui.skin.AppleIPhone3Skin;
 import org.jboss.tools.vpe.browsersim.ui.skin.DeviceComposite;
@@ -265,7 +265,7 @@ public class AppleIPhone3ResizableSkin extends ResizableSkin {
 
 	@Override
 	public void setOrientationAndSize(int orientation, Point browserSize, ResizableSkinSizeAdvisor sizeAdvisor) {
-		vertical = (orientation == DeviceOrientation.PORTRAIT || orientation == DeviceOrientation.PORTRAIT_INVERTED);
+		vertical = (orientation == SpecificPreferences.ORIENTATION_PORTRAIT || orientation == SpecificPreferences.ORIENTATION_PORTRAIT_INVERTED);
 		String urlTextText = deviceComposite.getUrlText().getText();
 		String pageTitle = deviceComposite.getPageTitleStyledText() != null ? deviceComposite.getPageTitleStyledText().getText() : "";
 		boolean backEnabled = deviceComposite.getBackButtonComposite().getEnabled();

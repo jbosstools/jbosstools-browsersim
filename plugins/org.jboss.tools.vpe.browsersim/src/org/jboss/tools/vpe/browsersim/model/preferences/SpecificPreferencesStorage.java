@@ -38,6 +38,7 @@ import org.xml.sax.SAXException;
  */
 
 public class SpecificPreferencesStorage implements PreferencesStorage{
+	private static final String PREFERENCES_ORIENTATION_ANGLE = "orientationAngle";
 	private static final String PREFERENCES_LOCATION_Y = "y";
 	private static final String PREFERENCES_LOCATION_X = "x";
 	private static final String PREFERENCES_LOCATION = "location";
@@ -92,7 +93,7 @@ public class SpecificPreferencesStorage implements PreferencesStorage{
 		}
 		
 		if (specificPreferences == null) {
-			specificPreferences = new SpecificPreferences(0, true, null);
+			specificPreferences = new SpecificPreferences(0, true, 0, null);
 		}
 
 		return specificPreferences;
@@ -101,6 +102,7 @@ public class SpecificPreferencesStorage implements PreferencesStorage{
 	private SpecificPreferences load(InputStream is) throws IOException {
 		int configVersion = 0;
 		int selectedDeviceIndex = 0;
+		int orientationAngle = 0;
 		Point currentlocation = null;
 		boolean useSkins = true;
 
@@ -125,6 +127,11 @@ public class SpecificPreferencesStorage implements PreferencesStorage{
 					useSkins = Boolean.parseBoolean(node.getTextContent());
 				}
 				
+				node = document.getElementsByTagName(PREFERENCES_ORIENTATION_ANGLE).item(0);
+				if (!PreferencesUtil.isNullOrEmpty(node)) {
+					orientationAngle = Integer.parseInt(node.getTextContent());
+				}
+				
 				node = document.getElementsByTagName(PREFERENCES_LOCATION).item(0);
 				if (!PreferencesUtil.isNullOrEmpty(node) && node.getNodeType() == Node.ELEMENT_NODE) {
 					Element location = (Element) node;
@@ -143,7 +150,7 @@ public class SpecificPreferencesStorage implements PreferencesStorage{
 			e.printStackTrace();
 		}
 
-		return new SpecificPreferences(selectedDeviceIndex, useSkins, currentlocation);
+		return new SpecificPreferences(selectedDeviceIndex, useSkins, orientationAngle, currentlocation);
 	}
 
 	private void save(SpecificPreferences sp, File file) throws IOException {
@@ -169,6 +176,10 @@ public class SpecificPreferencesStorage implements PreferencesStorage{
 			location.appendChild(locationX);
 			location.appendChild(locationY);
 			rootElement.appendChild(location);
+			
+			Element orientationAngle = doc.createElement(PREFERENCES_ORIENTATION_ANGLE);
+			orientationAngle.setTextContent(String.valueOf(sp.getOrientationAngle()));
+			rootElement.appendChild(orientationAngle);
 			
 			Element useSkins = doc.createElement(PREFERENCES_USE_SKINS);
 			useSkins.setTextContent(String.valueOf(sp.getUseSkins()));
