@@ -15,6 +15,7 @@ import java.util.List;
 import java.util.Observable;
 import java.util.Observer;
 
+import org.eclipse.swt.SWT;
 import org.eclipse.swt.SWTError;
 import org.eclipse.swt.browser.Browser;
 import org.eclipse.swt.browser.BrowserFunction;
@@ -31,14 +32,14 @@ import org.eclipse.swt.browser.TitleListener;
 import org.eclipse.swt.browser.WindowEvent;
 import org.eclipse.swt.events.ControlAdapter;
 import org.eclipse.swt.events.ControlEvent;
-import org.eclipse.swt.events.DisposeEvent;
-import org.eclipse.swt.events.DisposeListener;
 import org.eclipse.swt.events.ShellEvent;
 import org.eclipse.swt.events.ShellListener;
 import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.graphics.Point;
 import org.eclipse.swt.graphics.Rectangle;
 import org.eclipse.swt.widgets.Display;
+import org.eclipse.swt.widgets.Event;
+import org.eclipse.swt.widgets.Listener;
 import org.eclipse.swt.widgets.Menu;
 import org.eclipse.swt.widgets.Shell;
 import org.jboss.tools.vpe.browsersim.browser.BrowserSimBrowser;
@@ -155,8 +156,10 @@ public class BrowserSim {
 				super.controlMoved(e);
 			}
 		});
-		shell.addDisposeListener(new DisposeListener() {
-			public void widgetDisposed(DisposeEvent e) {
+		
+		shell.addListener(SWT.Close, new Listener() {
+			@Override
+			public void handleEvent(Event event) {
 				instances.remove(BrowserSim.this);
 				specificPreferences.setLocation(currentLocation);
 				SpecificPreferencesStorage.INSTANCE.save(specificPreferences);
@@ -431,7 +434,7 @@ public class BrowserSim {
 			oldSkinUrl = skin.getBrowser().getUrl();
 			Point currentLocation = skin.getShell().getLocation();
 			skin.getBrowser().removeProgressListener(progressListener);
-			skin.getBrowser().getShell().dispose();//XXX
+			skin.getBrowser().getShell().dispose();
 			initSkin(newSkinClass, currentLocation);
 		}
 

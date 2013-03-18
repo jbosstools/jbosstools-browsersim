@@ -255,7 +255,7 @@ public class BrowserSimMenuCreator {
 		exit.setText(Messages.BrowserSim_EXIT);
 		exit.addSelectionListener(new SelectionAdapter() {
 			public void widgetSelected(SelectionEvent e) {
-				shell.dispose();
+				shell.close();
 			};
 		});
 	}
