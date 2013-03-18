@@ -10,6 +10,6 @@ See https://community.jboss.org/docs/DOC-18100 for details.
 
 To build the application without anything else built:
 
-    $ mvn -Pbootstrap clean install
+    $ mvn clean install
 
 After sucessfull build you can find the jar in target\application\ folder.
