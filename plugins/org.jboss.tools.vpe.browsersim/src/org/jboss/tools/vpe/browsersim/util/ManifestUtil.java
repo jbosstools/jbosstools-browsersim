@@ -43,7 +43,10 @@ public class ManifestUtil {
 				InputStream inputStream = manifestUrl.openStream();
 				if (inputStream != null) {
 					Manifest manifest = new Manifest(inputStream);
-					version = getManifestVersion(manifest);
+					String manifestVersion = getManifestVersion(manifest);
+					if (!PreferencesUtil.isNullOrEmpty(manifestVersion)) {
+						version = manifestVersion; 
+					}
 				}
 			}
 

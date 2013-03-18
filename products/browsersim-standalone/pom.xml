@@ -110,6 +110,10 @@
 								<taskdef name="swtjar" classname="org.swtjar.ant.SWTJarTask" classpath="ant/swtjar.jar"/>
 								<swtjar jarfile="target/application/browsersim.jar" targetmainclass="org.jboss.tools.vpe.browsersim.BrowserSimRunner" swtversion="${org.eclipse.swt.version}">
 									<!--fileset dir="build/classes" includes="**/*" /-->
+									<manifest>
+									    <attribute name="Bundle-SymbolicName" value="org.jboss.tools.vpe.browsersim;singleton:=true" />
+									    <attribute name="Bundle-Version" value="${project.version}-${maven.build.timestamp}" />
+									</manifest>
 									<fileset dir="target/application/temp/swt" includes="*.jar" />
 									<zipfileset excludes="META-INF/*.MF" src="${org.jboss.tools.vpe.browsersim.browser.file}"/>
 									<zipfileset excludes="META-INF/*.MF" src="${org.jboss.tools.vpe.browsersim.file}"/>
