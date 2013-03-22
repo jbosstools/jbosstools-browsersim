@@ -168,6 +168,8 @@ public class BrowserSim {
 			}
 		});
 
+		final BrowserSimBrowser browser = skin.getBrowser();
+		controlHandler = new ControlHandlerImpl(browser);
 		final BrowserSimMenuCreator menuCreator = new BrowserSimMenuCreator(skin, commonPreferences,
 				specificPreferences, controlHandler, homeUrl);
 		
@@ -197,8 +199,6 @@ public class BrowserSim {
 		menuCreator.addMenuBar();
 		setShellAttibutes();
 		
-		final BrowserSimBrowser browser = skin.getBrowser();
-		controlHandler = new ControlHandlerImpl(browser);
 		skin.setControlHandler(controlHandler);
 		
 		Menu contextMenu = new Menu(shell);
