@@ -1,61 +1,23 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd" xmlns="http://maven.apache.org/POM/4.0.0"
     xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
-	<properties>
-		<tycho-version>0.16.0</tycho-version>
-	</properties>
+	<parent>
+		<groupId>org.jboss.tools.vpe</groupId>
+		<artifactId>products</artifactId>
+		<version>3.5.0-SNAPSHOT</version>
+	</parent>	
 	<modelVersion>4.0.0</modelVersion>
-	<groupId>org.jboss.tools.browsersim</groupId>
-	<artifactId>org.jboss.tools.browsersim-standalone</artifactId>
-	<version>3.4.0-SNAPSHOT</version>
+	<groupId>org.jboss.tools.vpe.browsersim</groupId>
+	<artifactId>org.jboss.tools.vpe.browsersim-standalone</artifactId>
+	<version>3.5.0-SNAPSHOT</version>
 	<packaging>eclipse-repository</packaging>
-	<name>org.jboss.tools.browsersim-standalone</name>
-   <build>
-      <plugins>
-         <plugin>
-            <groupId>org.eclipse.tycho</groupId>
-            <artifactId>tycho-maven-plugin</artifactId>
-            <version>${tycho-version}</version>
-            <extensions>true</extensions>
-         </plugin>
-		 <plugin>
-				<groupId>org.eclipse.tycho</groupId>
-				<artifactId>target-platform-configuration</artifactId>
-				<version>${tycho-version}</version>
-				<configuration>
-					<environments>
-						<environment>
-							<os>linux</os>
-							<ws>gtk</ws>
-							<arch>x86</arch>
-						</environment>
-						<environment>
-							<os>linux</os>
-							<ws>gtk</ws>
-							<arch>x86_64</arch>
-						</environment>
-						<environment>
-							<os>win32</os>
-							<ws>win32</ws>
-							<arch>x86</arch>
-						</environment>
-						<environment>
-							<os>macosx</os>
-							<ws>cocoa</ws>
-							<arch>x86</arch>
-						</environment>
-						<environment>
-							<os>macosx</os>
-							<ws>cocoa</ws>
-							<arch>x86_64</arch>
-						</environment>
-					</environments>
-				</configuration>
-			</plugin>
+	<name>org.jboss.tools.vpe.browsersim-standalone</name>
+	<build>
+		<plugins>
 			<plugin>
 				<groupId>org.eclipse.tycho</groupId>
 				<artifactId>tycho-p2-repository-plugin</artifactId>
-				<version>${tycho-version}</version>
+				<version>${tychoVersion}</version>
 				<configuration>
 					<includeAllDependencies>true</includeAllDependencies>
 				</configuration>
@@ -71,20 +33,17 @@
 								<mkdir dir="target/application"/>
 								<mkdir dir="target/application/temp/swt"/>
 
-								<taskdef resource="net/sf/antcontrib/antcontrib.properties">
-									<classpath>
-										<pathelement location="ant/ant-contrib-1.0b3.jar"/>
-									</classpath>
-								</taskdef>
+								<taskdef resource="net/sf/antcontrib/antcontrib.properties"/>
 								<path id="org.eclipse.swt.file.id"> 
 									<fileset dir="target/repository/plugins">
-										<include name="org.eclipse.swt_*.jar"/> 
+										<include name="org.eclipse.swt.gtk.linux.x86_64_*.jar"/> 
 									 </fileset>
 								</path> 
 
 								<property name="org.eclipse.swt.file" refid="org.eclipse.swt.file.id"/>
 								<echo message="${org.eclipse.swt.file}"/> 
-								<propertyregex property="org.eclipse.swt.version" input="${org.eclipse.swt.file}" regexp=".*org\.eclipse\.swt_(.*)\.jar" select="\1" casesensitive="true" />
+								<propertyregex property="org.eclipse.swt.version" input="${org.eclipse.swt.file}" regexp=".*org\.eclipse\.swt\.gtk\.linux\.x86_64_(.*)\.jar" select="\1" casesensitive="true" />
+								<echo message="${org.eclipse.swt.version}"/> 
 								
 								<copy file="target/repository/plugins/org.eclipse.swt.win32.win32.x86_${org.eclipse.swt.version}.jar" tofile="target/application/temp/swt/swt-win32-${org.eclipse.swt.version}.jar"/>
 								<copy file="target/repository/plugins/org.eclipse.swt.cocoa.macosx_${org.eclipse.swt.version}.jar" tofile="target/application/temp/swt/swt-osx32-${org.eclipse.swt.version}.jar"/>
@@ -126,21 +85,48 @@
 						</goals>
 					</execution>
 				</executions>
+				<dependencies>
+					<dependency>
+						<groupId>ant-contrib</groupId>
+						<artifactId>ant-contrib</artifactId>
+						<version>1.0b3</version>
+						<exclusions>
+							<exclusion>
+								<groupId>ant</groupId>
+								<artifactId>ant</artifactId>
+							</exclusion>
+						</exclusions>
+					</dependency>
+					<dependency>
+						<groupId>org.apache.ant</groupId>
+						<artifactId>ant-nodeps</artifactId>
+						<version>1.8.1</version>
+					</dependency>
+				</dependencies>
 			</plugin>
-      </plugins>
-   </build>
-   
-   <repositories>
-		<repository>
-			<id>eclipse-indigo-sr2</id>
-			<url>http://download.eclipse.org/releases/juno/</url>
-			<layout>p2</layout>
-			<snapshots>
-				<enabled>true</enabled>
-			</snapshots>
-			<releases>
-				<enabled>true</enabled>
-			</releases>
-		</repository>
-	</repositories> 
+			<plugin>
+				<groupId>org.codehaus.mojo</groupId>
+				<artifactId>build-helper-maven-plugin</artifactId>
+				<version>1.7</version>
+				<executions>
+					<execution>
+						<id>attach-standalone</id>
+						<phase>package</phase>
+						<goals>
+							<goal>attach-artifact</goal>
+						</goals>
+						<configuration>
+							<artifacts>
+								<artifact>
+									<file>${project.build.directory}/application/browsersim.jar</file>
+									<type>jar</type>
+									<classifier>standalone</classifier>
+								</artifact>
+							</artifacts>
+						</configuration>
+					</execution>
+				</executions>
+			</plugin>
+		</plugins>
+	</build>
 </project>
