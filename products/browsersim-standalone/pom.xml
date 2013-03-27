@@ -7,11 +7,11 @@
 		<version>3.5.0-SNAPSHOT</version>
 	</parent>	
 	<modelVersion>4.0.0</modelVersion>
-	<groupId>org.jboss.tools.browsersim</groupId>
-	<artifactId>org.jboss.tools.browsersim-standalone</artifactId>
+	<groupId>org.jboss.tools.vpe.browsersim</groupId>
+	<artifactId>org.jboss.tools.vpe.browsersim-standalone</artifactId>
 	<version>3.5.0-SNAPSHOT</version>
 	<packaging>eclipse-repository</packaging>
-	<name>org.jboss.tools.browsersim-standalone</name>
+	<name>org.jboss.tools.vpe.browsersim-standalone</name>
 	<build>
 		<plugins>
 			<plugin>
