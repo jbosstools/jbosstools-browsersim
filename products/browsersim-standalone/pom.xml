@@ -2,26 +2,22 @@
 <project xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd" xmlns="http://maven.apache.org/POM/4.0.0"
     xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
 	<parent>
-			<groupId>org.jboss.tools</groupId>
-			<artifactId>parent</artifactId>
-			<version>4.1.0.Alpha2-SNAPSHOT</version>
-			<relativePath>../jbosstools-build/parent/pom.xml</relativePath>
+		<groupId>org.jboss.tools.vpe</groupId>
+		<artifactId>products</artifactId>
+		<version>3.5.0-SNAPSHOT</version>
 	</parent>	
-	<properties>
-		<tycho-version>0.17.0</tycho-version>
-	</properties>
 	<modelVersion>4.0.0</modelVersion>
 	<groupId>org.jboss.tools.browsersim</groupId>
 	<artifactId>org.jboss.tools.browsersim-standalone</artifactId>
 	<version>3.5.0-SNAPSHOT</version>
 	<packaging>eclipse-repository</packaging>
 	<name>org.jboss.tools.browsersim-standalone</name>
-   <build>
-      <plugins>
+	<build>
+		<plugins>
 			<plugin>
 				<groupId>org.eclipse.tycho</groupId>
 				<artifactId>tycho-p2-repository-plugin</artifactId>
-				<version>${tycho-version}</version>
+				<version>${tychoVersion}</version>
 				<configuration>
 					<includeAllDependencies>true</includeAllDependencies>
 				</configuration>
@@ -37,11 +33,7 @@
 								<mkdir dir="target/application"/>
 								<mkdir dir="target/application/temp/swt"/>
 
-								<taskdef resource="net/sf/antcontrib/antcontrib.properties">
-									<classpath>
-										<pathelement location="ant/ant-contrib-1.0b3.jar"/>
-									</classpath>
-								</taskdef>
+								<taskdef resource="net/sf/antcontrib/antcontrib.properties"/>
 								<path id="org.eclipse.swt.file.id"> 
 									<fileset dir="target/repository/plugins">
 										<include name="org.eclipse.swt.gtk.linux.x86_64_*.jar"/> 
@@ -93,7 +85,48 @@
 						</goals>
 					</execution>
 				</executions>
+				<dependencies>
+					<dependency>
+						<groupId>ant-contrib</groupId>
+						<artifactId>ant-contrib</artifactId>
+						<version>1.0b3</version>
+						<exclusions>
+							<exclusion>
+								<groupId>ant</groupId>
+								<artifactId>ant</artifactId>
+							</exclusion>
+						</exclusions>
+					</dependency>
+					<dependency>
+						<groupId>org.apache.ant</groupId>
+						<artifactId>ant-nodeps</artifactId>
+						<version>1.8.1</version>
+					</dependency>
+				</dependencies>
 			</plugin>
-      </plugins>
-   </build>
+			<plugin>
+				<groupId>org.codehaus.mojo</groupId>
+				<artifactId>build-helper-maven-plugin</artifactId>
+				<version>1.7</version>
+				<executions>
+					<execution>
+						<id>attach-standalone</id>
+						<phase>package</phase>
+						<goals>
+							<goal>attach-artifact</goal>
+						</goals>
+						<configuration>
+							<artifacts>
+								<artifact>
+									<file>${project.build.directory}/application/browsersim.jar</file>
+									<type>jar</type>
+									<classifier>standalone</classifier>
+								</artifact>
+							</artifacts>
+						</configuration>
+					</execution>
+				</executions>
+			</plugin>
+		</plugins>
+	</build>
 </project>
