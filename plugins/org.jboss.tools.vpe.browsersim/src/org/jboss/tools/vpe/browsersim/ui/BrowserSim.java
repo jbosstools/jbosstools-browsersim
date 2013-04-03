@@ -116,6 +116,7 @@ public class BrowserSim {
 		setSelectedDevice();
 		controlHandler.goToAddress(url);
 		
+		instances.add(BrowserSim.this);
 		skin.getShell().open();
 	}
 
@@ -374,8 +375,6 @@ public class BrowserSim {
 				skin.pageTitleChanged(event.title);
 			}
 		});
-
-		instances.add(BrowserSim.this);
 	}
 	
 	private void initImages() {
