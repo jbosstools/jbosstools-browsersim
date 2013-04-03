@@ -13,7 +13,7 @@ package org.jboss.tools.vpe.browsersim.eclipse.editors;
 
 import org.eclipse.core.runtime.IPath;
 import org.eclipse.ui.IEditorLauncher;
-import org.jboss.tools.vpe.browsersim.eclipse.util.BrowserSimLauncher;
+import org.jboss.tools.vpe.browsersim.eclipse.launcher.BrowserSimLauncher;
 
 /**
  * @author "Yahor Radtsevich (yradtsevich)"

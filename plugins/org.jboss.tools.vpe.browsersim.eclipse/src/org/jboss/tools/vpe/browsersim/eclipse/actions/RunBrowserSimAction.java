@@ -35,7 +35,7 @@ import org.eclipse.ui.internal.browser.WebBrowserEditor;
 import org.eclipse.ui.internal.browser.WebBrowserView;
 import org.jboss.tools.vpe.browsersim.eclipse.Activator;
 import org.jboss.tools.vpe.browsersim.eclipse.editors.BrowserSimEditorLauncher;
-import org.jboss.tools.vpe.browsersim.eclipse.util.BrowserSimLauncher;
+import org.jboss.tools.vpe.browsersim.eclipse.launcher.BrowserSimLauncher;
 
 /**
  * @author "Yahor Radtsevich (yradtsevich)"

@@ -33,8 +33,9 @@ import org.eclipse.ui.PlatformUI;
 import org.eclipse.ui.texteditor.ITextEditor;
 import org.jboss.tools.jst.jsp.jspeditor.JSPMultiPageEditor;
 import org.jboss.tools.vpe.browsersim.eclipse.Activator;
-import org.jboss.tools.vpe.browsersim.eclipse.util.BrowserSimLauncher;
-import org.jboss.tools.vpe.browsersim.eclipse.util.TransparentReader;
+import org.jboss.tools.vpe.browsersim.eclipse.launcher.BrowserSimLauncher;
+import org.jboss.tools.vpe.browsersim.eclipse.launcher.ExternalProcessCallback;
+import org.jboss.tools.vpe.browsersim.eclipse.launcher.TransparentReader;
 
 /**
  * Handler for the BrowserSim commands printed to the console in the following form:
@@ -43,7 +44,7 @@ import org.jboss.tools.vpe.browsersim.eclipse.util.TransparentReader;
  * Base64EncodedPageSource==</code>
  * @author Yahor Radtsevich (yradtsevich)
  */
-public class ViewSourceCallback implements BrowserSimCallback {
+public class ViewSourceCallback implements ExternalProcessCallback {
 	private static final String VIEW_SOURCE_COMMAND = BrowserSimLauncher.BROWSERSIM_CLASS_NAME + ".command.viewSource:"; //$NON-NLS-1$
 
 	/* (non-Javadoc)
