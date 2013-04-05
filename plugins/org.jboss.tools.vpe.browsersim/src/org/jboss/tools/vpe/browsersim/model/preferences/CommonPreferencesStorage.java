@@ -15,8 +15,9 @@ import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.text.ParseException;
-import java.util.ArrayList;
-import java.util.List;
+import java.util.LinkedHashMap;
+import java.util.Map;
+import java.util.UUID;
 
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
@@ -43,6 +44,7 @@ import org.xml.sax.SAXException;
  */
 
 public class CommonPreferencesStorage implements PreferencesStorage{
+	private static final String PREFERENCES_ID = "id";
 	private static final String PREFERENCES_DEVICE = "device";
 	private static final String PREFERENCES_DEVICE_HEIGHT = "height";
 	private static final String PREFERENCES_DEVICE_WIDTH = "width";
@@ -65,7 +67,7 @@ public class CommonPreferencesStorage implements PreferencesStorage{
 	private static final String DEFAULT_WEINRE_SCRIPT_URL = "http://debug.phonegap.com/target/target-script-min.js";
 	private static final String DEFAULT_WEINRE_CLIENT_URL = "http://debug.phonegap.com/client/";
 	
-	private static final int CURRENT_CONFIG_VERSION = 10;
+	private static final int CURRENT_CONFIG_VERSION = 11;
 	
 	public static final CommonPreferencesStorage INSTANCE = new CommonPreferencesStorage();
 	
@@ -108,9 +110,10 @@ public class CommonPreferencesStorage implements PreferencesStorage{
 		}
 
 		if (commonPreferences == null) {
-			Device device = new Device("Default", 1024, 768, 1.0, null, null);
-			List<Device> devices = new ArrayList<Device>();
-			devices.add(device);
+			Device device = new Device(UUID.randomUUID().toString(), "Default", 1024, 768, 1.0, null, null);
+			Map<String, Device> devices = new LinkedHashMap<String, Device>();
+			
+			devices.put(device.getId(), device);
 			commonPreferences = new CommonPreferences(devices, TruncateWindow.PROMPT, getDefaultScreenshotsFolderPath(),
 					getDefaultWeinreScriptUrl(), getDefaultWeinreClientUrl());
 		}
@@ -119,7 +122,7 @@ public class CommonPreferencesStorage implements PreferencesStorage{
 	}
 	
 	private CommonPreferences load(InputStream is) throws IOException{
-		List<Device> devices = null;
+		Map<String, Device> devices = null;
 		TruncateWindow truncateWindow = TruncateWindow.PROMPT;
 		String screenshotsFolder = getDefaultScreenshotsFolderPath();
 		String weinreScriptUrl = getDefaultWeinreScriptUrl();
@@ -163,11 +166,10 @@ public class CommonPreferencesStorage implements PreferencesStorage{
 				node = document.getElementsByTagName(PREFERENCES_DEVICES).item(0);
 				if (!PreferencesUtil.isNullOrEmpty(node) && node.hasChildNodes()) {
 					NodeList devicesList = node.getChildNodes();
-					devices = new ArrayList<Device>();
+					devices = new LinkedHashMap<String, Device>();
 					for (int i = 0; i < devicesList.getLength();i++) {
 						Node item = devicesList.item(i);
 						if (!PreferencesUtil.isNullOrEmpty(item) && item.getNodeType() == Node.ELEMENT_NODE) {
-							 
 							Element device = (Element) item;
 							
 							double pixelRatio;
@@ -179,10 +181,13 @@ public class CommonPreferencesStorage implements PreferencesStorage{
 								pixelRatio = 1.0;
 								e.printStackTrace();
 							}
-							
+							String id = device.getAttribute(PREFERENCES_ID); 
+							if (id.isEmpty()) {
+								id = UUID.randomUUID().toString();
+							}
 							String userAgent = device.getElementsByTagName(PREFERENCES_DEVICE_USER_AGENT).item(0).getTextContent();
 							String skin = device.getElementsByTagName(PREFERENCES_DEVICE_SKIN).item(0).getTextContent(); 
-							devices.add(new Device(device.getElementsByTagName(PREFERENCES_DEVICE_NAME).item(0).getTextContent(),
+							devices.put(id, new Device(id, device.getElementsByTagName(PREFERENCES_DEVICE_NAME).item(0).getTextContent(),
 									Integer.parseInt(device.getElementsByTagName(PREFERENCES_DEVICE_WIDTH).item(0).getTextContent()),
 									Integer.parseInt(device.getElementsByTagName(PREFERENCES_DEVICE_HEIGHT).item(0).getTextContent()),
 									pixelRatio,
@@ -234,8 +239,10 @@ public class CommonPreferencesStorage implements PreferencesStorage{
 			rootElement.appendChild(weinre);
 			
 			Element devices = doc.createElement(PREFERENCES_DEVICES);
-			for (Device device : cp.getDevices()) {
+			for (String id : cp.getDevices().keySet()) {
+				Device device = cp.getDevices().get(id);
 				Element deviceElement = doc.createElement(PREFERENCES_DEVICE);
+				deviceElement.setAttribute(PREFERENCES_ID, id);
 				
 				Element name = doc.createElement(PREFERENCES_DEVICE_NAME);
 				name.setTextContent(device.getName());

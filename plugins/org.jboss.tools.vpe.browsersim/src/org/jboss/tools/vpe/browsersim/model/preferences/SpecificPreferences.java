@@ -26,25 +26,25 @@ public class SpecificPreferences extends Observable {
 	public static final int ORIENTATION_PORTRAIT_INVERTED = 180;
 	public static final int ORIENTATION_LANDSCAPE_INVERTED = -90;
 	
-	private int selectedDeviceIndex;
+	private String selectedDeviceId;
 	private boolean useSkins;
 	private int orientationAngle;
 	private Point location;
 
-	public SpecificPreferences(int selectedDeviceIndex, boolean useSkins, int orientationAngle, Point location) {
-		this.selectedDeviceIndex = selectedDeviceIndex;
+	public SpecificPreferences(String selectedDeviceId, boolean useSkins, int orientationAngle, Point location) {
+		this.selectedDeviceId = selectedDeviceId;
 		this.useSkins = useSkins;
 		this.orientationAngle = orientationAngle;
 		this.location = location;
 	}
 
-	public int getSelectedDeviceIndex() {
-		return selectedDeviceIndex;
+	public String getSelectedDeviceId() {
+		return selectedDeviceId;
 	}
 
-	public void setSelectedDeviceIndex(int selectedDeviceIndex) {
-		if (this.selectedDeviceIndex != selectedDeviceIndex) {
-			this.selectedDeviceIndex = selectedDeviceIndex;
+	public void setSelectedDeviceId(String selectedDeviceId) {
+		if (!this.selectedDeviceId.equals(selectedDeviceId)) {
+			this.selectedDeviceId = selectedDeviceId;
 			setChanged();
 		}
 	}
@@ -80,7 +80,7 @@ public class SpecificPreferences extends Observable {
 	}
 
 	public void copyProperties(SpecificPreferences sp) {
-		setSelectedDeviceIndex(sp.getSelectedDeviceIndex());
+		setSelectedDeviceId(sp.getSelectedDeviceId());
 		setUseSkins(sp.getUseSkins());
 		setOrientationAngle(sp.getOrientationAngle());
 		setLocation(sp.getLocation());

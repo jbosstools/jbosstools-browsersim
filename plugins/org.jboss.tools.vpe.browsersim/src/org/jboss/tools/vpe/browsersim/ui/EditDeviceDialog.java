@@ -49,8 +49,6 @@ public class EditDeviceDialog extends Dialog {
 	private Text textHeight;
 	private Text textPixelRatio;
 	private Text textUserAgent;
-	private Button checkButtonWidth;
-	private Button checkButtonHeight;
 	private Button checkButtonUserAgent;
 	private Combo comboSkin;
 	private List<String> skinIds;
@@ -101,10 +99,9 @@ public class EditDeviceDialog extends Dialog {
 		textName.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, true, false, 1, 1));
 		textName.addFocusListener(new FocusGainedTextListener());
 		textName.setText(initialDevice.getName());
-
-		checkButtonWidth = new Button(shell, SWT.CHECK);
-		checkButtonWidth.setText(Messages.EditDeviceDialog_WIDTH);
-		checkButtonWidth.setSelection(initialDevice.getWidth() != Device.DEFAULT_SIZE);
+		
+		Label labelWidth = new Label(shell, SWT.NONE);
+		labelWidth.setText(Messages.EditDeviceDialog_WIDTH);
 		
 		textWidth = new Text(shell, SWT.BORDER);
 		textWidth.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, true, false, 1, 1));
@@ -115,11 +112,9 @@ public class EditDeviceDialog extends Dialog {
 		if (initialDevice.getWidth() != Device.DEFAULT_SIZE) {
 			textWidth.setText(String.valueOf(initialDevice.getWidth()));
 		}
-		attachCheckBoxToText(checkButtonWidth, textWidth);
 		
-		checkButtonHeight = new Button(shell, SWT.CHECK);
-		checkButtonHeight.setText(Messages.EditDeviceDialog_HEIGHT);
-		checkButtonHeight.setSelection(initialDevice.getHeight() != Device.DEFAULT_SIZE);
+		Label labelHeight = new Label(shell, SWT.NONE);
+		labelHeight.setText(Messages.EditDeviceDialog_HEIGHT);
 		
 		textHeight = new Text(shell, SWT.BORDER);
 		textHeight.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, true, false, 1, 1));
@@ -130,7 +125,6 @@ public class EditDeviceDialog extends Dialog {
 		if (initialDevice.getHeight() != Device.DEFAULT_SIZE) {
 			textHeight.setText(String.valueOf(initialDevice.getHeight()));
 		}
-		attachCheckBoxToText(checkButtonHeight, textHeight);
 		
 		Label labelPixelRatio = new Label(shell, SWT.NONE);
 		labelPixelRatio.setText(Messages.EditDeviceDialog_PIXEL_RATIO);
@@ -187,8 +181,8 @@ public class EditDeviceDialog extends Dialog {
 				}
 				
 				resultDevice = new Device(textName.getText(),
-						checkButtonWidth.getSelection() ? Integer.valueOf("0" + textWidth.getText()) : Device.DEFAULT_SIZE, //$NON-NLS-1$
-						checkButtonHeight.getSelection() ? Integer.valueOf("0" + textHeight.getText()) : Device.DEFAULT_SIZE, //$NON-NLS-1$
+						Integer.valueOf("0" + textWidth.getText()), //$NON-NLS-1$
+						Integer.valueOf("0" + textHeight.getText()), //$NON-NLS-1$
 						pixelRatio,
 						checkButtonUserAgent.getSelection() ? textUserAgent.getText() : null,
 						comboSkin.getSelectionIndex() == 0 ? null : skinIds.get(comboSkin.getSelectionIndex()));

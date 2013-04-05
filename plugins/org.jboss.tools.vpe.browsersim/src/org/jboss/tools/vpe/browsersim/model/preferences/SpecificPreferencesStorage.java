@@ -43,14 +43,14 @@ public class SpecificPreferencesStorage implements PreferencesStorage{
 	private static final String PREFERENCES_LOCATION_X = "x";
 	private static final String PREFERENCES_LOCATION = "location";
 	private static final String PREFERENCES_USE_SKINS = "useSkins";
-	private static final String PREFERENCES_SELECTED_DEVICE = "selectedDevice";
+	private static final String PREFERENCES_SELECTED_DEVICE = "selectedDeviceId";
 	private static final String PREFERENCES_VERSION = "version";
 
 	
 	private static final String SPECIFIC_PREFERENCES_FILE = "specificPreferences.xml";
 	private static final String DEFAULT_SPECIFIC_PREFERENCES_RESOURCE = "config/specificPreferences.xml";
 
-	private static final int CURRENT_CONFIG_VERSION = 10;
+	private static final int CURRENT_CONFIG_VERSION = 11;
 
 	public static SpecificPreferencesStorage INSTANCE = new SpecificPreferencesStorage();
 	
@@ -93,7 +93,7 @@ public class SpecificPreferencesStorage implements PreferencesStorage{
 		}
 		
 		if (specificPreferences == null) {
-			specificPreferences = new SpecificPreferences(0, true, 0, null);
+			specificPreferences = new SpecificPreferences(null, true, 0, null);
 		}
 
 		return specificPreferences;
@@ -101,7 +101,7 @@ public class SpecificPreferencesStorage implements PreferencesStorage{
 	
 	private SpecificPreferences load(InputStream is) throws IOException {
 		int configVersion = 0;
-		int selectedDeviceIndex = 0;
+		String selectedDeviceId = null;
 		int orientationAngle = 0;
 		Point currentlocation = null;
 		boolean useSkins = true;
@@ -119,7 +119,7 @@ public class SpecificPreferencesStorage implements PreferencesStorage{
 			if (configVersion == CURRENT_CONFIG_VERSION) {
 				Node node = document.getElementsByTagName(PREFERENCES_SELECTED_DEVICE).item(0);
 				if (!PreferencesUtil.isNullOrEmpty(node)) {
-					selectedDeviceIndex = Integer.parseInt(node.getTextContent());
+					selectedDeviceId = node.getTextContent();
 				}
 				
 				node = document.getElementsByTagName(PREFERENCES_USE_SKINS).item(0);
@@ -143,6 +143,7 @@ public class SpecificPreferencesStorage implements PreferencesStorage{
 								.getTextContent()));
 					}
 				}
+				return new SpecificPreferences(selectedDeviceId, useSkins, orientationAngle, currentlocation);
 			}
 		} catch (SAXException e) {
 			e.printStackTrace();
@@ -150,7 +151,7 @@ public class SpecificPreferencesStorage implements PreferencesStorage{
 			e.printStackTrace();
 		}
 
-		return new SpecificPreferences(selectedDeviceIndex, useSkins, orientationAngle, currentlocation);
+		return null;
 	}
 
 	private void save(SpecificPreferences sp, File file) throws IOException {
@@ -164,7 +165,7 @@ public class SpecificPreferencesStorage implements PreferencesStorage{
 			doc.appendChild(rootElement);
 
 			Element selectedDevice = doc.createElement(PREFERENCES_SELECTED_DEVICE);
-			selectedDevice.setTextContent(String.valueOf(sp.getSelectedDeviceIndex()));
+			selectedDevice.setTextContent(String.valueOf(sp.getSelectedDeviceId()));
 			rootElement.appendChild(selectedDevice);
 
 			Element location = doc.createElement(PREFERENCES_LOCATION);

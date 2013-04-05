@@ -12,6 +12,7 @@ package org.jboss.tools.vpe.browsersim.ui;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.NoSuchElementException;
 import java.util.Observable;
 import java.util.Observer;
 
@@ -91,7 +92,6 @@ public class BrowserSim {
 
 	public BrowserSim(String homeUrl) {
 		this.homeUrl = homeUrl;
-		
 	}
 	
 	public void open() {
@@ -115,7 +115,20 @@ public class BrowserSim {
 		
 		specificPreferences = sp;
 		initObservers();
-		Device defaultDevice = getSelectedDevice(); 
+		Device defaultDevice = commonPreferences.getDevices().get(specificPreferences.getSelectedDeviceId()); 
+		if (defaultDevice == null) {
+			System.out.println("Could not find selected device in devices list");
+			String id;
+			try {
+				id = commonPreferences.getDevices().keySet().iterator().next();
+			} catch (NoSuchElementException e) {
+				commonPreferences = CommonPreferencesStorage.INSTANCE.loadDefault();
+				id = commonPreferences.getDevices().keySet().iterator().next();
+			}
+			specificPreferences.setSelectedDeviceId(id);
+			defaultDevice = commonPreferences.getDevices().get(id);
+		}
+		
 		initSkin(BrowserSimUtil.getSkinClass(defaultDevice, specificPreferences.getUseSkins()), specificPreferences.getLocation());
 		setSelectedDevice();
 		controlHandler.goToAddress(url);
@@ -123,7 +136,7 @@ public class BrowserSim {
 		instances.add(BrowserSim.this);
 		skin.getShell().open();
 	}
-
+	
 	private void initSkin(Class<? extends BrowserSimSkin> skinClass, Point location) {
 		try {
 			skin = skinClass.newInstance();//new AppleIPhone3Skin();//new NativeSkin();
@@ -171,8 +184,8 @@ public class BrowserSim {
 				commonPreferences.deleteObserver(commonPreferencesObserver);
 			}
 		});
+		
 		shell.addListener(SWT.Close, new Listener() {
-
 			@Override
 			public void handleEvent(Event event) {
 				for (ExitListener e : exitListenerList) {
@@ -436,38 +449,31 @@ public class BrowserSim {
 	}
 
 	private void setSelectedDevice() {
-		final Device device = getSelectedDevice();
-		Class<? extends BrowserSimSkin> newSkinClass = BrowserSimUtil.getSkinClass(device, specificPreferences.getUseSkins());
-		String oldSkinUrl = null;
-		if (newSkinClass != skin.getClass()) {
-			oldSkinUrl = getBrowser().getUrl();
-			Point currentLocation = skin.getShell().getLocation();
-			getBrowser().removeProgressListener(progressListener);
-			getBrowser().getShell().dispose();//XXX
-			initSkin(newSkinClass, currentLocation);
-		}
-		setOrientation(specificPreferences.getOrientationAngle(), device);
-
-		getBrowser().setDefaultUserAgent(device.getUserAgent());
-
-		if (oldSkinUrl != null) {
-			getBrowser().setUrl(oldSkinUrl); // skin (and browser instance) is changed
+		final Device device = commonPreferences.getDevices().get(specificPreferences.getSelectedDeviceId());
+		if (device == null) {
+			skin.getShell().close();
 		} else {
-			getBrowser().refresh(); // only user agent and size of the browser is changed
-		}
-		
-		skin.getShell().open();
-	}
+			Class<? extends BrowserSimSkin> newSkinClass = BrowserSimUtil.getSkinClass(device, specificPreferences.getUseSkins());
+			String oldSkinUrl = null;
+			if (newSkinClass != skin.getClass()) {
+				oldSkinUrl = skin.getBrowser().getUrl();
+				Point currentLocation = skin.getShell().getLocation();
+				skin.getBrowser().removeProgressListener(progressListener);
+				skin.getBrowser().getShell().dispose();
+				initSkin(newSkinClass, currentLocation);
+			}
+			setOrientation(specificPreferences.getOrientationAngle(), device);
 	
-	private Device getSelectedDevice() {
-		int index = 0;
-		if (specificPreferences.getSelectedDeviceIndex() < commonPreferences.getDevices().size()) {
-			index = specificPreferences.getSelectedDeviceIndex();
+			skin.getBrowser().setDefaultUserAgent(device.getUserAgent());
+	
+			if (oldSkinUrl != null) {
+				skin.getBrowser().setUrl(oldSkinUrl); // skin (and browser instance) is changed
+			} else {
+				skin.getBrowser().refresh(); // only user agent and size of the browser is changed
+			}
+	
+			skin.getShell().open();
 		}
-		specificPreferences.setSelectedDeviceIndex(index);
-		specificPreferences.notifyObservers();
-		
-		return commonPreferences.getDevices().get(index);
 	}
 
 	@SuppressWarnings("nls")

@@ -10,8 +10,6 @@
  ******************************************************************************/
 package org.jboss.tools.vpe.browsersim.ui.menu;
 
-import java.util.List;
-
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.MenuAdapter;
 import org.eclipse.swt.events.MenuEvent;
@@ -164,13 +162,11 @@ public class BrowserSimMenuCreator {
 	}
 
 	private void addDevicesListForMenu(Menu devicesMenu) {
-		List<Device> devices = commonPreferences.getDevices();
-		for (int i = 0; i < devices.size(); i++) {
-			Device device = devices.get(i);
+		for (Device device : commonPreferences.getDevices().values()) {
 			MenuItem deviceMenuItem = new MenuItem(devicesMenu, SWT.RADIO);
 			deviceMenuItem.setText(device.getName());
-			deviceMenuItem.setData(device);
-			if (i == specificPreferences.getSelectedDeviceIndex()) {
+			deviceMenuItem.setData(device.getId());
+			if (device.getId().equals(specificPreferences.getSelectedDeviceId())) {
 				deviceMenuItem.setSelection(true);
 			}
 
@@ -178,11 +174,8 @@ public class BrowserSimMenuCreator {
 				public void widgetSelected(SelectionEvent e) {
 					MenuItem menuItem = (MenuItem) e.widget;
 					if (menuItem.getSelection()) {
-						int selectedDeviceIndex = commonPreferences.getDevices().indexOf(menuItem.getData());
-						if (selectedDeviceIndex < 0) {
-							selectedDeviceIndex = 0;
-						}
-						specificPreferences.setSelectedDeviceIndex(selectedDeviceIndex);
+						Device selected = commonPreferences.getDevices().get(menuItem.getData());
+						specificPreferences.setSelectedDeviceId(selected.getId());
 						specificPreferences.notifyObservers();
 					}
 				};

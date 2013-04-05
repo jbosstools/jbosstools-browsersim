@@ -10,7 +10,10 @@
  ******************************************************************************/
 package org.jboss.tools.vpe.browsersim.ui;
 import java.util.ArrayList;
+import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.Map;
+import java.util.UUID;
 
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.SelectionAdapter;
@@ -48,8 +51,8 @@ public class ManageDevicesDialog extends Dialog {
 
 	protected CommonPreferences oldCommonPreferences;
 	protected SpecificPreferences oldSpecificPreferences;
-	protected List<Device> devices;
-	protected int selectedDeviceIndex;
+	protected Map<String, Device> devices;
+	protected String selectedDeviceId;
 	protected Shell shell;
 	protected Table table;
 	protected CommonPreferences newCommonPreferences;
@@ -72,12 +75,13 @@ public class ManageDevicesDialog extends Dialog {
 		setText(Messages.ManageDevicesDialog_PREFERENCES);
 		this.oldCommonPreferences = oldCommonPreferences;
 		this.oldSpecificPreferences = oldSpecificPreferences;
-		this.devices = new ArrayList<Device>(oldCommonPreferences.getDevices());
-		this.selectedDeviceIndex = oldSpecificPreferences.getSelectedDeviceIndex();
+		
+		this.devices = new LinkedHashMap<String, Device>(oldCommonPreferences.getDevices());
+		this.selectedDeviceId = oldSpecificPreferences.getSelectedDeviceId();
 		this.useSkins = oldSpecificPreferences.getUseSkins();
 		this.truncateWindow = oldCommonPreferences.getTruncateWindow();
 	} 
-
+	
 	/**
 	 * Open the dialog.
 	 * @return the newDevicesList
@@ -118,7 +122,7 @@ public class ManageDevicesDialog extends Dialog {
 		table.setHeaderVisible(true);
 		table.addSelectionListener(new SelectionAdapter() {
 			public void widgetSelected(SelectionEvent e) {
-				selectedDeviceIndex = ((Table)e.widget).getSelectionIndex();
+				selectedDeviceId = e.item.getData().toString();
 			}
 		});
 		
@@ -157,10 +161,12 @@ public class ManageDevicesDialog extends Dialog {
 		buttonAdd.addSelectionListener(new SelectionAdapter() {
 			public void widgetSelected(SelectionEvent e) {
 				Device newDevice = new EditDeviceDialog(shell,  SWT.APPLICATION_MODAL | SWT.SHELL_TRIM,
-						new Device(Messages.ManageDevicesDialog_NEW_DEVICE, 320, 480, 1.0, Messages.ManageDevicesDialog_NEW_USER_AGENT, null)).open();
+						devices.get(selectedDeviceId)).open();
 				if (newDevice != null) {
-					devices.add(newDevice);
-					selectedDeviceIndex = devices.size() - 1;
+					String id = UUID.randomUUID().toString();
+					newDevice.setId(id);
+					devices.put(id, newDevice);
+					selectedDeviceId = newDevice.getId();
 					updateDevices();
 				}
 			}
@@ -171,10 +177,10 @@ public class ManageDevicesDialog extends Dialog {
 		buttonEdit.addSelectionListener(new SelectionAdapter() {
 			public void widgetSelected(SelectionEvent e) {
 				Device newDevice = new EditDeviceDialog(shell,  SWT.APPLICATION_MODAL | SWT.SHELL_TRIM,
-						devices.get(selectedDeviceIndex)).open();
+						devices.get(selectedDeviceId)).open();
 				if (newDevice != null) {
-					devices.remove(selectedDeviceIndex);
-					devices.add(selectedDeviceIndex, newDevice);
+					newDevice.setId(selectedDeviceId);
+					devices.put(selectedDeviceId, newDevice);
 					updateDevices();
 				}
 			}
@@ -185,10 +191,13 @@ public class ManageDevicesDialog extends Dialog {
 		buttonRemove.addSelectionListener(new SelectionAdapter() {
 			public void widgetSelected(SelectionEvent e) {
 				if (devices.size() > 1) {
-					devices.remove(selectedDeviceIndex);
-					if (selectedDeviceIndex >= devices.size()) {
-						selectedDeviceIndex = devices.size() - 1;
+					int nextSelection = table.getSelectionIndex() + 1;
+					if (nextSelection == table.getItemCount()) {
+						//last element selected, then element before last must be selected after deletion
+						nextSelection = table.getItemCount() - 2;
 					}
+					devices.remove(selectedDeviceId);
+					selectedDeviceId = table.getItem(nextSelection).getData().toString();
 					updateDevices();
 				}
 			}
@@ -199,8 +208,8 @@ public class ManageDevicesDialog extends Dialog {
 		
 		buttonReset.addSelectionListener(new SelectionAdapter() {
 			public void widgetSelected(SelectionEvent e) {
-				devices  = new ArrayList<Device>(oldCommonPreferences.getDevices());
-				selectedDeviceIndex = oldSpecificPreferences.getSelectedDeviceIndex();
+				devices = new LinkedHashMap<String, Device>(oldCommonPreferences.getDevices());
+				selectedDeviceId = oldSpecificPreferences.getSelectedDeviceId();
 				updateDevices();
 			}
 		});
@@ -308,7 +317,7 @@ public class ManageDevicesDialog extends Dialog {
 				CommonPreferences cp = CommonPreferencesStorage.INSTANCE.loadDefault();
 				SpecificPreferences sp = SpecificPreferencesStorage.INSTANCE.loadDefault();
 				devices = cp.getDevices();
-				selectedDeviceIndex = sp.getSelectedDeviceIndex();
+				selectedDeviceId = sp.getSelectedDeviceId();
 				useSkins = sp.getUseSkins();
 				truncateWindow = cp.getTruncateWindow();
 				screenshotsPath.setText(cp.getScreenshotsFolder());
@@ -326,7 +335,7 @@ public class ManageDevicesDialog extends Dialog {
 			public void widgetSelected(SelectionEvent e) {
 				newCommonPreferences = new CommonPreferences(devices, truncateWindow, screenshotsPath.getText(),
 						weinreScriptUrlText.getText(), weinreClientUrlText.getText());
-				newSpecificPreferences = new SpecificPreferences(selectedDeviceIndex, useSkins,
+				newSpecificPreferences = new SpecificPreferences(selectedDeviceId, useSkins,
 						oldSpecificPreferences.getOrientationAngle(), oldSpecificPreferences.getLocation());
 				shell.close();
 			}
@@ -349,8 +358,12 @@ public class ManageDevicesDialog extends Dialog {
 	
 	public void updateDevices() {
 		table.removeAll();
-		for (Device device : devices) {
+		int selectionIndex = 0;//select first element by default to avoid NPE
+		List<Device> values = new ArrayList<Device>(devices.values()); 
+		for (int i = 0; i < values.size(); i++) {
+			Device device = values.get(i);
 			TableItem tableItem = new TableItem(table, SWT.NONE);
+			tableItem.setData(device.getId());
 			tableItem.setText(new String[] {
 					device.getName(), 
 					device.getWidth() == Device.DEFAULT_SIZE ? Messages.ManageDevicesDialog_DEFAULT : String.valueOf(device.getWidth()),
@@ -359,8 +372,11 @@ public class ManageDevicesDialog extends Dialog {
 					device.getUserAgent() == null ? Messages.ManageDevicesDialog_DEFAULT : device.getUserAgent(),
 					device.getSkinId() == null ?  Messages.ManageDevicesDialog_NONE : device.getSkinId()
 			});
+			if (device.getId().equals(selectedDeviceId)) {
+				selectionIndex = i;
+			}
 		}
-		table.setSelection(selectedDeviceIndex);
+		table.setSelection(selectionIndex);
 		
 		useSkinsCheckbox.setSelection(useSkins);
 		

@@ -26,13 +26,14 @@ public class Device {
 		PIXEL_RAIO_FORMAT.setDecimalFormatSymbols(formatSymbols);
 	}
 	
+	private String id;
+	
 	private String name;
 	private int width;
 	private int height;
 	private double pixelRatio;
 	private String userAgent;
 	private String skinId;
-
 
 	public Device(String name, int width, int height, double pixelRatio, String userAgent, String skinId) {
 		this.name = name;
@@ -43,6 +44,19 @@ public class Device {
 		this.skinId = skinId;
 	}
 
+	public Device(String id, String name, int width, int height, double pixelRatio, String userAgent, String skinId) {
+		this(name, width, height, pixelRatio, userAgent, skinId);
+		this.id = id;
+	}
+	
+	public String getId() {
+		return id;
+	}
+	
+	public void setId(String id) {
+		this.id = id;
+	}
+	
 	public int getWidth() {
 		return width;
 	}
@@ -66,7 +80,7 @@ public class Device {
 	public double getPixelRatio() {
 		return pixelRatio;
 	}
-
+	
 	@Override
 	public int hashCode() {
 		final int prime = 31;
@@ -91,7 +105,9 @@ public class Device {
 		if (getClass() != obj.getClass())
 			return false;
 		Device other = (Device) obj;
-		if (height != other.height)
+		if (!id.equals(other.id)) {
+			return false;
+		} if (height != other.height)
 			return false;
 		if (!name.equals(other.name))
 			return false;

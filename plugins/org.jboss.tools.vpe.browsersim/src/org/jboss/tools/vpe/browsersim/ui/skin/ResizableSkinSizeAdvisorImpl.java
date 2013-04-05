@@ -42,8 +42,7 @@ public class ResizableSkinSizeAdvisorImpl implements ResizableSkinSizeAdvisor{
 		TruncateWindow truncateWindow = null;
 		if (commonPreferences.getTruncateWindow() == TruncateWindow.PROMPT) {
 			if (prefferedShellSize.x > clientArea.width || prefferedShellSize.y > clientArea.height) { 
-				String deviceName = commonPreferences.getDevices().get(specificPreferences.getSelectedDeviceIndex()).getName();
-				
+				String deviceName = commonPreferences.getDevices().get(specificPreferences.getSelectedDeviceId()).getName();
 				SizeWarningDialog dialog = new SizeWarningDialog(shell, new Point(clientArea.width, clientArea.height),
 						prefferedShellSize, deviceName,
 						orientation == SpecificPreferences.ORIENTATION_PORTRAIT || orientation == SpecificPreferences.ORIENTATION_PORTRAIT_INVERTED);

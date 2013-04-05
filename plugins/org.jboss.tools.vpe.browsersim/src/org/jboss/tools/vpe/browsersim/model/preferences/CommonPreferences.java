@@ -10,7 +10,7 @@
  ******************************************************************************/
 package org.jboss.tools.vpe.browsersim.model.preferences;
 
-import java.util.List;
+import java.util.Map;
 import java.util.Observable;
 
 import org.jboss.tools.vpe.browsersim.model.Device;
@@ -23,13 +23,13 @@ import org.jboss.tools.vpe.browsersim.model.TruncateWindow;
  */
 
 public class CommonPreferences extends Observable {
-	private List<Device> devices;
+	private Map<String, Device> devices;
 	private TruncateWindow truncateWindow;
 	private String screenshotsFolder;
 	private String weinreScriptUrl;
 	private String weinreClientUrl;
 
-	public CommonPreferences(List<Device> devices, TruncateWindow truncateWindow, String screenshotsFolder,
+	public CommonPreferences(Map<String, Device> devices, TruncateWindow truncateWindow, String screenshotsFolder,
 			String weinreScriptUrl, String weinreClientUrl) {
 		this.devices = devices;
 		this.truncateWindow = truncateWindow;
@@ -38,11 +38,11 @@ public class CommonPreferences extends Observable {
 		this.weinreClientUrl = weinreClientUrl;
 	}
 
-	public List<Device> getDevices() {
+	public Map<String, Device> getDevices() {
 		return devices;
 	}
 
-	public void setDevices(List<Device> devices) {
+	public void setDevices(Map<String, Device> devices) {
 		if (!this.devices.equals(devices)) {
 			this.devices = devices;
 			setChanged();

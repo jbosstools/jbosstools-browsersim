@@ -10,7 +10,7 @@
  ******************************************************************************/
 package org.jboss.tools.vpe.browsersim.ui.menu;
 
-import java.util.List;
+import java.util.Map;
 import java.util.UUID;
 
 import org.eclipse.swt.SWT;
@@ -91,26 +91,23 @@ public class ToolsMenuCreator {
 	}
 	
 	public static void addSyncronizedWindowItem(Menu menu, final BrowserSimSkin skin,
-			final List<Device> devices, final Boolean useSkins, final int orientationAngle, final String homeUrl) {
+			final Map<String, Device> devices, final Boolean useSkins, final int orientationAngle, final String homeUrl) {
 		MenuItem syncWindow = new MenuItem(menu, SWT.CASCADE);
 		syncWindow.setText("Open Syncronized Window");
 		Menu subMenu = new Menu(menu);
 		syncWindow.setMenu(subMenu);
 
-		for (final Device device : devices) {
+		for (final Device device : devices.values()) {
 			MenuItem deviceMenuItem = new MenuItem(subMenu, SWT.RADIO);
 			deviceMenuItem.setText(device.getName());
-			deviceMenuItem.setData(device);
+			deviceMenuItem.setData(device.getId());
 
 			deviceMenuItem.addSelectionListener(new SelectionAdapter() {
 				public void widgetSelected(SelectionEvent e) {
 					MenuItem menuItem = (MenuItem) e.widget;
 					if (menuItem.getSelection()) {
-						int selectedDeviceIndex = devices.indexOf(menuItem.getData());
-						if (selectedDeviceIndex < 0) {
-							selectedDeviceIndex = 0;
-						}
-						SpecificPreferences sp = new SpecificPreferences(selectedDeviceIndex, useSkins,
+						Device selected = devices.get(menuItem.getData());
+						SpecificPreferences sp = new SpecificPreferences(selected.getId(), useSkins,
 								orientationAngle, null);
 
 						BrowserSim browserSim1 = new BrowserSim(homeUrl);
