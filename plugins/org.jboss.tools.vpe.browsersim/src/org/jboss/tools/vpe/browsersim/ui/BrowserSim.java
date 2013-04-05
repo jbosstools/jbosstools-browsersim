@@ -170,7 +170,7 @@ public class BrowserSim {
 		});
 
 		final BrowserSimBrowser browser = skin.getBrowser();
-		controlHandler = new ControlHandlerImpl(browser);
+		controlHandler = createControlHandler(browser, homeUrl, specificPreferences);
 		final BrowserSimMenuCreator menuCreator = new BrowserSimMenuCreator(skin, commonPreferences,
 				specificPreferences, controlHandler, homeUrl);
 		
@@ -463,22 +463,6 @@ public class BrowserSim {
 		skin.getBrowser().execute("window.onorientationchange = null;" + "window.orientation = " + orientation + ";");
 	}
 
-	private void rotateDevice(boolean counterclockwise) {
-		int orientationAngle = specificPreferences.getOrientationAngle();
-		if (counterclockwise) {
-			orientationAngle+= 90;
-		} else {
-			orientationAngle-= 90;
-		}
-		
-		// normalize angle to be in [-90; 180]
-		orientationAngle = ((orientationAngle - 180) % 360) + 180;
-		orientationAngle = ((orientationAngle + 90) % 360) - 90;
-		
-		specificPreferences.setOrientationAngle(orientationAngle);
-		specificPreferences.notifyObservers();
-	}
-	
 	@SuppressWarnings("nls")
 	private void setOrientation(int orientationAngle, Device device) {
 		Point size = BrowserSimUtil.getSizeInDesktopPixels(device);
@@ -505,57 +489,13 @@ public class BrowserSim {
 		);
 	}
 	
-	public class ControlHandlerImpl implements ControlHandler {
-		private Browser browser;
-
-		public ControlHandlerImpl(Browser browser) {
-			this.browser = browser;
-		}
-
-		@Override
-		public void goBack() {
-			browser.back();
-			browser.setFocus();
-		}
-
-		@Override
-		public void goForward() {
-			browser.forward();
-			browser.setFocus();
-		}
-
-		@Override
-		public void goHome() {
-			browser.setUrl(homeUrl);
-			browser.setFocus();
-		}
-
-		@Override
-		public void goToAddress(String address) {
-			browser.setUrl(address);
-			browser.setFocus();
-		}
-
-		@Override
-		public void showContextMenu() {
-			// TODO Auto-generated method stub//XXX
-		}
-
-		@Override
-		public void rotate(boolean counterclockwise) {
-			rotateDevice(counterclockwise);
-		}
-
-		@Override
-		public void stop() {
-			browser.stop();
-			browser.setFocus();
-		}
-
-		@Override
-		public void refresh() {
-			browser.refresh();
-			browser.setFocus();
-		}
+	/**
+	 * {@link ControlHandler} factory method.
+	 * 
+	 * Override this method if you need a custom {@link ControlHandler}
+	 */
+	protected ControlHandler createControlHandler(BrowserSimBrowser browser,
+			String homeUrl, SpecificPreferences specificPreferences) {
+		return new BrowserSimControlHandler(browser, homeUrl, specificPreferences);
 	}
 }
