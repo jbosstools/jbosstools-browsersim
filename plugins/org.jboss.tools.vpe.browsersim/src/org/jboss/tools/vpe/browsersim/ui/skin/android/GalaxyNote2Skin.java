@@ -17,15 +17,14 @@ import org.eclipse.swt.layout.FormData;
 import org.eclipse.swt.widgets.Composite;
 import org.jboss.tools.vpe.browsersim.ui.skin.DeviceComposite;
 import org.jboss.tools.vpe.browsersim.ui.skin.ImageDescriptor;
-import org.jboss.tools.vpe.browsersim.ui.skin.ios.AppleIPhone3ResizableSkin;
+import org.jboss.tools.vpe.browsersim.ui.skin.ResizableSkin;
 import org.jboss.tools.vpe.browsersim.ui.skin.ios.ButtonDescriptor;
 
 @SuppressWarnings("nls")
-public class GalaxyNote2Skin  extends AppleIPhone3ResizableSkin {
+public class GalaxyNote2Skin  extends ResizableSkin {
 	public static final String ANDROID_SKIN_ID = "Galaxy Note II";
-	private static final Point NORMAL_SKREEN_SIZE = new Point(213, 285);
-	private static final Point NORMAL_SKIN_SIZE = new Point(267, 453);
-	public static final int[] VISIBLE_REGION_VERTICAL = { 60, 0, 206, 0, 207, 1, 216, 1, 217, 2, 223, 2, 224, 3, 227,
+	
+	private static final int[] VISIBLE_REGION_VERTICAL = { 60, 0, 206, 0, 207, 1, 216, 1, 217, 2, 223, 2, 224, 3, 227,
 			3, 228, 4, 231, 4, 232, 5, 233, 5, 234, 6, 236, 6, 238, 8, 239, 8, 239, 9, 240, 10, 242, 10, 243, 11, 244,
 			11, 248, 15, 249, 15, 253, 19, 253, 20, 257, 24, 257, 25, 258, 26, 258, 27, 260, 29, 260, 30, 261, 31, 261,
 			33, 262, 34, 262, 35, 263, 36, 263, 38, 264, 39, 264, 42, 265, 43, 265, 47, 266, 48, 266, 392, 265, 393,
@@ -41,24 +40,25 @@ public class GalaxyNote2Skin  extends AppleIPhone3ResizableSkin {
 			23, 11, 24, 10, 26, 10, 27, 9, 27, 8, 28, 8, 30, 6, 32, 6, 33, 5, 34, 5, 35, 4, 38, 4, 39, 3, 42, 3, 43, 2,
 			49, 2, 50, 1, 59, 1 };
 	private static final int[] VISIBLE_REGION_HORIZONTAL = { 48, 0, 392, 0, 393, 1, 400, 1, 401, 2, 405, 2, 406, 3,
-			409, 3, 410, 4, 412, 4, 413, 5, 415, 5, 416, 6, 418, 6, 419, 7, 420, 7, 421, 8, 422, 8, 423, 9, 424, 9,
-			426, 11, 427, 11, 429, 13, 430, 13, 441, 24, 441, 25, 443, 27, 443, 28, 444, 29, 444, 30, 445, 31, 445, 32,
-			446, 33, 446, 34, 447, 35, 447, 36, 448, 37, 448, 39, 449, 40, 449, 42, 450, 43, 450, 47, 451, 48, 451, 52,
-			452, 53, 452, 213, 451, 214, 451, 218, 450, 219, 450, 223, 449, 224, 449, 226, 448, 227, 448, 229, 447,
-			230, 447, 231, 446, 232, 446, 233, 445, 234, 445, 235, 444, 236, 444, 237, 443, 238, 443, 239, 441, 241,
-			441, 242, 430, 253, 429, 253, 427, 255, 426, 255, 424, 257, 423, 257, 422, 258, 421, 258, 420, 259, 419,
-			259, 418, 260, 416, 260, 415, 261, 413, 261, 412, 262, 410, 262, 409, 263, 406, 263, 405, 264, 401, 264,
-			400, 265, 393, 265, 392, 266, 48, 266, 47, 265, 43, 265, 42, 264, 39, 264, 38, 263, 36, 263, 35, 262, 34,
-			262, 33, 261, 31, 261, 30, 260, 29, 260, 27, 258, 26, 258, 25, 257, 24, 257, 20, 253, 19, 253, 15, 249, 15,
-			248, 11, 244, 11, 243, 10, 242, 10, 240, 9, 239, 8, 239, 8, 238, 6, 236, 6, 234, 5, 233, 5, 232, 4, 231, 4,
-			228, 3, 227, 3, 224, 2, 223, 2, 217, 1, 216, 1, 207, 0, 206, 0, 60, 1, 59, 1, 50, 2, 49, 2, 43, 3, 42, 3,
-			39, 4, 38, 4, 35, 5, 34, 5, 33, 6, 32, 6, 30, 8, 28, 8, 27, 9, 27, 10, 26, 10, 24, 11, 23, 11, 22, 15, 18,
-			15, 17, 19, 13, 20, 13, 24, 9, 25, 9, 26, 8, 27, 8, 29, 6, 30, 6, 31, 5, 33, 5, 34, 4, 35, 4, 36, 3, 38, 3,
-			39, 2, 42, 2, 43, 1, 47, 1 };
-	private static final Point VERTICAL_BORDERS_SIZE = new Point(NORMAL_SKIN_SIZE.x - NORMAL_SKREEN_SIZE.x, NORMAL_SKIN_SIZE.y - NORMAL_SKREEN_SIZE.y);
-	private static final Point HORIZONTAL_BORDERS_SIZE = new Point(VERTICAL_BORDERS_SIZE.y, VERTICAL_BORDERS_SIZE.x);
-	private static final AndroidSkinDescriptor VERTICAL_DESCRIPTOR;
+		409, 3, 410, 4, 412, 4, 413, 5, 415, 5, 416, 6, 418, 6, 419, 7, 420, 7, 421, 8, 422, 8, 423, 9, 424, 9,
+		426, 11, 427, 11, 429, 13, 430, 13, 441, 24, 441, 25, 443, 27, 443, 28, 444, 29, 444, 30, 445, 31, 445, 32,
+		446, 33, 446, 34, 447, 35, 447, 36, 448, 37, 448, 39, 449, 40, 449, 42, 450, 43, 450, 47, 451, 48, 451, 52,
+		452, 53, 452, 213, 451, 214, 451, 218, 450, 219, 450, 223, 449, 224, 449, 226, 448, 227, 448, 229, 447,
+		230, 447, 231, 446, 232, 446, 233, 445, 234, 445, 235, 444, 236, 444, 237, 443, 238, 443, 239, 441, 241,
+		441, 242, 430, 253, 429, 253, 427, 255, 426, 255, 424, 257, 423, 257, 422, 258, 421, 258, 420, 259, 419,
+		259, 418, 260, 416, 260, 415, 261, 413, 261, 412, 262, 410, 262, 409, 263, 406, 263, 405, 264, 401, 264,
+		400, 265, 393, 265, 392, 266, 48, 266, 47, 265, 43, 265, 42, 264, 39, 264, 38, 263, 36, 263, 35, 262, 34,
+		262, 33, 261, 31, 261, 30, 260, 29, 260, 27, 258, 26, 258, 25, 257, 24, 257, 20, 253, 19, 253, 15, 249, 15,
+		248, 11, 244, 11, 243, 10, 242, 10, 240, 9, 239, 8, 239, 8, 238, 6, 236, 6, 234, 5, 233, 5, 232, 4, 231, 4,
+		228, 3, 227, 3, 224, 2, 223, 2, 217, 1, 216, 1, 207, 0, 206, 0, 60, 1, 59, 1, 50, 2, 49, 2, 43, 3, 42, 3,
+		39, 4, 38, 4, 35, 5, 34, 5, 33, 6, 32, 6, 30, 8, 28, 8, 27, 9, 27, 10, 26, 10, 24, 11, 23, 11, 22, 15, 18,
+		15, 17, 19, 13, 20, 13, 24, 9, 25, 9, 26, 8, 27, 8, 29, 6, 30, 6, 31, 5, 33, 5, 34, 4, 35, 4, 36, 3, 38, 3,
+		39, 2, 42, 2, 43, 1, 47, 1 };
+	private static final Point NORMAL_SCREEN_SIZE = new Point(213, 285);
+	private static final Point NORMAL_SKIN_SIZE = new Point(267, 453);
+	
 	private static final int CORNERS_SIZE = 32;
+	private static final AndroidSkinDescriptor VERTICAL_DESCRIPTOR;
 	static {
 		String bd = "android/galaxyNote2/vertical/";
 		ImageDescriptor iOsDescriptor = new ImageDescriptor(null, 5, 2, SWT.VERTICAL | SWT.HORIZONTAL);
@@ -152,11 +152,8 @@ public class GalaxyNote2Skin  extends AppleIPhone3ResizableSkin {
 				backButtonDescriptor, forwardButtonDescriptor, homeButtonDescriptor, refreshButtonDescriptor);
 	}
 	
-	
-	@Override
-	protected Point getBordersSize(boolean vertical) {
-		Point bordersSize = vertical ? VERTICAL_BORDERS_SIZE : HORIZONTAL_BORDERS_SIZE;
-		return bordersSize;
+	public GalaxyNote2Skin() {
+		super(VISIBLE_REGION_HORIZONTAL, VISIBLE_REGION_VERTICAL, NORMAL_SCREEN_SIZE, NORMAL_SKIN_SIZE);
 	}
 
 	@Override
@@ -168,16 +165,5 @@ public class GalaxyNote2Skin  extends AppleIPhone3ResizableSkin {
 			skinDescriptor = HORIZONTAL_DESCRIPTOR;
 		}
 		return new AndroidComposite(parent, skinDescriptor);
-	}
-	
-	@Override
-	protected int[] getNormalRegion(boolean vertical) {
-		if (vertical) {
-			return VISIBLE_REGION_VERTICAL;
-		} else {
-			return VISIBLE_REGION_HORIZONTAL;
-		}
-		
-		//return VISIBLE_REGION_VERTICAL;
 	}
 }
