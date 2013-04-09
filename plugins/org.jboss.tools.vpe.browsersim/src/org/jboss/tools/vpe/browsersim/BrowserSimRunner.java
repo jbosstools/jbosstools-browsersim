@@ -17,37 +17,40 @@ import java.util.Arrays;
 import java.util.List;
 
 import org.eclipse.swt.widgets.Display;
+import org.jboss.tools.vpe.browsersim.browser.PlatformUtil;
 import org.jboss.tools.vpe.browsersim.ui.BrowserSim;
+import org.jboss.tools.vpe.browsersim.ui.CocoaUIEnhancer;
+import org.jboss.tools.vpe.browsersim.ui.Messages;
 
 /**
  * @author Konstantin Marmalyukov (kmarmaliykov)
  */
 
 public class BrowserSimRunner {
-	private static final String NOT_STANDALONE = "-not-standalone"; //$NON-NLS-1$
-	private static final String DEFAULT_URL = "about:blank"; //"http://www.w3schools.com/js/tryit_view.asp?filename=try_nav_useragent"; //$NON-NLS-1$
+	public static final String NOT_STANDALONE = "-not-standalone"; //$NON-NLS-1$
+	public static final String ABOUT_BLANK = "about:blank"; //"http://www.w3schools.com/js/tryit_view.asp?filename=try_nav_useragent"; //$NON-NLS-1$
 	
 	public static void main(String[] args) {
-		List<String> params = new ArrayList<String>(Arrays.asList(args));
-		BrowserSim.isStandalone = !params.contains(NOT_STANDALONE);
-		if (!BrowserSim.isStandalone) {
-			params.remove(NOT_STANDALONE);
+		if (PlatformUtil.OS_MACOSX.equals(PlatformUtil.getOs())) {
+			CocoaUIEnhancer.initializeMacOSMenuBar(Messages.BrowserSim_BROWSER_SIM);
 		}
+		BrowserSimArgs browserSimArgs = BrowserSimArgs.parseArgs(args);
+		BrowserSim.isStandalone = browserSimArgs.isStandalone();
 		
-		String homeUrl;
-		if (params.size() > 0) {
-			String lastArg = params.get(params.size() - 1);
+		String path = browserSimArgs.getPath();
+		String url;
+		if (path != null) {
 			try {
-				new URI(lastArg); // validate URL
-				homeUrl = lastArg;
+				new URI(path); // validate URL
+				url = path;
 			} catch (URISyntaxException e) {
-				homeUrl = DEFAULT_URL;
+				url = ABOUT_BLANK;
 			}
 		} else {
-			homeUrl = DEFAULT_URL;
+			url = ABOUT_BLANK;
 		}
 		
-		BrowserSim browserSim = new BrowserSim(homeUrl);		
+		BrowserSim browserSim = new BrowserSim(url);
 		browserSim.open();
 
 		Display display = Display.getDefault();

@@ -51,6 +51,9 @@ import org.jboss.tools.vpe.browsersim.model.preferences.CommonPreferencesStorage
 import org.jboss.tools.vpe.browsersim.model.preferences.SpecificPreferences;
 import org.jboss.tools.vpe.browsersim.model.preferences.SpecificPreferencesStorage;
 import org.jboss.tools.vpe.browsersim.ui.debug.firebug.FireBugLiteLoader;
+import org.jboss.tools.vpe.browsersim.ui.events.ExitListener;
+import org.jboss.tools.vpe.browsersim.ui.events.SkinChangeEvent;
+import org.jboss.tools.vpe.browsersim.ui.events.SkinChangeListener;
 import org.jboss.tools.vpe.browsersim.ui.menu.BrowserSimMenuCreator;
 import org.jboss.tools.vpe.browsersim.ui.skin.BrowserSimSkin;
 import org.jboss.tools.vpe.browsersim.ui.skin.ResizableSkinSizeAdvisor;
@@ -65,10 +68,9 @@ import org.jboss.tools.vpe.browsersim.util.ImageList;
 public class BrowserSim {
 	public static final String BROWSERSIM_PLUGIN_ID = "org.jboss.tools.vpe.browsersim"; //$NON-NLS-1$
 	private static final String[] BROWSERSIM_ICONS = {"icons/browsersim_16px.png", "icons/browsersim_32px.png", "icons/browsersim_64px.png", "icons/browsersim_128px.png", "icons/browsersim_256px.png", }; //$NON-NLS-1$//$NON-NLS-2$//$NON-NLS-3$//$NON-NLS-4$//$NON-NLS-5$
-
+	
 	public static boolean isStandalone;
 	private static List<BrowserSim> instances;
-
 	private String homeUrl;
 	private static CommonPreferences commonPreferences;
 	private SpecificPreferences specificPreferences;
@@ -80,7 +82,9 @@ public class BrowserSim {
 	private Point currentLocation;
 	private ProgressListener progressListener;
 	private Observer commonPreferencesObserver;
-
+	private List<SkinChangeListener> skinChangeListenerList = new ArrayList<SkinChangeListener>();
+	private List<ExitListener> exitListenerList = new ArrayList<ExitListener>();
+	
 	static {
 		instances = new ArrayList<BrowserSim>();
 	}
@@ -89,7 +93,7 @@ public class BrowserSim {
 		this.homeUrl = homeUrl;
 		
 	}
-
+	
 	public void open() {
 		commonPreferences = (CommonPreferences) CommonPreferencesStorage.INSTANCE.load();
 		if (commonPreferences == null) {
@@ -133,7 +137,6 @@ public class BrowserSim {
 
 		skin.setBrowserFactory(new WebKitBrowserFactory());
 		
-		BrowserSimMenuCreator.initCocoaUIEnhancer();
 		Display display = Display.getDefault();
 		
 		try {
@@ -168,11 +171,19 @@ public class BrowserSim {
 				commonPreferences.deleteObserver(commonPreferencesObserver);
 			}
 		});
+		shell.addListener(SWT.Close, new Listener() {
 
-		final BrowserSimBrowser browser = skin.getBrowser();
-		controlHandler = new ControlHandlerImpl(browser);
-		final BrowserSimMenuCreator menuCreator = new BrowserSimMenuCreator(skin, commonPreferences,
-				specificPreferences, controlHandler, homeUrl);
+			@Override
+			public void handleEvent(Event event) {
+				for (ExitListener e : exitListenerList) {
+					e.exit();
+				}
+			}
+		});
+
+		final BrowserSimBrowser browser = getBrowser();
+		controlHandler = createControlHandler(browser, homeUrl, specificPreferences);
+		final BrowserSimMenuCreator menuCreator = createMenuCreator(skin, commonPreferences, specificPreferences, controlHandler, homeUrl);
 		
 		shell.addShellListener(new ShellListener() {
 			@Override
@@ -359,7 +370,7 @@ public class BrowserSim {
 		browser.addLocationListener(new LocationAdapter() {
 			@Override
 			public void changed(LocationEvent event) {
-				if (skin.getBrowser().equals(Display.getDefault().getFocusControl()) && event.top) {
+				if (getBrowser().equals(Display.getDefault().getFocusControl()) && event.top) {
 					for (BrowserSim bs : instances) {
 						if (bs.skin != skin) {
 							bs.skin.getBrowser().setUrl(event.location);
@@ -375,6 +386,7 @@ public class BrowserSim {
 				skin.pageTitleChanged(event.title);
 			}
 		});
+		fireSkinChangeEvent();
 	}
 	
 	private void initImages() {
@@ -428,22 +440,22 @@ public class BrowserSim {
 		Class<? extends BrowserSimSkin> newSkinClass = BrowserSimUtil.getSkinClass(device, specificPreferences.getUseSkins());
 		String oldSkinUrl = null;
 		if (newSkinClass != skin.getClass()) {
-			oldSkinUrl = skin.getBrowser().getUrl();
+			oldSkinUrl = getBrowser().getUrl();
 			Point currentLocation = skin.getShell().getLocation();
-			skin.getBrowser().removeProgressListener(progressListener);
-			skin.getBrowser().getShell().dispose();
+			getBrowser().removeProgressListener(progressListener);
+			getBrowser().getShell().dispose();//XXX
 			initSkin(newSkinClass, currentLocation);
 		}
 		setOrientation(specificPreferences.getOrientationAngle(), device);
 
-		skin.getBrowser().setDefaultUserAgent(device.getUserAgent());
+		getBrowser().setDefaultUserAgent(device.getUserAgent());
 
 		if (oldSkinUrl != null) {
-			skin.getBrowser().setUrl(oldSkinUrl); // skin (and browser instance) is changed
+			getBrowser().setUrl(oldSkinUrl); // skin (and browser instance) is changed
 		} else {
-			skin.getBrowser().refresh(); // only user agent and size of the browser is changed
+			getBrowser().refresh(); // only user agent and size of the browser is changed
 		}
-
+		
 		skin.getShell().open();
 	}
 	
@@ -460,25 +472,9 @@ public class BrowserSim {
 
 	@SuppressWarnings("nls")
 	private void initOrientation(int orientation) {
-		skin.getBrowser().execute("window.onorientationchange = null;" + "window.orientation = " + orientation + ";");
+		getBrowser().execute("window.onorientationchange = null;" + "window.orientation = " + orientation + ";");
 	}
 
-	private void rotateDevice(boolean counterclockwise) {
-		int orientationAngle = specificPreferences.getOrientationAngle();
-		if (counterclockwise) {
-			orientationAngle+= 90;
-		} else {
-			orientationAngle-= 90;
-		}
-		
-		// normalize angle to be in [-90; 180]
-		orientationAngle = ((orientationAngle - 180) % 360) + 180;
-		orientationAngle = ((orientationAngle + 90) % 360) - 90;
-		
-		specificPreferences.setOrientationAngle(orientationAngle);
-		specificPreferences.notifyObservers();
-	}
-	
 	@SuppressWarnings("nls")
 	private void setOrientation(int orientationAngle, Device device) {
 		Point size = BrowserSimUtil.getSizeInDesktopPixels(device);
@@ -493,7 +489,7 @@ public class BrowserSim {
 		Rectangle clientArea = BrowserSimUtil.getMonitorClientArea(skin.getShell().getMonitor());
 		skin.setOrientationAndSize(orientationAngle, browserSize, resizableSkinSizeAdvisor);
 		BrowserSimUtil.fixShellLocation(skin.getShell(), clientArea);
-		skin.getBrowser().execute("window.orientation = " + orientationAngle + ";"
+		getBrowser().execute("window.orientation = " + orientationAngle + ";"
 				+ "(function(){"
 				+ 		"var event = document.createEvent('Event');"
 				+ 		"event.initEvent('orientationchange', false, false);" // http://jsbin.com/azefow/6   https://developer.mozilla.org/en/DOM/document.createEvent
@@ -504,58 +500,43 @@ public class BrowserSim {
 				+	"})();"
 		);
 	}
+
+	public BrowserSimBrowser getBrowser() {
+		return skin != null ? skin.getBrowser() : null;
+	}
 	
-	public class ControlHandlerImpl implements ControlHandler {
-		private Browser browser;
-
-		public ControlHandlerImpl(Browser browser) {
-			this.browser = browser;
-		}
-
-		@Override
-		public void goBack() {
-			browser.back();
-			browser.setFocus();
-		}
-
-		@Override
-		public void goForward() {
-			browser.forward();
-			browser.setFocus();
-		}
-
-		@Override
-		public void goHome() {
-			browser.setUrl(homeUrl);
-			browser.setFocus();
-		}
-
-		@Override
-		public void goToAddress(String address) {
-			browser.setUrl(address);
-			browser.setFocus();
-		}
-
-		@Override
-		public void showContextMenu() {
-			// TODO Auto-generated method stub//XXX
-		}
-
-		@Override
-		public void rotate(boolean counterclockwise) {
-			rotateDevice(counterclockwise);
-		}
-
-		@Override
-		public void stop() {
-			browser.stop();
-			browser.setFocus();
-		}
-
-		@Override
-		public void refresh() {
-			browser.refresh();
-			browser.setFocus();
+	
+	public void addSkinChangeListener(SkinChangeListener listener) {
+		skinChangeListenerList.add(listener);
+	}
+	
+	public void addExitListener(ExitListener listener){
+		exitListenerList.add(listener);
+	}
+	
+	public void fireSkinChangeEvent() {
+		SkinChangeEvent event = new SkinChangeEvent(this, skin);
+		for (SkinChangeListener listener : skinChangeListenerList) {
+			listener.skinChanged(event);
 		}
 	}
+
+	/**
+	 * {@link ControlHandler} factory method.
+	 * 
+	 * Override this method if you need a custom {@link ControlHandler}
+	 */
+	protected ControlHandler createControlHandler(BrowserSimBrowser browser, String homeUrl, SpecificPreferences specificPreferences) {
+		return new BrowserSimControlHandler(browser, homeUrl, specificPreferences);
+	}
+	
+	/**
+	 * {@link BrowserSimMenuCreator} factory method.
+	 * 
+	 * Override this method if you need a custom {@link BrowserSimMenuCreator}
+	 */
+	protected BrowserSimMenuCreator createMenuCreator(BrowserSimSkin skin, CommonPreferences commonPreferences, SpecificPreferences specificPreferences, ControlHandler controlHandler, String homeUrl) {
+		return new BrowserSimMenuCreator(skin, commonPreferences, specificPreferences, controlHandler, homeUrl);
+	}	
+
 }

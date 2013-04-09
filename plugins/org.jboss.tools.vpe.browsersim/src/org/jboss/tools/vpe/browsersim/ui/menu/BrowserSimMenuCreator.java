@@ -46,8 +46,8 @@ public class BrowserSimMenuCreator {
 	private SpecificPreferences specificPreferences;
 	private ControlHandler controlHandler;
 	private String homeUrl;
-	private static CocoaUIEnhancer cocoaUIEnhancer;
 	
+
 	public BrowserSimMenuCreator(BrowserSimSkin skin, CommonPreferences cp, SpecificPreferences sp,
 			ControlHandler controlHandler, String homeUrl) {
 		this.skin = skin;
@@ -57,17 +57,6 @@ public class BrowserSimMenuCreator {
 		this.homeUrl = homeUrl;
 	}
 	
-	/**
-	 * must be called before display is created
-	 */
-	public static void initCocoaUIEnhancer() {
-		// CocoaUIEnhancer handles connection between the About, Preferences and Quit menus in MAC OS X
-		if (cocoaUIEnhancer == null && PlatformUtil.OS_MACOSX.equals(PlatformUtil.getOs())) {
-			cocoaUIEnhancer = new CocoaUIEnhancer(Messages.BrowserSim_BROWSER_SIM);
-			cocoaUIEnhancer.initializeMacOSMenuBar();
-		}
-	}
-
 	public void addMenuBar() {
 		Menu appMenuBar = skin.getMenuBar();
 		if (appMenuBar != null) {
@@ -81,8 +70,9 @@ public class BrowserSimMenuCreator {
 		}
 		
 		// set event handlers for Mac OS X Menu-bar
+		CocoaUIEnhancer cocoaUIEnhancer = CocoaUIEnhancer.getInstance();
 		if (cocoaUIEnhancer != null) {
-			addMacOsMenuApplicationHandler();
+			addMacOsMenuApplicationHandler(cocoaUIEnhancer);
 			cocoaUIEnhancer.hookApplicationMenu(skin.getShell().getDisplay());
 		}
 	}
@@ -103,7 +93,7 @@ public class BrowserSimMenuCreator {
 				addTurnMenuItems(contextMenu, controlHandler);
 
 				new MenuItem(contextMenu, SWT.BAR);
-				ToolsMenuCreator.addItems(contextMenu, skin, commonPreferences, specificPreferences, homeUrl);
+				addToolsItems(contextMenu, skin, commonPreferences, specificPreferences, homeUrl);
 
 				new MenuItem(contextMenu, SWT.BAR);
 				FileMenuCreator.addItems(contextMenu, skin);
@@ -148,13 +138,21 @@ public class BrowserSimMenuCreator {
 		});
 
 		Menu toolsMenu = createDropDownMenu(appMenuBar, Messages.BrowserSim_TOOLS);
-		ToolsMenuCreator.addItems(toolsMenu, skin, commonPreferences, specificPreferences, homeUrl);
+		addToolsItems(toolsMenu, skin, commonPreferences, specificPreferences, homeUrl);
 
 		// If Platform is Mac OS X, application will have no duplicated menu items (About)
 		if (!PlatformUtil.OS_MACOSX.equals(PlatformUtil.getOs())) {
 			Menu help = createDropDownMenu(appMenuBar, Messages.BrowserSim_HELP);
 			addAboutItem(help);
 		}
+	}
+	
+	protected void addToolsItems(Menu contextMenu, BrowserSimSkin skin, CommonPreferences commonPreferences,
+			SpecificPreferences specificPreferences, String homeUrl) {
+		ToolsMenuCreator.addFireBugLiteItem(contextMenu, skin);
+		ToolsMenuCreator.addWeinreItem(contextMenu, skin, commonPreferences.getWeinreScriptUrl(), commonPreferences.getWeinreClientUrl());
+		ToolsMenuCreator.addScreenshotMenuItem(contextMenu, skin, commonPreferences.getScreenshotsFolder());
+		ToolsMenuCreator.addSyncronizedWindowItem(contextMenu, skin, commonPreferences.getDevices(), specificPreferences.getUseSkins(), specificPreferences.getOrientationAngle(), homeUrl);
 	}
 
 	private Menu createDropDownMenu(Menu menuBar, String name) {
@@ -256,11 +254,11 @@ public class BrowserSimMenuCreator {
 		exit.addSelectionListener(new SelectionAdapter() {
 			public void widgetSelected(SelectionEvent e) {
 				shell.close();
-			};
+			}
 		});
 	}
 
-	private void addMacOsMenuApplicationHandler() {
+	private void addMacOsMenuApplicationHandler(CocoaUIEnhancer cocoaUIEnhancer) {
 		if (cocoaUIEnhancer != null) {
 			cocoaUIEnhancer.setQuitListener(new Listener() {
 				@Override

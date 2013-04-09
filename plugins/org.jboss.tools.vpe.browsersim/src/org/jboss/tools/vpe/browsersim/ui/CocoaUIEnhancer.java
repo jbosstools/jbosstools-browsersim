@@ -50,26 +50,29 @@ public class CocoaUIEnhancer {
     private Listener quitListener;
     private Runnable aboutAction;
     private Runnable preferencesAction;
+	private static CocoaUIEnhancer instance;
     
-    final private String appName;
-
     /**
      * Construct a new CocoaUIEnhancer.
+     * Must be invoked before a Display is created!
      * 
      * @param appName
      *            The name of the application. It will be used to customize the About and Quit menu
      *            items. If you do not wish to customize the About and Quit menu items, just pass
      *            <tt>null</tt> here.
-     */
-    public CocoaUIEnhancer( String appName ) {
-        this.appName = appName;
-    }
-    /**
-     * Must be invoked before a Display is created!
 	 */
-    public void initializeMacOSMenuBar(){
-    	System.setProperty("com.apple.mrj.application.apple.menu.about.name", appName);//$NON-NLS-1$
-    	
+    public static void initializeMacOSMenuBar(String appName){
+    	if (instance != null) {
+    		throw new IllegalStateException("Mac OS menu bar is already initialized");//$NON-NLS-1$
+    	}
+
+		System.setProperty("com.apple.mrj.application.apple.menu.about.name", appName);//$NON-NLS-1$
+		instance = new CocoaUIEnhancer();
+		instance.hookApplicationMenu(Display.getDefault());
+    }
+    
+    public static CocoaUIEnhancer getInstance() {
+    	return instance;
     }
 
     /**
