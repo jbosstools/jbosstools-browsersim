@@ -24,7 +24,6 @@ import org.eclipse.swt.widgets.Menu;
 import org.eclipse.swt.widgets.MenuItem;
 import org.eclipse.swt.widgets.Shell;
 import org.jboss.tools.vpe.browsersim.model.Device;
-import org.jboss.tools.vpe.browsersim.model.preferences.CommonPreferences;
 import org.jboss.tools.vpe.browsersim.model.preferences.SpecificPreferences;
 import org.jboss.tools.vpe.browsersim.ui.BrowserSim;
 import org.jboss.tools.vpe.browsersim.ui.Messages;
@@ -37,15 +36,8 @@ import org.jboss.tools.vpe.browsersim.ui.skin.BrowserSimSkin;
  */
 
 public class ToolsMenuCreator {
-	public static void addItems(Menu menu, final BrowserSimSkin skin, final CommonPreferences cp,
-			final SpecificPreferences sp, final String homeUrl) {
-		addFireBugLiteItem(menu, skin);
-		addWeinreItem(menu, skin, cp.getWeinreScriptUrl(), cp.getWeinreClientUrl());
-		addScreenshotMenuItem(menu, skin, cp.getScreenshotsFolder());
-		addSyncronizedWindowItem(menu, skin, cp.getDevices(), sp.getUseSkins(), sp.getOrientationAngle(), homeUrl);
-	}
 	
-	private static void addFireBugLiteItem(Menu menu, final BrowserSimSkin skin) {
+	public static void addFireBugLiteItem(Menu menu, final BrowserSimSkin skin) {
 		MenuItem fireBugLite = new MenuItem(menu, SWT.PUSH);
 		fireBugLite.setText(Messages.BrowserSim_FIREBUG_LITE);
 		fireBugLite.addSelectionListener(new SelectionAdapter() {
@@ -55,7 +47,7 @@ public class ToolsMenuCreator {
 		});
 	}
 	
-	private static void addWeinreItem(Menu menu, final BrowserSimSkin skin, final String weinreScriptUrl,
+	public static void addWeinreItem(Menu menu, final BrowserSimSkin skin, final String weinreScriptUrl,
 			final String weinreClientUrl) {
 		MenuItem weinre = new MenuItem(menu, SWT.PUSH);
 		weinre.setText(Messages.BrowserSim_WEINRE);
@@ -90,7 +82,7 @@ public class ToolsMenuCreator {
 		});
 	}
 	
-	private static void addScreenshotMenuItem(Menu menu, final BrowserSimSkin skin, final String path) {
+	public static void addScreenshotMenuItem(Menu menu, final BrowserSimSkin skin, final String path) {
 		MenuItem screenshot = new MenuItem(menu, SWT.CASCADE);
 		screenshot.setText(Messages.Screenshots_Screenshot);
 
@@ -98,7 +90,7 @@ public class ToolsMenuCreator {
 		screenshot.setMenu(subMenu);
 	}
 	
-	private static void addSyncronizedWindowItem(Menu menu, final BrowserSimSkin skin,
+	public static void addSyncronizedWindowItem(Menu menu, final BrowserSimSkin skin,
 			final List<Device> devices, final Boolean useSkins, final int orientationAngle, final String homeUrl) {
 		MenuItem syncWindow = new MenuItem(menu, SWT.CASCADE);
 		syncWindow.setText("Open Syncronized Window");

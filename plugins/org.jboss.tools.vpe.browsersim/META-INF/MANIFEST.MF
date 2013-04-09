@@ -14,5 +14,7 @@ Export-Package: org.jboss.tools.vpe.browsersim,
  org.jboss.tools.vpe.browsersim.model.preferences,
  org.jboss.tools.vpe.browsersim.ui,
  org.jboss.tools.vpe.browsersim.ui.events,
+ org.jboss.tools.vpe.browsersim.ui.menu,
+ org.jboss.tools.vpe.browsersim.ui.skin,
  org.jboss.tools.vpe.browsersim.util
 Bundle-Vendor: JBoss by Red Hat

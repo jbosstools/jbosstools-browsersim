@@ -183,7 +183,7 @@ public class BrowserSim {
 
 		final BrowserSimBrowser browser = getBrowser();
 		controlHandler = createControlHandler(browser, homeUrl, specificPreferences);
-		final BrowserSimMenuCreator menuCreator = new BrowserSimMenuCreator(skin, commonPreferences, specificPreferences, controlHandler, homeUrl);
+		final BrowserSimMenuCreator menuCreator = createMenuCreator(skin, commonPreferences, specificPreferences, controlHandler, homeUrl);
 		
 		shell.addShellListener(new ShellListener() {
 			@Override
@@ -529,5 +529,14 @@ public class BrowserSim {
 	protected ControlHandler createControlHandler(BrowserSimBrowser browser, String homeUrl, SpecificPreferences specificPreferences) {
 		return new BrowserSimControlHandler(browser, homeUrl, specificPreferences);
 	}
+	
+	/**
+	 * {@link BrowserSimMenuCreator} factory method.
+	 * 
+	 * Override this method if you need a custom {@link BrowserSimMenuCreator}
+	 */
+	protected BrowserSimMenuCreator createMenuCreator(BrowserSimSkin skin, CommonPreferences commonPreferences, SpecificPreferences specificPreferences, ControlHandler controlHandler, String homeUrl) {
+		return new BrowserSimMenuCreator(skin, commonPreferences, specificPreferences, controlHandler, homeUrl);
+	}	
 
 }

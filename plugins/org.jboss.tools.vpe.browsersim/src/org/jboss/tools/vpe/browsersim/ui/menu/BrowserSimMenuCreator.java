@@ -93,7 +93,7 @@ public class BrowserSimMenuCreator {
 				addTurnMenuItems(contextMenu, controlHandler);
 
 				new MenuItem(contextMenu, SWT.BAR);
-				ToolsMenuCreator.addItems(contextMenu, skin, commonPreferences, specificPreferences, homeUrl);
+				addToolsItems(contextMenu, skin, commonPreferences, specificPreferences, homeUrl);
 
 				new MenuItem(contextMenu, SWT.BAR);
 				FileMenuCreator.addItems(contextMenu, skin);
@@ -138,13 +138,21 @@ public class BrowserSimMenuCreator {
 		});
 
 		Menu toolsMenu = createDropDownMenu(appMenuBar, Messages.BrowserSim_TOOLS);
-		ToolsMenuCreator.addItems(toolsMenu, skin, commonPreferences, specificPreferences, homeUrl);
+		addToolsItems(toolsMenu, skin, commonPreferences, specificPreferences, homeUrl);
 
 		// If Platform is Mac OS X, application will have no duplicated menu items (About)
 		if (!PlatformUtil.OS_MACOSX.equals(PlatformUtil.getOs())) {
 			Menu help = createDropDownMenu(appMenuBar, Messages.BrowserSim_HELP);
 			addAboutItem(help);
 		}
+	}
+	
+	protected void addToolsItems(Menu contextMenu, BrowserSimSkin skin, CommonPreferences commonPreferences,
+			SpecificPreferences specificPreferences, String homeUrl) {
+		ToolsMenuCreator.addFireBugLiteItem(contextMenu, skin);
+		ToolsMenuCreator.addWeinreItem(contextMenu, skin, commonPreferences.getWeinreScriptUrl(), commonPreferences.getWeinreClientUrl());
+		ToolsMenuCreator.addScreenshotMenuItem(contextMenu, skin, commonPreferences.getScreenshotsFolder());
+		ToolsMenuCreator.addSyncronizedWindowItem(contextMenu, skin, commonPreferences.getDevices(), specificPreferences.getUseSkins(), specificPreferences.getOrientationAngle(), homeUrl);
 	}
 
 	private Menu createDropDownMenu(Menu menuBar, String name) {
