@@ -71,7 +71,7 @@ public class BrowserSimControlHandler implements ControlHandler {
 		orientationAngle = ((orientationAngle + 90) % 360) - 90;
 		
 		specificPreferences.setOrientationAngle(orientationAngle);
-		specificPreferences.notifyObservers();
+		specificPreferences.notifyObservers(false);
 	}
 
 	@Override

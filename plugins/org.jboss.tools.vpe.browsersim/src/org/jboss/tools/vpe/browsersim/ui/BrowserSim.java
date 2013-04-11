@@ -130,7 +130,7 @@ public class BrowserSim {
 		}
 		
 		initSkin(BrowserSimUtil.getSkinClass(defaultDevice, specificPreferences.getUseSkins()), specificPreferences.getLocation());
-		setSelectedDevice();
+		setSelectedDevice(null);
 		controlHandler.goToAddress(url);
 		
 		instances.add(BrowserSim.this);
@@ -422,33 +422,33 @@ public class BrowserSim {
 	private void initObservers() {
 		commonPreferencesObserver = new Observer() {
 			@Override
-			public void update(Observable o, Object arg) {
-				setSelectedDeviceAsync();
+			public void update(Observable o, Object refreshRequired) {
+				setSelectedDeviceAsync((Boolean) refreshRequired);
 			}
 		};
 		commonPreferences.addObserver(commonPreferencesObserver);
 		specificPreferences.addObserver(new Observer() {
-			public void update(Observable o, Object arg) {
-				setSelectedDeviceAsync();
+			public void update(Observable o, Object refreshRequired) {
+				setSelectedDeviceAsync((Boolean) refreshRequired);
 			}
 		});
 	}
 	
 	private boolean deviceUpdateRequired = false;
-	private void setSelectedDeviceAsync() {
+	private void setSelectedDeviceAsync(final Boolean refreshRequired) {
 		deviceUpdateRequired = true;
 		Display.getDefault().asyncExec(new Runnable() {
 			@Override
 			public void run() {
 				if (deviceUpdateRequired) {
-					setSelectedDevice();
+					setSelectedDevice(refreshRequired);
 					deviceUpdateRequired = false;
 				}
 			}
 		});
 	}
 
-	private void setSelectedDevice() {
+	private void setSelectedDevice(Boolean refreshRequired) {
 		final Device device = commonPreferences.getDevices().get(specificPreferences.getSelectedDeviceId());
 		if (device == null) {
 			skin.getShell().close();
@@ -468,9 +468,9 @@ public class BrowserSim {
 	
 			if (oldSkinUrl != null) {
 				skin.getBrowser().setUrl(oldSkinUrl); // skin (and browser instance) is changed
-			} else {
-				skin.getBrowser().refresh(); // only user agent and size of the browser is changed
-			}
+			} else if(!Boolean.FALSE.equals(refreshRequired)){
+				getBrowser().refresh(); // only user agent and size of the browser is changed and orientation is not changed
+	 		}
 	
 			skin.getShell().open();
 		}
