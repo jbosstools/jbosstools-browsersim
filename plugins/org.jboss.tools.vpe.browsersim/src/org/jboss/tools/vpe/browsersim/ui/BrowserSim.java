@@ -399,7 +399,6 @@ public class BrowserSim {
 				skin.pageTitleChanged(event.title);
 			}
 		});
-		fireSkinChangeEvent();
 	}
 	
 	private void initImages() {
@@ -461,6 +460,7 @@ public class BrowserSim {
 				skin.getBrowser().removeProgressListener(progressListener);
 				skin.getBrowser().getShell().dispose();
 				initSkin(newSkinClass, currentLocation);
+				fireSkinChangeEvent();
 			}
 			setOrientation(specificPreferences.getOrientationAngle(), device);
 	
@@ -473,7 +473,21 @@ public class BrowserSim {
 	 		}
 	
 			skin.getShell().open();
-		}
+		} 
+	} 
+	
+	public void reinitSkin() {
+		final Device device = commonPreferences.getDevices().get(specificPreferences.getSelectedDeviceId());
+		Class<? extends BrowserSimSkin> newSkinClass = BrowserSimUtil.getSkinClass(device, specificPreferences.getUseSkins());
+		String oldSkinUrl = skin.getBrowser().getUrl();
+		Point currentLocation = skin.getShell().getLocation();
+		skin.getBrowser().removeProgressListener(progressListener);
+		skin.getBrowser().getShell().dispose();
+		initSkin(newSkinClass, currentLocation);
+		setOrientation(specificPreferences.getOrientationAngle(), device);
+		skin.getBrowser().setDefaultUserAgent(device.getUserAgent());
+		skin.getBrowser().setUrl(oldSkinUrl); 
+		skin.getShell().open();
 	}
 
 	@SuppressWarnings("nls")
