@@ -52,12 +52,14 @@ public abstract class ResizableSkin implements BrowserSimSkin {
 	private int[] visibleRegionVertical;
 	private Point horizontalBorderSize;
 	private Point verticalBorderSize;
+	private Point maxScreenSize;
 
 	public ResizableSkin(int[] visibleRegionHorizontal, int[] visibleRegionVertical, Point normalScreenSize,
 			Point normalSkinSize) {
 		super();
 		this.visibleRegionHorizontal = visibleRegionHorizontal;
 		this.visibleRegionVertical = visibleRegionVertical;
+		this.maxScreenSize = normalScreenSize;
 		this.verticalBorderSize = new Point(normalSkinSize.x - normalScreenSize.x, normalSkinSize.y - normalScreenSize.y);
 		this.horizontalBorderSize = new Point(verticalBorderSize.y, verticalBorderSize.x);
 	}
@@ -356,6 +358,11 @@ public abstract class ResizableSkin implements BrowserSimSkin {
 	
 	private int[] getNormalRegion(boolean vertical) {
 		return vertical ? visibleRegionVertical : visibleRegionHorizontal;
+	}
+	
+	@Override
+	public Point getMinimalScreenSize() {
+		return maxScreenSize;
 	}
 	
 	@Override

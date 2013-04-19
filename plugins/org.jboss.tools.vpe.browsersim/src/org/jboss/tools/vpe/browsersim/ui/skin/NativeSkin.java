@@ -264,6 +264,11 @@ public class NativeSkin implements BrowserSimSkin {
 	}
 
 	@Override
+	public Point getMinimalScreenSize() {
+		return new Point(0,0);
+	}
+	
+	@Override
 	public void locationChanged(String location, boolean backEnabled, boolean forwardEnabled) {
 		locationText.setText(location);
 		itemBack.setEnabled(backEnabled);
