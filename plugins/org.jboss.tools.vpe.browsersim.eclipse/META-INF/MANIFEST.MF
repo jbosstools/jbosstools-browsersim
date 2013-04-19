@@ -13,10 +13,6 @@ Require-Bundle: org.eclipse.ui,
  org.eclipse.ui.ide,
  org.eclipse.ui.browser,
  org.eclipse.core.filesystem,
- org.jboss.tools.jst.jsp;bundle-version="3.3.0";resolution:=optional,
- org.eclipse.wst.sse.ui;resolution:=optional,
- org.jboss.tools.common.text.ext;bundle-version="3.3.0";resolution:=optional,
- org.jboss.tools.jst.web;bundle-version="3.3.0";resolution:=optional,
  org.jboss.tools.vpe.browsersim;bundle-version="3.3.0"
 Bundle-ActivationPolicy: lazy
 Bundle-RequiredExecutionEnvironment: JavaSE-1.6

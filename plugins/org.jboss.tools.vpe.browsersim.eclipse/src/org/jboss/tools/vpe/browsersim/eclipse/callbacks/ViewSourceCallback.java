@@ -31,9 +31,7 @@ import org.eclipse.ui.IWorkbenchWindow;
 import org.eclipse.ui.PartInitException;
 import org.eclipse.ui.PlatformUI;
 import org.eclipse.ui.texteditor.ITextEditor;
-import org.jboss.tools.jst.jsp.jspeditor.JSPMultiPageEditor;
 import org.jboss.tools.vpe.browsersim.eclipse.Activator;
-import org.jboss.tools.vpe.browsersim.eclipse.launcher.BrowserSimLauncher;
 import org.jboss.tools.vpe.browsersim.eclipse.launcher.ExternalProcessCallback;
 import org.jboss.tools.vpe.browsersim.eclipse.launcher.TransparentReader;
 
@@ -99,29 +97,20 @@ public class ViewSourceCallback implements ExternalProcessCallback {
 				 * See http://www.eclipse.org/forums/index.php/m/639937/
 				 */
 				IDocument doc = null;
+				ITextEditor textEditor = null;
+				if (editor instanceof ITextEditor) {
+					textEditor = (ITextEditor) editor;
+				} else {
+					textEditor = (ITextEditor) editor.getAdapter(ITextEditor.class);
+				}
 				
-				// this checking is needed to do not load jst.jsp plug-ins if it is unnecessary
-				if ("org.jboss.tools.jst.jsp.jspeditor.HTMLTextEditor".equals(editorId)) { //$NON-NLS-1$
-					try {
-						if (editor instanceof JSPMultiPageEditor) {
-							JSPMultiPageEditor multiPageEditor = (JSPMultiPageEditor) editor;
-							doc = multiPageEditor.getSourceEditor().getTextViewer().getDocument();
-							doc.set(content);
-							editor.doSave(null); // reset resource-changed marker
-						}
-					} catch (NoClassDefFoundError e1) {
-						// this is OK - there are some optional dependencies
-						ITextEditor textEditor = null;
-						if (editor instanceof ITextEditor) {
-							textEditor = (ITextEditor) editor;
-						} else {
-							textEditor = (ITextEditor) editor.getAdapter(ITextEditor.class);
-						}
-						
-						if (textEditor != null) {
-							doc = textEditor.getDocumentProvider().getDocument(input);
-						}
-					}
+				if (textEditor != null) {
+					doc = textEditor.getDocumentProvider().getDocument(input);
+				}
+
+				if (doc != null) {
+					doc.set(content);
+					editor.doSave(null); // reset resource-changed marker
 				}
 			} catch (PartInitException e) {
 				Activator.logError(e.getMessage(), e);
