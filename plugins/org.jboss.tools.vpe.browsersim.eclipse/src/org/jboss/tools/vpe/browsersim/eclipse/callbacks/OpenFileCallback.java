@@ -34,7 +34,7 @@ import org.jboss.tools.vpe.browsersim.eclipse.launcher.TransparentReader;
  * @author Yahor Radtsevich (yradtsevich)
  */
 public class OpenFileCallback implements ExternalProcessCallback {
-	private static final String OPEN_FILE_COMMAND = BrowserSimLauncher.BROWSERSIM_CLASS_NAME + ".command.openFile:"; //$NON-NLS-1$
+	private static final String OPEN_FILE_COMMAND = "org.jboss.tools.vpe.browsersim.command.openFile:"; //$NON-NLS-1$
 
 	/* (non-Javadoc)
 	 * @see org.jboss.tools.vpe.browsersim.eclipse.callbacks.BrowserSimCallback#getCallbackId()

@@ -36,11 +36,10 @@ import org.jboss.tools.vpe.browsersim.ui.skin.BrowserSimSkin;
  */
 
 public class FileMenuCreator {
-	private static final String BROWSERSIM_CLASS_NAME = "org.jboss.tools.vpe.browsersim.ui.BrowserSim"; //$NON-NLS-1$
 	/** @see org.jboss.tools.vpe.browsersim.eclipse.callbacks.OpenFileCallback */
-	private static final String OPEN_FILE_COMMAND = BROWSERSIM_CLASS_NAME + ".command.openFile:"; //$NON-NLS-1$
+	private static final String OPEN_FILE_COMMAND = "org.jboss.tools.vpe.browsersim.command.openFile:"; //$NON-NLS-1$
 	/** @see org.jboss.tools.vpe.browsersim.eclipse.callbacks.ViewSourceCallback */
-	private static final String VIEW_SOURCE_COMMAND = BROWSERSIM_CLASS_NAME + ".command.viewSource:"; //$NON-NLS-1$
+	private static final String VIEW_SOURCE_COMMAND = "org.jboss.tools.vpe.browsersim.command.viewSource:"; //$NON-NLS-1$
 
 	public static void addItems(final Menu menu, final BrowserSimSkin skin) {
 		addOpenInDefaultBrowserItem(menu, skin);

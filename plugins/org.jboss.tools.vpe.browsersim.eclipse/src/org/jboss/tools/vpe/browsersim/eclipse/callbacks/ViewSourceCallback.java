@@ -45,7 +45,7 @@ import org.jboss.tools.vpe.browsersim.eclipse.launcher.TransparentReader;
  * @author Yahor Radtsevich (yradtsevich)
  */
 public class ViewSourceCallback implements ExternalProcessCallback {
-	private static final String VIEW_SOURCE_COMMAND = BrowserSimLauncher.BROWSERSIM_CLASS_NAME + ".command.viewSource:"; //$NON-NLS-1$
+	private static final String VIEW_SOURCE_COMMAND = "org.jboss.tools.vpe.browsersim.command.viewSource:"; //$NON-NLS-1$
 
 	/* (non-Javadoc)
 	 * @see org.jboss.tools.vpe.browsersim.eclipse.callbacks.BrowserSimCallback#getCallbackId()
