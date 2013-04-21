@@ -31,8 +31,8 @@ public class BrowserSimArgs {
 
 	public static BrowserSimArgs parseArgs(String[] args) {
 		List<String> params = new ArrayList<String>(Arrays.asList(args));
-		boolean standalone = !params.contains(NOT_STANDALONE);
-		if (!BrowserSim.isStandalone) {
+		boolean notStandalone = params.contains(NOT_STANDALONE);
+		if (notStandalone) {
 			params.remove(NOT_STANDALONE);
 		}
 		
@@ -43,7 +43,7 @@ public class BrowserSimArgs {
 			path = null;
 		}
 		
-		return new BrowserSimArgs(path, standalone);
+		return new BrowserSimArgs(path, !notStandalone);
 	}
 	
 	public String getPath() {
