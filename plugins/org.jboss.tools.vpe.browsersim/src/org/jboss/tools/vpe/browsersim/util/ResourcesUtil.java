@@ -10,7 +10,10 @@
  ******************************************************************************/
 package org.jboss.tools.vpe.browsersim.util;
 
+import java.io.BufferedReader;
+import java.io.IOException;
 import java.io.InputStream;
+import java.io.InputStreamReader;
 
 import org.jboss.tools.vpe.browsersim.ui.BrowserSim;
 
@@ -27,5 +30,28 @@ public class ResourcesUtil {
 		} else {
 			return BrowserSim.class.getResourceAsStream(RESOURCES_ROOT_FOLDER + name);
 		}
+	}
+	
+	public static String getResourceAsString(String name) {
+		InputStream input = getResourceAsStream(name);
+		InputStreamReader reader = new InputStreamReader(input);
+		BufferedReader bufferedReader = new BufferedReader(reader);
+
+		StringBuilder stringBuilder = new StringBuilder();
+		String read;
+		try {
+			try {
+				while ((read = bufferedReader.readLine()) != null) {
+					stringBuilder.append(read);
+					stringBuilder.append('\n');
+				}
+			} finally {
+				bufferedReader.close();
+			}
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+
+		return stringBuilder.toString();
 	}
 }

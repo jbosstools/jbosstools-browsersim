@@ -51,6 +51,7 @@ import org.jboss.tools.vpe.browsersim.model.preferences.CommonPreferences;
 import org.jboss.tools.vpe.browsersim.model.preferences.CommonPreferencesStorage;
 import org.jboss.tools.vpe.browsersim.model.preferences.SpecificPreferences;
 import org.jboss.tools.vpe.browsersim.model.preferences.SpecificPreferencesStorage;
+import org.jboss.tools.vpe.browsersim.scripting.WebSqlLoader;
 import org.jboss.tools.vpe.browsersim.ui.debug.firebug.FireBugLiteLoader;
 import org.jboss.tools.vpe.browsersim.ui.events.ExitListener;
 import org.jboss.tools.vpe.browsersim.ui.events.SkinChangeEvent;
@@ -61,6 +62,7 @@ import org.jboss.tools.vpe.browsersim.ui.skin.ResizableSkinSizeAdvisor;
 import org.jboss.tools.vpe.browsersim.ui.skin.ResizableSkinSizeAdvisorImpl;
 import org.jboss.tools.vpe.browsersim.util.BrowserSimUtil;
 import org.jboss.tools.vpe.browsersim.util.ImageList;
+import org.jboss.tools.vpe.browsersim.util.ResourcesUtil;
 
 /**
  * @author Yahor Radtsevich (yradtsevich)
@@ -267,6 +269,7 @@ public class BrowserSim {
 		browser.addLocationListener(new LocationAdapter() {
 			public void changed(LocationEvent event) {
 				initOrientation(specificPreferences.getOrientationAngle());
+				WebSqlLoader.initWebSql(skin.getBrowser());
 			}
 		});
 
@@ -374,7 +377,7 @@ public class BrowserSim {
 								"})();");
 
 			}
-
+			
 			public void changing(LocationEvent event) {
 				skin.setAddressBarVisible(true);
 			}
