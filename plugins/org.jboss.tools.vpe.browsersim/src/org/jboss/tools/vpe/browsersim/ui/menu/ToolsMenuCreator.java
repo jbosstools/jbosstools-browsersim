@@ -37,7 +37,16 @@ import org.jboss.tools.vpe.browsersim.ui.skin.BrowserSimSkin;
 
 public class ToolsMenuCreator {
 	
-	public static void addFireBugLiteItem(Menu menu, final BrowserSimSkin skin) {
+	public static void addDebugItem(Menu menu, BrowserSimSkin skin, String weinreScriptUrl, String weinreClientUrl) {
+		MenuItem debug = new MenuItem(menu, SWT.CASCADE);
+		debug.setText(Messages.BrowserSim_DEBUG);
+		Menu subMenu = new Menu(debug);
+		addFireBugLiteItem(subMenu, skin);
+		addWeinreItem(subMenu, skin, weinreScriptUrl, weinreClientUrl);
+		debug.setMenu(subMenu);
+	}
+	
+	private static void addFireBugLiteItem(Menu menu, final BrowserSimSkin skin) {
 		MenuItem fireBugLite = new MenuItem(menu, SWT.PUSH);
 		fireBugLite.setText(Messages.BrowserSim_FIREBUG_LITE);
 		fireBugLite.addSelectionListener(new SelectionAdapter() {
@@ -47,7 +56,7 @@ public class ToolsMenuCreator {
 		});
 	}
 	
-	public static void addWeinreItem(Menu menu, final BrowserSimSkin skin, final String weinreScriptUrl,
+	private static void addWeinreItem(Menu menu, final BrowserSimSkin skin, final String weinreScriptUrl,
 			final String weinreClientUrl) {
 		MenuItem weinre = new MenuItem(menu, SWT.PUSH);
 		weinre.setText(Messages.BrowserSim_WEINRE);
@@ -93,7 +102,7 @@ public class ToolsMenuCreator {
 	public static void addSyncronizedWindowItem(Menu menu, final BrowserSimSkin skin,
 			final Map<String, Device> devices, final Boolean useSkins, final int orientationAngle, final String homeUrl) {
 		MenuItem syncWindow = new MenuItem(menu, SWT.CASCADE);
-		syncWindow.setText("Open Syncronized Window");
+		syncWindow.setText(Messages.BrowserSim_SYNCHRONIZED_WINDOW);
 		Menu subMenu = new Menu(menu);
 		syncWindow.setMenu(subMenu);
 

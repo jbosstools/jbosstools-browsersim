@@ -10,6 +10,9 @@
  ******************************************************************************/
 package org.jboss.tools.vpe.browsersim.ui.menu;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.MenuAdapter;
 import org.eclipse.swt.events.MenuEvent;
@@ -25,6 +28,7 @@ import org.jboss.tools.vpe.browsersim.browser.PlatformUtil;
 import org.jboss.tools.vpe.browsersim.model.Device;
 import org.jboss.tools.vpe.browsersim.model.preferences.CommonPreferences;
 import org.jboss.tools.vpe.browsersim.model.preferences.SpecificPreferences;
+import org.jboss.tools.vpe.browsersim.ui.BrowserSim;
 import org.jboss.tools.vpe.browsersim.ui.CocoaUIEnhancer;
 import org.jboss.tools.vpe.browsersim.ui.ControlHandler;
 import org.jboss.tools.vpe.browsersim.ui.ManageDevicesDialog;
@@ -83,10 +87,9 @@ public class BrowserSimMenuCreator {
 					item.dispose();
 				}
 
-				addDevicesListForMenu(contextMenu);
 				addUseSkinsItem(contextMenu);
-				addPreferencesItem(contextMenu);
-
+				addDevicesListForMenu(contextMenu);
+				
 				new MenuItem(contextMenu, SWT.BAR);
 				addTurnMenuItems(contextMenu, controlHandler);
 
@@ -94,7 +97,7 @@ public class BrowserSimMenuCreator {
 				addToolsItems(contextMenu, skin, commonPreferences, specificPreferences, homeUrl);
 
 				new MenuItem(contextMenu, SWT.BAR);
-				FileMenuCreator.addItems(contextMenu, skin);
+				FileMenuCreator.addItems(contextMenu, skin, commonPreferences, specificPreferences);
 
 				new MenuItem(contextMenu, SWT.BAR);
 				addAboutItem(contextMenu);
@@ -107,14 +110,14 @@ public class BrowserSimMenuCreator {
 
 	private void createMenusForMenuBar(Menu appMenuBar) {
 		Menu file = createDropDownMenu(appMenuBar, Messages.BrowserSim_FILE);
-		FileMenuCreator.addItems(file, skin);
+		FileMenuCreator.addItems(file, skin, commonPreferences, specificPreferences);
 
 		// If Platform is Mac OS X, application will have no duplicated menu items (Exit/Quit BrowserSim)
 		if (!PlatformUtil.OS_MACOSX.equals(PlatformUtil.getOs())) {
 			addExitItem(file, skin.getShell());
 		}
 
-		Menu devicesMenu = createDropDownMenu(appMenuBar, Messages.BrowserSim_DEVICES);
+		Menu devicesMenu = createDropDownMenu(appMenuBar, Messages.BrowserSim_DEVICE);
 		devicesMenu.addMenuListener(new MenuAdapter() {
 			public void menuShown(MenuEvent e) {
 				Menu devicesMenu = (Menu) e.widget;
@@ -122,16 +125,11 @@ public class BrowserSimMenuCreator {
 					item.dispose();
 				}
 
-				addDevicesListForMenu(devicesMenu);
-				addUseSkinsItem(devicesMenu);
-				
-				// If Platform is Mac OS X, application will have no duplicated menu items (Preferences)
-				if (!PlatformUtil.OS_MACOSX.equals(PlatformUtil.getOs())) {
-					addPreferencesItem(devicesMenu);
-				}
+				addTurnMenuItems(devicesMenu, controlHandler);
 
 				new MenuItem(devicesMenu, SWT.BAR);
-				addTurnMenuItems(devicesMenu, controlHandler);
+				addUseSkinsItem(devicesMenu);
+				addDevicesListForMenu(devicesMenu);
 			}
 		});
 
@@ -147,8 +145,7 @@ public class BrowserSimMenuCreator {
 	
 	protected void addToolsItems(Menu contextMenu, BrowserSimSkin skin, CommonPreferences commonPreferences,
 			SpecificPreferences specificPreferences, String homeUrl) {
-		ToolsMenuCreator.addFireBugLiteItem(contextMenu, skin);
-		ToolsMenuCreator.addWeinreItem(contextMenu, skin, commonPreferences.getWeinreScriptUrl(), commonPreferences.getWeinreClientUrl());
+		ToolsMenuCreator.addDebugItem(contextMenu, skin, commonPreferences.getWeinreScriptUrl(), commonPreferences.getWeinreClientUrl());
 		ToolsMenuCreator.addScreenshotMenuItem(contextMenu, skin, commonPreferences.getScreenshotsFolder());
 		ToolsMenuCreator.addSyncronizedWindowItem(contextMenu, skin, commonPreferences.getDevices(), specificPreferences.getUseSkins(), specificPreferences.getOrientationAngle(), homeUrl);
 	}
@@ -162,8 +159,11 @@ public class BrowserSimMenuCreator {
 	}
 
 	private void addDevicesListForMenu(Menu devicesMenu) {
+		MenuItem skins = new MenuItem(devicesMenu, SWT.CASCADE);
+		skins.setText(Messages.BrowserSim_SKIN);
+		Menu subMenu = new Menu(skins);
 		for (Device device : commonPreferences.getDevices().values()) {
-			MenuItem deviceMenuItem = new MenuItem(devicesMenu, SWT.RADIO);
+			MenuItem deviceMenuItem = new MenuItem(subMenu, SWT.RADIO);
 			deviceMenuItem.setText(device.getName());
 			deviceMenuItem.setData(device.getId());
 			if (device.getId().equals(specificPreferences.getSelectedDeviceId())) {
@@ -181,6 +181,7 @@ public class BrowserSimMenuCreator {
 				};
 			});
 		}
+		skins.setMenu(subMenu);
 	}
 
 	private void addUseSkinsItem(Menu menu) {
@@ -196,26 +197,9 @@ public class BrowserSimMenuCreator {
 		});
 	}
 
-	private void addPreferencesItem(Menu menu) {
-		MenuItem preferences = new MenuItem(menu, SWT.PUSH);
-		preferences.setText(Messages.BrowserSim_PREFERENCES);
-		preferences.addSelectionListener(new SelectionAdapter() {
-			public void widgetSelected(SelectionEvent e) {
-				PreferencesWrapper pw = new ManageDevicesDialog(Display.getDefault().getActiveShell(), SWT.APPLICATION_MODAL
-						| SWT.SHELL_TRIM, commonPreferences, specificPreferences).open();
-				if (pw != null) {
-					commonPreferences.copyProperties(pw.getCommonPreferences());
-					specificPreferences.copyProperties(pw.getSpecificPreferences());
-					commonPreferences.notifyObservers();
-					specificPreferences.notifyObservers();
-				}
-			}
-		});
-	}
-
 	private void addTurnMenuItems(Menu menu, final ControlHandler controlHandler) {
 		MenuItem turnLeft = new MenuItem(menu, SWT.PUSH);
-		turnLeft.setText(Messages.BrowserSim_TURN_LEFT);
+		turnLeft.setText(Messages.BrowserSim_ROTATE_LEFT);
 		turnLeft.addSelectionListener(new SelectionAdapter() {
 			public void widgetSelected(SelectionEvent e) {
 				controlHandler.rotate(true);
@@ -223,7 +207,7 @@ public class BrowserSimMenuCreator {
 		});
 
 		MenuItem turnRight = new MenuItem(menu, SWT.PUSH);
-		turnRight.setText(Messages.BrowserSim_TURN_RIGHT);
+		turnRight.setText(Messages.BrowserSim_ROTATE_RIGHT);
 		turnRight.addSelectionListener(new SelectionAdapter() {
 			public void widgetSelected(SelectionEvent e) {
 				controlHandler.rotate(false);
@@ -242,13 +226,39 @@ public class BrowserSimMenuCreator {
 	}
 
 	private void addExitItem(Menu menu, final Shell shell) {
-		MenuItem exit = new MenuItem(menu, SWT.PUSH);
-		exit.setText(Messages.BrowserSim_EXIT);
-		exit.addSelectionListener(new SelectionAdapter() {
+		MenuItem close = new MenuItem(menu, SWT.PUSH);
+		close.setText(Messages.BrowserSim_CLOSE);
+		close.addSelectionListener(new SelectionAdapter() {
 			public void widgetSelected(SelectionEvent e) {
 				shell.close();
 			}
 		});
+		
+		final List<BrowserSim> instances = new ArrayList<BrowserSim>(BrowserSim.getInstances());
+		if (instances.size() > 1) {
+			MenuItem closeOther = new MenuItem(menu, SWT.PUSH);
+			closeOther.setText(Messages.BrowserSim_CLOSE_OTHER);
+			closeOther.addSelectionListener(new SelectionAdapter() {
+				public void widgetSelected(SelectionEvent e) {
+					for (BrowserSim browserSim : instances) {
+						Shell source = ((MenuItem)e.widget).getParent().getShell();
+						if (!source.equals(browserSim.getBrowser().getShell())) {
+							browserSim.getBrowser().getShell().close();	
+						}
+					}
+				}
+			});
+
+			MenuItem closeAll = new MenuItem(menu, SWT.PUSH);
+			closeAll.setText(Messages.BrowserSim_CLOSE_ALL);
+			closeAll.addSelectionListener(new SelectionAdapter() {
+				public void widgetSelected(SelectionEvent e) {
+					for (BrowserSim browserSim : instances) {
+						browserSim.getBrowser().getShell().close();	
+					}
+				}
+			});
+		}
 	}
 
 	private void addMacOsMenuApplicationHandler(CocoaUIEnhancer cocoaUIEnhancer) {

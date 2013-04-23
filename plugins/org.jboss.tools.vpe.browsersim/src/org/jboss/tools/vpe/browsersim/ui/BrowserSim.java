@@ -543,6 +543,10 @@ public class BrowserSim {
 			listener.skinChanged(event);
 		}
 	}
+	
+	public static List<BrowserSim> getInstances() {
+		return instances;
+	}
 
 	/**
 	 * {@link ControlHandler} factory method.

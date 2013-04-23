@@ -22,12 +22,18 @@ import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.program.Program;
+import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Menu;
 import org.eclipse.swt.widgets.MenuItem;
+import org.jboss.tools.vpe.browsersim.browser.PlatformUtil;
+import org.jboss.tools.vpe.browsersim.model.preferences.CommonPreferences;
+import org.jboss.tools.vpe.browsersim.model.preferences.SpecificPreferences;
 import org.jboss.tools.vpe.browsersim.ui.BrowserSim;
 import org.jboss.tools.vpe.browsersim.ui.BrowserSimSourceViewer;
 import org.jboss.tools.vpe.browsersim.ui.ExceptionNotifier;
+import org.jboss.tools.vpe.browsersim.ui.ManageDevicesDialog;
 import org.jboss.tools.vpe.browsersim.ui.Messages;
+import org.jboss.tools.vpe.browsersim.ui.PreferencesWrapper;
 import org.jboss.tools.vpe.browsersim.ui.skin.BrowserSimSkin;
 
 /**
@@ -41,9 +47,14 @@ public class FileMenuCreator {
 	/** @see org.jboss.tools.vpe.browsersim.eclipse.callbacks.ViewSourceCallback */
 	private static final String VIEW_SOURCE_COMMAND = "org.jboss.tools.vpe.browsersim.command.viewSource:"; //$NON-NLS-1$
 
-	public static void addItems(final Menu menu, final BrowserSimSkin skin) {
+	public static void addItems(final Menu menu, final BrowserSimSkin skin, final CommonPreferences commonPreferences, final SpecificPreferences specificPreferences) {
 		addOpenInDefaultBrowserItem(menu, skin);
 		addViewSourceItem(menu, skin);
+
+		// If Platform is Mac OS X, application will have no duplicated menu items (Preferences)
+		if (!PlatformUtil.OS_MACOSX.equals(PlatformUtil.getOs())) {
+			addPreferencesItem(menu, commonPreferences, specificPreferences);
+		}
 	}
 	
 	private static void addOpenInDefaultBrowserItem(final Menu menu, final BrowserSimSkin skin) {
@@ -88,6 +99,23 @@ public class FileMenuCreator {
 						String base64Source = DatatypeConverter.printBase64Binary(source.getBytes());
 						System.out.println(base64Source);
 					}
+				}
+			}
+		});
+	}
+	
+	static void addPreferencesItem(Menu menu, final CommonPreferences commonPreferences, final SpecificPreferences specificPreferences) {
+		MenuItem preferences = new MenuItem(menu, SWT.PUSH);
+		preferences.setText(Messages.BrowserSim_PREFERENCES);
+		preferences.addSelectionListener(new SelectionAdapter() {
+			public void widgetSelected(SelectionEvent e) {
+				PreferencesWrapper pw = new ManageDevicesDialog(Display.getDefault().getActiveShell(), SWT.APPLICATION_MODAL
+						| SWT.SHELL_TRIM, commonPreferences, specificPreferences).open();
+				if (pw != null) {
+					commonPreferences.copyProperties(pw.getCommonPreferences());
+					specificPreferences.copyProperties(pw.getSpecificPreferences());
+					commonPreferences.notifyObservers();
+					specificPreferences.notifyObservers();
 				}
 			}
 		});
