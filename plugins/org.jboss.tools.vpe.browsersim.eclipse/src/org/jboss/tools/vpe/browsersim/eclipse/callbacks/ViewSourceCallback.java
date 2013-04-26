@@ -159,6 +159,7 @@ class StringInput implements IStorageEditorInput {
 		return toolTip;
 	}
 
+	@SuppressWarnings("rawtypes")
 	public Object getAdapter(Class adapter) {
 		return null;
 	}
@@ -181,6 +182,7 @@ class StringStorage implements IStorage {
 		return null;
 	}
 
+	@SuppressWarnings("rawtypes")
 	public Object getAdapter(Class adapter) {
 		return null;
 	}

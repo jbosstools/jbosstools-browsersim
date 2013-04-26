@@ -39,10 +39,12 @@ import org.osgi.framework.Bundle;
  * @author Yahor Radtsevich (yradtsevich)
  */
 public class ExternalProcessLauncher {
-	public static void launchAsExternalProcess(List<String> requiredBundles, List<String> optionalBundles,
+	private static String PATH_SEPARATOR = System.getProperty("path.separator"); //$NON-NLS-1$
+	
+	public static void launchAsExternalProcess(List<String> bundles, List<String> resourcesBundles,
 			final List<ExternalProcessCallback> callbacks, String className, List<String> parameters) {
 		try {			
-			String classPath = getClassPathString(requiredBundles, optionalBundles);
+			String classPath = getClassPathString(bundles, resourcesBundles);
 			IPreferenceStore store = Activator.getDefault().getPreferenceStore();
 			String jvmPath = "";
 			if (IPreferenceStore.FALSE.equals(store.getString(BrowserSimPreferencesPage.BROWSERSIM_JVM_AUTOMATICALLY))) {
@@ -145,31 +147,29 @@ public class ExternalProcessLauncher {
 		}		
 	}
 	
-	private static String getClassPathString(List<String> requiredBundles, List<String> optionalBundles) throws IOException {
+	private static String getClassPathString(List<String> bundles, List<String> resourcesBundles) throws IOException {
 		List<Bundle> classPathBundles = new ArrayList<Bundle>();
-		for (String bundleName : requiredBundles) {
-			Bundle bundle = Platform.getBundle(bundleName);
-			if (bundle != null) {
-				classPathBundles.add(bundle);
-			} else {
-				throw new IOException("Cannot find bundle: " + bundleName);
-			}
-		}
-		for (String bundleName : optionalBundles) {
+		for (String bundleName : bundles) {
 			Bundle bundle = Platform.getBundle(bundleName);
 			if (bundle != null) {
 				classPathBundles.add(bundle);
 			}
 		}
 					
-		String pathSeparator = System.getProperty("path.separator"); //$NON-NLS-1$
 		StringBuilder classPath = new StringBuilder();
 		if (classPathBundles.size() > 0) {
 			for (int i = 0; i < classPathBundles.size() - 1; i++) {
 				classPath.append(getBundleLocation(classPathBundles.get(i)));
-				classPath.append(pathSeparator);
+				classPath.append(PATH_SEPARATOR);
 			}
 			classPath.append(getBundleLocation(classPathBundles.get(classPathBundles.size() - 1)));
+		}	
+		
+		for (String bundleName : resourcesBundles) {
+			Bundle bundle = Platform.getBundle(bundleName);
+			if (bundle != null) {
+				classPath.append(getResource(bundle));
+			}
 		}
 		
 		return classPath.toString();
@@ -191,22 +191,17 @@ public class ExternalProcessLauncher {
 			throw new IOException("Cannot resolve the path to bundle: " + bundle.getSymbolicName(), e);
 		}
 	}
-//	
-//	private static List<Bundle> getBundleAndFragments(String symbolicName) {
-//		List<Bundle> bundles = new ArrayList<Bundle>();
-//		Bundle bundle = Platform.getBundle(symbolicName);
-//
-//		if (bundle != null) {
-//			bundles.add(bundle);
-//			
-//			if (bundle instanceof BundleHost) {
-//				BundleFragment[] fragments = ((BundleHost) bundle).getFragments();
-//				if (fragments != null) {
-//					Collections.addAll(bundles, fragments);
-//				}				
-//			}
-//		}		
-//		
-//		return bundles;
-//	}
+	
+	private static String getResource(Bundle bundle) throws IOException {
+		StringBuilder result = new StringBuilder();
+		String location = getBundleLocation(bundle);
+		File resources = new File(location + "/resources");
+		if (resources.exists()) {
+			for(File resource : resources.listFiles()) {
+				result.append(PATH_SEPARATOR);
+				result.append(resource.getCanonicalPath());
+			}
+		}
+		return result.toString();
+	}
 }

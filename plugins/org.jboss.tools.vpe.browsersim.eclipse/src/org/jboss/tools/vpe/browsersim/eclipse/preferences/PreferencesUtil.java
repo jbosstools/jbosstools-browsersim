@@ -1,3 +1,13 @@
+/*******************************************************************************
+ * Copyright (c) 2007-2013 Red Hat, Inc.
+ * Distributed under license by Red Hat, Inc. All rights reserved.
+ * This program is made available under the terms of the
+ * Eclipse Public License v1.0 which accompanies this distribution,
+ * and is available at http://www.eclipse.org/legal/epl-v10.html
+ *
+ * Contributor:
+ *     Red Hat, Inc. - initial API and implementation
+ ******************************************************************************/
 package org.jboss.tools.vpe.browsersim.eclipse.preferences;
 
 import java.io.File;
@@ -26,6 +36,9 @@ import org.jboss.tools.vpe.browsersim.browser.PlatformUtil;
 import org.jboss.tools.vpe.browsersim.eclipse.Activator;
 import org.jboss.tools.vpe.browsersim.eclipse.launcher.ExternalProcessLauncher;
 
+/**
+ * @author Konstantin Marmalyukov (kmarmaliykov)
+ */
 @SuppressWarnings("restriction")
 public class PreferencesUtil {
 	/**
@@ -87,6 +100,9 @@ public class PreferencesUtil {
         return null;
     }  
 	
+	/**
+	 * @see org.eclipse.jdt.internal.launching.StandardVMType#generateLibraryInfo
+	 */
 	@SuppressWarnings({ "unchecked" })
 	public static String generateLibraryInfo(File javaHome, File javaExecutable) throws IOException {
 		String arch = null;
