@@ -96,16 +96,19 @@ public class ViewSourceCallback implements ExternalProcessCallback {
 				 * is created and freezes UI.
 				 * See http://www.eclipse.org/forums/index.php/m/639937/
 				 */
-				IDocument doc = null;
-				ITextEditor textEditor = null;
-				if (editor instanceof ITextEditor) {
-					textEditor = (ITextEditor) editor;
-				} else {
-					textEditor = (ITextEditor) editor.getAdapter(ITextEditor.class);
+				ITextEditor textEditor = (ITextEditor) editor.getAdapter(ITextEditor.class);
+				if (textEditor == null) {
+					if (editor instanceof ITextEditor) {
+						textEditor = (ITextEditor) editor;
+					}
 				}
 				
+				IDocument doc = null;
 				if (textEditor != null) {
 					doc = textEditor.getDocumentProvider().getDocument(input);
+					if (doc == null) {
+						doc = (IDocument) textEditor.getAdapter(IDocument.class);// workaround for JSPMultiPageEditor, see JBIDE-14320 
+					}
 				}
 
 				if (doc != null) {
