@@ -58,11 +58,13 @@ public class ManageDevicesDialog extends Dialog {
 	protected CommonPreferences newCommonPreferences;
 	protected SpecificPreferences newSpecificPreferences;
 	protected boolean useSkins;
+	protected boolean enableLiveReload;
 	protected TruncateWindow truncateWindow;
 	protected Button askBeforeTruncateRadio;
 	protected Button alwaysTruncateRadio;
 	protected Button neverTruncateRadio;
 	protected Button useSkinsCheckbox;
+	protected Button liveReloadCheckBox;
 
 	/**
 	 * Create the dialog.
@@ -79,6 +81,7 @@ public class ManageDevicesDialog extends Dialog {
 		this.devices = new LinkedHashMap<String, Device>(oldCommonPreferences.getDevices());
 		this.selectedDeviceId = oldSpecificPreferences.getSelectedDeviceId();
 		this.useSkins = oldSpecificPreferences.getUseSkins();
+		this.enableLiveReload = oldSpecificPreferences.isEnableLiveReload();
 		this.truncateWindow = oldCommonPreferences.getTruncateWindow();
 	} 
 	
@@ -228,6 +231,20 @@ public class ManageDevicesDialog extends Dialog {
 			}
 		});
 		
+		Group liveReloadGroup = new Group(shell, SWT.NONE);
+		liveReloadGroup.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, true, false, 2, 1));
+		liveReloadGroup.setLayout(new RowLayout(SWT.VERTICAL));
+		liveReloadGroup.setText(Messages.ManageDevicesDialog_LIVE_RELOAD_OPTIONS);
+		liveReloadCheckBox = new Button(liveReloadGroup, SWT.CHECK);
+		liveReloadCheckBox.setText(Messages.ManageDevicesDialog_ENABLE_LIVE_RELOAD);
+		liveReloadCheckBox.addSelectionListener(new SelectionAdapter() {
+			@Override
+			public void widgetSelected(SelectionEvent e) {
+				Button checkbox = (Button) e.widget;
+				enableLiveReload = checkbox.getSelection();
+			}
+		});
+		
 		Group truncateWindowGroup = new Group(shell, SWT.NONE);
 		truncateWindowGroup.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, true, false, 2, 1));
 		truncateWindowGroup.setText(Messages.ManageDevicesDialog_TRUNCATE_THE_DEVICE_WINDOW);
@@ -319,6 +336,7 @@ public class ManageDevicesDialog extends Dialog {
 				devices = cp.getDevices();
 				selectedDeviceId = sp.getSelectedDeviceId();
 				useSkins = sp.getUseSkins();
+				enableLiveReload = sp.isEnableLiveReload();
 				truncateWindow = cp.getTruncateWindow();
 				screenshotsPath.setText(cp.getScreenshotsFolder());
 				weinreScriptUrlText.setText(cp.getWeinreScriptUrl());
@@ -335,7 +353,7 @@ public class ManageDevicesDialog extends Dialog {
 			public void widgetSelected(SelectionEvent e) {
 				newCommonPreferences = new CommonPreferences(devices, truncateWindow, screenshotsPath.getText(),
 						weinreScriptUrlText.getText(), weinreClientUrlText.getText());
-				newSpecificPreferences = new SpecificPreferences(selectedDeviceId, useSkins,
+				newSpecificPreferences = new SpecificPreferences(selectedDeviceId, useSkins, enableLiveReload,
 						oldSpecificPreferences.getOrientationAngle(), oldSpecificPreferences.getLocation());
 				shell.close();
 			}
@@ -379,6 +397,7 @@ public class ManageDevicesDialog extends Dialog {
 		table.setSelection(selectionIndex);
 		
 		useSkinsCheckbox.setSelection(useSkins);
+		liveReloadCheckBox.setSelection(enableLiveReload);
 		
 		askBeforeTruncateRadio.setSelection(TruncateWindow.PROMPT.equals(truncateWindow));
 		alwaysTruncateRadio.setSelection(TruncateWindow.ALWAYS_TRUNCATE.equals(truncateWindow));

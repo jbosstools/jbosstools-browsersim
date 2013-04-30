@@ -43,6 +43,7 @@ public class SpecificPreferencesStorage implements PreferencesStorage{
 	private static final String PREFERENCES_LOCATION_X = "x";
 	private static final String PREFERENCES_LOCATION = "location";
 	private static final String PREFERENCES_USE_SKINS = "useSkins";
+	private static final String PREFERENCES_LIVE_RELOAD = "enableLiveReload";
 	private static final String PREFERENCES_SELECTED_DEVICE = "selectedDeviceId";
 	private static final String PREFERENCES_VERSION = "version";
 
@@ -93,7 +94,7 @@ public class SpecificPreferencesStorage implements PreferencesStorage{
 		}
 		
 		if (specificPreferences == null) {
-			specificPreferences = new SpecificPreferences(null, true, 0, null);
+			specificPreferences = new SpecificPreferences(null, true, false, 0, null);
 		}
 
 		return specificPreferences;
@@ -105,6 +106,7 @@ public class SpecificPreferencesStorage implements PreferencesStorage{
 		int orientationAngle = 0;
 		Point currentlocation = null;
 		boolean useSkins = true;
+		boolean enableLiveReload = false;
 
 		try {
 			DocumentBuilderFactory dbFactory = DocumentBuilderFactory.newInstance();
@@ -127,6 +129,11 @@ public class SpecificPreferencesStorage implements PreferencesStorage{
 					useSkins = Boolean.parseBoolean(node.getTextContent());
 				}
 				
+				node = document.getElementsByTagName(PREFERENCES_LIVE_RELOAD).item(0);
+				if (!PreferencesUtil.isNullOrEmpty(node)) {
+					enableLiveReload = Boolean.parseBoolean(node.getTextContent());
+				}
+				
 				node = document.getElementsByTagName(PREFERENCES_ORIENTATION_ANGLE).item(0);
 				if (!PreferencesUtil.isNullOrEmpty(node)) {
 					orientationAngle = Integer.parseInt(node.getTextContent());
@@ -143,7 +150,7 @@ public class SpecificPreferencesStorage implements PreferencesStorage{
 								.getTextContent()));
 					}
 				}
-				return new SpecificPreferences(selectedDeviceId, useSkins, orientationAngle, currentlocation);
+				return new SpecificPreferences(selectedDeviceId, useSkins, enableLiveReload, orientationAngle, currentlocation);
 			}
 		} catch (SAXException e) {
 			e.printStackTrace();
@@ -185,6 +192,10 @@ public class SpecificPreferencesStorage implements PreferencesStorage{
 			Element useSkins = doc.createElement(PREFERENCES_USE_SKINS);
 			useSkins.setTextContent(String.valueOf(sp.getUseSkins()));
 			rootElement.appendChild(useSkins);
+			
+			Element enableLiveReload = doc.createElement(PREFERENCES_LIVE_RELOAD);
+			enableLiveReload.setTextContent(String.valueOf(sp.isEnableLiveReload()));
+			rootElement.appendChild(enableLiveReload);
 			
 			// write the content into xml file
 			TransformerFactory transformerFactory = TransformerFactory.newInstance();

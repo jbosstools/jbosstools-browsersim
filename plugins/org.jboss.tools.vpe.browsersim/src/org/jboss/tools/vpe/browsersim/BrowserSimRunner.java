@@ -12,7 +12,6 @@ package org.jboss.tools.vpe.browsersim;
 
 import java.net.URI;
 import java.net.URISyntaxException;
-
 import org.eclipse.swt.widgets.Display;
 import org.jboss.tools.vpe.browsersim.browser.PlatformUtil;
 import org.jboss.tools.vpe.browsersim.ui.BrowserSim;

@@ -62,7 +62,6 @@ import org.jboss.tools.vpe.browsersim.ui.skin.ResizableSkinSizeAdvisor;
 import org.jboss.tools.vpe.browsersim.ui.skin.ResizableSkinSizeAdvisorImpl;
 import org.jboss.tools.vpe.browsersim.util.BrowserSimUtil;
 import org.jboss.tools.vpe.browsersim.util.ImageList;
-import org.jboss.tools.vpe.browsersim.util.ResourcesUtil;
 
 /**
  * @author Yahor Radtsevich (yradtsevich)
@@ -85,6 +84,7 @@ public class BrowserSim {
 	private Point currentLocation;
 	private ProgressListener progressListener;
 	private Observer commonPreferencesObserver;
+	private LocationAdapter liveReloadLocationAdapter;
 	private List<SkinChangeListener> skinChangeListenerList = new ArrayList<SkinChangeListener>();
 	private List<ExitListener> exitListenerList = new ArrayList<ExitListener>();
 	
@@ -434,6 +434,7 @@ public class BrowserSim {
 				setSelectedDeviceAsync((Boolean) refreshRequired);
 			}
 		});
+		
 	}
 	
 	private boolean deviceUpdateRequired = false;
@@ -466,7 +467,6 @@ public class BrowserSim {
 				fireSkinChangeEvent();
 			}
 			setOrientation(specificPreferences.getOrientationAngle(), device);
-	
 			skin.getBrowser().setDefaultUserAgent(device.getUserAgent());
 	
 			if (oldSkinUrl != null) {
@@ -474,6 +474,8 @@ public class BrowserSim {
 			} else if(!Boolean.FALSE.equals(refreshRequired)){
 				getBrowser().refresh(); // only user agent and size of the browser is changed and orientation is not changed
 	 		}
+			
+			processLiveReload(specificPreferences.isEnableLiveReload());
 	
 			skin.getShell().open();
 		} 
@@ -491,6 +493,35 @@ public class BrowserSim {
 		skin.getBrowser().setDefaultUserAgent(device.getUserAgent());
 		skin.getBrowser().setUrl(oldSkinUrl); 
 		skin.getShell().open();
+	}
+	
+	private void processLiveReload(boolean isLiveReloadEnabled) {
+		if (isLiveReloadEnabled) {
+			if (liveReloadLocationAdapter == null) {
+				initLiveReloadLocationAdapter();
+			}
+			skin.getBrowser().addLocationListener(liveReloadLocationAdapter);
+		} else if (liveReloadLocationAdapter != null) {
+			skin.getBrowser().removeLocationListener(liveReloadLocationAdapter);
+		}
+	}
+	
+	private void initLiveReloadLocationAdapter() {
+		liveReloadLocationAdapter = new LocationAdapter() {
+			@Override
+			public void changed(LocationEvent event) {
+				Browser browser = (Browser) event.widget;
+				browser.execute("if (!window.LiveReload) {" +
+									"window.addEventListener('load', function(){" +
+										"var e = document.createElement('script');" +
+										"e.type = 'text/javascript';" +
+										"e.async = 'true';" +
+										"e.src = 'http://localhost:35729/livereload.js';" +
+										"document.head.appendChild(e);" +
+									"});" +
+								"}");
+			}
+		};
 	}
 
 	@SuppressWarnings("nls")

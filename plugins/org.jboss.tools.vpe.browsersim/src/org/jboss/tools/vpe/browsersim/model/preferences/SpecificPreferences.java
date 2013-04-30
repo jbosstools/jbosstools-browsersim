@@ -12,6 +12,8 @@ package org.jboss.tools.vpe.browsersim.model.preferences;
 
 import java.util.Observable;
 
+import javax.swing.text.StyledEditorKit.BoldAction;
+
 import org.eclipse.swt.graphics.Point;
 
 /**
@@ -28,12 +30,15 @@ public class SpecificPreferences extends Observable {
 	
 	private String selectedDeviceId;
 	private boolean useSkins;
+	private boolean enableLiveReload;
 	private int orientationAngle;
 	private Point location;
+	
 
-	public SpecificPreferences(String selectedDeviceId, boolean useSkins, int orientationAngle, Point location) {
+	public SpecificPreferences(String selectedDeviceId, boolean useSkins, boolean enableLiveReload, int orientationAngle, Point location) {
 		this.selectedDeviceId = selectedDeviceId;
 		this.useSkins = useSkins;
+		this.enableLiveReload = enableLiveReload;
 		this.orientationAngle = orientationAngle;
 		this.location = location;
 	}
@@ -60,6 +65,17 @@ public class SpecificPreferences extends Observable {
 		}
 	}
 	
+	public boolean isEnableLiveReload() {
+		return enableLiveReload;
+	}
+
+	public void setEnableLiveReload(boolean enableLiveReload) {
+		if (this.enableLiveReload != enableLiveReload) {
+			this.enableLiveReload = enableLiveReload;
+			setChanged();
+		}
+	}
+	
 	public int getOrientationAngle() {
 		return orientationAngle;
 	}
@@ -82,7 +98,9 @@ public class SpecificPreferences extends Observable {
 	public void copyProperties(SpecificPreferences sp) {
 		setSelectedDeviceId(sp.getSelectedDeviceId());
 		setUseSkins(sp.getUseSkins());
+		setEnableLiveReload(sp.isEnableLiveReload());
 		setOrientationAngle(sp.getOrientationAngle());
 		setLocation(sp.getLocation());
 	}
+
 }

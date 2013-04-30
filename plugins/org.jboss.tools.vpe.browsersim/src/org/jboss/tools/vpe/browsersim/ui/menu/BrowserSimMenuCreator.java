@@ -49,7 +49,6 @@ public class BrowserSimMenuCreator {
 	private ControlHandler controlHandler;
 	private String homeUrl;
 	
-
 	public BrowserSimMenuCreator(BrowserSimSkin skin, CommonPreferences cp, SpecificPreferences sp,
 			ControlHandler controlHandler, String homeUrl) {
 		this.skin = skin;
@@ -134,7 +133,17 @@ public class BrowserSimMenuCreator {
 		});
 
 		Menu toolsMenu = createDropDownMenu(appMenuBar, Messages.BrowserSim_TOOLS);
-		addToolsItems(toolsMenu, skin, commonPreferences, specificPreferences, homeUrl);
+		toolsMenu.addMenuListener(new MenuAdapter() {
+			@Override
+			public void menuShown(MenuEvent e) {
+				Menu toolsMenu = (Menu) e.widget;
+				for (MenuItem item : toolsMenu.getItems()) {
+					item.dispose();
+				}
+				
+				addToolsItems(toolsMenu, skin, commonPreferences, specificPreferences, homeUrl);
+			}
+		});
 
 		// If Platform is Mac OS X, application will have no duplicated menu items (About)
 		if (!PlatformUtil.OS_MACOSX.equals(PlatformUtil.getOs())) {
@@ -147,7 +156,9 @@ public class BrowserSimMenuCreator {
 			SpecificPreferences specificPreferences, String homeUrl) {
 		ToolsMenuCreator.addDebugItem(contextMenu, skin, commonPreferences.getWeinreScriptUrl(), commonPreferences.getWeinreClientUrl());
 		ToolsMenuCreator.addScreenshotMenuItem(contextMenu, skin, commonPreferences.getScreenshotsFolder());
-		ToolsMenuCreator.addSyncronizedWindowItem(contextMenu, skin, commonPreferences.getDevices(), specificPreferences.getUseSkins(), specificPreferences.getOrientationAngle(), homeUrl);
+		ToolsMenuCreator.addSyncronizedWindowItem(contextMenu, skin, commonPreferences.getDevices(), specificPreferences.getUseSkins(), specificPreferences.isEnableLiveReload(), 
+				specificPreferences.getOrientationAngle(), homeUrl);
+		ToolsMenuCreator.addLiveReloadItem(contextMenu, specificPreferences);
 	}
 
 	private Menu createDropDownMenu(Menu menuBar, String name) {
@@ -196,7 +207,7 @@ public class BrowserSimMenuCreator {
 			}
 		});
 	}
-
+		
 	private void addTurnMenuItems(Menu menu, final ControlHandler controlHandler) {
 		MenuItem turnLeft = new MenuItem(menu, SWT.PUSH);
 		turnLeft.setText(Messages.BrowserSim_ROTATE_LEFT);

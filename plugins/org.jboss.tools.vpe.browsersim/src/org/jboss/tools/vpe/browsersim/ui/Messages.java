@@ -17,7 +17,6 @@ import org.jboss.tools.vpe.browsersim.util.NLS;
  */
 public class Messages {
 	private static final String BUNDLE_NAME = Messages.class.getName().toString().toLowerCase();
-
 	
 	public static String BrowserSim_ABOUT;
 	public static String BrowserSim_ABOUT_MESSAGE;
@@ -27,6 +26,7 @@ public class Messages {
 	public static String BrowserSim_DEVICE;
 	public static String BrowserSim_DEBUG;
 	public static String BrowserSim_ERROR;
+	public static String BrowserSim_ENABLE_LIVE_RELOAD;
 	public static String BrowserSim_CLOSE;
 	public static String BrowserSim_CLOSE_OTHER;
 	public static String BrowserSim_CLOSE_ALL;
@@ -76,7 +76,9 @@ public class Messages {
 	public static String ManageDevicesDialog_DEFAULT;
 	public static String ManageDevicesDialog_DEVICES;
 	public static String ManageDevicesDialog_EDIT;
+	public static String ManageDevicesDialog_ENABLE_LIVE_RELOAD;
 	public static String ManageDevicesDialog_HEIGHT;
+	public static String ManageDevicesDialog_LIVE_RELOAD_OPTIONS;
 	public static String ManageDevicesDialog_LOAD_DEFAULTS;
 	public static String ManageDevicesDialog_LOCATION;
 	public static String ManageDevicesDialog_NAME;

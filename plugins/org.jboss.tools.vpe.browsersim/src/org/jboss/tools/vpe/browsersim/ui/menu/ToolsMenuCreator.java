@@ -100,7 +100,7 @@ public class ToolsMenuCreator {
 	}
 	
 	public static void addSyncronizedWindowItem(Menu menu, final BrowserSimSkin skin,
-			final Map<String, Device> devices, final Boolean useSkins, final int orientationAngle, final String homeUrl) {
+			final Map<String, Device> devices, final Boolean useSkins, final Boolean enableLiveReload, final int orientationAngle, final String homeUrl) {
 		MenuItem syncWindow = new MenuItem(menu, SWT.CASCADE);
 		syncWindow.setText(Messages.BrowserSim_SYNCHRONIZED_WINDOW);
 		Menu subMenu = new Menu(menu);
@@ -116,7 +116,7 @@ public class ToolsMenuCreator {
 					MenuItem menuItem = (MenuItem) e.widget;
 					if (menuItem.getSelection()) {
 						Device selected = devices.get(menuItem.getData());
-						SpecificPreferences sp = new SpecificPreferences(selected.getId(), useSkins,
+						SpecificPreferences sp = new SpecificPreferences(selected.getId(), useSkins, enableLiveReload,
 								orientationAngle, null);
 
 						BrowserSim browserSim1 = new BrowserSim(homeUrl);
@@ -125,5 +125,18 @@ public class ToolsMenuCreator {
 				};
 			});
 		}
+	}
+	
+	public static void addLiveReloadItem(Menu menu, final SpecificPreferences specificPreferences) {
+		MenuItem liveReloadMenuItem = new MenuItem(menu, SWT.CHECK);
+		liveReloadMenuItem.setText(Messages.BrowserSim_ENABLE_LIVE_RELOAD);
+		liveReloadMenuItem.setSelection(specificPreferences.isEnableLiveReload());
+		liveReloadMenuItem.addSelectionListener(new SelectionAdapter() {
+			public void widgetSelected(SelectionEvent e) {
+				MenuItem menuItem = (MenuItem) e.widget;
+				specificPreferences.setEnableLiveReload(menuItem.getSelection());
+				specificPreferences.notifyObservers();
+			}
+		});
 	}
 }
