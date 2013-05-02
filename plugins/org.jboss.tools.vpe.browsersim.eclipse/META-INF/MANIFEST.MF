@@ -12,6 +12,10 @@ Require-Bundle: org.eclipse.ui,
  org.eclipse.ui.editors,
  org.eclipse.ui.ide,
  org.eclipse.ui.browser,
+ org.eclipse.jdt.core,
+ org.eclipse.jdt.ui,
+ org.eclipse.jdt.debug.ui,
+ org.eclipse.jdt.launching,
  org.eclipse.core.filesystem,
  org.eclipse.wst.server.ui;resolution:=optional,
  org.eclipse.wst.server.core;resolution:=optional,
@@ -20,3 +24,7 @@ Bundle-ActivationPolicy: lazy
 Bundle-RequiredExecutionEnvironment: JavaSE-1.6
 Bundle-Vendor: JBoss by Red Hat
 Export-Package: org.jboss.tools.vpe.browsersim.eclipse.launcher
+Import-Package: org.eclipse.debug.core,
+ org.eclipse.debug.core.model,
+ org.eclipse.jdt.internal.launching,
+ org.eclipse.jdt.launching

@@ -19,6 +19,7 @@ import org.eclipse.swt.SWT;
 public class PlatformUtil {
 
 	public static final String ARCH_X86 = "x86";
+	public static final String ARCH_X64 = "x86_64";
 	public static final String OS_WIN32 = "win32";
 	public static final String OS_LINUX = "linux";
 	public static final String OS_MACOSX = "macosx";
@@ -40,13 +41,17 @@ public class PlatformUtil {
 	 */
 	public static String getArch() {
 		String osArch = System.getProperty("os.arch"); //$NON-NLS-1$
-		if (osArch.equals ("i386") || osArch.equals ("i686")) return ARCH_X86; //$NON-NLS-1$ $NON-NLS-2$ $NON-NLS-3$
-		if (osArch.equals ("amd64")) return "x86_64"; //$NON-NLS-1$ $NON-NLS-2$
+		return parseArch(osArch);
+	}
+
+	public static String parseArch(String osArch) {
+		if (osArch.equals ("i386") || osArch.equals ("i686")) return ARCH_X86; //$NON-NLS-1$ $NON-NLS-2$
+		if (osArch.equals ("amd64")) return ARCH_X64; //$NON-NLS-1$
 		if (osArch.equals ("IA64N")) return "ia64_32"; //$NON-NLS-1$ $NON-NLS-2$
 		if (osArch.equals ("IA64W")) return "ia64"; //$NON-NLS-1$ $NON-NLS-2$
 		return osArch;
 	}
-
+	
 	/*
 	 * Copy of org.eclipse.swt.internal.Library.os()
 	 */

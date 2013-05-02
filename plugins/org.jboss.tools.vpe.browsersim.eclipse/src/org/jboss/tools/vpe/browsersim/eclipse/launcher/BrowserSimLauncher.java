@@ -21,7 +21,6 @@ import org.jboss.tools.vpe.browsersim.eclipse.callbacks.ViewSourceCallback;
 /**
  * @author "Yahor Radtsevich (yradtsevich)"
  */
-@SuppressWarnings("restriction")
 public class BrowserSimLauncher {
 	public static final String BROWSERSIM_CLASS_NAME = "org.jboss.tools.vpe.browsersim.BrowserSimRunner"; //$NON-NLS-1$
 	public static final List<ExternalProcessCallback> BROWSERSIM_CALLBACKS = Arrays.asList(
