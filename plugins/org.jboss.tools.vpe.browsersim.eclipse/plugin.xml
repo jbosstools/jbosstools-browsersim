@@ -58,8 +58,32 @@
           <location>
              .
           </location>
-   </browser>
+   		</browser>
    </extension>
+   <extension point="org.eclipse.ui.menus">
+    	<menuContribution 
+      		locationURI="popup:org.eclipse.ui.navigate.showInQuickMenu?after=additions">
+	              <command
+	                   commandId="org.jboss.tools.vpe.browsersim.eclipse.commands.runBrowserSim"
+	                   icon="icons/browsersim_16px.png"
+	                   label="BrowserSim"
+	                   style="push">
+	                   <visibleWhen checkEnabled="false">
+	                      <with variable="selection">
+	                        <iterate
+	                              ifEmpty="false"
+	                              operator="or">
+	                            <adapt
+	                                  type="org.eclipse.wst.server.ui.IServerModule">
+	                            </adapt>
+	                        </iterate>
+	                      </with>
+	                   </visibleWhen>
+	              </command>
+      	</menuContribution>
+    </extension>
+    <extension point="org.eclipse.ui.handlers">
+    </extension>
 	<extension point="org.eclipse.ui.perspectiveExtensions"> 
 		<perspectiveExtension targetID="org.jboss.tools.common.ui.JBossPerspective"> 
 			<actionSet id="org.jboss.tools.vpe.browsersim.eclipse.actionSet"/> 

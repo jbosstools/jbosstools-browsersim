@@ -11,6 +11,7 @@
 package org.jboss.tools.vpe.browsersim.eclipse.actions;
 
 import java.lang.reflect.Field;
+import java.net.URL;
 
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.runtime.IAdaptable;
@@ -30,9 +31,14 @@ import org.eclipse.ui.IWorkbenchPart;
 import org.eclipse.ui.IWorkbenchWindow;
 import org.eclipse.ui.IWorkbenchWindowActionDelegate;
 import org.eclipse.ui.PlatformUI;
+import org.eclipse.ui.ide.ResourceUtil;
 import org.eclipse.ui.internal.browser.BrowserViewer;
 import org.eclipse.ui.internal.browser.WebBrowserEditor;
 import org.eclipse.ui.internal.browser.WebBrowserView;
+import org.eclipse.wst.server.core.IModule;
+import org.eclipse.wst.server.core.IServer;
+import org.eclipse.wst.server.core.model.IURLProvider;
+import org.eclipse.wst.server.ui.IServerModule;
 import org.jboss.tools.vpe.browsersim.eclipse.Activator;
 import org.jboss.tools.vpe.browsersim.eclipse.editors.BrowserSimEditorLauncher;
 import org.jboss.tools.vpe.browsersim.eclipse.launcher.BrowserSimLauncher;
@@ -68,9 +74,12 @@ public class RunBrowserSimAction implements IWorkbenchWindowActionDelegate {
 			
 			if (url == null) {
 				ISelection selection = window.getSelectionService().getSelection();
-				IFile selectedFile = getSelectedFile(selection);
-				if (isSupportedFile(selectedFile)) {
-					url = toUrl(selectedFile);
+				if (selection instanceof IStructuredSelection) {
+					IStructuredSelection ssel = (IStructuredSelection) selection;
+					Object firstSelectedElement = ssel.getFirstElement();
+					if (firstSelectedElement != null) {
+						url = getUrlFromSelection(firstSelectedElement);
+					}
 				}
 			}
 		}
@@ -164,33 +173,58 @@ public class RunBrowserSimAction implements IWorkbenchWindowActionDelegate {
 	 * Returns selected file, if a file is contained in the {@code selection}.
 	 * Otherwise returns {@code null}.
 	 */
-	private IFile getSelectedFile(ISelection selection) {
+	private IFile getSelectedFile(Object firstSelectedElement) {
 		IFile file = null;
-		if (selection instanceof IStructuredSelection) {
-		    IStructuredSelection ssel = (IStructuredSelection) selection;
-		    Object firstSelectedElement = ssel.getFirstElement();
-		    if (firstSelectedElement != null) {
-			    file = (IFile) Platform.getAdapterManager().getAdapter(firstSelectedElement,
-			            IFile.class);
-		    }
-		    
-		    if (file == null) {
-		        if (firstSelectedElement instanceof IAdaptable) {
-		            file = (IFile) ((IAdaptable) firstSelectedElement).getAdapter(IFile.class);
-		        }
-		    }
+		file = (IFile) Platform.getAdapterManager().getAdapter(firstSelectedElement, IFile.class);
+		if (file == null) {
+			if (firstSelectedElement instanceof IAdaptable) {
+				file = (IFile) ((IAdaptable) firstSelectedElement).getAdapter(IFile.class);
+			}
 		}
 		return file;
+	}
+	
+	private String getUrlFromSelection(Object firstSelectedElement) {
+		String url = null;
+
+		if (firstSelectedElement instanceof IFile) {
+			IFile selectedFile = getSelectedFile(firstSelectedElement);
+			if (isSupportedFile(selectedFile)) {
+				url = toUrl(selectedFile);
+			}
+		} else if (Platform.getBundle("org.eclipse.wst.server.core") != null && Platform.getBundle("org.eclipse.wst.server.ui") != null) { //JBIDE-13879 - This bundles are optional 
+			IServerModule serverModule = (IServerModule) ResourceUtil.getAdapter(firstSelectedElement, IServerModule.class, false);
+			if (serverModule != null) {
+				url = toUrl(serverModule);
+			}
+		}
+		return url;
 	}
 
 	private String toUrl(IFile file) {
 		String url = null;
-		
+
 		if (file != null) {
-		    IPath location = file.getLocation();
-		    if (location != null) {
-		    	url = location.toFile().toURI().toASCIIString();
-		    }
+			IPath location = file.getLocation();
+			if (location != null) {
+				url = location.toFile().toURI().toASCIIString();
+			}
+		}
+		return url;
+	}
+
+	private String toUrl(IServerModule serverModule) {
+		String url = null;
+
+		IServer server = serverModule.getServer();
+		IModule[] module = serverModule.getModule();
+		if (server.getServerState() == IServer.STATE_STARTED && module.length == 1) {
+			IModule selectedModule = module[0];
+			Object serverAdapter = server.loadAdapter(IURLProvider.class, null);
+			if (serverAdapter != null && selectedModule != null) {
+				URL moduleRootUrl = ((IURLProvider) serverAdapter).getModuleRootURL(selectedModule);
+				url = moduleRootUrl.toString();
+			}
 		}
 		return url;
 	}
