@@ -95,4 +95,12 @@
 			<actionSet id="org.jboss.tools.vpe.browsersim.eclipse.actionSet"/> 
 		</perspectiveExtension> 
 	</extension>
+ <extension
+       point="org.jboss.tools.jst.text.ext.openWithEditorExtension">
+    <editor-launcher
+          class="org.jboss.tools.vpe.browsersim.eclipse.launcher.OpenWithBrowserSimLauncher"
+          editor-name="BrowserSim"
+          id="org.jboss.tools.vpe.browsersim.eclipse.OpenWithBrowserSim">
+    </editor-launcher>
+ </extension>
 </plugin>
