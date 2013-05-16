@@ -50,7 +50,7 @@
    </extension>
    <extension point="org.eclipse.ui.browser.browsers">
        <browser
-             executable=""
+             executable="."
              factoryclass="org.jboss.tools.vpe.browsersim.eclipse.BrowserSimFactory"
              id="org.jboss.tools.vpe.browsersim.eclipse"
              name="BrowserSim"
