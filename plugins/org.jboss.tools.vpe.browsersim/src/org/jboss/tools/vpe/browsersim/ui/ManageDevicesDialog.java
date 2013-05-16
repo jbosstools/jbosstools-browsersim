@@ -108,7 +108,7 @@ public class ManageDevicesDialog extends Dialog {
 	 */
 	private void createContents() {
 		shell = new Shell(getParent(), getStyle());
-		shell.setSize(750, 500);
+		shell.setSize(780, 555);
 		shell.setText(getText());
 		shell.setLayout(new GridLayout(1, false));
 		
@@ -160,7 +160,7 @@ public class ManageDevicesDialog extends Dialog {
 		buttonAdd.setText(Messages.ManageDevicesDialog_ADD);
 		buttonAdd.addSelectionListener(new SelectionAdapter() {
 			public void widgetSelected(SelectionEvent e) {
-				Device newDevice = new EditDeviceDialog(shell,  SWT.APPLICATION_MODAL | SWT.SHELL_TRIM,
+				Device newDevice = new AddDeviceDialog(shell,  SWT.APPLICATION_MODAL | SWT.SHELL_TRIM,
 						devices.get(selectedDeviceId)).open();
 				if (newDevice != null) {
 					String id = UUID.randomUUID().toString();

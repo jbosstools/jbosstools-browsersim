@@ -27,6 +27,7 @@ public interface BrowserSimSkin {
 	BrowserSimBrowser getBrowser();
 	Shell getShell();
 	Menu getMenuBar();
+	Point getMinimalScreenSize();
 	void setControlHandler(ControlHandler controlHandler);
 	
 	void locationChanged(String newLocation, boolean backEnabled, boolean forwardEnabled);
