@@ -33,7 +33,7 @@ public class WebKitTests extends TestCase {
 	}
 	
 	public void testWebKitSetDefaultUserAgent() {
-		Display display = new Display();
+		Display display = Display.getDefault();
 		Shell shell = new Shell(display);
 		shell.setLayout(new FillLayout());
 		final AbstractWebKitBrowser webKitBrowser = new WebKitBrowserFactory().createBrowser(shell, SWT.NONE);
@@ -51,7 +51,7 @@ public class WebKitTests extends TestCase {
 		assertEquals(initialUserAgent, finalUserAgent);
 		
 		expressionsEvaluator.dispose();
-		display.dispose();
+//		display.dispose();
 	}
 }
 
