@@ -1,0 +1,32 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<title>JBoss Tools jQuery Mobile Palette Demo</title>
+	<meta name="viewport" content="width=device-width, initial-scale=1">
+    <script src="http://code.jquery.com/jquery-1.9.1.min.js"></script>
+    <script src="http://code.jquery.com/mobile/1.3.0/jquery.mobile-1.3.0.min.js"></script>
+    <link rel="stylesheet" href="http://code.jquery.com/mobile/1.3.0/jquery.mobile-1.3.0.min.css" />
+</head>
+<body>
+	<div data-role="page" id="home">
+    	<h1>Home</h1><br>
+    	<p>This is the home page</p>
+       	<a href="#gallery" data-role="button" data-inline="true" data-icon="forward">Gallery</a>
+       	<a href="#index" data-role="button" data-inline="true" data-icon="forward">Index</a>
+    </div>
+
+	<div data-role="page" id="gallery">
+    	<h1>Gallery</h1><br>
+    	<p>This is the gallery page. Here you can see some pictures.</p>
+       	<a href="#home" data-role="button" data-inline="true" data-icon="back">Home</a>
+       	<a href="#index" data-role="button" data-inline="true" data-icon="forward">Index</a>
+    </div>
+
+	<div data-role="page" id="index">
+    	<h1>Index Page</h1><br>
+    	<p>This is the index page.</p>
+       	<a href="#home" data-role="button" data-inline="true" data-icon="back">Home</a>
+       	<a href="#gallery" data-role="button" data-inline="true" data-icon="back">Gallery</a>
+    </div>
+    </body>
+</html>

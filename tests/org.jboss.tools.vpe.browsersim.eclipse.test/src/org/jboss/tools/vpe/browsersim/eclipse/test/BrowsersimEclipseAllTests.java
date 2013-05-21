@@ -14,7 +14,7 @@ public class BrowsersimEclipseAllTests extends TestSuite {
 		// $JUnit-BEGIN$
 		
 		suite.addTest(new ProjectImportTestSetup(new TestSuite(JQueryMobileHyperlinkDetectorTest.class),
-				"org.jboss.tools.jst.text.ext.test",
+				"org.jboss.tools.vpe.browsersim.eclipse.test",
 				new String[]{"projects/OpenOnTest"},
 				new String[]{"OpenOnTest"}));
 		
