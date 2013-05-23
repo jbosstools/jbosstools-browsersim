@@ -120,7 +120,7 @@ public class ToolsMenuCreator {
 								orientationAngle, null);
 
 						BrowserSim browserSim1 = new BrowserSim(homeUrl);
-						browserSim1.open(sp, skin.getBrowser().getUrl());
+						browserSim1.open(sp, skin.getBrowser().getUrl(), null);
 					}
 				};
 			});

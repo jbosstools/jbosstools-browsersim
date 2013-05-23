@@ -22,7 +22,7 @@ import org.eclipse.swt.widgets.Text;
 import org.jboss.tools.vpe.browsersim.ui.AdressBarText;
 import org.jboss.tools.vpe.browsersim.ui.skin.ImageButtonComposite;
 import org.jboss.tools.vpe.browsersim.ui.skin.ImageDescriptor;
-import org.jboss.tools.vpe.browsersim.util.ImageList;
+import org.jboss.tools.vpe.browsersim.util.BrowserSimImageList;
 
 
 /**
@@ -45,7 +45,7 @@ public class IPadNavBarComposite extends Composite {
 	 * @param parent
 	 * @param style
 	 */
-	public IPadNavBarComposite(Composite parent, ImageList imageList) {
+	public IPadNavBarComposite(Composite parent, BrowserSimImageList imageList) {
 		super(parent, SWT.NONE);
 
 		this.setLayout(new FormLayout());

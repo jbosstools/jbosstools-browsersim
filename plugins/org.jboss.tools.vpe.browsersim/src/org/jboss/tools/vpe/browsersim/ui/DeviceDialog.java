@@ -43,7 +43,7 @@ import org.eclipse.swt.widgets.Text;
 import org.jboss.tools.vpe.browsersim.model.Device;
 import org.jboss.tools.vpe.browsersim.model.SkinMap;
 import org.jboss.tools.vpe.browsersim.ui.skin.BrowserSimSkin;
-import org.jboss.tools.vpe.browsersim.util.ImageList;
+import org.jboss.tools.vpe.browsersim.util.BrowserSimImageList;
 
 /**
  * @author Yahor Radtsevich (yradtsevich)
@@ -67,7 +67,7 @@ public abstract class DeviceDialog extends Dialog {
 	private Button buttonOk;
 	private List<String> skinIds;
 	
-	private ImageList imageList;
+	private BrowserSimImageList imageList;
 
 	/**
 	 * Create the dialog.
@@ -111,7 +111,7 @@ public abstract class DeviceDialog extends Dialog {
 		shellLayout.marginHeight = 0;
 		shell.setLayout(shellLayout);
 
-		imageList = new ImageList(shell);
+		imageList = new BrowserSimImageList(shell);
 		
 		header = new Composite(shell, getStyle());
 		header.setLayout(new GridLayout(2, false));

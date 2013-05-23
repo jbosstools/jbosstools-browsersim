@@ -15,7 +15,7 @@ import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.graphics.Rectangle;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.widgets.Composite;
-import org.jboss.tools.vpe.browsersim.util.ImageList;
+import org.jboss.tools.vpe.browsersim.util.BrowserSimImageList;
 
 
 public class ImageDescriptor extends WidgetDescriptor {
@@ -32,7 +32,7 @@ public class ImageDescriptor extends WidgetDescriptor {
 		this(imageName, 1, 1);
 	}
 	
-	public Composite createWidget(Composite parent, ImageList imageList) {
+	public Composite createWidget(Composite parent, BrowserSimImageList imageList) {
 		Composite composite = new Composite(parent, SWT.NONE);
 		boolean fillHorizontal = (getStretching() & SWT.HORIZONTAL) != 0;
 		boolean fillVertical = (getStretching() & SWT.VERTICAL) != 0;

@@ -23,7 +23,7 @@ import org.jboss.tools.vpe.browsersim.ui.ControlHandler;
  */
 public interface BrowserSimSkin {
 	void setBrowserFactory(IBrowserSimBrowserFactory browserFactory);
-	void createControls(Display display, Point location);
+	void createControls(Display display, Point location, Shell parentShell);
 	BrowserSimBrowser getBrowser();
 	Shell getShell();
 	Menu getMenuBar();

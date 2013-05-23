@@ -15,7 +15,7 @@ import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Listener;
-import org.jboss.tools.vpe.browsersim.util.ImageList;
+import org.jboss.tools.vpe.browsersim.util.BrowserSimImageList;
 
 public abstract class AbstractTimeComposite extends Composite {
 
@@ -24,7 +24,7 @@ public abstract class AbstractTimeComposite extends Composite {
 	 * @param parent
 	 * @param style
 	 */
-	public AbstractTimeComposite(Composite parent, ImageList imageList) {
+	public AbstractTimeComposite(Composite parent, BrowserSimImageList imageList) {
 		super(parent, SWT.NONE);
 		GridLayout gridLayout = new GridLayout(5, false);
 		gridLayout.verticalSpacing = 0;

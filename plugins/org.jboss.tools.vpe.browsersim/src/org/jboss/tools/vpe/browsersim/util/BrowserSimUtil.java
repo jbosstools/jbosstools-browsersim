@@ -100,7 +100,7 @@ public class BrowserSimUtil {
 		} else {
 			message = MessageFormat.format(Messages.BrowserSim_ABOUT_MESSAGE, ""); //$NON-NLS-1$
 		}
-		ImageList imageList = new ImageList(shell);
+		BrowserSimImageList imageList = new BrowserSimImageList(shell);
 		new MessageBoxWithLinks(shell, message, imageList.getImage(ABOUT_ICON), Messages.BrowserSim_ABOUT).open();
 	}
 	

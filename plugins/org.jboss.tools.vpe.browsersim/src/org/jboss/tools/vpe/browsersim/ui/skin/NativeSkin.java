@@ -34,7 +34,7 @@ import org.jboss.tools.vpe.browsersim.browser.IBrowserSimBrowserFactory;
 import org.jboss.tools.vpe.browsersim.model.Device;
 import org.jboss.tools.vpe.browsersim.ui.ControlHandler;
 import org.jboss.tools.vpe.browsersim.ui.Messages;
-import org.jboss.tools.vpe.browsersim.util.ResourcesUtil;
+import org.jboss.tools.vpe.browsersim.util.BrowserSimResourcesUtil;
 
 /**
  * @author Yahor Radtsevich (yradtsevich)
@@ -66,8 +66,12 @@ public class NativeSkin implements BrowserSimSkin {
 	};
 	
 	@Override
-	public void createControls(Display display, Point location) {
-		shell = new Shell(display);
+	public void createControls(Display display, Point location, Shell parentShell) {
+		if (parentShell == null) {
+			shell = new Shell(display);
+		} else {
+			shell = new Shell(parentShell);
+		}
 		shell.setLayout(new FillLayout(SWT.VERTICAL | SWT.HORIZONTAL));
 		if (location != null) {
 			shell.setLocation(location);
@@ -199,13 +203,13 @@ public class NativeSkin implements BrowserSimSkin {
 //		itemGo.setText("Rotate Clockwise");
 		
 		Display display = skinComposite.getDisplay();
-		final Image imageBack = new Image(display, ResourcesUtil.getResourceAsStream("native_skin/nav_backward.gif")); //$NON-NLS-1$
-		final Image imageForward = new Image(display, ResourcesUtil.getResourceAsStream("native_skin/nav_forward.gif")); //$NON-NLS-1$
-		final Image imageStop = new Image(display, ResourcesUtil.getResourceAsStream("native_skin/nav_stop.gif")); //$NON-NLS-1$
-		final Image imageRefresh = new Image(display, ResourcesUtil.getResourceAsStream("native_skin/nav_refresh.gif")); //$NON-NLS-1$
-		final Image imageGo = new Image(display, ResourcesUtil.getResourceAsStream("native_skin/nav_go.gif")); //$NON-NLS-1$
-		final Image imageRotateClockwise = new Image(display, ResourcesUtil.getResourceAsStream("native_skin/rotate_clockwise.png")); //$NON-NLS-1$
-		final Image imageRotateCounterclockwise = new Image(display, ResourcesUtil.getResourceAsStream("native_skin/rotate_counterclockwise.png")); //$NON-NLS-1$		
+		final Image imageBack = new Image(display, BrowserSimResourcesUtil.getResourceAsStream("native_skin/nav_backward.gif")); //$NON-NLS-1$
+		final Image imageForward = new Image(display, BrowserSimResourcesUtil.getResourceAsStream("native_skin/nav_forward.gif")); //$NON-NLS-1$
+		final Image imageStop = new Image(display, BrowserSimResourcesUtil.getResourceAsStream("native_skin/nav_stop.gif")); //$NON-NLS-1$
+		final Image imageRefresh = new Image(display, BrowserSimResourcesUtil.getResourceAsStream("native_skin/nav_refresh.gif")); //$NON-NLS-1$
+		final Image imageGo = new Image(display, BrowserSimResourcesUtil.getResourceAsStream("native_skin/nav_go.gif")); //$NON-NLS-1$
+		final Image imageRotateClockwise = new Image(display, BrowserSimResourcesUtil.getResourceAsStream("native_skin/rotate_clockwise.png")); //$NON-NLS-1$
+		final Image imageRotateCounterclockwise = new Image(display, BrowserSimResourcesUtil.getResourceAsStream("native_skin/rotate_counterclockwise.png")); //$NON-NLS-1$		
 		
 		itemBack.setImage(imageBack);
 		itemForward.setImage(imageForward);

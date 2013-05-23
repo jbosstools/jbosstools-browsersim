@@ -36,7 +36,7 @@ import org.jboss.tools.vpe.browsersim.browser.IBrowserSimBrowserFactory;
 import org.jboss.tools.vpe.browsersim.model.preferences.SpecificPreferences;
 import org.jboss.tools.vpe.browsersim.ui.ControlHandler;
 import org.jboss.tools.vpe.browsersim.util.BrowserSimUtil;
-import org.jboss.tools.vpe.browsersim.util.ImageList;
+import org.jboss.tools.vpe.browsersim.util.BrowserSimImageList;
 
 public abstract class ResizableSkin implements BrowserSimSkin {
 	protected DeviceComposite deviceComposite;
@@ -65,9 +65,13 @@ public abstract class ResizableSkin implements BrowserSimSkin {
 	}
 	
 	@Override
-	public void createControls(Display display, Point location) {
+	public void createControls(Display display, Point location, Shell parentShell) {
 		this.display = display;
-		shell = new Shell(display, SWT.NO_TRIM | SWT.NO_BACKGROUND);
+		if (parentShell == null) {
+			shell = new Shell(display, SWT.NO_TRIM | SWT.NO_BACKGROUND);
+		} else {
+			shell = new Shell(parentShell,  SWT.NO_TRIM | SWT.NO_BACKGROUND );
+		}
 		shell.setLayout(new FillLayout());
 
 		if (location != null && display.getClientArea().contains(location)) {
@@ -165,7 +169,7 @@ public abstract class ResizableSkin implements BrowserSimSkin {
 		deviceComposite.addListener(SWT.MouseUp, moveListener);
 		deviceComposite.addListener(SWT.MouseMove, moveListener);
 		
-		final ImageList imageList = new ImageList(deviceComposite);
+		final BrowserSimImageList imageList = new BrowserSimImageList(deviceComposite);
 		Listener rotationHotSpotListener = new Listener() {
 			@Override
 			public void handleEvent(Event event) {

@@ -25,7 +25,7 @@ import javax.xml.transform.stream.StreamResult;
 
 import org.eclipse.swt.graphics.Point;
 import org.jboss.tools.vpe.browsersim.util.PreferencesUtil;
-import org.jboss.tools.vpe.browsersim.util.ResourcesUtil;
+import org.jboss.tools.vpe.browsersim.util.BrowserSimResourcesUtil;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
@@ -88,7 +88,7 @@ public class SpecificPreferencesStorage implements PreferencesStorage{
 	public SpecificPreferences loadDefault() {
 		SpecificPreferences specificPreferences = null;
 		try {
-			specificPreferences = load(ResourcesUtil.getResourceAsStream(DEFAULT_SPECIFIC_PREFERENCES_RESOURCE));
+			specificPreferences = load(BrowserSimResourcesUtil.getResourceAsStream(DEFAULT_SPECIFIC_PREFERENCES_RESOURCE));
 		} catch (IOException e) {
 			e.printStackTrace();
 		}

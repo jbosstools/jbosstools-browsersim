@@ -14,7 +14,7 @@ import org.eclipse.swt.SWT;
 import org.eclipse.swt.widgets.Composite;
 import org.jboss.tools.vpe.browsersim.ui.skin.AbstractTimeComposite;
 import org.jboss.tools.vpe.browsersim.ui.skin.ImageDescriptor;
-import org.jboss.tools.vpe.browsersim.util.ImageList;
+import org.jboss.tools.vpe.browsersim.util.BrowserSimImageList;
 
 /**
  * @author Yahor Radtsevich (yradtsevich)
@@ -26,7 +26,7 @@ public class AndroidTimeComposite extends AbstractTimeComposite {
 		new ImageDescriptor(BD + "time-1.png"), new ImageDescriptor(BD + "time-2.png", 1, 1, SWT.HORIZONTAL), new ImageDescriptor(BD + "time-3.png")
 	};
 
-	public AndroidTimeComposite(Composite parent, ImageList imageList) {
+	public AndroidTimeComposite(Composite parent, BrowserSimImageList imageList) {
 		super(parent, imageList);
 	}
 

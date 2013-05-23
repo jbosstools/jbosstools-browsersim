@@ -21,19 +21,16 @@ import org.jboss.tools.vpe.browsersim.ui.BrowserSim;
  * @author Yahor Radtsevich (yradtsevich)
  */
 public class ResourcesUtil {
-
-	private static final String RESOURCES_ROOT_FOLDER = "/org/jboss/tools/vpe/browsersim/resources/"; //$NON-NLS-1$
-
-	public static InputStream getResourceAsStream(String name) {
+	public static InputStream getResourceAsStream(String resourcesRootFolder, String name) {
 		if (name.startsWith("/")) { //$NON-NLS-1$
 			return BrowserSim.class.getResourceAsStream(name);
 		} else {
-			return BrowserSim.class.getResourceAsStream(RESOURCES_ROOT_FOLDER + name);
+			return BrowserSim.class.getResourceAsStream(resourcesRootFolder + name);
 		}
 	}
 	
-	public static String getResourceAsString(String name) {
-		InputStream input = getResourceAsStream(name);
+	public static String getResourceAsString(String resourcesRootFolder, String name) {
+		InputStream input = getResourceAsStream(resourcesRootFolder, name);
 		InputStreamReader reader = new InputStreamReader(input);
 		BufferedReader bufferedReader = new BufferedReader(reader);
 

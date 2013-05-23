@@ -22,13 +22,13 @@ import org.eclipse.swt.widgets.Text;
 import org.jboss.tools.vpe.browsersim.ui.skin.DeviceComposite;
 import org.jboss.tools.vpe.browsersim.ui.skin.ImageButtonComposite;
 import org.jboss.tools.vpe.browsersim.ui.skin.ImageDescriptor;
-import org.jboss.tools.vpe.browsersim.util.ImageList;
+import org.jboss.tools.vpe.browsersim.util.BrowserSimImageList;
 
 /**
  * @author Ilya Buziuk (ibuziuk)
  */
 public class AppleIPadComposite extends DeviceComposite {
-	private ImageList imageList;
+	private BrowserSimImageList imageList;
 	private Composite iOsCompositeContainer;
 	private Composite browserContainer;
 	private IPadNavBarComposite navBarComposite;
@@ -45,7 +45,7 @@ public class AppleIPadComposite extends DeviceComposite {
 	public AppleIPadComposite(Composite parent, IPhoneSkinDescriptor skinDescriptor) {
 		super(parent, SWT.NONE);
 		
-		imageList = new ImageList(this);
+		imageList = new BrowserSimImageList(this);
 		setLayout(new FormLayout());
 		
 		backButtonComposite = new ImageButtonComposite(this, imageList, skinDescriptor.getBackButton());

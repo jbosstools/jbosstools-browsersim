@@ -17,7 +17,7 @@ import org.eclipse.swt.graphics.Rectangle;
 import org.eclipse.swt.layout.FormData;
 import org.eclipse.swt.widgets.Composite;
 import org.jboss.tools.vpe.browsersim.ui.skin.ios.ButtonDescriptor;
-import org.jboss.tools.vpe.browsersim.util.ImageList;
+import org.jboss.tools.vpe.browsersim.util.BrowserSimImageList;
 
 
 public class ImageButtonComposite extends Composite {
@@ -42,7 +42,7 @@ public class ImageButtonComposite extends Composite {
 		addMouseTrackListener(getMouseTrackListener());
 	}
 	
-	public ImageButtonComposite(Composite parent, ImageList imageList, ButtonDescriptor buttonDescriptor) {
+	public ImageButtonComposite(Composite parent, BrowserSimImageList imageList, ButtonDescriptor buttonDescriptor) {
 		this( parent, imageList.getImage(buttonDescriptor.getEnabledImageName()),
 				imageList.getImage(buttonDescriptor.getDisabledImageName()),
 				imageList.getImage(buttonDescriptor.getSelectedImageName()) );

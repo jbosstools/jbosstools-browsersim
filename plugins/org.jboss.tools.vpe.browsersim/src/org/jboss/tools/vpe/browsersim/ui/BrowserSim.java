@@ -61,7 +61,7 @@ import org.jboss.tools.vpe.browsersim.ui.skin.BrowserSimSkin;
 import org.jboss.tools.vpe.browsersim.ui.skin.ResizableSkinSizeAdvisor;
 import org.jboss.tools.vpe.browsersim.ui.skin.ResizableSkinSizeAdvisorImpl;
 import org.jboss.tools.vpe.browsersim.util.BrowserSimUtil;
-import org.jboss.tools.vpe.browsersim.util.ImageList;
+import org.jboss.tools.vpe.browsersim.util.BrowserSimImageList;
 
 /**
  * @author Yahor Radtsevich (yradtsevich)
@@ -73,13 +73,14 @@ public class BrowserSim {
 	
 	public static boolean isStandalone;
 	private static List<BrowserSim> instances;
+	private Shell parentShell; // is needed for CordovaSim in order to have one icon in the taskbar JBIDE-14578 
 	private String homeUrl;
 	private static CommonPreferences commonPreferences;
 	private SpecificPreferences specificPreferences;
 	private ResizableSkinSizeAdvisor resizableSkinSizeAdvisor;
 	private BrowserSimSkin skin;
 	private ControlHandler controlHandler;
-	private ImageList imageList;
+	private BrowserSimImageList imageList;
 	private Image[] icons;
 	private Point currentLocation;
 	private ProgressListener progressListener;
@@ -96,6 +97,11 @@ public class BrowserSim {
 		this.homeUrl = homeUrl;
 	}
 	
+	public BrowserSim(String homeUrl, Shell parentShell) {
+		this.homeUrl = homeUrl;
+		this.parentShell = parentShell;
+	}
+	
 	public void open() {
 		commonPreferences = (CommonPreferences) CommonPreferencesStorage.INSTANCE.load();
 		if (commonPreferences == null) {
@@ -107,10 +113,10 @@ public class BrowserSim {
 			sp = (SpecificPreferences) SpecificPreferencesStorage.INSTANCE.loadDefault();
 		}
 		
-		open(sp, null);
+		open(sp, null, parentShell);
 	}
 
-	public void open(SpecificPreferences sp, String url) {
+	public void open(SpecificPreferences sp, String url, Shell parentShell) {
 		if (url == null) {
 			url = homeUrl;
 		}
@@ -131,7 +137,7 @@ public class BrowserSim {
 			defaultDevice = commonPreferences.getDevices().get(id);
 		}
 		
-		initSkin(BrowserSimUtil.getSkinClass(defaultDevice, specificPreferences.getUseSkins()), specificPreferences.getLocation());
+		initSkin(BrowserSimUtil.getSkinClass(defaultDevice, specificPreferences.getUseSkins()), specificPreferences.getLocation(), parentShell);
 		setSelectedDevice(null);
 		controlHandler.goToAddress(url);
 		
@@ -139,7 +145,7 @@ public class BrowserSim {
 		skin.getShell().open();
 	}
 	
-	private void initSkin(Class<? extends BrowserSimSkin> skinClass, Point location) {
+	private void initSkin(Class<? extends BrowserSimSkin> skinClass, Point location, Shell parentShell) {
 		try {
 			skin = skinClass.newInstance();//new AppleIPhone3Skin();//new NativeSkin();
 		} catch (InstantiationException e1) {
@@ -155,7 +161,7 @@ public class BrowserSim {
 		Display display = Display.getDefault();
 		
 		try {
-			skin.createControls(display, location);
+			skin.createControls(display, location, parentShell);
 			currentLocation = location;
 		} catch (SWTError e) {
 			e.printStackTrace();
@@ -405,7 +411,7 @@ public class BrowserSim {
 	}
 	
 	private void initImages() {
-		imageList = new ImageList(skin.getShell());
+		imageList = new BrowserSimImageList(skin.getShell());
 		this.icons = new Image[BROWSERSIM_ICONS.length];
 		for (int i = 0; i < BROWSERSIM_ICONS.length; i++) {
 			icons[i] = imageList.getImage(BROWSERSIM_ICONS[i]);
@@ -463,7 +469,7 @@ public class BrowserSim {
 				Point currentLocation = skin.getShell().getLocation();
 				skin.getBrowser().removeProgressListener(progressListener);
 				skin.getBrowser().getShell().dispose();
-				initSkin(newSkinClass, currentLocation);
+				initSkin(newSkinClass, currentLocation, parentShell);
 				fireSkinChangeEvent();
 			}
 			setOrientation(specificPreferences.getOrientationAngle(), device);
@@ -488,7 +494,7 @@ public class BrowserSim {
 		Point currentLocation = skin.getShell().getLocation();
 		skin.getBrowser().removeProgressListener(progressListener);
 		skin.getBrowser().getShell().dispose();
-		initSkin(newSkinClass, currentLocation);
+		initSkin(newSkinClass, currentLocation, parentShell);
 		setOrientation(specificPreferences.getOrientationAngle(), device);
 		skin.getBrowser().setDefaultUserAgent(device.getUserAgent());
 		skin.getBrowser().setUrl(oldSkinUrl); 
@@ -595,6 +601,5 @@ public class BrowserSim {
 	 */
 	protected BrowserSimMenuCreator createMenuCreator(BrowserSimSkin skin, CommonPreferences commonPreferences, SpecificPreferences specificPreferences, ControlHandler controlHandler, String homeUrl) {
 		return new BrowserSimMenuCreator(skin, commonPreferences, specificPreferences, controlHandler, homeUrl);
-	}	
-
+	}
 }

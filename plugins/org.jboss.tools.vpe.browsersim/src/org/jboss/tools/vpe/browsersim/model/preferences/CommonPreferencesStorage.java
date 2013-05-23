@@ -30,7 +30,7 @@ import javax.xml.transform.stream.StreamResult;
 import org.jboss.tools.vpe.browsersim.model.Device;
 import org.jboss.tools.vpe.browsersim.model.TruncateWindow;
 import org.jboss.tools.vpe.browsersim.util.PreferencesUtil;
-import org.jboss.tools.vpe.browsersim.util.ResourcesUtil;
+import org.jboss.tools.vpe.browsersim.util.BrowserSimResourcesUtil;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
@@ -104,7 +104,7 @@ public class CommonPreferencesStorage implements PreferencesStorage{
 	public CommonPreferences loadDefault(){
 		CommonPreferences commonPreferences = null;
 		try {
-			commonPreferences = load(ResourcesUtil.getResourceAsStream(DEFAULT_COMMON_PREFERENCES_RESOURCE));
+			commonPreferences = load(BrowserSimResourcesUtil.getResourceAsStream(DEFAULT_COMMON_PREFERENCES_RESOURCE));
 		} catch (IOException e) {
 			e.printStackTrace();
 		}

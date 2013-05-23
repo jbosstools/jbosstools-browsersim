@@ -17,7 +17,7 @@ import org.eclipse.swt.graphics.Device;
 import org.eclipse.swt.graphics.Font;
 import org.eclipse.swt.widgets.Composite;
 import org.jboss.tools.vpe.browsersim.util.BrowserSimUtil;
-import org.jboss.tools.vpe.browsersim.util.ImageList;
+import org.jboss.tools.vpe.browsersim.util.BrowserSimImageList;
 
 /**
  * @author Ilya Buziuk (ibuziuk)
@@ -29,7 +29,7 @@ public class IPadPageTitleStyledText extends StyledText {
 	private Color foregroundColor;
 	private static boolean IS_OSX = SWT.getPlatform() == "cocoa";
 	
-	public IPadPageTitleStyledText(Composite parent, ImageList imageList) {
+	public IPadPageTitleStyledText(Composite parent, BrowserSimImageList imageList) {
 		super(parent, (IS_OSX ? SWT.MULTI : SWT.SINGLE) | SWT.WRAP);
 		setBackgroundImage(imageList.getImage(BD + "page-title-background.png"));
 		setEditable(false);

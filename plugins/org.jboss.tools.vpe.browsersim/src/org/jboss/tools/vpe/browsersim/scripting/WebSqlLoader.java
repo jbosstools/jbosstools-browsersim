@@ -12,7 +12,7 @@ package org.jboss.tools.vpe.browsersim.scripting;
 
 import org.eclipse.swt.browser.Browser;
 import org.eclipse.swt.browser.BrowserFunction;
-import org.jboss.tools.vpe.browsersim.util.ResourcesUtil;
+import org.jboss.tools.vpe.browsersim.util.BrowserSimResourcesUtil;
 
 /**
  * @author Yahor Radtsevich (yradtsevich)
@@ -32,10 +32,10 @@ public class WebSqlLoader {
 			public Object function(Object[] arguments) {
 				super.function(arguments);
 				
-				String purejswebsql = ResourcesUtil.getResourceAsString("javascript/purejswebsql.js");
+				String purejswebsql = BrowserSimResourcesUtil.getResourceAsString("javascript/purejswebsql.js");
 				browser.execute(purejswebsql);
 
-				String sql = ResourcesUtil.getResourceAsString("javascript/sql.js");
+				String sql = BrowserSimResourcesUtil.getResourceAsString("javascript/sql.js");
 				browser.execute(sql);
 				return null;
 			}
