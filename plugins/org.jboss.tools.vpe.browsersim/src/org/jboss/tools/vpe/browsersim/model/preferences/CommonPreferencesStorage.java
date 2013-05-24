@@ -284,7 +284,7 @@ public class CommonPreferencesStorage implements PreferencesStorage{
 	}
 	
 	private static String getDefaultScreenshotsFolderPath() {
-		return PreferencesUtil.USER_HOME;
+		return "";
 	}
 	
 	private static String getDefaultWeinreScriptUrl() {

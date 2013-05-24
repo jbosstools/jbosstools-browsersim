@@ -40,6 +40,7 @@ import org.eclipse.swt.widgets.Menu;
 import org.eclipse.swt.widgets.MenuItem;
 import org.eclipse.swt.widgets.Shell;
 import org.jboss.tools.vpe.browsersim.browser.PlatformUtil;
+import org.jboss.tools.vpe.browsersim.model.preferences.CommonPreferences;
 import org.jboss.tools.vpe.browsersim.ui.Messages;
 import org.jboss.tools.vpe.browsersim.util.PreferencesUtil;
 
@@ -54,7 +55,7 @@ public class ScreenshotMenuCreator {
 	private static ImageData data;
 	
 	public static Menu createScreenshotsMenu(final Menu parent, final Display display, final Shell shell,
-			final String defaultFolder) {
+			final CommonPreferences commonPreferences) {
 		Menu screenshotsMenu = new Menu(parent);
 		
 		MenuItem saveItem = new MenuItem(screenshotsMenu, SWT.PUSH);
@@ -66,7 +67,18 @@ public class ScreenshotMenuCreator {
 					@Override
 					public void run() {
 						Image image = takeScreenshot(display, shell);
+						String defaultFolder = commonPreferences.getScreenshotsFolder();
+						if (defaultFolder.isEmpty()) {
+							defaultFolder = saveAs(shell);
+							if (defaultFolder != null) {
+								File selected = new File(defaultFolder);
+								commonPreferences.setScreenshotsFolder(selected.getParentFile().getAbsolutePath());
+								saveImage(image, selected.getParentFile().getAbsolutePath(), selected.getName());
+								image.dispose();
+							}
+						} else {
 						saveImage(image, defaultFolder);
+					}
 						image.dispose();
 					}
 				});
@@ -163,7 +175,7 @@ public class ScreenshotMenuCreator {
 	
 	private static String saveAs(Shell parent) {
 		FileDialog fd = new FileDialog(parent, SWT.SAVE);
-		fd.setText(Messages.Screenshots_SaveAs);
+		fd.setText(Messages.Screenshots_SaveAsDialog);
 		String[] filterExt = {EXTENSION};
 		fd.setFilterExtensions(filterExt);
 		fd.setFileName(getDefaultFilename());
@@ -193,8 +205,8 @@ public class ScreenshotMenuCreator {
 	}
 	
 	private static String getDefaultFilename() {
-		DateFormat df = new SimpleDateFormat("yyyy-MM-dd_hh-mm-ss");  
-		return df.format(new Date()) + EXTENSION;
+		DateFormat df = new SimpleDateFormat("yyyy-MM-dd-HHmmss");  
+		return "browsersim_" + df.format(new Date()) + EXTENSION;
 	}
 	
 	private static BufferedImage convertToAWT(ImageData data) {

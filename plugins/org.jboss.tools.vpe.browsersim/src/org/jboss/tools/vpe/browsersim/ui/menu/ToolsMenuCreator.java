@@ -25,6 +25,7 @@ import org.eclipse.swt.widgets.MenuItem;
 import org.eclipse.swt.widgets.Shell;
 import org.jboss.tools.vpe.browsersim.model.Device;
 import org.jboss.tools.vpe.browsersim.model.preferences.BrowserSimSpecificPreferences;
+import org.jboss.tools.vpe.browsersim.model.preferences.CommonPreferences;
 import org.jboss.tools.vpe.browsersim.model.preferences.SpecificPreferences;
 import org.jboss.tools.vpe.browsersim.ui.BrowserSim;
 import org.jboss.tools.vpe.browsersim.ui.Messages;
@@ -92,11 +93,11 @@ public class ToolsMenuCreator {
 		});
 	}
 	
-	public static void addScreenshotMenuItem(Menu menu, final BrowserSimSkin skin, final String path) {
+	public static void addScreenshotMenuItem(Menu menu, final BrowserSimSkin skin, final CommonPreferences commonPreferences) {
 		MenuItem screenshot = new MenuItem(menu, SWT.CASCADE);
 		screenshot.setText(Messages.Screenshots_Screenshot);
 
-		Menu subMenu = ScreenshotMenuCreator.createScreenshotsMenu(menu, Display.getDefault(), skin.getShell(), path);
+		Menu subMenu = ScreenshotMenuCreator.createScreenshotsMenu(menu, Display.getDefault(), skin.getShell(), commonPreferences);
 		screenshot.setMenu(subMenu);
 	}
 	

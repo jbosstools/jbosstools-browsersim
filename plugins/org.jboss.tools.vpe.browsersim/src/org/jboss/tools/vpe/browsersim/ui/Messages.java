@@ -108,6 +108,7 @@ public class Messages {
 	public static String Screenshots_Screenshot;
 	public static String Screenshots_Save;
 	public static String Screenshots_SaveAs;
+	public static String Screenshots_SaveAsDialog;
 	public static String Screenshots_CopyToClipboard;
 	public static String SizeWarningDialog_CANCEL;
 	public static String SizeWarningDialog_DESKTOP_SIZE_TOO_SMALL_HORIZONTAL;
