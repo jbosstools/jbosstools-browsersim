@@ -51,6 +51,7 @@ import org.jboss.tools.vpe.browsersim.util.PreferencesUtil;
 
 public class ScreenshotMenuCreator {
 	private static final String EXTENSION = ".png";
+	private static ImageData data;
 	
 	public static Menu createScreenshotsMenu(final Menu parent, final Display display, final Shell shell,
 			final String defaultFolder) {
@@ -61,9 +62,15 @@ public class ScreenshotMenuCreator {
 		saveItem.addSelectionListener(new SelectionAdapter() {
 			@Override
 			public void widgetSelected(SelectionEvent e) {
-				Image image = takeScreenshot(display, shell);
-				saveImage(image, defaultFolder);
-				image.dispose();
+				display.asyncExec(new Runnable() {
+					@Override
+					public void run() {
+						Image image = takeScreenshot(display, shell);
+						saveImage(image, defaultFolder);
+						image.dispose();
+					}
+				});
+				
 			};
 		});
 
@@ -72,12 +79,16 @@ public class ScreenshotMenuCreator {
 		saveAsItem.addSelectionListener(new SelectionAdapter() {
 			@Override
 			public void widgetSelected(SelectionEvent e) {
-				String selectedPath = saveAs(shell);
+				final String selectedPath = saveAs(shell);
 				if (selectedPath != null) {
-					File selected = new File(selectedPath);
-					Image image = takeScreenshot(display, shell);
-					saveImage(image, selected.getParentFile().getAbsolutePath(), selected.getName());
-					image.dispose();
+					display.asyncExec(new Runnable() {
+						public void run() {
+							File selected = new File(selectedPath);
+							Image image = takeScreenshot(display, shell);
+							saveImage(image, selected.getParentFile().getAbsolutePath(), selected.getName());
+							image.dispose();
+						}
+					});
 				}				
 			};
 		});
@@ -87,27 +98,32 @@ public class ScreenshotMenuCreator {
 		copyItem.addSelectionListener(new SelectionAdapter() {
 			@Override
 			public void widgetSelected(SelectionEvent e) {
-				Image image = takeScreenshot(display, shell);
-				//on Linux SWT dnd canot copy image to clipboard, that's why we need to do it using AWT
-				if (PlatformUtil.OS_LINUX.equals(PlatformUtil.getOs())) {
-					java.awt.datatransfer.Clipboard clipboard = Toolkit.getDefaultToolkit().getSystemClipboard();
-					java.awt.Image awtImage = convertToAWT(image.getImageData());
-					ImageSelection selection = new ImageSelection(awtImage);
-		            clipboard.setContents(selection, null);
-		            awtImage.flush();
-				} else {
-					Clipboard cl = new Clipboard(display);
-					cl.setContents(new Object[] {image.getImageData()}, new Transfer[] {ImageTransfer.getInstance()});
-					cl.dispose();					
-				}				
-				image.dispose();
+				display.asyncExec(new Runnable() {
+					@Override
+					public void run() {
+						Image image = takeScreenshot(display, shell);
+						//on Linux SWT dnd canot copy image to clipboard, that's why we need to do it using AWT
+						if (PlatformUtil.OS_LINUX.equals(PlatformUtil.getOs())) {
+							java.awt.datatransfer.Clipboard clipboard = Toolkit.getDefaultToolkit().getSystemClipboard();
+							java.awt.Image awtImage = convertToAWT(image.getImageData());
+							ImageSelection selection = new ImageSelection(awtImage);
+				            clipboard.setContents(selection, null);
+				            awtImage.flush();
+						} else {
+							Clipboard cl = new Clipboard(display);
+							cl.setContents(new Object[] {image.getImageData()}, new Transfer[] {ImageTransfer.getInstance()});
+							cl.dispose();					
+						}				
+						image.dispose();
+					}
+				});
 			};
 		});
 		
 		return screenshotsMenu;
 	}
 	
-	private static Image takeScreenshot(Display display, Shell parent) {
+	private static Image takeScreenshot(final Display display, final Shell parent) {
 		/* Take the screen shot */
 		GC gc = new GC(parent);
 		Image image = new Image(display, parent.getClientArea());
@@ -116,8 +132,8 @@ public class ScreenshotMenuCreator {
 		gcImage.setForeground(display.getSystemColor(SWT.COLOR_WHITE));
 		gcImage.setAdvanced(true);
 		Region region = parent.getRegion();
-		
-		ImageData data = image.getImageData();
+
+		data = image.getImageData();
 		if (region != null) {
 			int height = image.getBounds().height;
 			int width = image.getBounds().width;
@@ -137,11 +153,11 @@ public class ScreenshotMenuCreator {
 			}
 			data.alphaData = alphaData;
 		}
-		
+
 		image.dispose();
 		gcImage.dispose();
 		gc.dispose();
-		
+
 		return new Image(display, data);
 	}
 	
