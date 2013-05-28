@@ -96,10 +96,15 @@ public class Messages {
 	public static String ManageDevicesDialog_SELECT_FOLDER;
 	public static String ManageDevicesDialog_SKIN;
 	public static String ManageDevicesDialog_SKINS_OPTIONS;
+	public static String ManageDevicesDialog_TABS_DEVICES;
+	public static String ManageDevicesDialog_TABS_SETTINGS;
 	public static String ManageDevicesDialog_TRUNCATE_THE_DEVICE_WINDOW;
 	public static String ManageDevicesDialog_USE_SKINS;
 	public static String ManageDevicesDialog_USER_AGENT;
 	public static String ManageDevicesDialog_WIDTH;
+	public static String ManageDevicesDialog_WEINRE;
+	public static String ManageDevicesDialog_WEINRE_SCRIPT_URL;
+	public static String ManageDevicesDialog_WEINRE_CLIENT_URL;
 	public static String Screenshots_Screenshot;
 	public static String Screenshots_Save;
 	public static String Screenshots_SaveAs;

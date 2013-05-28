@@ -19,6 +19,7 @@ import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.events.SelectionListener;
+import org.eclipse.swt.graphics.Rectangle;
 import org.eclipse.swt.layout.FillLayout;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
@@ -33,6 +34,8 @@ import org.eclipse.swt.widgets.Group;
 import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Listener;
 import org.eclipse.swt.widgets.Shell;
+import org.eclipse.swt.widgets.TabFolder;
+import org.eclipse.swt.widgets.TabItem;
 import org.eclipse.swt.widgets.Table;
 import org.eclipse.swt.widgets.TableColumn;
 import org.eclipse.swt.widgets.TableItem;
@@ -115,7 +118,17 @@ public class ManageDevicesDialog extends Dialog {
 		shell.setText(getText());
 		shell.setLayout(new GridLayout(1, false));
 		
-		Group devicesGroup = new Group(shell, SWT.NONE);
+		final TabFolder tabFolder = new TabFolder (shell, SWT.NONE);
+		Rectangle clientArea = shell.getClientArea ();
+		tabFolder.setLocation (clientArea.x, clientArea.y);
+
+		TabItem devicesTab = new TabItem(tabFolder, SWT.NONE);
+		devicesTab.setText(Messages.ManageDevicesDialog_TABS_DEVICES);
+		
+		Composite devicesComposite = new Composite(tabFolder, SWT.NONE);
+		devicesComposite.setLayout(new GridLayout());
+
+		Group devicesGroup = new Group(devicesComposite, SWT.NONE);
 		devicesGroup.setText(Messages.ManageDevicesDialog_DEVICES);
 		devicesGroup.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, true));
 		devicesGroup.setLayout(new GridLayout(2, false));
@@ -128,43 +141,42 @@ public class ManageDevicesDialog extends Dialog {
 				selectedDeviceId = e.item.getData().toString();
 			}
 		});
-		
-		
+
 		TableColumn tableColumnName = new TableColumn(table, SWT.NONE);
 		tableColumnName.setWidth(175);
 		tableColumnName.setText(Messages.ManageDevicesDialog_NAME);
-		
+
 		TableColumn tableColumnWidth = new TableColumn(table, SWT.NONE);
 		tableColumnWidth.setWidth(75);
 		tableColumnWidth.setText(Messages.ManageDevicesDialog_WIDTH);
-		
+
 		TableColumn tableColumnHeight = new TableColumn(table, SWT.NONE);
 		tableColumnHeight.setWidth(75);
 		tableColumnHeight.setText(Messages.ManageDevicesDialog_HEIGHT);
-		
+
 		TableColumn tableColumnPixelRatio = new TableColumn(table, SWT.NONE);
 		tableColumnPixelRatio.setWidth(75);
 		tableColumnPixelRatio.setText(Messages.ManageDevicesDialog_PIXEL_RATIO);
-		
+
 		TableColumn tableColumnUseragent = new TableColumn(table, SWT.NONE);
 		tableColumnUseragent.setWidth(150);
 		tableColumnUseragent.setText(Messages.ManageDevicesDialog_USER_AGENT);
-		
+
 		TableColumn tableColumnSkin = new TableColumn(table, SWT.NONE);
 		tableColumnSkin.setWidth(75);
 		tableColumnSkin.setText(Messages.ManageDevicesDialog_SKIN);
-		
+
 		Composite compositeControls = new Composite(devicesGroup, SWT.NONE);
 		compositeControls.setLayoutData(new GridData(SWT.LEFT, SWT.TOP, false, false, 1, 1));
 		compositeControls.setLayout(new FillLayout(SWT.VERTICAL));
-		
+
 		Button buttonAdd = new Button(compositeControls, SWT.NONE);
 		buttonAdd.setSize(88, SWT.DEFAULT);
 		buttonAdd.setText(Messages.ManageDevicesDialog_ADD);
 		buttonAdd.addSelectionListener(new SelectionAdapter() {
 			public void widgetSelected(SelectionEvent e) {
-				Device newDevice = new AddDeviceDialog(shell,  SWT.APPLICATION_MODAL | SWT.SHELL_TRIM,
-						devices.get(selectedDeviceId)).open();
+				Device newDevice = new AddDeviceDialog(shell, SWT.APPLICATION_MODAL | SWT.SHELL_TRIM, devices
+						.get(selectedDeviceId)).open();
 				if (newDevice != null) {
 					String id = UUID.randomUUID().toString();
 					newDevice.setId(id);
@@ -174,13 +186,13 @@ public class ManageDevicesDialog extends Dialog {
 				}
 			}
 		});
-		
+
 		Button buttonEdit = new Button(compositeControls, SWT.NONE);
 		buttonEdit.setText(Messages.ManageDevicesDialog_EDIT);
 		buttonEdit.addSelectionListener(new SelectionAdapter() {
 			public void widgetSelected(SelectionEvent e) {
-				Device newDevice = new EditDeviceDialog(shell,  SWT.APPLICATION_MODAL | SWT.SHELL_TRIM,
-						devices.get(selectedDeviceId)).open();
+				Device newDevice = new EditDeviceDialog(shell, SWT.APPLICATION_MODAL | SWT.SHELL_TRIM, devices
+						.get(selectedDeviceId)).open();
 				if (newDevice != null) {
 					newDevice.setId(selectedDeviceId);
 					devices.put(selectedDeviceId, newDevice);
@@ -188,7 +200,7 @@ public class ManageDevicesDialog extends Dialog {
 				}
 			}
 		});
-		
+
 		Button buttonRemove = new Button(compositeControls, SWT.NONE);
 		buttonRemove.setText(Messages.ManageDevicesDialog_REMOVE);
 		buttonRemove.addSelectionListener(new SelectionAdapter() {
@@ -196,7 +208,8 @@ public class ManageDevicesDialog extends Dialog {
 				if (devices.size() > 1) {
 					int nextSelection = table.getSelectionIndex() + 1;
 					if (nextSelection == table.getItemCount()) {
-						//last element selected, then element before last must be selected after deletion
+						// last element selected, then element before last must
+						// be selected after deletion
 						nextSelection = table.getItemCount() - 2;
 					}
 					devices.remove(selectedDeviceId);
@@ -205,10 +218,10 @@ public class ManageDevicesDialog extends Dialog {
 				}
 			}
 		});
-		
+
 		Button buttonReset = new Button(compositeControls, SWT.NONE);
 		buttonReset.setText(Messages.ManageDevicesDialog_REVERT_ALL);
-		
+
 		buttonReset.addSelectionListener(new SelectionAdapter() {
 			public void widgetSelected(SelectionEvent e) {
 				devices = new LinkedHashMap<String, Device>(oldCommonPreferences.getDevices());
@@ -216,8 +229,8 @@ public class ManageDevicesDialog extends Dialog {
 				updateDevices();
 			}
 		});
-		
-		Group useSkinsGroup = new Group(shell, SWT.NONE);
+
+		Group useSkinsGroup = new Group(devicesComposite, SWT.NONE);
 		useSkinsGroup.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, true, false, 2, 1));
 		useSkinsGroup.setLayout(new RowLayout(SWT.VERTICAL));
 		useSkinsGroup.setText(Messages.ManageDevicesDialog_SKINS_OPTIONS);
@@ -231,21 +244,7 @@ public class ManageDevicesDialog extends Dialog {
 			}
 		});
 		
-		Group liveReloadGroup = new Group(shell, SWT.NONE);
-		liveReloadGroup.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, true, false, 2, 1));
-		liveReloadGroup.setLayout(new RowLayout(SWT.VERTICAL));
-		liveReloadGroup.setText(Messages.ManageDevicesDialog_LIVE_RELOAD_OPTIONS);
-		liveReloadCheckBox = new Button(liveReloadGroup, SWT.CHECK);
-		liveReloadCheckBox.setText(Messages.ManageDevicesDialog_ENABLE_LIVE_RELOAD);
-		liveReloadCheckBox.addSelectionListener(new SelectionAdapter() {
-			@Override
-			public void widgetSelected(SelectionEvent e) {
-				Button checkbox = (Button) e.widget;
-				enableLiveReload = checkbox.getSelection();
-			}
-		});
-		
-		Group truncateWindowGroup = new Group(shell, SWT.NONE);
+		Group truncateWindowGroup = new Group(devicesComposite, SWT.NONE);
 		truncateWindowGroup.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, true, false, 2, 1));
 		truncateWindowGroup.setText(Messages.ManageDevicesDialog_TRUNCATE_THE_DEVICE_WINDOW);
 		truncateWindowGroup.setLayout(new RowLayout(SWT.HORIZONTAL));
@@ -276,8 +275,30 @@ public class ManageDevicesDialog extends Dialog {
 		askBeforeTruncateRadio.addSelectionListener(truncateSelectionListener);
 		alwaysTruncateRadio.addSelectionListener(truncateSelectionListener);
 		neverTruncateRadio.addSelectionListener(truncateSelectionListener);
+
+		devicesTab.setControl(devicesComposite);
 		
-		Group screnshotGroup = new Group(shell, SWT.NONE);
+		TabItem settingsTab = new TabItem(tabFolder, SWT.NONE);
+		settingsTab.setText(Messages.ManageDevicesDialog_TABS_SETTINGS);
+		
+		Composite settingsComposite = new Composite(tabFolder, SWT.NONE);
+		settingsComposite.setLayout(new GridLayout());
+		
+		Group liveReloadGroup = new Group(settingsComposite, SWT.NONE);
+		liveReloadGroup.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, true, false, 2, 1));
+		liveReloadGroup.setLayout(new RowLayout(SWT.VERTICAL));
+		liveReloadGroup.setText(Messages.ManageDevicesDialog_LIVE_RELOAD_OPTIONS);
+		liveReloadCheckBox = new Button(liveReloadGroup, SWT.CHECK);
+		liveReloadCheckBox.setText(Messages.ManageDevicesDialog_ENABLE_LIVE_RELOAD);
+		liveReloadCheckBox.addSelectionListener(new SelectionAdapter() {
+			@Override
+			public void widgetSelected(SelectionEvent e) {
+				Button checkbox = (Button) e.widget;
+				enableLiveReload = checkbox.getSelection();
+			}
+		});
+		
+		Group screnshotGroup = new Group(settingsComposite, SWT.NONE);
 		screnshotGroup.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, true, false, 1, 1));
 		screnshotGroup.setText(Messages.ManageDevicesDialog_SCREENSHOTS);
 		screnshotGroup.setLayout(new GridLayout(3, false));
@@ -304,22 +325,25 @@ public class ManageDevicesDialog extends Dialog {
 			}
 		});
 		
-		Group weinreGroup = new Group(shell, SWT.NONE);
+		Group weinreGroup = new Group(settingsComposite, SWT.NONE);
 		weinreGroup.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, true, false, 1, 1));
-		weinreGroup.setText("Weinre");
+		weinreGroup.setText(Messages.ManageDevicesDialog_WEINRE);
 		weinreGroup.setLayout(new GridLayout(2, false));
 		
 		Label weinreScriptUrlLabel = new Label(weinreGroup, SWT.NONE);
-		weinreScriptUrlLabel.setText("Script URL:");
+		weinreScriptUrlLabel.setText(Messages.ManageDevicesDialog_WEINRE_SCRIPT_URL);
 		final Text weinreScriptUrlText = new Text(weinreGroup, SWT.BORDER);
 		weinreScriptUrlText.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, true, true));
 		weinreScriptUrlText.setText(oldCommonPreferences.getWeinreScriptUrl());
 		
 		Label weinreClientUrlLabel = new Label(weinreGroup, SWT.NONE);
-		weinreClientUrlLabel.setText("Client URL:");
+		weinreClientUrlLabel.setText(Messages.ManageDevicesDialog_WEINRE_CLIENT_URL);
 		final Text weinreClientUrlText = new Text(weinreGroup, SWT.BORDER);
 		weinreClientUrlText.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, true, true));
 		weinreClientUrlText.setText(oldCommonPreferences.getWeinreClientUrl());
+		
+		settingsTab.setControl(settingsComposite);
+		tabFolder.pack();
 		
 		Composite compositeOkCancel = new Composite(shell, SWT.NONE);
 		compositeOkCancel.setLayout(new GridLayout(2, true));
