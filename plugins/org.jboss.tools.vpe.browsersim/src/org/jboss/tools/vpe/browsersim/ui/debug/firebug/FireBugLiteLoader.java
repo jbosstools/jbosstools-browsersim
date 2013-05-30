@@ -33,15 +33,34 @@ public class FireBugLiteLoader {
 		if (!Boolean.TRUE.equals(fireBugScriptLoaded)) {
 			browser.execute(
 				"(function() {" +
+				   "var initializeFireBug = function() {" +
+						  /* Cordova's InAppBrowser API overrides window.open function, so we have to restore it
+						   * (see RippleInjector.java and JBIDE-14625) */
+						  "var cordovaOpen = window.open;" +
+						  "window.open = window._bsOriginalWindowOpen || window.open;" +
+						  "window.Firebug.chrome.toggle(true, true);" +
+						  "window.open = cordovaOpen;" +
+					"};" +
 					"var e = document.createElement('script');" +
 					"e.type = 'text/javascript';" +
-					"e.src = '" + FIREBUG_LITE_JS_URL + "#startInNewWindow';" +
+					"e.src = '" + FIREBUG_LITE_JS_URL + "';" +
+					"e.addEventListener('load'," +
+						"function() {" +
+							/* XXX: Two timeouts because we need to run our initializeFireBug method
+							 * AFTER two inner FireBug Lite timeouts */
+							"setTimeout(function() {" +
+								"setTimeout(initializeFireBug, 0)" +
+							 "}, 0)" +
+						"}, false);" +
 					"document.head.appendChild(e);" +
 				"})()");
 		} else {
 			browser.execute(
+					"var cordovaOpen = window.open;" +
+					"window.open = window._bsOriginalWindowOpen || window.open;" +
 					"window.Firebug.chrome.close();" +  // cannot open FireBug Lite twice without this line 
-					"window.Firebug.chrome.toggle(true, true);"
+					"window.Firebug.chrome.toggle(true, true);" +
+					"window.open = cordovaOpen;"
 			);
 		}
 	}
