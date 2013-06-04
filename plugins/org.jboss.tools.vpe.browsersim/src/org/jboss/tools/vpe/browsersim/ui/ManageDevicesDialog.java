@@ -69,6 +69,9 @@ public class ManageDevicesDialog extends Dialog {
 	protected Button useSkinsCheckbox;
 	protected Button liveReloadCheckBox;
 
+	protected Button buttonEdit;
+	protected Button buttonRemove;
+	
 	/**
 	 * Create the dialog.
 	 * @param parent
@@ -118,7 +121,8 @@ public class ManageDevicesDialog extends Dialog {
 		shell.setText(getText());
 		shell.setLayout(new GridLayout(1, false));
 		
-		final TabFolder tabFolder = new TabFolder (shell, SWT.NONE);
+		final TabFolder tabFolder = new TabFolder (shell, SWT.FILL);
+		tabFolder.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, true));
 		Rectangle clientArea = shell.getClientArea ();
 		tabFolder.setLocation (clientArea.x, clientArea.y);
 
@@ -133,12 +137,18 @@ public class ManageDevicesDialog extends Dialog {
 		devicesGroup.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, true));
 		devicesGroup.setLayout(new GridLayout(2, false));
 
-		table = new Table(devicesGroup, SWT.BORDER | SWT.FULL_SELECTION);
+		table = new Table(devicesGroup, SWT.CHECK |SWT.BORDER | SWT.FULL_SELECTION);
 		table.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, true, 1, 1));
 		table.setHeaderVisible(true);
 		table.addSelectionListener(new SelectionAdapter() {
 			public void widgetSelected(SelectionEvent e) {
-				selectedDeviceId = e.item.getData().toString();
+				if (e.detail == SWT.CHECK) {
+					selectedDeviceId = e.item.getData().toString();
+					for (TableItem item : table.getItems()) {
+						item.setChecked(false);
+					}
+					((TableItem)e.item).setChecked(true);
+				}
 			}
 		});
 
@@ -187,7 +197,7 @@ public class ManageDevicesDialog extends Dialog {
 			}
 		});
 
-		Button buttonEdit = new Button(compositeControls, SWT.NONE);
+		buttonEdit = new Button(compositeControls, SWT.NONE);
 		buttonEdit.setText(Messages.ManageDevicesDialog_EDIT);
 		buttonEdit.addSelectionListener(new SelectionAdapter() {
 			public void widgetSelected(SelectionEvent e) {
@@ -201,24 +211,38 @@ public class ManageDevicesDialog extends Dialog {
 			}
 		});
 
-		Button buttonRemove = new Button(compositeControls, SWT.NONE);
+		buttonRemove = new Button(compositeControls, SWT.NONE);
 		buttonRemove.setText(Messages.ManageDevicesDialog_REMOVE);
 		buttonRemove.addSelectionListener(new SelectionAdapter() {
 			public void widgetSelected(SelectionEvent e) {
 				if (devices.size() > 1) {
-					int nextSelection = table.getSelectionIndex() + 1;
-					if (nextSelection == table.getItemCount()) {
-						// last element selected, then element before last must
-						// be selected after deletion
-						nextSelection = table.getItemCount() - 2;
+					boolean selectedRemoved = selectedDeviceId.equals(table.getItem(table.getSelectionIndex()).getData());
+					if (selectedRemoved) {
+						int nextSelection = table.getSelectionIndex() + 1;
+						if (nextSelection == table.getItemCount()) {
+							// last element selected, then element before last must
+							// be selected after deletion
+							nextSelection = table.getItemCount() - 2;
+						}
+						devices.remove(selectedDeviceId);
+						selectedDeviceId = table.getItem(nextSelection).getData().toString();
+					} else {
+						devices.remove(table.getItem(table.getSelectionIndex()).getData());
 					}
-					devices.remove(selectedDeviceId);
-					selectedDeviceId = table.getItem(nextSelection).getData().toString();
 					updateDevices();
 				}
 			}
 		});
 
+		table.addSelectionListener(new SelectionAdapter() {
+			@Override
+			public void widgetSelected(SelectionEvent e) {
+				super.widgetSelected(e);
+				buttonEdit.setEnabled(true);
+				buttonRemove.setEnabled(true);
+			}
+		});
+		
 		Button buttonReset = new Button(compositeControls, SWT.NONE);
 		buttonReset.setText(Messages.ManageDevicesDialog_REVERT_ALL);
 
@@ -400,7 +424,6 @@ public class ManageDevicesDialog extends Dialog {
 	
 	public void updateDevices() {
 		table.removeAll();
-		int selectionIndex = 0;//select first element by default to avoid NPE
 		List<Device> values = new ArrayList<Device>(devices.values()); 
 		for (int i = 0; i < values.size(); i++) {
 			Device device = values.get(i);
@@ -415,10 +438,12 @@ public class ManageDevicesDialog extends Dialog {
 					device.getSkinId() == null ?  Messages.ManageDevicesDialog_NONE : device.getSkinId()
 			});
 			if (device.getId().equals(selectedDeviceId)) {
-				selectionIndex = i;
+				tableItem.setChecked(true);
 			}
 		}
-		table.setSelection(selectionIndex);
+		
+		buttonEdit.setEnabled(false);
+		buttonRemove.setEnabled(false);
 		
 		useSkinsCheckbox.setSelection(useSkins);
 		liveReloadCheckBox.setSelection(enableLiveReload);
