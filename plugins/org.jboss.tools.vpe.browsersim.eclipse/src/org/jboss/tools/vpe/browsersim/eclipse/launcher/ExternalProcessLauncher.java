@@ -14,10 +14,12 @@ import java.io.File;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.Reader;
+import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
 
 import org.eclipse.core.runtime.FileLocator;
+import org.eclipse.core.runtime.Path;
 import org.eclipse.core.runtime.Platform;
 import org.eclipse.core.runtime.preferences.ConfigurationScope;
 import org.eclipse.jdt.launching.IVMInstall;
@@ -194,8 +196,10 @@ public class ExternalProcessLauncher {
 	
 	private static String getResource(Bundle bundle) throws IOException {
 		StringBuilder result = new StringBuilder();
-		String location = getBundleLocation(bundle);
-		File resources = new File(location + "/resources");
+		
+		//URL[] res = FileLocator.findEntries(bundle, new Path("plugins"));
+		String location = FileLocator.getBundleFile(bundle).getCanonicalPath(); 
+		File resources = new File(location + "/plugins");
 		if (resources.exists()) {
 			for(File resource : resources.listFiles()) {
 				result.append(PATH_SEPARATOR);
