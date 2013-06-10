@@ -42,6 +42,8 @@ import org.eclipse.swt.widgets.TableItem;
 import org.eclipse.swt.widgets.Text;
 import org.jboss.tools.vpe.browsersim.model.Device;
 import org.jboss.tools.vpe.browsersim.model.TruncateWindow;
+import org.jboss.tools.vpe.browsersim.model.preferences.BrowserSimSpecificPreferences;
+import org.jboss.tools.vpe.browsersim.model.preferences.BrowserSimSpecificPreferencesStorage;
 import org.jboss.tools.vpe.browsersim.model.preferences.CommonPreferences;
 import org.jboss.tools.vpe.browsersim.model.preferences.CommonPreferencesStorage;
 import org.jboss.tools.vpe.browsersim.model.preferences.SpecificPreferences;
@@ -380,7 +382,7 @@ public class ManageDevicesDialog extends Dialog {
 		buttonLoadDefaults.addSelectionListener(new SelectionAdapter() {
 			public void widgetSelected(SelectionEvent e) {
 				CommonPreferences cp = CommonPreferencesStorage.INSTANCE.loadDefault();
-				SpecificPreferences sp = SpecificPreferencesStorage.INSTANCE.loadDefault();
+				SpecificPreferences sp = getSpecificPreferencesStorage().loadDefault();
 				devices = cp.getDevices();
 				selectedDeviceId = sp.getSelectedDeviceId();
 				useSkins = sp.getUseSkins();
@@ -401,8 +403,7 @@ public class ManageDevicesDialog extends Dialog {
 			public void widgetSelected(SelectionEvent e) {
 				newCommonPreferences = new CommonPreferences(devices, truncateWindow, screenshotsPath.getText(),
 						weinreScriptUrlText.getText(), weinreClientUrlText.getText());
-				newSpecificPreferences = new SpecificPreferences(selectedDeviceId, useSkins, enableLiveReload,
-						oldSpecificPreferences.getOrientationAngle(), oldSpecificPreferences.getLocation());
+				newSpecificPreferences = create(selectedDeviceId, useSkins, enableLiveReload);
 				shell.close();
 			}
 		});
@@ -451,5 +452,19 @@ public class ManageDevicesDialog extends Dialog {
 		askBeforeTruncateRadio.setSelection(TruncateWindow.PROMPT.equals(truncateWindow));
 		alwaysTruncateRadio.setSelection(TruncateWindow.ALWAYS_TRUNCATE.equals(truncateWindow));
 		neverTruncateRadio.setSelection(TruncateWindow.NEVER_TRUNCATE.equals(truncateWindow));
+	}
+	
+	/**
+	 * {@link SpecificPreferencesStorage} factory method.
+	 * 
+	 * Override this method if you need a custom {@link SpecificPreferencesStorage}
+	 */
+	protected SpecificPreferencesStorage getSpecificPreferencesStorage() {
+		return BrowserSimSpecificPreferencesStorage.INSTANCE;
+	}
+	
+	protected SpecificPreferences create(String selectedDeviceId, boolean useSkins, boolean enableLiveReload) {
+		return new BrowserSimSpecificPreferences(selectedDeviceId, useSkins, enableLiveReload,
+				oldSpecificPreferences.getOrientationAngle(), oldSpecificPreferences.getLocation());
 	}
 }

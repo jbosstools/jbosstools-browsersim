@@ -14,8 +14,6 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
-import org.jboss.tools.vpe.browsersim.ui.BrowserSim;
-
 /**
  * @author Yahor Radtsevich (yradtsevich)
  */

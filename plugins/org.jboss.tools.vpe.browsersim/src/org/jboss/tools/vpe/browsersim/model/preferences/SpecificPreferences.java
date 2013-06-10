@@ -12,8 +12,6 @@ package org.jboss.tools.vpe.browsersim.model.preferences;
 
 import java.util.Observable;
 
-import javax.swing.text.StyledEditorKit.BoldAction;
-
 import org.eclipse.swt.graphics.Point;
 
 /**
@@ -22,7 +20,7 @@ import org.eclipse.swt.graphics.Point;
  *
  */
 
-public class SpecificPreferences extends Observable {
+public abstract class SpecificPreferences extends Observable {
 	public static final int ORIENTATION_PORTRAIT = 0;
 	public static final int ORIENTATION_LANDSCAPE = 90;
 	public static final int ORIENTATION_PORTRAIT_INVERTED = 180;

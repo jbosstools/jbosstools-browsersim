@@ -47,6 +47,7 @@ import org.jboss.tools.vpe.browsersim.browser.BrowserSimBrowser;
 import org.jboss.tools.vpe.browsersim.browser.PlatformUtil;
 import org.jboss.tools.vpe.browsersim.browser.WebKitBrowserFactory;
 import org.jboss.tools.vpe.browsersim.model.Device;
+import org.jboss.tools.vpe.browsersim.model.preferences.BrowserSimSpecificPreferencesStorage;
 import org.jboss.tools.vpe.browsersim.model.preferences.CommonPreferences;
 import org.jboss.tools.vpe.browsersim.model.preferences.CommonPreferencesStorage;
 import org.jboss.tools.vpe.browsersim.model.preferences.SpecificPreferences;
@@ -91,6 +92,10 @@ public class BrowserSim {
 	
 	static {
 		instances = new ArrayList<BrowserSim>();
+		commonPreferences = (CommonPreferences) CommonPreferencesStorage.INSTANCE.load();
+		if (commonPreferences == null) {
+			commonPreferences = (CommonPreferences) CommonPreferencesStorage.INSTANCE.loadDefault();
+		}
 	}
 
 	public BrowserSim(String homeUrl) {
@@ -103,14 +108,9 @@ public class BrowserSim {
 	}
 	
 	public void open() {
-		commonPreferences = (CommonPreferences) CommonPreferencesStorage.INSTANCE.load();
-		if (commonPreferences == null) {
-			commonPreferences = (CommonPreferences) CommonPreferencesStorage.INSTANCE.loadDefault();
-		}
-		
-		SpecificPreferences sp = (SpecificPreferences) SpecificPreferencesStorage.INSTANCE.load();
+		SpecificPreferences sp = (SpecificPreferences) getSpecificPreferencesStorage().load();
 		if (sp == null) {
-			sp = (SpecificPreferences) SpecificPreferencesStorage.INSTANCE.loadDefault();
+			sp = (SpecificPreferences) getSpecificPreferencesStorage().loadDefault();
 		}
 		
 		open(sp, null, parentShell);
@@ -185,7 +185,7 @@ public class BrowserSim {
 			public void handleEvent(Event event) {
 				instances.remove(BrowserSim.this);
 				specificPreferences.setLocation(currentLocation);
-				SpecificPreferencesStorage.INSTANCE.save(specificPreferences);
+				getSpecificPreferencesStorage().save(specificPreferences);
 				if(instances.isEmpty()) {
 					CommonPreferencesStorage.INSTANCE.save(commonPreferences);
 				}
@@ -601,5 +601,16 @@ public class BrowserSim {
 	 */
 	protected BrowserSimMenuCreator createMenuCreator(BrowserSimSkin skin, CommonPreferences commonPreferences, SpecificPreferences specificPreferences, ControlHandler controlHandler, String homeUrl) {
 		return new BrowserSimMenuCreator(skin, commonPreferences, specificPreferences, controlHandler, homeUrl);
+	}
+	/**
+	 * {@link SpecificPreferencesStorage} factory method.
+	 * 
+	 * Override this method if you need a custom {@link SpecificPreferencesStorage}
+	 */
+	protected SpecificPreferencesStorage getSpecificPreferencesStorage() {
+		return BrowserSimSpecificPreferencesStorage.INSTANCE;
+	}
+	public SpecificPreferences getSpecificPreferences() {
+		return specificPreferences;
 	}
 }

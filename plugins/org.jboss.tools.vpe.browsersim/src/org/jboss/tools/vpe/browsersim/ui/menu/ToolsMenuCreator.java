@@ -24,6 +24,7 @@ import org.eclipse.swt.widgets.Menu;
 import org.eclipse.swt.widgets.MenuItem;
 import org.eclipse.swt.widgets.Shell;
 import org.jboss.tools.vpe.browsersim.model.Device;
+import org.jboss.tools.vpe.browsersim.model.preferences.BrowserSimSpecificPreferences;
 import org.jboss.tools.vpe.browsersim.model.preferences.SpecificPreferences;
 import org.jboss.tools.vpe.browsersim.ui.BrowserSim;
 import org.jboss.tools.vpe.browsersim.ui.Messages;
@@ -116,8 +117,8 @@ public class ToolsMenuCreator {
 					MenuItem menuItem = (MenuItem) e.widget;
 					if (menuItem.getSelection()) {
 						Device selected = devices.get(menuItem.getData());
-						SpecificPreferences sp = new SpecificPreferences(selected.getId(), useSkins, enableLiveReload,
-								orientationAngle, null);
+						SpecificPreferences sp = new BrowserSimSpecificPreferences(selected.getId(), useSkins,
+								enableLiveReload, orientationAngle, null);
 
 						BrowserSim browserSim1 = new BrowserSim(homeUrl);
 						browserSim1.open(sp, skin.getBrowser().getUrl(), null);

@@ -10,7 +10,10 @@
  ******************************************************************************/
 package org.jboss.tools.vpe.browsersim.util;
 
+import java.io.File;
 import java.io.InputStream;
+
+import org.jboss.tools.vpe.browsersim.ui.BrowserSim;
 
 /**
  * @author Yahor Radtsevich (yradtsevich)
@@ -25,5 +28,13 @@ public class BrowserSimResourcesUtil {
 	
 	public static String getResourceAsString(String name) {
 		return ResourcesUtil.getResourceAsString(RESOURCES_ROOT_FOLDER, name);
+	}
+	
+	public static File getResourceAsFile(String name) {
+		if (name.startsWith("/")) { //$NON-NLS-1$
+			return new File(BrowserSim.class.getResource(name).getPath());
+		} else {
+			return new File(BrowserSim.class.getResource(RESOURCES_ROOT_FOLDER + name).getPath());
+		}
 	}
 }
