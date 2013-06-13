@@ -16,13 +16,20 @@ import java.util.UUID;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.SWTError;
 import org.eclipse.swt.browser.Browser;
+import org.eclipse.swt.browser.ProgressEvent;
+import org.eclipse.swt.browser.ProgressListener;
 import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.layout.FillLayout;
+import org.eclipse.swt.layout.GridData;
+import org.eclipse.swt.layout.GridLayout;
+import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Menu;
 import org.eclipse.swt.widgets.MenuItem;
+import org.eclipse.swt.widgets.ProgressBar;
 import org.eclipse.swt.widgets.Shell;
+import org.eclipse.swt.widgets.Text;
 import org.jboss.tools.vpe.browsersim.model.Device;
 import org.jboss.tools.vpe.browsersim.model.preferences.BrowserSimSpecificPreferences;
 import org.jboss.tools.vpe.browsersim.model.preferences.CommonPreferences;
@@ -77,16 +84,62 @@ public class ToolsMenuCreator {
 
 				Display display = skin.getBrowser().getDisplay();
 				Shell shell = new Shell(display);
-				shell.setLayout(new FillLayout());
+				shell.setLayout(new FillLayout(SWT.VERTICAL | SWT.HORIZONTAL));
 				shell.setText("Weinre Inspector");
+				
+				Composite browserComposite = new Composite(shell, SWT.NONE);
+				GridLayout gridLayout = new GridLayout();
+				gridLayout.numColumns = 1;
+				browserComposite.setLayout(gridLayout);
+				
+				Text locationText = new Text(browserComposite, SWT.BORDER | SWT.READ_ONLY);
+				GridData data = new GridData();
+				data.horizontalAlignment = GridData.FILL;
+				data.grabExcessHorizontalSpace = true;
+				data.widthHint = 0;
+				locationText.setLayoutData(data);
+				locationText.setText(url);
+				//locationText.setEditable(false);
+				
 				final Browser browser;
 				try {
-					browser = new Browser(shell, SWT.WEBKIT);
+					browser = new Browser(browserComposite, SWT.WEBKIT);
+					GridData browserData = new GridData();
+					browserData.horizontalAlignment = GridData.FILL;
+					browserData.verticalAlignment = GridData.FILL;
+					browserData.horizontalSpan = 1;
+					browserData.grabExcessHorizontalSpace = true;
+					browserData.grabExcessVerticalSpace = true;
+					browser.setLayoutData(browserData);
 				} catch (SWTError e2) {
 					System.out.println("Could not instantiate Browser: " + e2.getMessage());
 					display.dispose();
 					return;
 				}
+				final ProgressBar progressBar = new ProgressBar(browserComposite, SWT.NONE);
+				data = new GridData();
+				data.horizontalAlignment = GridData.END;
+				progressBar.setLayoutData(data);
+
+				browser.addProgressListener(new ProgressListener() {
+					public void changed(ProgressEvent event) {
+						int ratio;
+						if (event.current == event.total || event.total == 0) {
+							progressBar.setSelection(0);
+							progressBar.setEnabled(false);
+						} else {
+							ratio = event.current * 100 / event.total;
+							progressBar.setEnabled(true);
+							progressBar.setSelection(ratio);
+						}
+					}
+
+					public void completed(ProgressEvent event) {
+						progressBar.setSelection(0);
+						progressBar.setEnabled(false);
+					}
+				});
+				
 				shell.open();
 				browser.setUrl(url);
 			}
