@@ -95,12 +95,25 @@
 			<actionSet id="org.jboss.tools.vpe.browsersim.eclipse.actionSet"/> 
 		</perspectiveExtension> 
 	</extension>
- <extension
-       point="org.jboss.tools.jst.text.ext.openWithEditorExtension">
-    <editor-launcher
-          class="org.jboss.tools.vpe.browsersim.eclipse.launcher.OpenWithBrowserSimLauncher"
-          editor-name="BrowserSim"
-          id="org.jboss.tools.vpe.browsersim.eclipse.OpenWithBrowserSim">
-    </editor-launcher>
- </extension>
+	<extension point="org.jboss.tools.jst.text.ext.openWithEditorExtension">
+	    <editor-launcher
+	    	class="org.jboss.tools.vpe.browsersim.eclipse.launcher.OpenWithBrowserSimLauncher"
+	        editor-name="BrowserSim"
+	        id="org.jboss.tools.vpe.browsersim.eclipse.OpenWithBrowserSim">
+		</editor-launcher>
+	</extension>
+	<extension
+         point="org.eclipse.ui.preferencePages">
+      <page
+            class="org.jboss.tools.vpe.browsersim.eclipse.preferences.BrowserSimPreferencesPage"
+            id="org.jboss.tools.vpe.browsersim.eclipse.preferences.BrowserSimPreferences"
+            name="BrowserSim">
+      </page>
+   </extension>
+   <extension
+      point="org.eclipse.core.runtime.preferences">
+	   <initializer
+	         class="org.jboss.tools.vpe.browsersim.eclipse.preferences.BrowserSimPreferencesInitializer">
+	   </initializer>
+	</extension>
 </plugin>

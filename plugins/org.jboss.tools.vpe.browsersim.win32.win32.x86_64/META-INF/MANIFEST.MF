@@ -1,0 +1,9 @@
+Manifest-Version: 1.0
+Eclipse-PlatformFilter: (& (osgi.ws=win32) (osgi.os=win32) (osgi.arch=x86_64))
+Bundle-ManifestVersion: 2
+Bundle-Name: Eclipse win64 integrations of BrowserSim
+Bundle-SymbolicName: org.jboss.tools.vpe.browsersim.win32.win32.x86_64;singleton:=true
+Bundle-Version: 3.5.0.qualifier
+Fragment-Host: org.jboss.tools.vpe.browsersim;bundle-version="3.5.0"
+Bundle-RequiredExecutionEnvironment: JavaSE-1.6
+Eclipse-BundleShape: dir

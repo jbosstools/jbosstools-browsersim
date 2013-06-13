@@ -22,7 +22,6 @@ import org.eclipse.ui.PartInitException;
 import org.eclipse.ui.PlatformUI;
 import org.eclipse.ui.ide.IDE;
 import org.jboss.tools.vpe.browsersim.eclipse.Activator;
-import org.jboss.tools.vpe.browsersim.eclipse.launcher.BrowserSimLauncher;
 import org.jboss.tools.vpe.browsersim.eclipse.launcher.ExternalProcessCallback;
 import org.jboss.tools.vpe.browsersim.eclipse.launcher.TransparentReader;
 
