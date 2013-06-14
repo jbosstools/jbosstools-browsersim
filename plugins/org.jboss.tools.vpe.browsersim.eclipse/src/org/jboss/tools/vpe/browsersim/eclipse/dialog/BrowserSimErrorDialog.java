@@ -21,10 +21,13 @@ import org.eclipse.ui.dialogs.PreferencesUtil;
 public class BrowserSimErrorDialog extends MessageDialog {
 	private static final String BROWSERSIM_PREFERENCE_PAGE_ID = "org.jboss.tools.vpe.browsersim.eclipse.preferences.BrowserSimPreferences";
 	
+	private String programName;
+	
 	public BrowserSimErrorDialog(Shell parentShell, String dialogTitle,	Image dialogTitleImage,
-			String dialogMessage, int dialogImageType, String[] dialogButtonLabels, int defaultIndex) {
-		super(parentShell, dialogTitle, dialogTitleImage, dialogMessage,
+			String programName, int dialogImageType, String[] dialogButtonLabels, int defaultIndex) {
+		super(parentShell, dialogTitle, dialogTitleImage, MessageFormat.format("{0} is failed to start", programName),
 				dialogImageType, dialogButtonLabels, defaultIndex);
+		this.programName = programName;
 	}
 
 	@Override
@@ -35,9 +38,9 @@ public class BrowserSimErrorDialog extends MessageDialog {
         data.horizontalSpan = 2;
         link.setData(data);
 		
-        String message = "BrowserSim requires a 32-bit JVM to run on Windows.\nPlease go to the <a href=\"#\">{0} preferences</a> and select an appropriate JVM.";
+        String message = "{0} requires a 32-bit JVM to run on Windows.\nPlease go to the <a href=\"#\">{1} preferences</a> and select an appropriate JVM.";
 		IPreferenceNode jreNode = getPreferenceNode(BROWSERSIM_PREFERENCE_PAGE_ID);
-		String result = MessageFormat.format(message, jreNode.getLabelText());
+		String result = MessageFormat.format(message, programName, jreNode.getLabelText());
 	    link.setText(result);
 	    link.addSelectionListener(new SelectionAdapter(){
 	        @Override

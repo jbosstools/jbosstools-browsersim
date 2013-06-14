@@ -14,12 +14,10 @@ import java.io.File;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.Reader;
-import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
 
 import org.eclipse.core.runtime.FileLocator;
-import org.eclipse.core.runtime.Path;
 import org.eclipse.core.runtime.Platform;
 import org.eclipse.core.runtime.preferences.ConfigurationScope;
 import org.eclipse.jdt.launching.IVMInstall;
@@ -44,7 +42,7 @@ public class ExternalProcessLauncher {
 	private static String PATH_SEPARATOR = System.getProperty("path.separator"); //$NON-NLS-1$
 	
 	public static void launchAsExternalProcess(List<String> bundles, List<String> resourcesBundles,
-			final List<ExternalProcessCallback> callbacks, String className, List<String> parameters) {
+			final List<ExternalProcessCallback> callbacks, String className, List<String> parameters, final String programName) {
 		try {			
 			String classPath = getClassPathString(bundles, resourcesBundles);
 			IPreferenceStore store = Activator.getDefault().getPreferenceStore();
@@ -139,10 +137,17 @@ public class ExternalProcessLauncher {
 					};
 				}.start();
 			} else {
-				Shell shell = Display.getDefault().getActiveShell();
-				BrowserSimErrorDialog e = new BrowserSimErrorDialog(shell, "Error", shell.getDisplay().getSystemImage(SWT.ICON_ERROR),
-						"BrowserSim is failed to start", MessageDialog.ERROR, new String[] {"OK"}, 0); 
-				e.open();
+				Display.getDefault().asyncExec(new Runnable() {
+					
+					@Override
+					public void run() {
+						Shell shell = Display.getDefault().getActiveShell();
+						BrowserSimErrorDialog e = new BrowserSimErrorDialog(shell, "Error", shell.getDisplay().getSystemImage(SWT.ICON_ERROR),
+								programName, MessageDialog.ERROR, new String[] {"OK"}, 0); 
+						e.open();
+					}
+				});
+				
 			}
 		} catch (IOException e) {
 			Activator.logError(e.getMessage(), e);

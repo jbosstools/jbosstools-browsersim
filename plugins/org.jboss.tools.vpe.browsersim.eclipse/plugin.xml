@@ -107,7 +107,7 @@
       <page
             class="org.jboss.tools.vpe.browsersim.eclipse.preferences.BrowserSimPreferencesPage"
             id="org.jboss.tools.vpe.browsersim.eclipse.preferences.BrowserSimPreferences"
-            name="BrowserSim">
+            name="BrowserSim/CordovaSim">
       </page>
    </extension>
    <extension

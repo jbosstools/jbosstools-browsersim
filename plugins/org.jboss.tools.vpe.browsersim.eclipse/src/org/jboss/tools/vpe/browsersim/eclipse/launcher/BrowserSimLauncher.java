@@ -45,7 +45,7 @@ public class BrowserSimLauncher {
 		}
 		
 		ExternalProcessLauncher.launchAsExternalProcess(BUNDLES, RESOURCES_BUNDLES,
-				BROWSERSIM_CALLBACKS, BROWSERSIM_CLASS_NAME, parameters);
+				BROWSERSIM_CALLBACKS, BROWSERSIM_CLASS_NAME, parameters, "BrowserSim");
 	}
 	
 	private static List<String> getBundles() {
