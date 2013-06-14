@@ -11,6 +11,9 @@
 package org.jboss.tools.vpe.browsersim.model.preferences;
 
 import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+import java.io.InputStream;
 
 import org.jboss.tools.vpe.browsersim.util.PreferencesUtil;
 
@@ -45,7 +48,11 @@ public abstract class SpecificPreferencesStorage implements PreferencesStorage{
 		File customConfigFile = new File(folder + PreferencesUtil.SEPARATOR + getFileName());
 		SpecificPreferences specificPreferences = null;
 		if (customConfigFile.exists()) {
-			specificPreferences = load(customConfigFile);
+			try {
+				specificPreferences = load(new FileInputStream(customConfigFile));
+			} catch (FileNotFoundException e) {
+				e.printStackTrace();
+			}
 		}
 		
 		return specificPreferences;
@@ -54,10 +61,10 @@ public abstract class SpecificPreferencesStorage implements PreferencesStorage{
 	@Override
 	public SpecificPreferences loadDefault() {
 		SpecificPreferences specificPreferences = null;
-		specificPreferences = load(getDefaultFile());
+		specificPreferences = load(getDefaultPreferencesFileAsStream());
 		
 		if (specificPreferences == null) {
-			specificPreferences = loadDefault();
+			specificPreferences = createBlankPreferences();
 		}
 
 		return specificPreferences;
@@ -65,13 +72,13 @@ public abstract class SpecificPreferencesStorage implements PreferencesStorage{
 	
 	protected abstract SpecificPreferencesStorage getInstance();
 	
-	protected abstract SpecificPreferences load(File path);
+	protected abstract SpecificPreferences load(InputStream is);
 	
-	protected abstract SpecificPreferences getDefault();
+	protected abstract SpecificPreferences createBlankPreferences();
 
 	protected abstract void save(SpecificPreferences sp, File file);
 	
 	protected abstract String getFileName();
 	
-	protected abstract File getDefaultFile();
+	protected abstract InputStream getDefaultPreferencesFileAsStream();
 }

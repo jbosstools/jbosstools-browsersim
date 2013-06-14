@@ -45,8 +45,12 @@ public abstract class SpecificPreferences extends Observable {
 		return selectedDeviceId;
 	}
 
+	/**Sets selected Device ID
+	 * 
+	 * @param selectedDeviceId must not be <code>null</code>
+	 */
 	public void setSelectedDeviceId(String selectedDeviceId) {
-		if (!this.selectedDeviceId.equals(selectedDeviceId)) {
+		if (selectedDeviceId != null && !selectedDeviceId.equals(this.selectedDeviceId)) {
 			this.selectedDeviceId = selectedDeviceId;
 			setChanged();
 		}

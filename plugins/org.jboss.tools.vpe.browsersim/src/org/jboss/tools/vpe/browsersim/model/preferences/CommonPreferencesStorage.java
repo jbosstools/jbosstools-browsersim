@@ -196,19 +196,24 @@ public class CommonPreferencesStorage implements PreferencesStorage{
 						}
 					}
 				}
-				
+				return new CommonPreferences(devices, truncateWindow, screenshotsFolder, weinreScriptUrl, weinreClientUrl);
 			}
 		} catch (ParserConfigurationException pce) {
 			pce.printStackTrace();
 		} catch (SAXException e1) {
 			e1.printStackTrace();
+		} catch (Throwable t) {
+			t.printStackTrace();
+		} finally {
+			try {
+				if (is != null)
+					is.close();
+			} catch (IOException ex) {
+				ex.printStackTrace();
+			}
 		}
 		
-		if (devices == null) {
-			return null;
-		} else { 
-			return new CommonPreferences(devices, truncateWindow, screenshotsFolder, weinreScriptUrl, weinreClientUrl);
-		}
+		return null;
 	}
 
 	private void saveCommonPreferences(CommonPreferences cp, File file) throws IOException {
