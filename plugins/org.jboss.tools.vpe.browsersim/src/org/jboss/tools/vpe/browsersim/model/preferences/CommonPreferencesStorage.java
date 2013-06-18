@@ -21,6 +21,7 @@ import java.util.UUID;
 
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
+import javax.xml.parsers.FactoryConfigurationError;
 import javax.xml.parsers.ParserConfigurationException;
 import javax.xml.transform.TransformerException;
 import javax.xml.transform.TransformerFactory;
@@ -102,13 +103,7 @@ public class CommonPreferencesStorage implements PreferencesStorage{
 
 	@Override
 	public CommonPreferences loadDefault(){
-		CommonPreferences commonPreferences = null;
-		try {
-			commonPreferences = load(BrowserSimResourcesUtil.getResourceAsStream(DEFAULT_COMMON_PREFERENCES_RESOURCE));
-		} catch (IOException e) {
-			e.printStackTrace();
-		}
-
+		CommonPreferences commonPreferences = load(BrowserSimResourcesUtil.getResourceAsStream(DEFAULT_COMMON_PREFERENCES_RESOURCE));
 		if (commonPreferences == null) {
 			Device device = new Device(UUID.randomUUID().toString(), "Default", 1024, 768, 1.0, null, null);
 			Map<String, Device> devices = new LinkedHashMap<String, Device>();
@@ -121,7 +116,7 @@ public class CommonPreferencesStorage implements PreferencesStorage{
 		return commonPreferences;
 	}
 	
-	private CommonPreferences load(InputStream is) throws IOException{
+	private CommonPreferences load(InputStream is){
 		Map<String, Device> devices = null;
 		TruncateWindow truncateWindow = TruncateWindow.PROMPT;
 		String screenshotsFolder = getDefaultScreenshotsFolderPath();
@@ -198,12 +193,17 @@ public class CommonPreferencesStorage implements PreferencesStorage{
 				}
 				return new CommonPreferences(devices, truncateWindow, screenshotsFolder, weinreScriptUrl, weinreClientUrl);
 			}
-		} catch (ParserConfigurationException pce) {
-			pce.printStackTrace();
-		} catch (SAXException e1) {
-			e1.printStackTrace();
-		} catch (Throwable t) {
-			t.printStackTrace();
+		} catch (ParserConfigurationException e) {
+			e.printStackTrace();
+		} catch (SAXException e) {
+			e.printStackTrace();
+		} catch (FactoryConfigurationError e) {
+			e.printStackTrace();
+		} catch (IOException e) {
+			e.printStackTrace();
+		} catch (RuntimeException e) {
+			//catched to avoid exceptions like NPE, NFE, etc
+			e.printStackTrace();
 		} finally {
 			try {
 				if (is != null)
