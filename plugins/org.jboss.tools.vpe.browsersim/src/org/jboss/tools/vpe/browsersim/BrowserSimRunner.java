@@ -12,17 +12,24 @@ package org.jboss.tools.vpe.browsersim;
 
 import java.net.URI;
 import java.net.URISyntaxException;
+
+import org.eclipse.swt.SWT;
+import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.widgets.Display;
+import org.eclipse.swt.widgets.Shell;
 import org.jboss.tools.vpe.browsersim.browser.PlatformUtil;
 import org.jboss.tools.vpe.browsersim.ui.BrowserSim;
 import org.jboss.tools.vpe.browsersim.ui.CocoaUIEnhancer;
 import org.jboss.tools.vpe.browsersim.ui.Messages;
+import org.jboss.tools.vpe.browsersim.util.BrowserSimImageList;
 
 /**
  * @author Konstantin Marmalyukov (kmarmaliykov)
  */
 
 public class BrowserSimRunner {
+	private static final String[] BROWSERSIM_ICONS = {"icons/browsersim_16px.png", "icons/browsersim_32px.png", "icons/browsersim_64px.png", "icons/browsersim_128px.png", "icons/browsersim_256px.png", }; //$NON-NLS-1$//$NON-NLS-2$//$NON-NLS-3$//$NON-NLS-4$//$NON-NLS-5$
+	
 	public static final String NOT_STANDALONE = "-not-standalone"; //$NON-NLS-1$
 	public static final String ABOUT_BLANK = "about:blank"; //"http://www.w3schools.com/js/tryit_view.asp?filename=try_nav_useragent"; //$NON-NLS-1$
 	
@@ -44,16 +51,39 @@ public class BrowserSimRunner {
 		} else {
 			url = ABOUT_BLANK;
 		}
-		
-		BrowserSim browserSim = new BrowserSim(url);
+
+		Shell parent = null;
+		if (!PlatformUtil.OS_MACOSX.equals(PlatformUtil.getOs())) {
+			parent = new Shell(Display.getDefault(), SWT.NO_TRIM);
+			parent.setSize(0, 0);
+			setShellAttributes(parent);
+			parent.open();
+		}
+		BrowserSim browserSim = new BrowserSim(url, parent);
 		browserSim.open();
 
 		Display display = Display.getDefault();
-		while (!display.isDisposed() && display.getShells().length > 0) {
+		while (!display.isDisposed() && BrowserSim.getInstances().size() > 0) {
 			if (!display.readAndDispatch()) {
 				display.sleep();
 			}
 		}
 		display.dispose();
+	}
+	
+	private static Image[] initImages(Shell shell) {
+		BrowserSimImageList imageList = new BrowserSimImageList(shell);
+		Image[] icons = new Image[BROWSERSIM_ICONS.length];
+		for (int i = 0; i < BROWSERSIM_ICONS.length; i++) {
+			icons[i] = imageList.getImage(BROWSERSIM_ICONS[i]);
+		}
+		
+		return icons;
+	}
+
+	public static void setShellAttributes(Shell shell) {
+		Image[] icons = initImages(shell);
+		shell.setImages(icons);
+		shell.setText(Messages.BrowserSim_BROWSER_SIM);
 	}
 }

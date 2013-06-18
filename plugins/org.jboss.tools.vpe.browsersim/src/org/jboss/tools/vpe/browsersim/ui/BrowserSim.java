@@ -35,7 +35,6 @@ import org.eclipse.swt.events.ControlAdapter;
 import org.eclipse.swt.events.ControlEvent;
 import org.eclipse.swt.events.ShellEvent;
 import org.eclipse.swt.events.ShellListener;
-import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.graphics.Point;
 import org.eclipse.swt.graphics.Rectangle;
 import org.eclipse.swt.widgets.Display;
@@ -43,6 +42,7 @@ import org.eclipse.swt.widgets.Event;
 import org.eclipse.swt.widgets.Listener;
 import org.eclipse.swt.widgets.Menu;
 import org.eclipse.swt.widgets.Shell;
+import org.jboss.tools.vpe.browsersim.BrowserSimRunner;
 import org.jboss.tools.vpe.browsersim.browser.BrowserSimBrowser;
 import org.jboss.tools.vpe.browsersim.browser.PlatformUtil;
 import org.jboss.tools.vpe.browsersim.browser.WebKitBrowserFactory;
@@ -62,7 +62,6 @@ import org.jboss.tools.vpe.browsersim.ui.skin.BrowserSimSkin;
 import org.jboss.tools.vpe.browsersim.ui.skin.ResizableSkinSizeAdvisor;
 import org.jboss.tools.vpe.browsersim.ui.skin.ResizableSkinSizeAdvisorImpl;
 import org.jboss.tools.vpe.browsersim.util.BrowserSimUtil;
-import org.jboss.tools.vpe.browsersim.util.BrowserSimImageList;
 
 /**
  * @author Yahor Radtsevich (yradtsevich)
@@ -70,7 +69,6 @@ import org.jboss.tools.vpe.browsersim.util.BrowserSimImageList;
  */
 public class BrowserSim {
 	public static final String BROWSERSIM_PLUGIN_ID = "org.jboss.tools.vpe.browsersim"; //$NON-NLS-1$
-	private static final String[] BROWSERSIM_ICONS = {"icons/browsersim_16px.png", "icons/browsersim_32px.png", "icons/browsersim_64px.png", "icons/browsersim_128px.png", "icons/browsersim_256px.png", }; //$NON-NLS-1$//$NON-NLS-2$//$NON-NLS-3$//$NON-NLS-4$//$NON-NLS-5$
 
 	private static List<BrowserSim> instances;
 	private Shell parentShell; // is needed for CordovaSim in order to have one icon in the taskbar JBIDE-14578 
@@ -80,8 +78,6 @@ public class BrowserSim {
 	private ResizableSkinSizeAdvisor resizableSkinSizeAdvisor;
 	private BrowserSimSkin skin;
 	private ControlHandler controlHandler;
-	private BrowserSimImageList imageList;
-	private Image[] icons;
 	private Point currentLocation;
 	private ProgressListener progressListener;
 	private Observer commonPreferencesObserver;
@@ -103,9 +99,9 @@ public class BrowserSim {
 		this.homeUrl = homeUrl;
 	}
 	
-	public BrowserSim(String homeUrl, Shell parentShell) {
+	public BrowserSim(String homeUrl, Shell parent) {
 		this.homeUrl = homeUrl;
-		this.parentShell = parentShell;
+		parentShell = parent;
 	}
 	
 	public void open() {
@@ -146,7 +142,7 @@ public class BrowserSim {
 		skin.getShell().open();
 	}
 	
-	private void initSkin(Class<? extends BrowserSimSkin> skinClass, Point location, Shell parentShell) {
+	private void initSkin(Class<? extends BrowserSimSkin> skinClass, Point location, final Shell parentShell) {
 		try {
 			skin = skinClass.newInstance();//new AppleIPhone3Skin();//new NativeSkin();
 		} catch (InstantiationException e1) {
@@ -231,7 +227,10 @@ public class BrowserSim {
 			}
 		});
 		menuCreator.addMenuBar();
-		setShellAttibutes();
+		
+		if (PlatformUtil.OS_MACOSX.equals(PlatformUtil.getOs())) {
+			BrowserSimRunner.setShellAttributes(shell);
+		}
 		
 		skin.setControlHandler(controlHandler);
 		
@@ -339,7 +338,7 @@ public class BrowserSim {
 		browser.addOpenWindowListener(new OpenWindowListener() {
 			public void open(WindowEvent event) {
 				if (FireBugLiteLoader.isFireBugPopUp(event)) {
-					FireBugLiteLoader.processFireBugPopUp(event);
+					FireBugLiteLoader.processFireBugPopUp(event, skin);
 				} else {
 					event.browser = browser;
 				}
@@ -411,23 +410,6 @@ public class BrowserSim {
 		});
 	}
 	
-	private void initImages() {
-		imageList = new BrowserSimImageList(skin.getShell());
-		this.icons = new Image[BROWSERSIM_ICONS.length];
-		for (int i = 0; i < BROWSERSIM_ICONS.length; i++) {
-			icons[i] = imageList.getImage(BROWSERSIM_ICONS[i]);
-		}
-	}
-	
-	private void setShellAttibutes() {
-		Shell shell = skin.getShell();
-		if (shell != null) {
-			initImages();
-			shell.setImages(icons);
-			shell.setText(Messages.BrowserSim_BROWSER_SIM);
-		}
-	}
-
 	private void initObservers() {
 		commonPreferencesObserver = new Observer() {
 			@Override

@@ -20,6 +20,7 @@ import org.eclipse.swt.graphics.Resource;
 import org.eclipse.swt.widgets.Monitor;
 import org.eclipse.swt.widgets.Shell;
 import org.eclipse.swt.widgets.Widget;
+import org.jboss.tools.vpe.browsersim.browser.PlatformUtil;
 import org.jboss.tools.vpe.browsersim.model.Device;
 import org.jboss.tools.vpe.browsersim.model.SkinMap;
 import org.jboss.tools.vpe.browsersim.ui.MessageBoxWithLinks;
@@ -111,5 +112,9 @@ public class BrowserSimUtil {
 				disposable.dispose();
 			}
 		});
+	}
+	
+	public static Shell getParentShell(BrowserSimSkin skin) {
+		return PlatformUtil.OS_MACOSX.equals(PlatformUtil.getOs()) ? null : skin.getShell().getParent().getShell();
 	}
 }

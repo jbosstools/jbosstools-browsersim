@@ -29,8 +29,8 @@ public class BrowserSimSourceViewer {
 	private Text text;
 	private Shell shell;
 
-	public BrowserSimSourceViewer() {
-		shell = new Shell(SWT.SHELL_TRIM);
+	public BrowserSimSourceViewer(Shell parent) {
+		shell = new Shell(parent, SWT.SHELL_TRIM);
 	    shell.setLayout(new FillLayout());
 	    			    
 	    text = new Text(shell, SWT.MULTI | SWT.WRAP | SWT.V_SCROLL
@@ -79,5 +79,9 @@ public class BrowserSimSourceViewer {
 	
 	public void open() {
 	    shell.open();
+	}
+
+	public Shell getShell() {
+		return shell;
 	}
 }

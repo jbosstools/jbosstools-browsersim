@@ -18,6 +18,8 @@ import org.eclipse.swt.SWTError;
 import org.eclipse.swt.browser.Browser;
 import org.eclipse.swt.browser.ProgressEvent;
 import org.eclipse.swt.browser.ProgressListener;
+import org.eclipse.swt.events.DisposeEvent;
+import org.eclipse.swt.events.DisposeListener;
 import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.layout.FillLayout;
@@ -30,6 +32,7 @@ import org.eclipse.swt.widgets.MenuItem;
 import org.eclipse.swt.widgets.ProgressBar;
 import org.eclipse.swt.widgets.Shell;
 import org.eclipse.swt.widgets.Text;
+import org.jboss.tools.vpe.browsersim.browser.PlatformUtil;
 import org.jboss.tools.vpe.browsersim.model.Device;
 import org.jboss.tools.vpe.browsersim.model.preferences.BrowserSimSpecificPreferences;
 import org.jboss.tools.vpe.browsersim.model.preferences.CommonPreferences;
@@ -38,6 +41,7 @@ import org.jboss.tools.vpe.browsersim.ui.BrowserSim;
 import org.jboss.tools.vpe.browsersim.ui.Messages;
 import org.jboss.tools.vpe.browsersim.ui.debug.firebug.FireBugLiteLoader;
 import org.jboss.tools.vpe.browsersim.ui.skin.BrowserSimSkin;
+import org.jboss.tools.vpe.browsersim.util.BrowserSimUtil;
 
 /**
  * @author Yahor Radtsevich (yradtsevich)
@@ -83,7 +87,7 @@ public class ToolsMenuCreator {
 				}
 
 				Display display = skin.getBrowser().getDisplay();
-				Shell shell = new Shell(display);
+				Shell shell = new Shell(BrowserSimUtil.getParentShell(skin), SWT.SHELL_TRIM);
 				shell.setLayout(new FillLayout(SWT.VERTICAL | SWT.HORIZONTAL));
 				shell.setText("Weinre Inspector");
 				
@@ -140,6 +144,15 @@ public class ToolsMenuCreator {
 					}
 				});
 				
+				skin.getShell().addDisposeListener(new DisposeListener() {
+					@Override
+					public void widgetDisposed(DisposeEvent arg0) {
+						if (!browser.isDisposed() && !browser.getShell().isDisposed()) {
+							browser.getShell().dispose();
+						}
+					}
+				});
+				
 				shell.open();
 				browser.setUrl(url);
 			}
@@ -175,7 +188,7 @@ public class ToolsMenuCreator {
 								enableLiveReload, orientationAngle, null);
 
 						BrowserSim browserSim1 = new BrowserSim(homeUrl);
-						browserSim1.open(sp, skin.getBrowser().getUrl(), null);
+						browserSim1.open(sp, skin.getBrowser().getUrl(), BrowserSimUtil.getParentShell(skin));
 					}
 				};
 			});

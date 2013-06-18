@@ -19,12 +19,15 @@ import java.net.URL;
 import javax.xml.bind.DatatypeConverter;
 
 import org.eclipse.swt.SWT;
+import org.eclipse.swt.events.DisposeEvent;
+import org.eclipse.swt.events.DisposeListener;
 import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.program.Program;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Menu;
 import org.eclipse.swt.widgets.MenuItem;
+import org.eclipse.swt.widgets.Shell;
 import org.jboss.tools.vpe.browsersim.BrowserSimArgs;
 import org.jboss.tools.vpe.browsersim.browser.PlatformUtil;
 import org.jboss.tools.vpe.browsersim.model.preferences.CommonPreferences;
@@ -35,6 +38,7 @@ import org.jboss.tools.vpe.browsersim.ui.ManageDevicesDialog;
 import org.jboss.tools.vpe.browsersim.ui.Messages;
 import org.jboss.tools.vpe.browsersim.ui.PreferencesWrapper;
 import org.jboss.tools.vpe.browsersim.ui.skin.BrowserSimSkin;
+import org.jboss.tools.vpe.browsersim.util.BrowserSimUtil;
 
 /**
  * @author Yahor Radtsevich (yradtsevich)
@@ -80,9 +84,19 @@ public class FileMenuCreator {
 		openInDefaultBrowser.addSelectionListener(new SelectionAdapter() {
 			public void widgetSelected(SelectionEvent e) {
 				if (BrowserSimArgs.standalone) {
-					BrowserSimSourceViewer sourceViewer = new BrowserSimSourceViewer();
+					final BrowserSimSourceViewer sourceViewer = new BrowserSimSourceViewer(BrowserSimUtil.getParentShell(skin));
 					sourceViewer.setText(skin.getBrowser().getText());
 					sourceViewer.open();
+					
+					skin.getShell().addDisposeListener(new DisposeListener() {
+						@Override
+						public void widgetDisposed(DisposeEvent arg0) {
+							Shell sourceShell = sourceViewer.getShell();
+							if (!sourceShell.isDisposed()) {
+								sourceShell.dispose();
+							}
+						}
+					});
 				} else {
 					if (skin.getBrowser().getUrl().startsWith("file:")) { //$NON-NLS-1$
 						URI uri = null;

@@ -15,11 +15,15 @@ import org.eclipse.swt.browser.Browser;
 import org.eclipse.swt.browser.CloseWindowListener;
 import org.eclipse.swt.browser.VisibilityWindowListener;
 import org.eclipse.swt.browser.WindowEvent;
+import org.eclipse.swt.events.DisposeEvent;
+import org.eclipse.swt.events.DisposeListener;
 import org.eclipse.swt.events.ShellAdapter;
 import org.eclipse.swt.events.ShellEvent;
 import org.eclipse.swt.layout.FillLayout;
 import org.eclipse.swt.widgets.Shell;
 import org.jboss.tools.vpe.browsersim.browser.PlatformUtil;
+import org.jboss.tools.vpe.browsersim.ui.skin.BrowserSimSkin;
+import org.jboss.tools.vpe.browsersim.util.BrowserSimUtil;
 
 /**
  * @author "Yahor Radtsevich (yradtsevich)"
@@ -70,13 +74,14 @@ public class FireBugLiteLoader {
 		return Boolean.TRUE.equals(parentBrowser.evaluate("return !!window._fireBugLiteLoading"));
 	}
 	
-	public static void processFireBugPopUp(WindowEvent openWindowEvent) {
+	public static void processFireBugPopUp(WindowEvent openWindowEvent, BrowserSimSkin skin) {
 		final Browser parentBrowser = (Browser) openWindowEvent.widget;
 		parentBrowser.execute("window._fireBugLiteLoading = false;");
-		Shell shell = new Shell(parentBrowser.getDisplay());
+		
+		Shell shell = new Shell(BrowserSimUtil.getParentShell(skin), SWT.SHELL_TRIM);
 		shell.setLayout(new FillLayout());
 		
-		Browser fireBugBrowser = new Browser(shell, SWT.WEBKIT);
+		final Browser fireBugBrowser = new Browser(shell, SWT.WEBKIT);
 		openWindowEvent.browser = fireBugBrowser;
 		
 		fireBugBrowser.addVisibilityWindowListener(new VisibilityWindowListener() {
@@ -98,6 +103,15 @@ public class FireBugLiteLoader {
 			}
 		});
 		
+		skin.getShell().addDisposeListener(new DisposeListener() {
+			@Override
+			public void widgetDisposed(DisposeEvent arg0) {
+				if (!fireBugBrowser.isDisposed() && !fireBugBrowser.getShell().isDisposed()) {
+					fireBugBrowser.getShell().dispose();
+				}
+			}
+		});
+		
 		// yradtsevich: fix for JBIDE-13625 Browsersim closes unexpectively when closing Firebug Lite
 		if (PlatformUtil.OS_MACOSX.equals(PlatformUtil.getOs())) {
 			shell.addShellListener(new ShellAdapter() {
@@ -108,14 +122,14 @@ public class FireBugLiteLoader {
 					}
 				}
 			});
+		} else {
+			fireBugBrowser.addCloseWindowListener(new CloseWindowListener() {
+				public void close(WindowEvent event) {
+					Browser browser = (Browser)event.widget;
+					Shell shell = browser.getShell();
+					shell.close();
+				}
+			});
 		}
-
-		fireBugBrowser.addCloseWindowListener(new CloseWindowListener() {
-			public void close(WindowEvent event) {
-				Browser browser = (Browser)event.widget;
-				Shell shell = browser.getShell();
-				shell.close();
-			}
-		});
 	}
 }
