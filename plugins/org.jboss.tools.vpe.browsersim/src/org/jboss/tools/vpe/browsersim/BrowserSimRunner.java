@@ -31,8 +31,7 @@ public class BrowserSimRunner {
 			CocoaUIEnhancer.initializeMacOSMenuBar(Messages.BrowserSim_BROWSER_SIM);
 		}
 		BrowserSimArgs browserSimArgs = BrowserSimArgs.parseArgs(args);
-		BrowserSim.isStandalone = browserSimArgs.isStandalone();
-		
+
 		String path = browserSimArgs.getPath();
 		String url;
 		if (path != null) {

@@ -20,11 +20,11 @@ import java.util.List;
 public class BrowserSimArgs {
 	public static final String NOT_STANDALONE = "-not-standalone"; //$NON-NLS-1$
 	private String path;
-	private boolean standalone;
+	public static boolean standalone;
 	
-	private BrowserSimArgs(String path, boolean standalone) {
+	private BrowserSimArgs(String path, boolean isStandalone) {
 		this.path = path;
-		this.standalone = standalone;
+		standalone = isStandalone;
 	}
 
 	public static BrowserSimArgs parseArgs(String[] args) {
@@ -46,8 +46,5 @@ public class BrowserSimArgs {
 	
 	public String getPath() {
 		return path;
-	}
-	public boolean isStandalone() {
-		return standalone;
 	}
 }

@@ -71,8 +71,7 @@ import org.jboss.tools.vpe.browsersim.util.BrowserSimImageList;
 public class BrowserSim {
 	public static final String BROWSERSIM_PLUGIN_ID = "org.jboss.tools.vpe.browsersim"; //$NON-NLS-1$
 	private static final String[] BROWSERSIM_ICONS = {"icons/browsersim_16px.png", "icons/browsersim_32px.png", "icons/browsersim_64px.png", "icons/browsersim_128px.png", "icons/browsersim_256px.png", }; //$NON-NLS-1$//$NON-NLS-2$//$NON-NLS-3$//$NON-NLS-4$//$NON-NLS-5$
-	
-	public static boolean isStandalone;
+
 	private static List<BrowserSim> instances;
 	private Shell parentShell; // is needed for CordovaSim in order to have one icon in the taskbar JBIDE-14578 
 	private String homeUrl;
@@ -92,6 +91,12 @@ public class BrowserSim {
 	
 	static {
 		instances = new ArrayList<BrowserSim>();
+		if (commonPreferences == null) {
+			commonPreferences = (CommonPreferences) CommonPreferencesStorage.INSTANCE.load();
+			if (commonPreferences == null) {
+				commonPreferences = (CommonPreferences) CommonPreferencesStorage.INSTANCE.loadDefault();
+			}
+		}
 	}
 
 	public BrowserSim(String homeUrl) {
@@ -113,13 +118,6 @@ public class BrowserSim {
 	}
 
 	public void open(SpecificPreferences sp, String url, Shell parentShell) {
-		if (commonPreferences == null) {
-			commonPreferences = (CommonPreferences) CommonPreferencesStorage.INSTANCE.load();
-			if (commonPreferences == null) {
-				commonPreferences = (CommonPreferences) CommonPreferencesStorage.INSTANCE.loadDefault();
-			}
-		}
-		
 		if (url == null) {
 			url = homeUrl;
 		}

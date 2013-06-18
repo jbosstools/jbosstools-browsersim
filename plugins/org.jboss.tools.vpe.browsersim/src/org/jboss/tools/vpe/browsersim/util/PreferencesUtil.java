@@ -10,7 +10,7 @@
  ******************************************************************************/
 package org.jboss.tools.vpe.browsersim.util;
 
-import org.jboss.tools.vpe.browsersim.ui.BrowserSim;
+import org.jboss.tools.vpe.browsersim.BrowserSimArgs;
 import org.w3c.dom.Node;
 
 /**
@@ -27,7 +27,7 @@ public class PreferencesUtil {
 	private static final String USER_PREFERENCES_FOLDER = "org.jboss.tools.vpe.browsersim";
 	
 	public static final String getConfigFolderPath() {
-		return BrowserSim.isStandalone	? USER_HOME + SEPARATOR + STANDALONE_PREFERENCES_FOLDER : USER_PREFERENCES_FOLDER;
+		return BrowserSimArgs.standalone ? USER_HOME + SEPARATOR + STANDALONE_PREFERENCES_FOLDER : USER_PREFERENCES_FOLDER;
 	}
 	
 	public static boolean isNullOrEmpty(String s) {
