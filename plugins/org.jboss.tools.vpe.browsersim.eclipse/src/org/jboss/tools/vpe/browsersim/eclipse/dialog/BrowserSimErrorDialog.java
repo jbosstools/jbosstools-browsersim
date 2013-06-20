@@ -3,6 +3,7 @@ package org.jboss.tools.vpe.browsersim.eclipse.dialog;
 import java.text.MessageFormat;
 import java.util.Iterator;
 
+import org.eclipse.core.runtime.Platform;
 import org.eclipse.jface.dialogs.MessageDialog;
 import org.eclipse.jface.preference.IPreferenceNode;
 import org.eclipse.jface.preference.PreferenceManager;
@@ -38,7 +39,13 @@ public class BrowserSimErrorDialog extends MessageDialog {
         data.horizontalSpan = 2;
         link.setData(data);
 		
-        String message = "{0} requires a 32-bit JVM to run on Windows.\nPlease go to the <a href=\"#\">{1} preferences</a> and select an appropriate JVM.";
+        String message;
+		if (Platform.OS_WIN32.equals(Platform.getOS())) {
+			message = "{0} requires a 32-bit JRE/JDK 6 or JDK 7 to run on Windows.\nPlease go to the <a href=\"#\">{1} preferences</a> and select an appropriate JVM.";
+		} else {
+			message = "{0} requires Java 6 and above to be installed.\nPlease go to the <a href=\"#\">{1} preferences</a> and select an appropriate JVM.";
+		}
+		
 		IPreferenceNode jreNode = getPreferenceNode(BROWSERSIM_PREFERENCE_PAGE_ID);
 		String result = MessageFormat.format(message, programName, jreNode.getLabelText());
 	    link.setText(result);

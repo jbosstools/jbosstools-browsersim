@@ -12,6 +12,7 @@ package org.jboss.tools.vpe.browsersim.eclipse.preferences;
 
 import java.util.List;
 
+import org.eclipse.core.runtime.Platform;
 import org.eclipse.jdt.launching.IVMInstall;
 import org.eclipse.jface.dialogs.Dialog;
 import org.eclipse.jface.dialogs.IDialogConstants;
@@ -136,8 +137,14 @@ public class BrowserSimPreferencesPage extends PreferencePage implements IWorkbe
 			/*
 			 * browserSim can be executed only on 32bit jvm on windows, that's why jvm list can be empty.
 			 * @see https://issues.jboss.org/browse/JBIDE-13988
-			 */			
-			setMessage("BrowserSim requires a 32-bit JVM to run on Windows. Please add 32-bit JVM.", IMessageProvider.WARNING);//$NON-NLS-1$
+			 */
+			String message;
+			if (Platform.OS_WIN32.equals(Platform.getOS())) {
+				message = "BrowserSim/CordovaSim require a 32-bit JRE/JDK 6 or JDK 7 to be installed.";
+			} else {
+				message = "BrowserSim/CordovaSim require Java 6 and above to be installed.";
+			}
+			setMessage(message, IMessageProvider.ERROR);//$NON-NLS-1$
 			automatically.setSelection(true);
 			select.setEnabled(false);
 			combo.setEnabled(false);
