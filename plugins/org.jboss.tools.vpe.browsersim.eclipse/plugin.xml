@@ -105,6 +105,7 @@
 	<extension
          point="org.eclipse.ui.preferencePages">
       <page
+      		category="org.jboss.tools.common.model.ui.MainPreferencePage"
             class="org.jboss.tools.vpe.browsersim.eclipse.preferences.BrowserSimPreferencesPage"
             id="org.jboss.tools.vpe.browsersim.eclipse.preferences.BrowserSimPreferences"
             name="BrowserSim/CordovaSim">
