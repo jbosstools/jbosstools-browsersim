@@ -156,8 +156,9 @@ public class BrowserSimMenuCreator {
 			SpecificPreferences specificPreferences, String homeUrl) {
 		ToolsMenuCreator.addDebugItem(contextMenu, skin, commonPreferences.getWeinreScriptUrl(), commonPreferences.getWeinreClientUrl());
 		ToolsMenuCreator.addScreenshotMenuItem(contextMenu, skin, commonPreferences);
-		ToolsMenuCreator.addSyncronizedWindowItem(contextMenu, skin, commonPreferences.getDevices(), specificPreferences.getUseSkins(), specificPreferences.isEnableLiveReload(), 
-				specificPreferences.getOrientationAngle(), homeUrl);
+		ToolsMenuCreator.addSyncronizedWindowItem(contextMenu, skin, commonPreferences.getDevices(),
+				specificPreferences.getUseSkins(), specificPreferences.isEnableLiveReload(),
+				specificPreferences.getLiveReloadPort(), specificPreferences.getOrientationAngle(), homeUrl);
 		ToolsMenuCreator.addLiveReloadItem(contextMenu, specificPreferences);
 	}
 

@@ -29,14 +29,16 @@ public abstract class SpecificPreferences extends Observable {
 	private String selectedDeviceId;
 	private boolean useSkins;
 	private boolean enableLiveReload;
+	private int liveReloadPort;
 	private int orientationAngle;
 	private Point location;
 	
 
-	public SpecificPreferences(String selectedDeviceId, boolean useSkins, boolean enableLiveReload, int orientationAngle, Point location) {
+	public SpecificPreferences(String selectedDeviceId, boolean useSkins, boolean enableLiveReload, int liveReloadPort, int orientationAngle, Point location) {
 		this.selectedDeviceId = selectedDeviceId;
 		this.useSkins = useSkins;
 		this.enableLiveReload = enableLiveReload;
+		this.liveReloadPort = liveReloadPort;
 		this.orientationAngle = orientationAngle;
 		this.location = location;
 	}
@@ -77,7 +79,18 @@ public abstract class SpecificPreferences extends Observable {
 			setChanged();
 		}
 	}
-	
+
+	public int getLiveReloadPort() {
+		return liveReloadPort;
+	}
+
+	public void setLiveReloadPort(int liveReloadPort) {
+		if (this.liveReloadPort != liveReloadPort) {
+			this.liveReloadPort = liveReloadPort;
+			setChanged();
+		}
+	}
+
 	public int getOrientationAngle() {
 		return orientationAngle;
 	}
@@ -101,6 +114,7 @@ public abstract class SpecificPreferences extends Observable {
 		setSelectedDeviceId(sp.getSelectedDeviceId());
 		setUseSkins(sp.getUseSkins());
 		setEnableLiveReload(sp.isEnableLiveReload());
+		setLiveReloadPort(sp.getLiveReloadPort());
 		setOrientationAngle(sp.getOrientationAngle());
 		setLocation(sp.getLocation());
 	}

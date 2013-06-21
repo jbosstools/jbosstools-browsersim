@@ -396,17 +396,6 @@ final class VerifyFloatListener implements VerifyListener {
 	}
 }
 
-final class VerifyDigitsListener implements VerifyListener {
-	public void verifyText(VerifyEvent e) {
-		for (char c : e.text.toCharArray()) {
-			if (!('0' <= c && c <= '9')) {
-				e.doit = false;
-				return;
-			}
-		}
-	}
-}
-
 final class FocusGainedTextListener extends FocusAdapter {
 	public void focusGained(FocusEvent e) {
 		Text text = ((Text) e.widget);

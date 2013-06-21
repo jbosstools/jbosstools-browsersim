@@ -30,9 +30,12 @@ public abstract class SpecificPreferencesStorage implements PreferencesStorage{
 	protected static final String PREFERENCES_LOCATION = "location";
 	protected static final String PREFERENCES_USE_SKINS = "useSkins";
 	protected static final String PREFERENCES_LIVE_RELOAD = "enableLiveReload";
+	protected static final String PREFERENCES_LIVE_RELOAD_PORT = "liveReloadPort";
 	protected static final String PREFERENCES_SELECTED_DEVICE = "selectedDeviceId";
 	protected static final String PREFERENCES_VERSION = "version";
 
+	public static final int DEFAULT_LIVE_RELOAD_PORT = 35729;
+	
 	@Override
 	public void save(Object o) {
 		File configFolder = new File(PreferencesUtil.getConfigFolderPath());

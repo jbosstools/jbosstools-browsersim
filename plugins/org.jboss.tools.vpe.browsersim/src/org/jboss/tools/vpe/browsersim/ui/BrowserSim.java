@@ -505,7 +505,7 @@ public class BrowserSim {
 										"var e = document.createElement('script');" +
 										"e.type = 'text/javascript';" +
 										"e.async = 'true';" +
-										"e.src = 'http://localhost:35729/livereload.js';" +
+										"e.src = 'http://localhost:" + specificPreferences.getLiveReloadPort() + "/livereload.js';" +
 										"document.head.appendChild(e);" +
 									"});" +
 								"}");
