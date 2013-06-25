@@ -29,7 +29,6 @@ import org.eclipse.swt.events.VerifyListener;
 import org.eclipse.swt.graphics.FontMetrics;
 import org.eclipse.swt.graphics.GC;
 import org.eclipse.swt.graphics.Point;
-import org.eclipse.swt.layout.FillLayout;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Button;
@@ -113,9 +112,9 @@ public abstract class DeviceDialog extends Dialog {
 
 		imageList = new BrowserSimImageList(shell);
 		
-		header = new Composite(shell, getStyle());
+		header = new Composite(shell, SWT.NONE);
 		header.setLayout(new GridLayout(2, false));
-		header.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, true, true, 1, 1));
+		header.setLayoutData(new GridData(SWT.FILL, SWT.BEGINNING, true, false, 1, 1));
 		header.setBackground(shell.getDisplay().getSystemColor(SWT.COLOR_LIST_BACKGROUND));
 		
 		textStatus = new Text(header, SWT.MULTI | SWT.WRAP | SWT.READ_ONLY);
@@ -137,10 +136,9 @@ public abstract class DeviceDialog extends Dialog {
 		textStatus.setBackground(textStatus.getDisplay().getSystemColor(SWT.COLOR_LIST_BACKGROUND));
 		textStatus.setText(getDefaultStatusText());
 
-		Composite body = new Composite(shell, getStyle());
+		Composite body = new Composite(shell, SWT.NONE);
 		body.setLayout(new GridLayout(2, false));
-		body.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, true, true, 1, 1));
-		
+		body.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, true, false, 1, 1));
 		Label labelName = new Label(body, SWT.NONE);
 		labelName.setText(Messages.EditDeviceDialog_NAME);
 		
@@ -217,14 +215,12 @@ public abstract class DeviceDialog extends Dialog {
 		comboSkin.addModifyListener(new ModifySizeListener());
 
 		Composite buttonsComposite = new Composite(shell, SWT.NONE);
-		FillLayout buttonsLayout = new FillLayout(SWT.HORIZONTAL);
-		buttonsLayout.marginHeight = 5;
-		buttonsLayout.marginWidth = 5;
-		buttonsComposite.setLayout(buttonsLayout);
-		buttonsComposite.setLayoutData(new GridData(SWT.RIGHT, SWT.BOTTOM, true, true, 1, 1));
+		buttonsComposite.setLayout(new GridLayout(2, true));
+		buttonsComposite.setLayoutData(new GridData(SWT.RIGHT, SWT.BOTTOM, false, false, 1, 1));
 		
 		buttonOk = new Button(buttonsComposite, SWT.NONE);
 		buttonOk.setText(Messages.EditDeviceDialog_OK);
+		buttonOk.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, false, false));
 		buttonOk.addSelectionListener(new SelectionAdapter() {
 			public void widgetSelected(SelectionEvent e) {
 				double pixelRatio;
@@ -247,12 +243,13 @@ public abstract class DeviceDialog extends Dialog {
 		
 		Button buttonCancel = new Button(buttonsComposite, SWT.NONE);
 		buttonCancel.setText(Messages.EditDeviceDialog_CANCEL);
+		buttonCancel.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, false, false));
 		buttonCancel.addSelectionListener(new SelectionAdapter() {
 			public void widgetSelected(SelectionEvent e) {
 				resultDevice = null;
 				shell.close();
 			}
-		});	
+		});
 	}
 
 	private void showStatusImageLabel() {
