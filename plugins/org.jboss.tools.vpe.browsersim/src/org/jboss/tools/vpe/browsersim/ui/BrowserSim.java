@@ -227,10 +227,7 @@ public class BrowserSim {
 			}
 		});
 		menuCreator.addMenuBar();
-		
-		if (PlatformUtil.OS_MACOSX.equals(PlatformUtil.getOs())) {
-			BrowserSimRunner.setShellAttributes(shell);
-		}
+		BrowserSimRunner.setShellAttributes(shell);
 		
 		skin.setControlHandler(controlHandler);
 		

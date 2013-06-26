@@ -70,7 +70,7 @@ public class NativeSkin implements BrowserSimSkin {
 		if (parentShell == null) {
 			shell = new Shell(display);
 		} else {
-			shell = new Shell(parentShell);
+			shell = new Shell(parentShell, SWT.SHELL_TRIM);
 		}
 		shell.setLayout(new FillLayout(SWT.VERTICAL | SWT.HORIZONTAL));
 		if (location != null) {
