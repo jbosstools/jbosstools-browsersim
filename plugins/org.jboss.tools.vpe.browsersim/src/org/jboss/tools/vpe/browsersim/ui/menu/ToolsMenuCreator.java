@@ -189,8 +189,8 @@ public class ToolsMenuCreator {
 						SpecificPreferences sp = new BrowserSimSpecificPreferences(selected.getId(), useSkins,
 								enableLiveReload, liveReloadPort, orientationAngle, null);
 
-						BrowserSim browserSim1 = new BrowserSim(homeUrl);
-						browserSim1.open(sp, skin.getBrowser().getUrl(), BrowserSimUtil.getParentShell(skin));
+						BrowserSim browserSim1 = new BrowserSim(homeUrl, BrowserSimUtil.getParentShell(skin));
+						browserSim1.open(sp, skin.getBrowser().getUrl());
 					}
 				};
 			});

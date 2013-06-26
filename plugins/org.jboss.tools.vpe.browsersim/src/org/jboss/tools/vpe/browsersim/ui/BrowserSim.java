@@ -94,10 +94,6 @@ public class BrowserSim {
 			}
 		}
 	}
-
-	public BrowserSim(String homeUrl) {
-		this.homeUrl = homeUrl;
-	}
 	
 	public BrowserSim(String homeUrl, Shell parent) {
 		this.homeUrl = homeUrl;
@@ -110,10 +106,10 @@ public class BrowserSim {
 			sp = (SpecificPreferences) getSpecificPreferencesStorage().loadDefault();
 		}
 		
-		open(sp, null, parentShell);
+		open(sp, null);
 	}
 
-	public void open(SpecificPreferences sp, String url, Shell parentShell) {
+	public void open(SpecificPreferences sp, String url) {
 		if (url == null) {
 			url = homeUrl;
 		}
