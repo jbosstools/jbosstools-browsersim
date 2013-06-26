@@ -16,6 +16,8 @@ import java.util.Map;
 import java.util.UUID;
 
 import org.eclipse.swt.SWT;
+import org.eclipse.swt.events.FocusAdapter;
+import org.eclipse.swt.events.FocusEvent;
 import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.events.SelectionListener;
@@ -64,12 +66,15 @@ public class ManageDevicesDialog extends Dialog {
 	protected SpecificPreferences newSpecificPreferences;
 	protected boolean useSkins;
 	protected boolean enableLiveReload;
+	protected int liveReloadPort;
 	protected TruncateWindow truncateWindow;
 	protected Button askBeforeTruncateRadio;
 	protected Button alwaysTruncateRadio;
 	protected Button neverTruncateRadio;
 	protected Button useSkinsCheckbox;
 	protected Button liveReloadCheckBox;
+	protected Label liveReloadPortLabel;
+	protected Text liveReloadPortText;
 
 	protected Button buttonEdit;
 	protected Button buttonRemove;
@@ -90,6 +95,7 @@ public class ManageDevicesDialog extends Dialog {
 		this.selectedDeviceId = oldSpecificPreferences.getSelectedDeviceId();
 		this.useSkins = oldSpecificPreferences.getUseSkins();
 		this.enableLiveReload = oldSpecificPreferences.isEnableLiveReload();
+		this.liveReloadPort = oldSpecificPreferences.getLiveReloadPort();
 		this.truncateWindow = oldCommonPreferences.getTruncateWindow();
 	} 
 	
@@ -311,16 +317,40 @@ public class ManageDevicesDialog extends Dialog {
 		settingsComposite.setLayout(new GridLayout());
 		
 		Group liveReloadGroup = new Group(settingsComposite, SWT.NONE);
-		liveReloadGroup.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, true, false, 2, 1));
-		liveReloadGroup.setLayout(new RowLayout(SWT.VERTICAL));
+		liveReloadGroup.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, true, false, 1, 1));
+		liveReloadGroup.setLayout(new GridLayout(2, false));
 		liveReloadGroup.setText(Messages.ManageDevicesDialog_LIVE_RELOAD_OPTIONS);
 		liveReloadCheckBox = new Button(liveReloadGroup, SWT.CHECK);
+		liveReloadCheckBox.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, true, false, 2, 1));
 		liveReloadCheckBox.setText(Messages.ManageDevicesDialog_ENABLE_LIVE_RELOAD);
+		
+		final Composite liveReloadPortComposite = new Composite(liveReloadGroup, SWT.NONE);
+		liveReloadPortComposite.setLayout(new GridLayout(2, false));
+		GridData data = new GridData(SWT.FILL, SWT.CENTER, true, false);
+		data.horizontalIndent = 15;
+		liveReloadPortComposite.setLayoutData(data);
+		liveReloadPortLabel = new Label(liveReloadPortComposite, SWT.NONE);
+		liveReloadPortLabel.setText("LiveReload Port");
+		liveReloadPortText = new Text(liveReloadPortComposite, SWT.BORDER);
+		liveReloadPortText.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, true, true));
+		liveReloadPortText.setText(Integer.toString(liveReloadPort));
+		liveReloadPortText.setTextLimit(5);
+		liveReloadPortText.addVerifyListener(new VerifyDigitsListener());
+		liveReloadPortText.addFocusListener(new FocusAdapter() {
+			@Override
+			public void focusLost(FocusEvent e) {
+				if ("".equals(liveReloadPortText.getText())) {
+					liveReloadPortText.setText(Integer.toString(SpecificPreferencesStorage.DEFAULT_LIVE_RELOAD_PORT));
+				}
+			}
+		});
+		
 		liveReloadCheckBox.addSelectionListener(new SelectionAdapter() {
 			@Override
 			public void widgetSelected(SelectionEvent e) {
 				Button checkbox = (Button) e.widget;
 				enableLiveReload = checkbox.getSelection();
+				enableLiveReloadPort(enableLiveReload);
 			}
 		});
 		
@@ -387,6 +417,7 @@ public class ManageDevicesDialog extends Dialog {
 				selectedDeviceId = sp.getSelectedDeviceId();
 				useSkins = sp.getUseSkins();
 				enableLiveReload = sp.isEnableLiveReload();
+				liveReloadPortText.setText(Integer.toString(sp.getLiveReloadPort()));
 				truncateWindow = cp.getTruncateWindow();
 				screenshotsPath.setText(cp.getScreenshotsFolder());
 				weinreScriptUrlText.setText(cp.getWeinreScriptUrl());
@@ -394,6 +425,7 @@ public class ManageDevicesDialog extends Dialog {
 				updateDevices();
 			}
 		});
+		
 		
 		Button buttonOk = new Button(compositeOkCancel, SWT.NONE);
 		buttonOk.setText(Messages.ManageDevicesDialog_OK);
@@ -403,7 +435,7 @@ public class ManageDevicesDialog extends Dialog {
 			public void widgetSelected(SelectionEvent e) {
 				newCommonPreferences = new CommonPreferences(devices, truncateWindow, screenshotsPath.getText(),
 						weinreScriptUrlText.getText(), weinreClientUrlText.getText());
-				newSpecificPreferences = create(selectedDeviceId, useSkins, enableLiveReload);
+				newSpecificPreferences = create(selectedDeviceId, useSkins, enableLiveReload, getLiveReloadPort());
 				shell.close();
 			}
 		});
@@ -448,10 +480,21 @@ public class ManageDevicesDialog extends Dialog {
 		
 		useSkinsCheckbox.setSelection(useSkins);
 		liveReloadCheckBox.setSelection(enableLiveReload);
+		enableLiveReloadPort(enableLiveReload);
 		
 		askBeforeTruncateRadio.setSelection(TruncateWindow.PROMPT.equals(truncateWindow));
 		alwaysTruncateRadio.setSelection(TruncateWindow.ALWAYS_TRUNCATE.equals(truncateWindow));
 		neverTruncateRadio.setSelection(TruncateWindow.NEVER_TRUNCATE.equals(truncateWindow));
+	}
+	
+	private void enableLiveReloadPort(boolean enableLiveReload) {
+		liveReloadPortLabel.setEnabled(enableLiveReload);
+		liveReloadPortText.setEnabled(enableLiveReload);
+	}
+	
+	private int getLiveReloadPort() {
+		String port = liveReloadPortText.getText();
+		return port.isEmpty() ? SpecificPreferencesStorage.DEFAULT_LIVE_RELOAD_PORT : Integer.parseInt(port);
 	}
 	
 	/**
@@ -463,8 +506,8 @@ public class ManageDevicesDialog extends Dialog {
 		return BrowserSimSpecificPreferencesStorage.INSTANCE;
 	}
 	
-	protected SpecificPreferences create(String selectedDeviceId, boolean useSkins, boolean enableLiveReload) {
-		return new BrowserSimSpecificPreferences(selectedDeviceId, useSkins, enableLiveReload,
+	protected SpecificPreferences create(String selectedDeviceId, boolean useSkins, boolean enableLiveReload, int liveReloadPort) {
+		return new BrowserSimSpecificPreferences(selectedDeviceId, useSkins, enableLiveReload, liveReloadPort,
 				oldSpecificPreferences.getOrientationAngle(), oldSpecificPreferences.getLocation());
 	}
 }

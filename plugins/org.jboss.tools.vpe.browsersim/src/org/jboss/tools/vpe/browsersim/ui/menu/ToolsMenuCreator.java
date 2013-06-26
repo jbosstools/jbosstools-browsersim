@@ -32,7 +32,6 @@ import org.eclipse.swt.widgets.MenuItem;
 import org.eclipse.swt.widgets.ProgressBar;
 import org.eclipse.swt.widgets.Shell;
 import org.eclipse.swt.widgets.Text;
-import org.jboss.tools.vpe.browsersim.browser.PlatformUtil;
 import org.jboss.tools.vpe.browsersim.model.Device;
 import org.jboss.tools.vpe.browsersim.model.preferences.BrowserSimSpecificPreferences;
 import org.jboss.tools.vpe.browsersim.model.preferences.CommonPreferences;
@@ -168,7 +167,7 @@ public class ToolsMenuCreator {
 	}
 	
 	public static void addSyncronizedWindowItem(Menu menu, final BrowserSimSkin skin,
-			final Map<String, Device> devices, final Boolean useSkins, final Boolean enableLiveReload, final int orientationAngle, final String homeUrl) {
+			final Map<String, Device> devices, final Boolean useSkins, final Boolean enableLiveReload, final int liveReloadPort, final int orientationAngle, final String homeUrl) {
 		MenuItem syncWindow = new MenuItem(menu, SWT.CASCADE);
 		syncWindow.setText(Messages.BrowserSim_SYNCHRONIZED_WINDOW);
 		Menu subMenu = new Menu(menu);
@@ -185,7 +184,7 @@ public class ToolsMenuCreator {
 					if (menuItem.getSelection()) {
 						Device selected = devices.get(menuItem.getData());
 						SpecificPreferences sp = new BrowserSimSpecificPreferences(selected.getId(), useSkins,
-								enableLiveReload, orientationAngle, null);
+								enableLiveReload, liveReloadPort, orientationAngle, null);
 
 						BrowserSim browserSim1 = new BrowserSim(homeUrl);
 						browserSim1.open(sp, skin.getBrowser().getUrl(), BrowserSimUtil.getParentShell(skin));
