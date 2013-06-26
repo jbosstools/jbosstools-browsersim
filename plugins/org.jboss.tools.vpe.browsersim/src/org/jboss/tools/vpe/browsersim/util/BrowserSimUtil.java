@@ -10,10 +10,9 @@
  ******************************************************************************/
 package org.jboss.tools.vpe.browsersim.util;
 
-import java.text.MessageFormat;
-
 import org.eclipse.swt.events.DisposeEvent;
 import org.eclipse.swt.events.DisposeListener;
+import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.graphics.Point;
 import org.eclipse.swt.graphics.Rectangle;
 import org.eclipse.swt.graphics.Resource;
@@ -33,8 +32,6 @@ import org.jboss.tools.vpe.browsersim.ui.skin.BrowserSimSkin;
  */
 
 public class BrowserSimUtil {
-	private static final String ABOUT_ICON = "icons/browsersim_32px.png"; //$NON-NLS-1$
-	
 	public static void fixShellLocation(Shell shell, Rectangle clientArea) {
 		Point shellLocation = shell.getLocation();
 		Point shellSize = shell.getSize();
@@ -93,16 +90,8 @@ public class BrowserSimUtil {
 	}
 	
 
-	public static void showAboutDialog(Shell shell) {
-		String message;
-		String version = ManifestUtil.getManifestVersion();
-		if (version != null) {
-			message = MessageFormat.format(Messages.BrowserSim_ABOUT_MESSAGE, ManifestUtil.getManifestVersion());
-		} else {
-			message = MessageFormat.format(Messages.BrowserSim_ABOUT_MESSAGE, ""); //$NON-NLS-1$
-		}
-		BrowserSimImageList imageList = new BrowserSimImageList(shell);
-		new MessageBoxWithLinks(shell, message, imageList.getImage(ABOUT_ICON), Messages.BrowserSim_ABOUT).open();
+	public static void showAboutDialog(Shell shell, String message, Image icon) {
+		new MessageBoxWithLinks(shell, message, icon, Messages.BrowserSim_ABOUT_HEADER).open();
 	}
 	
 	public static void addDisposeListener(Widget widget, final Resource disposable) {

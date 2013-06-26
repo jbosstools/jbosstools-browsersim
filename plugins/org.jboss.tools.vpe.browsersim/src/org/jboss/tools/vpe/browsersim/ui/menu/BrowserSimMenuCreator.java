@@ -10,6 +10,7 @@
  ******************************************************************************/
 package org.jboss.tools.vpe.browsersim.ui.menu;
 
+import java.text.MessageFormat;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -35,7 +36,9 @@ import org.jboss.tools.vpe.browsersim.ui.ManageDevicesDialog;
 import org.jboss.tools.vpe.browsersim.ui.Messages;
 import org.jboss.tools.vpe.browsersim.ui.PreferencesWrapper;
 import org.jboss.tools.vpe.browsersim.ui.skin.BrowserSimSkin;
+import org.jboss.tools.vpe.browsersim.util.BrowserSimImageList;
 import org.jboss.tools.vpe.browsersim.util.BrowserSimUtil;
+import org.jboss.tools.vpe.browsersim.util.ManifestUtil;
 
 /**
  * @author Yahor Radtsevich (yradtsevich)
@@ -43,6 +46,8 @@ import org.jboss.tools.vpe.browsersim.util.BrowserSimUtil;
  */
 
 public class BrowserSimMenuCreator {
+	private static final String ABOUT_ICON = "icons/browsersim_32px.png"; //$NON-NLS-1$
+	
 	private BrowserSimSkin skin;
 	private static CommonPreferences commonPreferences;
 	private SpecificPreferences specificPreferences;
@@ -232,7 +237,7 @@ public class BrowserSimMenuCreator {
 		about.setText(Messages.BrowserSim_ABOUT);
 		about.addSelectionListener(new SelectionAdapter() {
 			public void widgetSelected(SelectionEvent e) {
-				BrowserSimUtil.showAboutDialog(e.display.getActiveShell());
+				showAboutDialog(e.display.getActiveShell());
 			}
 		});
 	}
@@ -286,7 +291,7 @@ public class BrowserSimMenuCreator {
 			cocoaUIEnhancer.setAboutAction(new Runnable() {
 				@Override
 				public void run() {
-					BrowserSimUtil.showAboutDialog(getParentShell());
+					showAboutDialog(getParentShell());
 				}
 			});
 
@@ -319,5 +324,17 @@ public class BrowserSimMenuCreator {
 			return skin.getShell();
 		}
 		return new Shell();
+	}
+	
+	private void showAboutDialog(Shell shell) {
+		String message = "";
+		String version = ManifestUtil.getManifestVersion();
+		if (version != null) {
+			message = MessageFormat.format(Messages.BrowserSim_ABOUT_BROWSERSIM_MESSAGE, ManifestUtil.getManifestVersion());
+		} else {
+			message = MessageFormat.format(Messages.BrowserSim_ABOUT_BROWSERSIM_MESSAGE, ""); //$NON-NLS-1$
+		}
+		BrowserSimImageList imageList = new BrowserSimImageList(shell);
+		BrowserSimUtil.showAboutDialog(shell, message, imageList.getImage(ABOUT_ICON));
 	}
 }

@@ -19,7 +19,9 @@ public class Messages {
 	private static final String BUNDLE_NAME = Messages.class.getName().toString().toLowerCase();
 	
 	public static String BrowserSim_ABOUT;
-	public static String BrowserSim_ABOUT_MESSAGE;
+	public static String BrowserSim_ABOUT_HEADER;
+	public static String BrowserSim_ABOUT_BROWSERSIM_MESSAGE;
+	public static String BrowserSim_ABOUT_WEINRE_MESSAGE;
 	public static String BrowserSim_ADDRESS;
 	public static String BrowserSim_BROWSER_SIM;
 	public static String BrowserSim_COULD_NOT_OPEN_DEFAULT_BROWSER;
@@ -43,6 +45,8 @@ public class Messages {
 	public static String BrowserSim_USE_SKINS;
 	public static String BrowserSim_VIEW_PAGE_SOURCE;
 	public static String BrowserSim_WEINRE;
+	public static String BrowserSim_WEINRE_ABOUT;
+	public static String BrowserSim_WEINRE_HELP;
 	public static String EditDeviceDialog_CANCEL;
 	public static String EditDeviceDialog_ADD_DEVICE;
 	public static String EditDeviceDialog_ADD_DEVICE_STATUS;

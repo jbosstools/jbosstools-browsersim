@@ -86,9 +86,30 @@ public class ToolsMenuCreator {
 				}
 
 				Display display = skin.getBrowser().getDisplay();
-				Shell shell = new Shell(BrowserSimUtil.getParentShell(skin), SWT.SHELL_TRIM);
+				final Shell shell = new Shell(BrowserSimUtil.getParentShell(skin), SWT.SHELL_TRIM);
 				shell.setLayout(new FillLayout(SWT.VERTICAL | SWT.HORIZONTAL));
 				shell.setText("Weinre Inspector");
+				
+				Menu menuBar = display.getMenuBar();
+				if (menuBar == null) {
+					menuBar = new Menu(shell, SWT.BAR);
+					shell.setMenuBar(menuBar);
+				}
+				
+				MenuItem help = new MenuItem(menuBar, SWT.CASCADE);
+				help.setText(Messages.BrowserSim_WEINRE_HELP);
+				Menu subMenu = new Menu(menuBar);
+				help.setMenu(subMenu);
+				
+				MenuItem about = new MenuItem(subMenu, SWT.NONE);
+				about.setText(Messages.BrowserSim_WEINRE_ABOUT);
+				about.addSelectionListener(new SelectionAdapter() {
+					@Override
+					public void widgetSelected(SelectionEvent e) {
+						BrowserSimUtil.showAboutDialog(shell, Messages.BrowserSim_ABOUT_WEINRE_MESSAGE,
+								Display.getDefault().getSystemImage(SWT.ICON_INFORMATION));
+					}
+				});
 				
 				Composite browserComposite = new Composite(shell, SWT.NONE);
 				GridLayout gridLayout = new GridLayout();
