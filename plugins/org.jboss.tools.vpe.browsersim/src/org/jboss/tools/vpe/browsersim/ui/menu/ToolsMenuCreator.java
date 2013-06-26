@@ -93,6 +93,9 @@ public class ToolsMenuCreator {
 				Composite browserComposite = new Composite(shell, SWT.NONE);
 				GridLayout gridLayout = new GridLayout();
 				gridLayout.numColumns = 1;
+				gridLayout.verticalSpacing = 0;
+				gridLayout.marginWidth = 0;
+				gridLayout.marginHeight = 0;
 				browserComposite.setLayout(gridLayout);
 				
 				Text locationText = new Text(browserComposite, SWT.BORDER | SWT.READ_ONLY);

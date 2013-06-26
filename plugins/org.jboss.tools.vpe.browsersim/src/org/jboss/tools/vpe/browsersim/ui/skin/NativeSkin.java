@@ -86,21 +86,37 @@ public class NativeSkin implements BrowserSimSkin {
 		skinComposite = new Composite(shell, SWT.NONE);
 		GridLayout gridLayout = new GridLayout();
 		gridLayout.numColumns = 3;
+		gridLayout.verticalSpacing = 0;
+		gridLayout.marginWidth = 0;
+		gridLayout.marginHeight = 0;
 		skinComposite.setLayout(gridLayout);
 		
 		ToolBar toolbar = createControlBar();
 		GridData toolbarData = new GridData();
 		toolbarData.horizontalSpan = 3;
+		toolbarData.verticalIndent = 5;
+		toolbarData.horizontalIndent = 5;
 		toolbar.setLayoutData(toolbarData);
 
-		Label labelAddress = new Label(skinComposite, SWT.NONE);
+		Composite addressComposite = new Composite(skinComposite, SWT.NONE);
+		GridData adressCompositeGridData = new GridData();
+		adressCompositeGridData.horizontalSpan = 3;
+		adressCompositeGridData.horizontalAlignment = SWT.FILL;
+		GridLayout adressLayout = new GridLayout();
+		adressLayout.numColumns = 2;
+		adressLayout.marginHeight = 4;
+		adressLayout.marginWidth = 4;
+		addressComposite.setLayout(adressLayout);
+		addressComposite.setLayoutData(adressCompositeGridData);
+		
+		Label labelAddress = new Label(addressComposite, SWT.NONE);
 		labelAddress.setText(Messages.BrowserSim_ADDRESS);
 		
-		locationText = new Text(skinComposite, SWT.BORDER);
+		locationText = new Text(addressComposite, SWT.BORDER);
 		GridData data = new GridData();
 		data.horizontalAlignment = GridData.FILL;
-		data.horizontalSpan = 2;
 		data.grabExcessHorizontalSpace = true;
+		data.grabExcessVerticalSpace = true;
 		data.widthHint = 0;
 		locationText.setLayoutData(data);
 		
@@ -113,13 +129,23 @@ public class NativeSkin implements BrowserSimSkin {
 		browserData.grabExcessVerticalSpace = true;
 		browser.setLayoutData(browserData);
 		
-		statusLabel = new Label(skinComposite, SWT.NONE);
+		Composite statusComposite = new Composite(skinComposite, SWT.NONE);
+		GridData statusData = new GridData();
+		statusData.horizontalSpan = 3;
+		statusData.horizontalAlignment = SWT.FILL;
+		GridLayout statusLayout = new GridLayout();
+     	statusLayout.numColumns = 2;
+     	statusLayout.marginHeight = 4;
+     	statusLayout.marginWidth = 4;
+     	statusComposite.setLayout(statusLayout);
+     	statusComposite.setLayoutData(statusData);
+		
+		statusLabel = new Label(statusComposite, SWT.NONE);
 		data = new GridData(GridData.FILL_HORIZONTAL);
-		data.horizontalSpan = 2;
 		data.widthHint = 0;
 		statusLabel.setLayoutData(data);
 
-		progressBar = new ProgressBar(skinComposite, SWT.NONE);
+		progressBar = new ProgressBar(statusComposite, SWT.NONE);
 		data = new GridData();
 		data.horizontalAlignment = GridData.END;
 		progressBar.setLayoutData(data);
