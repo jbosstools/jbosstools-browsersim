@@ -216,7 +216,7 @@ public abstract class DeviceDialog extends Dialog {
 
 		Composite buttonsComposite = new Composite(shell, SWT.NONE);
 		buttonsComposite.setLayout(new GridLayout(2, true));
-		buttonsComposite.setLayoutData(new GridData(SWT.RIGHT, SWT.BOTTOM, false, false, 1, 1));
+		buttonsComposite.setLayoutData(new GridData(SWT.RIGHT, SWT.BOTTOM, false, true, 1, 1));
 		
 		buttonOk = new Button(buttonsComposite, SWT.NONE);
 		buttonOk.setText(Messages.EditDeviceDialog_OK);
