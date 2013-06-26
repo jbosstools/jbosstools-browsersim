@@ -16,6 +16,8 @@ import java.util.Map;
 import java.util.UUID;
 
 import org.eclipse.swt.SWT;
+import org.eclipse.swt.events.FocusAdapter;
+import org.eclipse.swt.events.FocusEvent;
 import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.events.SelectionListener;
@@ -334,6 +336,14 @@ public class ManageDevicesDialog extends Dialog {
 		liveReloadPortText.setText(Integer.toString(liveReloadPort));
 		liveReloadPortText.setTextLimit(5);
 		liveReloadPortText.addVerifyListener(new VerifyDigitsListener());
+		liveReloadPortText.addFocusListener(new FocusAdapter() {
+			@Override
+			public void focusLost(FocusEvent e) {
+				if ("".equals(liveReloadPortText.getText())) {
+					liveReloadPortText.setText(Integer.toString(SpecificPreferencesStorage.DEFAULT_LIVE_RELOAD_PORT));
+				}
+			}
+		});
 		
 		liveReloadCheckBox.addSelectionListener(new SelectionAdapter() {
 			@Override
