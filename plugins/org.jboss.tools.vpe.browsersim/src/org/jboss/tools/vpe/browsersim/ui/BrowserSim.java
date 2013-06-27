@@ -36,7 +36,6 @@ import org.eclipse.swt.events.ControlEvent;
 import org.eclipse.swt.events.ShellEvent;
 import org.eclipse.swt.events.ShellListener;
 import org.eclipse.swt.graphics.Point;
-import org.eclipse.swt.graphics.Rectangle;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Event;
 import org.eclipse.swt.widgets.Listener;
@@ -521,10 +520,9 @@ public class BrowserSim {
 		} else {
 			browserSize = size;
 		}
-		
-		Rectangle clientArea = BrowserSimUtil.getMonitorClientArea(skin.getShell().getMonitor());
+
 		skin.setOrientationAndSize(orientationAngle, browserSize, resizableSkinSizeAdvisor);
-		BrowserSimUtil.fixShellLocation(skin.getShell(), clientArea);
+		BrowserSimUtil.fixShellLocation(skin.getShell());
 		getBrowser().execute("window.orientation = " + orientationAngle + ";"
 				+ "(function(){"
 				+ 		"var event = document.createEvent('Event');"

@@ -16,6 +16,7 @@ import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.graphics.Point;
 import org.eclipse.swt.graphics.Rectangle;
 import org.eclipse.swt.graphics.Resource;
+import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Monitor;
 import org.eclipse.swt.widgets.Shell;
 import org.eclipse.swt.widgets.Widget;
@@ -32,10 +33,12 @@ import org.jboss.tools.vpe.browsersim.ui.skin.BrowserSimSkin;
  */
 
 public class BrowserSimUtil {
-	public static void fixShellLocation(Shell shell, Rectangle clientArea) {
+	public static void fixShellLocation(Shell shell) {
+		Rectangle allClientArea = shell.getMonitor().getClientArea();
+		
 		Point shellLocation = shell.getLocation();
 		Point shellSize = shell.getSize();
-		int bottomOverlap = shellLocation.y + shellSize.y - (clientArea.y + clientArea.height);
+		int bottomOverlap = shellLocation.y + shellSize.y - (allClientArea.y + allClientArea.height);
 		if (bottomOverlap > 0) {
 			if (shellLocation.y > bottomOverlap) {
 				shellLocation.y -= bottomOverlap;
@@ -44,7 +47,7 @@ public class BrowserSimUtil {
 			}
 		}
 
-		int rightOverlap = shellLocation.x + shellSize.x - (clientArea.x + clientArea.width);
+		int rightOverlap = shellLocation.x + shellSize.x - (allClientArea.x + allClientArea.width);
 		if (rightOverlap > 0) {
 			if (shellLocation.x > rightOverlap) {
 				shellLocation.x -= rightOverlap;
@@ -56,13 +59,18 @@ public class BrowserSimUtil {
 		shell.setLocation(shellLocation);
 	}
 	
-	public static Rectangle getMonitorClientArea(Monitor monitor) {
-		Rectangle clientArea = monitor.getClientArea();
+	public static Rectangle getMonitorClientArea(Shell shell) {
+		Rectangle clientArea = shell.getMonitor().getClientArea();
 
 		/* on Linux returned monitor client area may be bigger
 		 * than the monitor bounds when multiple monitors are used.
 		 * The following code fixes this */
-		Rectangle bounds = monitor.getBounds();
+		Rectangle bounds = shell.getMonitor().getBounds();
+		for(Monitor monitor : Display.getDefault().getMonitors()) {
+			if(monitor.getBounds().intersects(shell.getBounds())) {
+				bounds = monitor.getBounds();
+			}
+		}
 		clientArea.width = Math.min(clientArea.width, bounds.width);
 		clientArea.height = Math.min(clientArea.height, bounds.height);
 

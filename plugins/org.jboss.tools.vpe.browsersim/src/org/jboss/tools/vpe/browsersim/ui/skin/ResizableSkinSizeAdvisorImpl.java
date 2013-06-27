@@ -37,7 +37,7 @@ public class ResizableSkinSizeAdvisorImpl implements ResizableSkinSizeAdvisor{
 
 	@Override
 	public Point checkWindowSize(int orientation, Point prefferedSize, Point prefferedShellSize) {
-		Rectangle clientArea = BrowserSimUtil.getMonitorClientArea(shell.getMonitor());
+		Rectangle clientArea = BrowserSimUtil.getMonitorClientArea(shell);
 
 		TruncateWindow truncateWindow = null;
 		if (commonPreferences.getTruncateWindow() == TruncateWindow.PROMPT) {
