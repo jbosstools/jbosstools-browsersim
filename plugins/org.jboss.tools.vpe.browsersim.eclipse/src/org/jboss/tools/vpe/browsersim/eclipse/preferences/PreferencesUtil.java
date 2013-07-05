@@ -26,8 +26,8 @@ import org.eclipse.debug.core.Launch;
 import org.eclipse.debug.core.model.IProcess;
 import org.eclipse.debug.core.model.IStreamsProxy;
 import org.eclipse.jdt.internal.launching.LaunchingPlugin;
-import org.eclipse.jdt.internal.launching.StandardVM;
 import org.eclipse.jdt.internal.launching.StandardVMType;
+import org.eclipse.jdt.launching.AbstractVMInstall;
 import org.eclipse.jdt.launching.IVMInstall;
 import org.eclipse.jdt.launching.IVMInstallType;
 import org.eclipse.jdt.launching.JavaRuntime;
@@ -55,6 +55,11 @@ public class PreferencesUtil {
 					if (isX86(vm) && !conflictsWithWebKit(vm)) {
 						vms.add(vm);
 					}
+				} else if (PlatformUtil.OS_MACOSX.equals(PlatformUtil.getOs()) && PlatformUtil.ARCH_X86.equals(PlatformUtil.getArch())) {
+					//cannot use Java 7 for 32bit Studio in Mac OS
+					if ((vm instanceof AbstractVMInstall) && ((AbstractVMInstall) vm).getJavaVersion().compareTo("1.7") < 0) {
+						vms.add(vm);
+					}
 				} else {
 					vms.add(vm);
 				}
@@ -74,7 +79,7 @@ public class PreferencesUtil {
 		return "";
 	}
 	
-	public static String getArchitecture(StandardVM defaultVMInstall) {
+	public static String getArchitecture(IVMInstall defaultVMInstall) {
 		try {
 			return generateLibraryInfo(defaultVMInstall.getInstallLocation(), getJavaExecutable(defaultVMInstall));
 		} catch (IOException e) {
@@ -84,7 +89,7 @@ public class PreferencesUtil {
 	}
 	
 	private static boolean isX86(IVMInstall vm) {
-		return (vm instanceof StandardVM) && PlatformUtil.ARCH_X86.equals(PreferencesUtil.getArchitecture((StandardVM) vm));
+		return PlatformUtil.ARCH_X86.equals(PreferencesUtil.getArchitecture(vm));
 	}
 	
 	private static boolean conflictsWithWebKit(IVMInstall vm) {
@@ -92,7 +97,7 @@ public class PreferencesUtil {
 		return libxml2.exists();
 	}
 	
-	private static File getJavaExecutable(StandardVM standardVM) {
+	private static File getJavaExecutable(IVMInstall standardVM) {
     	File installLocation = standardVM.getInstallLocation();
         if (installLocation != null) {
             return StandardVMType.findJavaExecutable(installLocation);

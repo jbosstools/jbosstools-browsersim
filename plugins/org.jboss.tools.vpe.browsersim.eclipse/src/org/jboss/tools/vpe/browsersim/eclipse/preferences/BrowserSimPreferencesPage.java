@@ -34,6 +34,7 @@ import org.eclipse.ui.IWorkbench;
 import org.eclipse.ui.IWorkbenchPreferencePage;
 import org.eclipse.ui.dialogs.PreferenceLinkArea;
 import org.eclipse.ui.preferences.IWorkbenchPreferenceContainer;
+import org.jboss.tools.vpe.browsersim.browser.PlatformUtil;
 import org.jboss.tools.vpe.browsersim.eclipse.Activator;
 
 /**
@@ -141,6 +142,8 @@ public class BrowserSimPreferencesPage extends PreferencePage implements IWorkbe
 			String message;
 			if (Platform.OS_WIN32.equals(Platform.getOS())) {
 				message = "BrowserSim/CordovaSim require a 32-bit JRE/JDK 6 or JDK 7 to be installed.";
+			} else if (PlatformUtil.OS_MACOSX.equals(PlatformUtil.getOs()) && PlatformUtil.ARCH_X86.equals(PlatformUtil.getArch())) {
+				message = "To run BrowserSim/CordovaSim with Java 7 you must run 64-bit Eclipse or use Java 6.";
 			} else {
 				message = "BrowserSim/CordovaSim require Java 6 and above to be installed.";
 			}
