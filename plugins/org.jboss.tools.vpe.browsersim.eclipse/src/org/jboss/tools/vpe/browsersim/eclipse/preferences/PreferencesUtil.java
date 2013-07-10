@@ -47,24 +47,40 @@ public class PreferencesUtil {
 	protected static final String JAVA_JVM_VERSION = "JAVA_JVM_VERSION"; //$NON-NLS-1$
 	
 	public static List<IVMInstall> getSuitableJvms() {
+		String eclipseOs = PlatformUtil.getOs();
+		String eclipseArch = PlatformUtil.getArch();
+		
 		List<IVMInstall> vms = new ArrayList<IVMInstall>();
 		for(IVMInstallType type : JavaRuntime.getVMInstallTypes()) {
 			for(IVMInstall vm : type.getVMInstalls()) {
-				if (PlatformUtil.OS_WIN32.equals(PlatformUtil.getOs())) {
-					// can use only 32 bit jvm on windows
-					if (isX86(vm) && !conflictsWithWebKit(vm)) {
-						vms.add(vm);
+				if (vm instanceof AbstractVMInstall) {
+					AbstractVMInstall abstractVm = (AbstractVMInstall) vm;
+					String javaVersion = abstractVm.getJavaVersion();
+					if (javaVersion != null && javaVersion.compareTo("1.6") >= 0) {
+						if (PlatformUtil.OS_WIN32.equals(eclipseOs)) {
+							// can use only 32 bit jvm on windows
+							if (isX86(abstractVm) && !conflictsWithWebKit(abstractVm)) {
+								vms.add(abstractVm);
+							}
+						} else if (PlatformUtil.OS_MACOSX.equals(eclipseOs)) {
+							if (PlatformUtil.ARCH_X86.equals(eclipseArch)) {
+								// Only Java 6 supports 32-bit mode on Mac
+								if (javaVersion.startsWith("1.6")) {
+									vms.add(abstractVm);
+								}
+							} else {
+								vms.add(abstractVm);
+							}
+						} else if (PlatformUtil.OS_LINUX.equals(eclipseOs)) {
+							if (PlatformUtil.ARCH_X86.equals(eclipseArch) == isX86(abstractVm)) {
+								vms.add(abstractVm);
+							}
+						}
 					}
-				} else if (PlatformUtil.OS_MACOSX.equals(PlatformUtil.getOs()) && PlatformUtil.ARCH_X86.equals(PlatformUtil.getArch())) {
-					//cannot use Java 7 for 32bit Studio in Mac OS
-					if ((vm instanceof AbstractVMInstall) && ((AbstractVMInstall) vm).getJavaVersion().compareTo("1.7") < 0) {
-						vms.add(vm);
-					}
-				} else {
-					vms.add(vm);
 				}
 			}
 		}
+		
 		return vms;
 	}
 	

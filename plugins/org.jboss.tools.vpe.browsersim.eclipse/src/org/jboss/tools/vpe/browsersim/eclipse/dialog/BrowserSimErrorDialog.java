@@ -18,6 +18,7 @@ import org.eclipse.swt.widgets.Link;
 import org.eclipse.swt.widgets.Shell;
 import org.eclipse.ui.PlatformUI;
 import org.eclipse.ui.dialogs.PreferencesUtil;
+import org.jboss.tools.vpe.browsersim.browser.PlatformUtil;
 
 public class BrowserSimErrorDialog extends MessageDialog {
 	private static final String BROWSERSIM_PREFERENCE_PAGE_ID = "org.jboss.tools.vpe.browsersim.eclipse.preferences.BrowserSimPreferences";
@@ -39,11 +40,16 @@ public class BrowserSimErrorDialog extends MessageDialog {
         data.horizontalSpan = 2;
         link.setData(data);
 		
-        String message;
-		if (Platform.OS_WIN32.equals(Platform.getOS())) {
+		String message;
+		String os = Platform.getOS();
+		boolean is32bitEclipse = PlatformUtil.ARCH_X86.equals(PlatformUtil.getArch());
+		if (Platform.OS_WIN32.equals(os)) {
 			message = "{0} requires a 32-bit JRE/JDK 6 or JDK 7 to run on Windows.\nPlease go to the <a href=\"#\">{1} preferences</a> and select an appropriate JVM.";
-		} else {
-			message = "{0} requires Java 6 and above to be installed.\nPlease go to the <a href=\"#\">{1} preferences</a> and select an appropriate JVM.";
+		} else if (Platform.OS_MACOSX.equals(os) && is32bitEclipse) {
+			message = "{0} requires Java 6 to be installed.\nPlease go to the <a href=\"#\">{1} preferences</a> and select an appropriate JVM.";
+		} else {// Linux, 64-bit Mac
+			message = "{0} requires " + (is32bitEclipse ? "32-bit" : "64-bit")
+					+ " Java 6 and above to be installed.\nPlease go to the <a href=\"#\">{1} preferences</a> and select an appropriate JVM.";
 		}
 		
 		IPreferenceNode jreNode = getPreferenceNode(BROWSERSIM_PREFERENCE_PAGE_ID);
