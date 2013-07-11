@@ -84,22 +84,25 @@ public class PreferencesUtil {
 		return vms;
 	}
 	
-	public static String getJVMPath(String id) {
+	public static IVMInstall getJVM(String id) {
 		for(IVMInstallType type : JavaRuntime.getVMInstallTypes()) {
 			for(IVMInstall vm : type.getVMInstalls()) {
 				if (id.equals(vm.getId())) {
-					return vm.getInstallLocation().getAbsolutePath();
+					return vm;
 				}
 			}
 		}
-		return "";
+		return null;
 	}
 	
 	public static String getArchitecture(IVMInstall defaultVMInstall) {
-		try {
-			return generateLibraryInfo(defaultVMInstall.getInstallLocation(), getJavaExecutable(defaultVMInstall));
-		} catch (IOException e) {
-			Activator.logError(e.getMessage(), e);
+		String javaCommand = getJavaCommand(defaultVMInstall);
+		if (javaCommand != null) {
+			try {
+				return generateLibraryInfo(defaultVMInstall.getInstallLocation(), javaCommand);
+			} catch (IOException e) {
+				Activator.logError(e.getMessage(), e);
+			}
 		}
 		return null;
 	}
@@ -113,24 +116,28 @@ public class PreferencesUtil {
 		return libxml2.exists();
 	}
 	
-	private static File getJavaExecutable(IVMInstall standardVM) {
-    	File installLocation = standardVM.getInstallLocation();
-        if (installLocation != null) {
-            return StandardVMType.findJavaExecutable(installLocation);
-        }
-        return null;
-    }  
-	
+	public static String getJavaCommand(IVMInstall jvm) {
+		if (jvm != null) {
+			File installLocation = jvm.getInstallLocation();
+			if (installLocation != null) {
+				File javaExecutable = StandardVMType.findJavaExecutable(installLocation);
+				if (javaExecutable != null) {
+					return javaExecutable.getAbsolutePath();
+				}
+			}
+		}
+		return null;
+	}
+
 	/**
 	 * @see org.eclipse.jdt.internal.launching.StandardVMType#generateLibraryInfo
 	 */
 	@SuppressWarnings({ "unchecked" })
-	public static String generateLibraryInfo(File javaHome, File javaExecutable) throws IOException {
+	public static String generateLibraryInfo(File javaHome, String javaCommand) throws IOException {
 		String arch = null;
-		String javaExecutablePath = javaExecutable.getAbsolutePath();
 		String currentBundleLocation = ExternalProcessLauncher
 				.getBundleLocation(Platform.getBundle(Activator.PLUGIN_ID));
-		String[] cmdLine = new String[] {javaExecutablePath, "-cp", currentBundleLocation, "org.jboss.tools.vpe.browsersim.eclipse.preferences.ArchitectureDetector" }; //$NON-NLS-1$ //$NON-NLS-2$
+		String[] cmdLine = new String[] {javaCommand, "-cp", currentBundleLocation, "org.jboss.tools.vpe.browsersim.eclipse.preferences.ArchitectureDetector" }; //$NON-NLS-1$ //$NON-NLS-2$
 		Process p = null;
 		try {
 			String envp[] = null;

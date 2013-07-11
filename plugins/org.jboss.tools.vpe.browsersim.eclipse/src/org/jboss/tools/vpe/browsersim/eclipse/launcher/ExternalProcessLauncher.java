@@ -46,22 +46,21 @@ public class ExternalProcessLauncher {
 		try {			
 			String classPath = getClassPathString(bundles, resourcesBundles);
 			IPreferenceStore store = Activator.getDefault().getPreferenceStore();
-			String jvmPath = "";
+			IVMInstall jvm = null;
 			if (IPreferenceStore.FALSE.equals(store.getString(BrowserSimPreferencesPage.BROWSERSIM_JVM_AUTOMATICALLY))) {
 				// path to browserSim jvm is located in preferences
 				String jvmId = store.getString(BrowserSimPreferencesPage.BROWSERSIM_JVM_ID);
-				jvmPath = PreferencesUtil.getJVMPath(jvmId);
+				jvm = PreferencesUtil.getJVM(jvmId);
 			} else {
 				// detect jvm automatically
 				List<IVMInstall> jvms = PreferencesUtil.getSuitableJvms();
 				if (!jvms.isEmpty()) {
-					jvmPath = jvms.get(0).getInstallLocation().getAbsolutePath();
+					jvm = jvms.get(0);
 				}
 			}
 			
-			if (!jvmPath.isEmpty()) {
-				String javaCommand = jvmPath + "/bin/java"; //$NON-NLS-1$ //$NON-NLS-2$
-				
+			String javaCommand = PreferencesUtil.getJavaCommand(jvm);
+			if (javaCommand != null) {
 				List<String> commandElements = new ArrayList<String>();
 				commandElements.add(javaCommand);
 				
