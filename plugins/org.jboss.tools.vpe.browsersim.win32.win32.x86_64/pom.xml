@@ -38,6 +38,7 @@
   	               </goals>
   	               <phase>generate-resources</phase>
 					<configuration>
+					    <skip>false</skip>
 					    <artifactItems>
 					        <artifactItem>
 					            <groupId>org.jboss.tools.vpe.win32_win32_x86</groupId>
