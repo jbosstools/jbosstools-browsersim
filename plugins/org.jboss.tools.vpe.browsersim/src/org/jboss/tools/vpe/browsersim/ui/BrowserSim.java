@@ -129,12 +129,18 @@ public class BrowserSim {
 			defaultDevice = commonPreferences.getDevices().get(id);
 		}
 		
-		initSkin(BrowserSimUtil.getSkinClass(defaultDevice, specificPreferences.getUseSkins()), specificPreferences.getLocation(), parentShell);
-		setSelectedDevice(null);
-		controlHandler.goToAddress(url);
+		try {
+			initSkin(BrowserSimUtil.getSkinClass(defaultDevice, specificPreferences.getUseSkins()), specificPreferences.getLocation(), parentShell);
+			setSelectedDevice(null);
+			controlHandler.goToAddress(url);
+			
+			instances.add(BrowserSim.this);
+			skin.getShell().open();
+		} catch (SWTError e) {
+			e.printStackTrace();
+			ExceptionNotifier.showWebKitLoadError(new Shell(Display.getDefault()), e, "BrowserSim");
+		}
 		
-		instances.add(BrowserSim.this);
-		skin.getShell().open();
 	}
 	
 	private void initSkin(Class<? extends BrowserSimSkin> skinClass, Point location, final Shell parentShell) {
@@ -152,15 +158,8 @@ public class BrowserSim {
 		
 		Display display = Display.getDefault();
 		
-		try {
-			skin.createControls(display, location, parentShell);
-			currentLocation = location;
-		} catch (SWTError e) {
-			e.printStackTrace();
-			ExceptionNotifier.showWebKitLoadError(new Shell(display), e);
-			display.dispose();
-			return;
-		}
+		skin.createControls(display, location, parentShell);
+		currentLocation = location;
 		
 		final Shell shell = skin.getShell();
 		resizableSkinSizeAdvisor = new ResizableSkinSizeAdvisorImpl(commonPreferences, specificPreferences, shell);

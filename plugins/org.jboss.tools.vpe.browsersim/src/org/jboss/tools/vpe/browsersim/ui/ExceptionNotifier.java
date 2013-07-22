@@ -25,7 +25,7 @@ public class ExceptionNotifier {
 	/**
 	 * Should be used to notify user about WebKit-loading errors
 	 */
-	public static void showWebKitLoadError(Shell parentShell, SWTError error) {
+	public static void showWebKitLoadError(Shell parentShell, SWTError error, String appName) {
 		String os = PlatformUtil.getOs();
 		String arch = PlatformUtil.getArch();
 		String message;
@@ -34,7 +34,7 @@ public class ExceptionNotifier {
 		} else if (PlatformUtil.OS_WIN32.equals(os) && PlatformUtil.ARCH_X86.equals(arch) // Eclipse 32-bit on Windows and
 				&& error.getMessage() != null											  // Safari is not installed
 				&& error.getMessage().contains("Safari must be installed to use a SWT.WEBKIT-style Browser")) { //$NON-NLS-1$
-			message = Messages.ExceptionNotifier_APPLE_APPLICATION_SUPPORT_IS_NOT_FOUND;
+			message = MessageFormat.format(Messages.ExceptionNotifier_APPLE_APPLICATION_SUPPORT_IS_NOT_FOUND, appName);
 		} else if (PlatformUtil.OS_WIN32.equals(os) && PlatformUtil.ARCH_X86.equals(arch) // Eclipse 32-bit on Windows and
 				&& error.getMessage() != null											  // Apple Application Support is not installed and
 				&& error.getMessage().contains("No more handles [Failed to load the swt-webkit library]") // Safari libs cannot be loaded and //$NON-NLS-1$
