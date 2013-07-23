@@ -20,7 +20,6 @@ import java.io.Reader;
 public class TransparentReader {
 	private Reader reader;
 	private PrintStream output;
-	private int prevCharInt = -1;
 
 	public TransparentReader(Reader reader, PrintStream output) {
 		this.reader = reader;
@@ -37,15 +36,11 @@ public class TransparentReader {
 				output.print(nextChar);
 			}				
 			
-			if (nextChar == '\r' || nextChar == '\n') { // EOL
-				if ((nextChar == '\r' && prevCharInt != '\n') || (nextChar == '\n' && prevCharInt != '\r')) {//not second part of CR/LF
-					eolReached = true;
-				}
-			} else {
+			if (nextChar == '\n') {
+				eolReached = true;
+			} else if (nextChar != '\r') {
 				nextLine.append(nextChar);
 			}
-			
-			prevCharInt = nextCharInt;
 		}
 		
 		if (nextLine.length() == 0 && nextCharInt < 0) {// nothing read AND end reached
@@ -53,6 +48,5 @@ public class TransparentReader {
 		} else {
 			return nextLine.toString();
 		}
-	}
-	
+	}	
 }
