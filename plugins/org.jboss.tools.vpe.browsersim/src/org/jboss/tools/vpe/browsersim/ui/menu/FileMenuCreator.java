@@ -29,6 +29,7 @@ import org.eclipse.swt.widgets.Menu;
 import org.eclipse.swt.widgets.MenuItem;
 import org.eclipse.swt.widgets.Shell;
 import org.jboss.tools.vpe.browsersim.BrowserSimArgs;
+import org.jboss.tools.vpe.browsersim.BrowserSimLogger;
 import org.jboss.tools.vpe.browsersim.browser.PlatformUtil;
 import org.jboss.tools.vpe.browsersim.model.preferences.CommonPreferences;
 import org.jboss.tools.vpe.browsersim.model.preferences.SpecificPreferences;
@@ -65,14 +66,14 @@ public class FileMenuCreator {
 		MenuItem openInDefaultBrowser = new MenuItem(menu, SWT.PUSH);
 		openInDefaultBrowser.setText(Messages.BrowserSim_OPEN_IN_DEFAULT_BROWSER);
 		openInDefaultBrowser.addSelectionListener(new SelectionAdapter() {
-			public void widgetSelected(SelectionEvent e) {
+			public void widgetSelected(SelectionEvent event) {
 				URL url;
 				try {
 					url = new URL(skin.getBrowser().getUrl());// validate URL (to do not open 'about:blank' and similar)
 					Program.launch(url.toString());
-				} catch (MalformedURLException e1) {
-					e1.printStackTrace();
-					ExceptionNotifier.showErrorMessage(skin.getShell(), Messages.BrowserSim_COULD_NOT_OPEN_DEFAULT_BROWSER + e1.getMessage());
+				} catch (MalformedURLException e) {
+					BrowserSimLogger.logError(e.getMessage(), e);
+					ExceptionNotifier.showErrorMessage(skin.getShell(), Messages.BrowserSim_COULD_NOT_OPEN_DEFAULT_BROWSER + e.getMessage());
 				}
 			}
 		});
@@ -82,7 +83,7 @@ public class FileMenuCreator {
 		MenuItem openInDefaultBrowser = new MenuItem(menu, SWT.PUSH);
 		openInDefaultBrowser.setText(Messages.BrowserSim_VIEW_PAGE_SOURCE);
 		openInDefaultBrowser.addSelectionListener(new SelectionAdapter() {
-			public void widgetSelected(SelectionEvent e) {
+			public void widgetSelected(SelectionEvent event) {
 				if (BrowserSimArgs.standalone) {
 					final BrowserSimSourceViewer sourceViewer = new BrowserSimSourceViewer(BrowserSimUtil.getParentShell(skin));
 					sourceViewer.setText(skin.getBrowser().getText());
@@ -104,8 +105,8 @@ public class FileMenuCreator {
 							uri = new URI(skin.getBrowser().getUrl());
 							File sourceFile = new File(uri);
 							System.out.println(OPEN_FILE_COMMAND + sourceFile.getAbsolutePath()); // send command to Eclipse
-						} catch (URISyntaxException e1) {
-							e1.printStackTrace();
+						} catch (URISyntaxException e) {
+							BrowserSimLogger.logError(e.getMessage(), e);
 						}
 					} else {
 						System.out.println(VIEW_SOURCE_COMMAND + skin.getBrowser().getUrl()); // send command to Eclipse

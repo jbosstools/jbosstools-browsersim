@@ -41,6 +41,7 @@ import org.eclipse.swt.widgets.Event;
 import org.eclipse.swt.widgets.Listener;
 import org.eclipse.swt.widgets.Menu;
 import org.eclipse.swt.widgets.Shell;
+import org.jboss.tools.vpe.browsersim.BrowserSimLogger;
 import org.jboss.tools.vpe.browsersim.BrowserSimRunner;
 import org.jboss.tools.vpe.browsersim.browser.BrowserSimBrowser;
 import org.jboss.tools.vpe.browsersim.browser.PlatformUtil;
@@ -117,7 +118,7 @@ public class BrowserSim {
 		initObservers();
 		Device defaultDevice = commonPreferences.getDevices().get(specificPreferences.getSelectedDeviceId()); 
 		if (defaultDevice == null) {
-			System.out.println("Could not find selected device in devices list");
+			BrowserSimLogger.logError("Could not find selected device in devices list", new NullPointerException());
 			String id;
 			try {
 				id = commonPreferences.getDevices().keySet().iterator().next();
@@ -147,11 +148,9 @@ public class BrowserSim {
 		try {
 			skin = skinClass.newInstance();//new AppleIPhone3Skin();//new NativeSkin();
 		} catch (InstantiationException e1) {
-			// TODO Auto-generated catch block
-			e1.printStackTrace();
+			BrowserSimLogger.logError(e1.getMessage(), e1);
 		} catch (IllegalAccessException e1) {
-			// TODO Auto-generated catch block
-			e1.printStackTrace();
+			BrowserSimLogger.logError(e1.getMessage(), e1);
 		}
 
 		skin.setBrowserFactory(new WebKitBrowserFactory());

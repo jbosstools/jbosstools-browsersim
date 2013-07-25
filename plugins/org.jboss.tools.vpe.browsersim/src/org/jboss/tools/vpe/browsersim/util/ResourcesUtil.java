@@ -15,6 +15,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 
+import org.jboss.tools.vpe.browsersim.BrowserSimLogger;
 import org.jboss.tools.vpe.browsersim.ui.BrowserSim;
 
 /**
@@ -46,7 +47,7 @@ public class ResourcesUtil {
 				bufferedReader.close();
 			}
 		} catch (IOException e) {
-			e.printStackTrace();
+			BrowserSimLogger.logError(e.getMessage(), e);
 		}
 
 		return stringBuilder.toString();

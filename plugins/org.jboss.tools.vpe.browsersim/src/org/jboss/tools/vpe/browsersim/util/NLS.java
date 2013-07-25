@@ -15,6 +15,8 @@ import java.lang.reflect.Modifier;
 import java.util.MissingResourceException;
 import java.util.ResourceBundle;
 
+import org.jboss.tools.vpe.browsersim.BrowserSimLogger;
+
 /**
  * @author Yahor Radtsevich (yradtsevich)
  */
@@ -45,7 +47,7 @@ public class NLS {
 				}
 			}
 		}  catch (IllegalAccessException e) {
-			e.printStackTrace();
+			BrowserSimLogger.logError(e.getMessage(), e);
 		}
 	}
 }

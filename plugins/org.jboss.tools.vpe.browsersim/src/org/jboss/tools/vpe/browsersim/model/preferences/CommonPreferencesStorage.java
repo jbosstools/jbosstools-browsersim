@@ -28,6 +28,7 @@ import javax.xml.transform.TransformerFactory;
 import javax.xml.transform.dom.DOMSource;
 import javax.xml.transform.stream.StreamResult;
 
+import org.jboss.tools.vpe.browsersim.BrowserSimLogger;
 import org.jboss.tools.vpe.browsersim.model.Device;
 import org.jboss.tools.vpe.browsersim.model.TruncateWindow;
 import org.jboss.tools.vpe.browsersim.util.PreferencesUtil;
@@ -81,7 +82,7 @@ public class CommonPreferencesStorage implements PreferencesStorage{
 		try {
 			saveCommonPreferences((CommonPreferences) o, configFile);
 		} catch (IOException e) {
-			e.printStackTrace();
+			BrowserSimLogger.logError(e.getMessage(), e);
 		}
 	}
 	
@@ -94,7 +95,7 @@ public class CommonPreferencesStorage implements PreferencesStorage{
 			try {
 				commonPreferences = load(new FileInputStream(customConfigFile));
 			} catch (IOException e) {
-				e.printStackTrace();
+				BrowserSimLogger.logError(e.getMessage(), e);
 			}
 		}
 		
@@ -174,7 +175,7 @@ public class CommonPreferencesStorage implements PreferencesStorage{
 												.getTextContent()).doubleValue();
 							} catch (ParseException e) {
 								pixelRatio = 1.0;
-								e.printStackTrace();
+								BrowserSimLogger.logError(e.getMessage(), e);
 							}
 							String id = device.getAttribute(PREFERENCES_ID); 
 							if (id.isEmpty()) {
@@ -194,22 +195,22 @@ public class CommonPreferencesStorage implements PreferencesStorage{
 				return new CommonPreferences(devices, truncateWindow, screenshotsFolder, weinreScriptUrl, weinreClientUrl);
 			}
 		} catch (ParserConfigurationException e) {
-			e.printStackTrace();
+			BrowserSimLogger.logError(e.getMessage(), e);
 		} catch (SAXException e) {
-			e.printStackTrace();
+			BrowserSimLogger.logError(e.getMessage(), e);
 		} catch (FactoryConfigurationError e) {
-			e.printStackTrace();
+			BrowserSimLogger.logError(e.getMessage(), e);
 		} catch (IOException e) {
-			e.printStackTrace();
+			BrowserSimLogger.logError(e.getMessage(), e);
 		} catch (RuntimeException e) {
 			//catched to avoid exceptions like NPE, NFE, etc
-			e.printStackTrace();
+			BrowserSimLogger.logError(e.getMessage(), e);
 		} finally {
 			try {
 				if (is != null)
 					is.close();
-			} catch (IOException ex) {
-				ex.printStackTrace();
+			} catch (IOException e) {
+				BrowserSimLogger.logError(e.getMessage(), e);
 			}
 		}
 		
@@ -281,10 +282,10 @@ public class CommonPreferencesStorage implements PreferencesStorage{
 			TransformerFactory transformerFactory = TransformerFactory.newInstance();
 			transformerFactory.newTransformer().transform(new DOMSource(doc), new StreamResult(file));
 
-		} catch (ParserConfigurationException pce) {
-			pce.printStackTrace();
-		} catch (TransformerException tfe) {
-			tfe.printStackTrace();
+		} catch (ParserConfigurationException e) {
+			BrowserSimLogger.logError(e.getMessage(), e);
+		} catch (TransformerException e) {
+			BrowserSimLogger.logError(e.getMessage(), e);
 		}
 	}
 	
