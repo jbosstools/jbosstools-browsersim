@@ -46,7 +46,12 @@ public class PreferencesUtil {
 	 */
 	protected static final String JAVA_JVM_VERSION = "JAVA_JVM_VERSION"; //$NON-NLS-1$
 	
-	public static List<IVMInstall> getSuitableJvms() {
+	/**
+	 * @return JVMs which can run BrowserSim, but no more than {@code limit}.
+	 * If {@code limit <= 0} returns all suitable JVMs not limiting their number.
+	 * The less {@code limit}, the faster the method performs. 
+	 */
+	public static List<IVMInstall> getSuitableJvms(int limit) {
 		String eclipseOs = PlatformUtil.getOs();
 		String eclipseArch = PlatformUtil.getArch();
 		
@@ -78,10 +83,18 @@ public class PreferencesUtil {
 						}
 					}
 				}
+				
+				if (limit > 0 && vms.size() >= limit) {// if limit <= 0, return all
+					return vms;
+				}
 			}
 		}
 		
 		return vms;
+	}
+	
+	public static List<IVMInstall> getSuitableJvms() {
+		return getSuitableJvms(0);
 	}
 	
 	public static IVMInstall getJVM(String id) {

@@ -53,7 +53,7 @@ public class ExternalProcessLauncher {
 				jvm = PreferencesUtil.getJVM(jvmId);
 			} else {
 				// detect jvm automatically
-				List<IVMInstall> jvms = PreferencesUtil.getSuitableJvms();
+				List<IVMInstall> jvms = PreferencesUtil.getSuitableJvms(1);
 				if (!jvms.isEmpty()) {
 					jvm = jvms.get(0);
 				}
