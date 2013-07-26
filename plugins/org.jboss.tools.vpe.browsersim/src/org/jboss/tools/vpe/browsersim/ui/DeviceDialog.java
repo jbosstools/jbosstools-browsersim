@@ -39,6 +39,7 @@ import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Shell;
 import org.eclipse.swt.widgets.Text;
+import org.jboss.tools.vpe.browsersim.BrowserSimLogger;
 import org.jboss.tools.vpe.browsersim.model.Device;
 import org.jboss.tools.vpe.browsersim.model.SkinMap;
 import org.jboss.tools.vpe.browsersim.ui.skin.BrowserSimSkin;
@@ -318,9 +319,9 @@ public abstract class DeviceDialog extends Dialog {
 				buttonOk.setEnabled(true);
 			}
 		} catch (InstantiationException e) {
-			e.printStackTrace();
+			BrowserSimLogger.logError(e.getMessage(), e);
 		} catch (IllegalAccessException e) {
-			e.printStackTrace();
+			BrowserSimLogger.logError(e.getMessage(), e);
 		}
 		
 	}

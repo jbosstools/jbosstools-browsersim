@@ -32,6 +32,7 @@ import org.eclipse.swt.widgets.MenuItem;
 import org.eclipse.swt.widgets.ProgressBar;
 import org.eclipse.swt.widgets.Shell;
 import org.eclipse.swt.widgets.Text;
+import org.jboss.tools.vpe.browsersim.BrowserSimLogger;
 import org.jboss.tools.vpe.browsersim.model.Device;
 import org.jboss.tools.vpe.browsersim.model.preferences.BrowserSimSpecificPreferences;
 import org.jboss.tools.vpe.browsersim.model.preferences.CommonPreferences;
@@ -139,7 +140,7 @@ public class ToolsMenuCreator {
 					browserData.grabExcessVerticalSpace = true;
 					browser.setLayoutData(browserData);
 				} catch (SWTError e2) {
-					System.out.println("Could not instantiate Browser: " + e2.getMessage());
+					BrowserSimLogger.logError("Could not instantiate Browser", e2);
 					display.dispose();
 					return;
 				}

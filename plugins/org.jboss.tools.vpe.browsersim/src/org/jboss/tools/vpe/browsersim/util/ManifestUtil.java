@@ -21,6 +21,7 @@ import java.util.jar.Attributes;
 import java.util.jar.JarFile;
 import java.util.jar.Manifest;
 
+import org.jboss.tools.vpe.browsersim.BrowserSimLogger;
 import org.jboss.tools.vpe.browsersim.ui.BrowserSim;
 
 /**
@@ -63,7 +64,7 @@ public class ManifestUtil {
 				}
 			}
 		} catch (IOException e) {
-			e.printStackTrace();
+			BrowserSimLogger.logError(e.getMessage(), e);
 			version = null;
 		}
 	

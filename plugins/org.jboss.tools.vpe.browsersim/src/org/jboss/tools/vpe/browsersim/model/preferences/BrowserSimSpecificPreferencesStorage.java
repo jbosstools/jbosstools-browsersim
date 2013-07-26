@@ -24,6 +24,7 @@ import javax.xml.transform.dom.DOMSource;
 import javax.xml.transform.stream.StreamResult;
 
 import org.eclipse.swt.graphics.Point;
+import org.jboss.tools.vpe.browsersim.BrowserSimLogger;
 import org.jboss.tools.vpe.browsersim.util.BrowserSimResourcesUtil;
 import org.jboss.tools.vpe.browsersim.util.PreferencesUtil;
 import org.w3c.dom.Document;
@@ -101,22 +102,22 @@ public class BrowserSimSpecificPreferencesStorage extends SpecificPreferencesSto
 				return new BrowserSimSpecificPreferences(selectedDeviceId, useSkins, enableLiveReload, liveReloadPort, orientationAngle, currentlocation);
 			}
 		} catch (SAXException e) {
-			e.printStackTrace();
+			BrowserSimLogger.logError(e.getMessage(), e);
 		} catch (ParserConfigurationException e) {
-			e.printStackTrace();
+			BrowserSimLogger.logError(e.getMessage(), e);
 		} catch (IOException e) {
-			e.printStackTrace();
+			BrowserSimLogger.logError(e.getMessage(), e);
 		} catch (FactoryConfigurationError e) {
-			e.printStackTrace();
+			BrowserSimLogger.logError(e.getMessage(), e);
 		} catch (RuntimeException e) {
 			//catched to avoid exceptions like NPE, NFE, etc
-			e.printStackTrace();
+			BrowserSimLogger.logError(e.getMessage(), e);
 		} finally {
 			try {
 				if (is != null)
 					is.close();
-			} catch (IOException ex) {
-				ex.printStackTrace();
+			} catch (IOException e) {
+				BrowserSimLogger.logError(e.getMessage(), e);
 			}
 		}
 
@@ -168,10 +169,10 @@ public class BrowserSimSpecificPreferencesStorage extends SpecificPreferencesSto
 			TransformerFactory transformerFactory = TransformerFactory.newInstance();
 			transformerFactory.newTransformer().transform(new DOMSource(doc), new StreamResult(file));
 
-		} catch (ParserConfigurationException pce) {
-			pce.printStackTrace();
-		} catch (TransformerException tfe) {
-			tfe.printStackTrace();
+		} catch (ParserConfigurationException e) {
+			BrowserSimLogger.logError(e.getMessage(), e);
+		} catch (TransformerException e) {
+			BrowserSimLogger.logError(e.getMessage(), e);
 		}
 	}
 

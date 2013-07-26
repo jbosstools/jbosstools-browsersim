@@ -15,6 +15,7 @@ import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.InputStream;
 
+import org.jboss.tools.vpe.browsersim.BrowserSimLogger;
 import org.jboss.tools.vpe.browsersim.util.PreferencesUtil;
 
 /**
@@ -54,7 +55,7 @@ public abstract class SpecificPreferencesStorage implements PreferencesStorage{
 			try {
 				specificPreferences = load(new FileInputStream(customConfigFile));
 			} catch (FileNotFoundException e) {
-				e.printStackTrace();
+				BrowserSimLogger.logError(e.getMessage(), e);
 			}
 		}
 		

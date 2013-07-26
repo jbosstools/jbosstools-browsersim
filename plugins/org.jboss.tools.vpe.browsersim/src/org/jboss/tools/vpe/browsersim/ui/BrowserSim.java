@@ -41,6 +41,7 @@ import org.eclipse.swt.widgets.Event;
 import org.eclipse.swt.widgets.Listener;
 import org.eclipse.swt.widgets.Menu;
 import org.eclipse.swt.widgets.Shell;
+import org.jboss.tools.vpe.browsersim.BrowserSimLogger;
 import org.jboss.tools.vpe.browsersim.BrowserSimRunner;
 import org.jboss.tools.vpe.browsersim.browser.BrowserSimBrowser;
 import org.jboss.tools.vpe.browsersim.browser.PlatformUtil;
@@ -117,7 +118,7 @@ public class BrowserSim {
 		initObservers();
 		Device defaultDevice = commonPreferences.getDevices().get(specificPreferences.getSelectedDeviceId()); 
 		if (defaultDevice == null) {
-			System.out.println("Could not find selected device in devices list");
+			BrowserSimLogger.logError("Could not find selected device in devices list", new NullPointerException());
 			String id;
 			try {
 				id = commonPreferences.getDevices().keySet().iterator().next();
@@ -129,29 +130,21 @@ public class BrowserSim {
 			defaultDevice = commonPreferences.getDevices().get(id);
 		}
 		
-		try {
-			initSkin(BrowserSimUtil.getSkinClass(defaultDevice, specificPreferences.getUseSkins()), specificPreferences.getLocation(), parentShell);
-			setSelectedDevice(null);
-			controlHandler.goToAddress(url);
-			
-			instances.add(BrowserSim.this);
-			skin.getShell().open();
-		} catch (SWTError e) {
-			e.printStackTrace();
-			ExceptionNotifier.showWebKitLoadError(new Shell(Display.getDefault()), e, "BrowserSim");
-		}
+		initSkin(BrowserSimUtil.getSkinClass(defaultDevice, specificPreferences.getUseSkins()), specificPreferences.getLocation(), parentShell);
+		setSelectedDevice(null);
+		controlHandler.goToAddress(url);
 		
+		instances.add(BrowserSim.this);
+		skin.getShell().open();
 	}
 	
 	private void initSkin(Class<? extends BrowserSimSkin> skinClass, Point location, final Shell parentShell) {
 		try {
 			skin = skinClass.newInstance();//new AppleIPhone3Skin();//new NativeSkin();
 		} catch (InstantiationException e1) {
-			// TODO Auto-generated catch block
-			e1.printStackTrace();
+			BrowserSimLogger.logError(e1.getMessage(), e1);
 		} catch (IllegalAccessException e1) {
-			// TODO Auto-generated catch block
-			e1.printStackTrace();
+			BrowserSimLogger.logError(e1.getMessage(), e1);
 		}
 
 		skin.setBrowserFactory(new WebKitBrowserFactory());

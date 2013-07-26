@@ -20,6 +20,7 @@ import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Monitor;
 import org.eclipse.swt.widgets.Shell;
 import org.eclipse.swt.widgets.Widget;
+import org.jboss.tools.vpe.browsersim.BrowserSimLogger;
 import org.jboss.tools.vpe.browsersim.browser.PlatformUtil;
 import org.jboss.tools.vpe.browsersim.model.Device;
 import org.jboss.tools.vpe.browsersim.model.SkinMap;
@@ -86,7 +87,8 @@ public class BrowserSimUtil {
 		double pixelRatio = device.getPixelRatio();
 		if (device.getPixelRatio() == 0.0) {
 			pixelRatio = 1.0;
-			new RuntimeException("Pixel Ratio is 0.0").printStackTrace();
+			RuntimeException e = new RuntimeException("Pixel Ratio is 0.0");
+			BrowserSimLogger.logError(e.getMessage(), e);
 		}
 		int width = (int) Math.round(device.getWidth() / pixelRatio);
 		int height = (int) Math.round(device.getHeight() / pixelRatio);
