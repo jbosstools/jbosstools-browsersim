@@ -130,18 +130,12 @@ public class BrowserSim {
 			defaultDevice = commonPreferences.getDevices().get(id);
 		}
 		
-		try {
-			initSkin(BrowserSimUtil.getSkinClass(defaultDevice, specificPreferences.getUseSkins()), specificPreferences.getLocation(), parentShell);
-			setSelectedDevice(null);
-			controlHandler.goToAddress(url);
-			
-			instances.add(BrowserSim.this);
-			skin.getShell().open();
-		} catch (SWTError e) {
-			e.printStackTrace();
-			ExceptionNotifier.showWebKitLoadError(new Shell(Display.getDefault()), e, "BrowserSim");
-		}
+		initSkin(BrowserSimUtil.getSkinClass(defaultDevice, specificPreferences.getUseSkins()), specificPreferences.getLocation(), parentShell);
+		setSelectedDevice(null);
+		controlHandler.goToAddress(url);
 		
+		instances.add(BrowserSim.this);
+		skin.getShell().open();
 	}
 	
 	private void initSkin(Class<? extends BrowserSimSkin> skinClass, Point location, final Shell parentShell) {

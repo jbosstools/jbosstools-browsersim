@@ -16,6 +16,7 @@ import org.eclipse.swt.SWT;
 import org.eclipse.swt.SWTError;
 import org.eclipse.swt.widgets.MessageBox;
 import org.eclipse.swt.widgets.Shell;
+import org.jboss.tools.vpe.browsersim.BrowserSimLogger;
 import org.jboss.tools.vpe.browsersim.browser.PlatformUtil;
 
 /**
@@ -25,7 +26,7 @@ public class ExceptionNotifier {
 	/**
 	 * Should be used to notify user about WebKit-loading errors
 	 */
-	public static void showWebKitLoadError(Shell parentShell, SWTError error, String appName) {
+	public static void showBrowserSimLoadError(Shell parentShell, SWTError error, String appName) {
 		String os = PlatformUtil.getOs();
 		String arch = PlatformUtil.getArch();
 		String message;
@@ -46,11 +47,11 @@ public class ExceptionNotifier {
 		} else {																	  // everything else
 			message = MessageFormat.format(Messages.ExceptionNotifier_BROWSERSIM_IS_FAILED_TO_START, error.getMessage());
 		}
-		showErrorMessageWithLinks(parentShell, message);
+		showErrorMessageWithLinks(parentShell, message, error);
 	}
 
 	public static void showErrorMessage(Shell shell, String message) {
-		System.err.println(message);
+		BrowserSimLogger.logError(message, null);
 
 		MessageBox messageBox = new MessageBox(shell, SWT.OK | SWT.ICON_ERROR);
 		messageBox.setText(Messages.BrowserSim_ERROR);
@@ -58,8 +59,8 @@ public class ExceptionNotifier {
 		messageBox.open();
 	}
 
-	public static void showErrorMessageWithLinks(Shell shell, String message) {
-		System.err.println(message);
+	private static void showErrorMessageWithLinks(Shell shell, String message, Throwable throwable) {
+		BrowserSimLogger.logError(message, throwable);
 
 		MessageBoxWithLinks messageBox = new MessageBoxWithLinks(shell,
 				message, shell.getDisplay().getSystemImage(SWT.ICON_ERROR),

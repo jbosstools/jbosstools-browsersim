@@ -14,12 +14,14 @@ import java.net.URI;
 import java.net.URISyntaxException;
 
 import org.eclipse.swt.SWT;
+import org.eclipse.swt.SWTError;
 import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Shell;
 import org.jboss.tools.vpe.browsersim.browser.PlatformUtil;
 import org.jboss.tools.vpe.browsersim.ui.BrowserSim;
 import org.jboss.tools.vpe.browsersim.ui.CocoaUIEnhancer;
+import org.jboss.tools.vpe.browsersim.ui.ExceptionNotifier;
 import org.jboss.tools.vpe.browsersim.ui.Messages;
 import org.jboss.tools.vpe.browsersim.util.BrowserSimImageList;
 
@@ -35,41 +37,51 @@ public class BrowserSimRunner {
 	public static final String ABOUT_BLANK = "about:blank"; //"http://www.w3schools.com/js/tryit_view.asp?filename=try_nav_useragent"; //$NON-NLS-1$
 	
 	public static void main(String[] args) {
-		if (PlatformUtil.OS_MACOSX.equals(PlatformUtil.getOs())) {
-			CocoaUIEnhancer.initializeMacOSMenuBar(Messages.BrowserSim_BROWSER_SIM);
-		}
-		BrowserSimArgs browserSimArgs = BrowserSimArgs.parseArgs(args);
-
-		String path = browserSimArgs.getPath();
-		String url;
-		if (path != null) {
-			try {
-				new URI(path); // validate URL
-				url = path;
-			} catch (URISyntaxException e) {
+		Display display = null;
+		try {
+			if (PlatformUtil.OS_MACOSX.equals(PlatformUtil.getOs())) {
+				CocoaUIEnhancer.initializeMacOSMenuBar(Messages.BrowserSim_BROWSER_SIM);
+			}
+			BrowserSimArgs browserSimArgs = BrowserSimArgs.parseArgs(args);
+	
+			String path = browserSimArgs.getPath();
+			String url;
+			if (path != null) {
+				try {
+					new URI(path); // validate URL
+					url = path;
+				} catch (URISyntaxException e) {
+					url = ABOUT_BLANK;
+				}
+			} else {
 				url = ABOUT_BLANK;
 			}
-		} else {
-			url = ABOUT_BLANK;
-		}
-
-		Shell parent = null;
-		if (!PlatformUtil.OS_MACOSX.equals(PlatformUtil.getOs())) {
-			parent = new Shell(Display.getDefault(), SWT.NO_TRIM);
-			parent.setSize(0, 0);
-			setShellAttributes(parent);
-			parent.open();
-		}
-		BrowserSim browserSim = new BrowserSim(url, parent);
-		browserSim.open();
-
-		Display display = Display.getDefault();
-		while (!display.isDisposed() && BrowserSim.getInstances().size() > 0) {
-			if (!display.readAndDispatch()) {
-				display.sleep();
+	
+			Shell parent = null;
+			if (!PlatformUtil.OS_MACOSX.equals(PlatformUtil.getOs())) {
+				parent = new Shell(Display.getDefault(), SWT.NO_TRIM);
+				parent.setSize(0, 0);
+				setShellAttributes(parent);
+				parent.open();
+			}
+			BrowserSim browserSim = new BrowserSim(url, parent);
+			browserSim.open();
+	
+			display = Display.getDefault();
+			while (!display.isDisposed() && BrowserSim.getInstances().size() > 0) {
+				if (!display.readAndDispatch()) {
+					display.sleep();
+				}
+			}
+		} catch (SWTError e) {
+			ExceptionNotifier.showBrowserSimLoadError(new Shell(Display.getDefault()), e, "BrowserSim");
+		} catch (Throwable t) {
+			BrowserSimLogger.logError(t.getMessage(), t);
+		} finally {
+			if (display != null) {
+				display.dispose();
 			}
 		}
-		display.dispose();
 	}
 	
 	private static Image[] initImages(Shell shell) {
