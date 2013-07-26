@@ -74,7 +74,7 @@ public class BrowserSimRunner {
 				}
 			}
 		} catch (SWTError e) {
-			ExceptionNotifier.showBrowserSimLoadError(new Shell(Display.getDefault()), e, "BrowserSim");
+			ExceptionNotifier.showBrowserSimLoadError(new Shell(Display.getDefault()), e, Messages.BrowserSim_BROWSER_SIM);
 		} catch (Throwable t) {
 			BrowserSimLogger.logError(t.getMessage(), t);
 		} finally {

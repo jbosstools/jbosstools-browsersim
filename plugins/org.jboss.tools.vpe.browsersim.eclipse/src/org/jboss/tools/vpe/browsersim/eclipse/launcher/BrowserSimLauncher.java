@@ -16,6 +16,7 @@ import java.util.List;
 
 import org.jboss.tools.vpe.browsersim.browser.PlatformUtil;
 import org.jboss.tools.vpe.browsersim.eclipse.callbacks.LogCallback;
+import org.jboss.tools.vpe.browsersim.eclipse.Messages;
 import org.jboss.tools.vpe.browsersim.eclipse.callbacks.OpenFileCallback;
 import org.jboss.tools.vpe.browsersim.eclipse.callbacks.ViewSourceCallback;
 
@@ -31,7 +32,7 @@ public class BrowserSimLauncher {
 	);
 	public static final List<String> BUNDLES = getBundles();
 	public static final List<String> RESOURCES_BUNDLES = Arrays.asList(
-		"org.jboss.tools.vpe.browsersim.win32.win32.x86_64"
+		"org.jboss.tools.vpe.browsersim.win32.win32.x86_64" //$NON-NLS-1$
 	);
 	
 	//if you change this parameter, see also @org.jbosstools.browsersim.ui.BrowserSim
@@ -47,19 +48,19 @@ public class BrowserSimLauncher {
 		}
 		
 		ExternalProcessLauncher.launchAsExternalProcess(BUNDLES, RESOURCES_BUNDLES,
-				BROWSERSIM_CALLBACKS, BROWSERSIM_CLASS_NAME, parameters, "BrowserSim");
+				BROWSERSIM_CALLBACKS, BROWSERSIM_CLASS_NAME, parameters, Messages.BrowserSim);
 	}
 	
 	private static List<String> getBundles() {
 		List<String> bundles = new ArrayList<String>();
-		bundles.add("org.jboss.tools.vpe.browsersim");
-		bundles.add("org.jboss.tools.vpe.browsersim.browser");
+		bundles.add("org.jboss.tools.vpe.browsersim"); //$NON-NLS-1$
+		bundles.add("org.jboss.tools.vpe.browsersim.browser"); //$NON-NLS-1$
 		
 		//for Win64 we add swt from fragment which mached in resources
 		if (!(PlatformUtil.OS_WIN32.equals(PlatformUtil.getOs())
 				&& PlatformUtil.ARCH_X64.equals(PlatformUtil.getArch()))) {
-			bundles.add("org.eclipse.swt");
-			bundles.add("org.eclipse.swt."+ PlatformUtil.CURRENT_PLATFORM);
+			bundles.add("org.eclipse.swt"); //$NON-NLS-1$
+			bundles.add("org.eclipse.swt."+ PlatformUtil.CURRENT_PLATFORM); //$NON-NLS-1$
 		}
 		return bundles;
 	}

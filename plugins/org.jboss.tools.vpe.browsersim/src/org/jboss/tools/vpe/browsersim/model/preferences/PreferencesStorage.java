@@ -17,6 +17,8 @@ package org.jboss.tools.vpe.browsersim.model.preferences;
  */
 
 public interface PreferencesStorage {
+	static final String PREFERENCES_BROWSERSIM = "browserSim"; //$NON-NLS-1$
+	
 	public void save(Object o);
 	
 	public Object load();

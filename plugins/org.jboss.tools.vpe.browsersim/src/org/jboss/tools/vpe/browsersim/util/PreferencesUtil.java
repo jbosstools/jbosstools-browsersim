@@ -20,11 +20,11 @@ import org.w3c.dom.Node;
  */
 
 public class PreferencesUtil {
-	public static final String SEPARATOR = System.getProperty("file.separator");
-	public static final String USER_HOME = System.getProperty("user.home");
+	public static final String SEPARATOR = System.getProperty("file.separator"); //$NON-NLS-1$
+	public static final String USER_HOME = System.getProperty("user.home"); //$NON-NLS-1$
 	
-	private static final String STANDALONE_PREFERENCES_FOLDER = ".browsersim";
-	private static final String USER_PREFERENCES_FOLDER = "org.jboss.tools.vpe.browsersim";
+	private static final String STANDALONE_PREFERENCES_FOLDER = ".browsersim"; //$NON-NLS-1$
+	private static final String USER_PREFERENCES_FOLDER = "org.jboss.tools.vpe.browsersim"; //$NON-NLS-1$
 	
 	public static final String getConfigFolderPath() {
 		return BrowserSimArgs.standalone ? USER_HOME + SEPARATOR + STANDALONE_PREFERENCES_FOLDER : USER_PREFERENCES_FOLDER;

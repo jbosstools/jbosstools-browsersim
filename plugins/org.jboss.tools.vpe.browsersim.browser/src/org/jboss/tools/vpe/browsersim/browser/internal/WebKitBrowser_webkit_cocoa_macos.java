@@ -21,7 +21,6 @@ import org.jboss.tools.vpe.browsersim.browser.AbstractWebKitBrowser;
 /**
  * @author Yahor Radtsevich (yradtsevich)
  */
-@SuppressWarnings("nls")
 public class WebKitBrowser_webkit_cocoa_macos extends AbstractWebKitBrowser {
 	
 	public WebKitBrowser_webkit_cocoa_macos(Composite parent, int style) {
@@ -30,20 +29,20 @@ public class WebKitBrowser_webkit_cocoa_macos extends AbstractWebKitBrowser {
 
 	protected void setCustomUserAgent(String userAgent) {
 		try {
-			Field webBrowserField = Browser.class.getDeclaredField("webBrowser");
+			Field webBrowserField = Browser.class.getDeclaredField("webBrowser"); //$NON-NLS-1$
 			webBrowserField.setAccessible(true);
 			Object webKit = webBrowserField.get(this);
 	
-			Field webViewField = webKit.getClass().getDeclaredField("webView");
+			Field webViewField = webKit.getClass().getDeclaredField("webView"); //$NON-NLS-1$
 			webViewField.setAccessible(true);
 			Object webView = webViewField.get(webKit);
-			Class<?> NSString = Browser.class.getClassLoader().loadClass("org.eclipse.swt.internal.cocoa.NSString");
-			Method setCustomUserAgent = webView.getClass().getDeclaredMethod("setCustomUserAgent", NSString);
+			Class<?> NSString = Browser.class.getClassLoader().loadClass("org.eclipse.swt.internal.cocoa.NSString"); //$NON-NLS-1$
+			Method setCustomUserAgent = webView.getClass().getDeclaredMethod("setCustomUserAgent", NSString); //$NON-NLS-1$
 			
 			if (userAgent == null) {
 				setCustomUserAgent.invoke(webView, (Object) null);
 			} else {
-				Method NSString_stringWith = NSString.getDeclaredMethod("stringWith", String.class);
+				Method NSString_stringWith = NSString.getDeclaredMethod("stringWith", String.class); //$NON-NLS-1$
 				//setCustomUserAgent.invoke(webView, org.eclipse.swt.internal.cocoa.NSString.stringWith(userAgent));
 				setCustomUserAgent.invoke(webView, NSString_stringWith.invoke(null, userAgent));
 			}

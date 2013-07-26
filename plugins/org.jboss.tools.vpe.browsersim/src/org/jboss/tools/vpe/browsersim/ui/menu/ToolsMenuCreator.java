@@ -77,8 +77,8 @@ public class ToolsMenuCreator {
 		weinre.addSelectionListener(new SelectionAdapter() {
 			public void widgetSelected(SelectionEvent e) {
 				//check if weinre url injected by user only in first page
-				String clientUrl = (String) skin.getBrowser().evaluate("if(window.WeinreServerURL && window.WeinreServerId) {return window.WeinreServerURL + 'client/'} else {return null}");
-				String id = (String) skin.getBrowser().evaluate("if(window.WeinreServerURL && window.WeinreServerId) {return window.WeinreServerId} else {return null}");
+				String clientUrl = (String) skin.getBrowser().evaluate("if(window.WeinreServerURL && window.WeinreServerId) {return window.WeinreServerURL + 'client/'} else {return null}"); //$NON-NLS-1$
+				String id = (String) skin.getBrowser().evaluate("if(window.WeinreServerURL && window.WeinreServerId) {return window.WeinreServerId} else {return null}"); //$NON-NLS-1$
 				
 				if (clientUrl == null || id == null) {
 					id = UUID.randomUUID().toString();
@@ -154,16 +154,16 @@ public class ToolsMenuCreator {
 	}
 	
 	private static void injectUrl(Browser browser, String scriptUrl, String ID) {
-		browser.execute("var head = document.head;"
-				+		"var script = document.createElement('script');"
-				+		"head.appendChild(script);"
-				+		"script.src='" + scriptUrl + "#" + ID + "'");
+		browser.execute("var head = document.head;" //$NON-NLS-1$
+				+		"var script = document.createElement('script');" //$NON-NLS-1$
+				+		"head.appendChild(script);" //$NON-NLS-1$
+				+		"script.src='" + scriptUrl + "#" + ID + "'"); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
 	}
 	
 	private static Shell createWeinreShell(final BrowserSimSkin skin, String clientUrl, final String scriptUrl, final String id) {
 		final Shell shell = new Shell(BrowserSimUtil.getParentShell(skin), SWT.SHELL_TRIM);
 		shell.setLayout(new FillLayout(SWT.VERTICAL | SWT.HORIZONTAL));
-		shell.setText("Weinre Inspector");
+		shell.setText(Messages.BrowserSim_WEINRE_INSPECTOR);
 		
 		Composite browserComposite = createBrowserComposite(shell, clientUrl);
 		final Browser weinreBrowser = createWeinreBrowser(browserComposite);
@@ -175,12 +175,12 @@ public class ToolsMenuCreator {
 				if (event.top) {
 					Browser browser = (Browser) event.widget;
 					browser.execute(
-						  "window.addEventListener('load', function() {"
-						+	"var head = document.head;"
-						+ 	"var script = document.createElement('script');"
-						+ 	"head.appendChild(script);"
-						+ 	"script.src='" + scriptUrl + "#" + id + "';"
-						+ "});");
+						  "window.addEventListener('load', function() {" //$NON-NLS-1$
+						+	"var head = document.head;" //$NON-NLS-1$
+						+ 	"var script = document.createElement('script');" //$NON-NLS-1$
+						+ 	"head.appendChild(script);" //$NON-NLS-1$
+						+ 	"script.src='" + scriptUrl + "#" + id + "';" //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
+						+ "});"); //$NON-NLS-1$
 				}
 			}
 		};

@@ -40,7 +40,7 @@ public class BrowserSimSourceViewer {
 	    Menu bar = new Menu (shell, SWT.BAR);
 		shell.setMenuBar (bar);
 		MenuItem editItem = new MenuItem (bar, SWT.CASCADE);
-		editItem.setText ("Edit");
+		editItem.setText (Messages.BrowserSimSourceViewer_EDIT);
 		Menu submenu = new Menu (shell, SWT.DROP_DOWN);
 		editItem.setMenu (submenu);
 
@@ -50,7 +50,7 @@ public class BrowserSimSourceViewer {
 				text.selectAll();
 			}
 		});
-		copyAllItem.setText ("Select &All\tCtrl+A");
+		copyAllItem.setText (Messages.BrowserSimSourceViewer_SELECT_ALL);
 		copyAllItem.setAccelerator (SWT.MOD1 + 'A');
 		
 		MenuItem copyItem = new MenuItem (submenu, SWT.PUSH);
@@ -59,7 +59,7 @@ public class BrowserSimSourceViewer {
 				text.copy();
 			}
 		});
-		copyItem.setText ("Copy\tCtrl+C");
+		copyItem.setText (Messages.BrowserSimSourceViewer_COPY);
 		copyItem.setAccelerator (SWT.MOD1 + 'C');
 		
 		

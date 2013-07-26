@@ -34,6 +34,7 @@ import org.eclipse.jdt.launching.JavaRuntime;
 import org.eclipse.osgi.util.NLS;
 import org.jboss.tools.vpe.browsersim.browser.PlatformUtil;
 import org.jboss.tools.vpe.browsersim.eclipse.Activator;
+import org.jboss.tools.vpe.browsersim.eclipse.Messages;
 import org.jboss.tools.vpe.browsersim.eclipse.launcher.ExternalProcessLauncher;
 
 /**
@@ -61,7 +62,7 @@ public class PreferencesUtil {
 				if (vm instanceof AbstractVMInstall) {
 					AbstractVMInstall abstractVm = (AbstractVMInstall) vm;
 					String javaVersion = abstractVm.getJavaVersion();
-					if (javaVersion != null && javaVersion.compareTo("1.6") >= 0) {
+					if (javaVersion != null && javaVersion.compareTo("1.6") >= 0) { //$NON-NLS-1$
 						if (PlatformUtil.OS_WIN32.equals(eclipseOs)) {
 							// can use only 32 bit jvm on windows
 							if (isX86(abstractVm) && !conflictsWithWebKit(abstractVm)) {
@@ -70,7 +71,7 @@ public class PreferencesUtil {
 						} else if (PlatformUtil.OS_MACOSX.equals(eclipseOs)) {
 							if (PlatformUtil.ARCH_X86.equals(eclipseArch)) {
 								// Only Java 6 supports 32-bit mode on Mac
-								if (javaVersion.startsWith("1.6")) {
+								if (javaVersion.startsWith("1.6")) { //$NON-NLS-1$
 									vms.add(abstractVm);
 								}
 							} else {
@@ -125,7 +126,7 @@ public class PreferencesUtil {
 	}
 	
 	private static boolean conflictsWithWebKit(IVMInstall vm) {
-		File libxml2 = new File(vm.getInstallLocation().getAbsolutePath() + "/bin/libxml2.dll");
+		File libxml2 = new File(vm.getInstallLocation().getAbsolutePath() + "/bin/libxml2.dll"); //$NON-NLS-1$
 		return libxml2.exists();
 	}
 	
@@ -168,7 +169,7 @@ public class PreferencesUtil {
 				}
 			}
 			p = DebugPlugin.exec(cmdLine, null, envp);
-			IProcess process = DebugPlugin.newProcess(new Launch(null, ILaunchManager.RUN_MODE, null), p, "Library Detection"); //$NON-NLS-1$
+			IProcess process = DebugPlugin.newProcess(new Launch(null, ILaunchManager.RUN_MODE, null), p, Messages.BrowserSim_LIBRARY_DETECTION);
 			for (int i = 0; i < 600; i++) {
 				// Wait no more than 30 seconds (600 * 50 milliseconds)
 				if (process.isTerminated()) {
@@ -189,7 +190,7 @@ public class PreferencesUtil {
 		}
 		if (arch == null) {
 		    // log error that we were unable to generate library information - see bug 70011
-		    LaunchingPlugin.log(NLS.bind("Failed to retrieve default libraries for {0}", new String[]{javaHome.getAbsolutePath()})); //$NON-NLS-1$
+		    LaunchingPlugin.log(NLS.bind(Messages.BrowserSim_LIBRARY_DETECTION_FAILURE, new String[]{javaHome.getAbsolutePath()}));
 		}
 		return arch;
 	}

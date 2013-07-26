@@ -40,7 +40,7 @@ public class BrowserSimLogger {
 			printStream.println(message);
 		}
 		if (throwable != null) {
-			printStream.println("Stack trace:");
+			printStream.println("Stack trace:"); //$NON-NLS-1$
 			throwable.printStackTrace(printStream);
 		}
 	}

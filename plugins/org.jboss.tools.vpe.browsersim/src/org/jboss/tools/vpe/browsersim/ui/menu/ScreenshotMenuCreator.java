@@ -51,7 +51,7 @@ import org.jboss.tools.vpe.browsersim.util.PreferencesUtil;
  */
 
 public class ScreenshotMenuCreator {
-	private static final String EXTENSION = ".png";
+	private static final String EXTENSION = ".png"; //$NON-NLS-1$
 	private static ImageData data;
 	
 	public static Menu createScreenshotsMenu(final Menu parent, final Display display, final Shell shell,
@@ -205,8 +205,8 @@ public class ScreenshotMenuCreator {
 	}
 	
 	private static String getDefaultFilename() {
-		DateFormat df = new SimpleDateFormat("yyyy-MM-dd-HHmmss");  
-		return "browsersim_" + df.format(new Date()) + EXTENSION;
+		DateFormat df = new SimpleDateFormat("yyyy-MM-dd-HHmmss"); //$NON-NLS-1$
+		return "browsersim_" + df.format(new Date()) + EXTENSION; //$NON-NLS-1$
 	}
 	
 	private static BufferedImage convertToAWT(ImageData data) {

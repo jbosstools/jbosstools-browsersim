@@ -19,15 +19,16 @@ import org.eclipse.swt.widgets.Shell;
 import org.eclipse.ui.PlatformUI;
 import org.eclipse.ui.dialogs.PreferencesUtil;
 import org.jboss.tools.vpe.browsersim.browser.PlatformUtil;
+import org.jboss.tools.vpe.browsersim.eclipse.Messages;
 
 public class BrowserSimErrorDialog extends MessageDialog {
-	private static final String BROWSERSIM_PREFERENCE_PAGE_ID = "org.jboss.tools.vpe.browsersim.eclipse.preferences.BrowserSimPreferences";
+	private static final String BROWSERSIM_PREFERENCE_PAGE_ID = "org.jboss.tools.vpe.browsersim.eclipse.preferences.BrowserSimPreferences"; //$NON-NLS-1$
 	
 	private String programName;
 	
 	public BrowserSimErrorDialog(Shell parentShell, String dialogTitle,	Image dialogTitleImage,
 			String programName, int dialogImageType, String[] dialogButtonLabels, int defaultIndex) {
-		super(parentShell, dialogTitle, dialogTitleImage, MessageFormat.format("{0} is failed to start", programName),
+		super(parentShell, dialogTitle, dialogTitleImage, MessageFormat.format(Messages.BrowserSimErrorDialog_ERROR_MESSAGE_HEADER, programName),
 				dialogImageType, dialogButtonLabels, defaultIndex);
 		this.programName = programName;
 	}
@@ -43,18 +44,17 @@ public class BrowserSimErrorDialog extends MessageDialog {
 		String message;
 		String os = Platform.getOS();
 		boolean is32bitEclipse = PlatformUtil.ARCH_X86.equals(PlatformUtil.getArch());
-		if (Platform.OS_WIN32.equals(os)) {
-			message = "{0} requires a 32-bit JRE/JDK 6 or JDK 7 to run on Windows.\nPlease go to the <a href=\"#\">{1} preferences</a> and select an appropriate JVM.";
-		} else if (Platform.OS_MACOSX.equals(os) && is32bitEclipse) {
-			message = "{0} requires Java 6 to be installed.\nPlease go to the <a href=\"#\">{1} preferences</a> and select an appropriate JVM.";
-		} else {// Linux, 64-bit Mac
-			message = "{0} requires " + (is32bitEclipse ? "32-bit" : "64-bit")
-					+ " Java 6 and above to be installed.\nPlease go to the <a href=\"#\">{1} preferences</a> and select an appropriate JVM.";
-		}
-		
 		IPreferenceNode jreNode = getPreferenceNode(BROWSERSIM_PREFERENCE_PAGE_ID);
-		String result = MessageFormat.format(message, programName, jreNode.getLabelText());
-	    link.setText(result);
+		if (Platform.OS_WIN32.equals(os)) {
+			message = MessageFormat.format(Messages.BrowserSimErrorDialog_ERROR_MESSAGE_WINDOWS, programName, jreNode.getLabelText());
+		} else if (Platform.OS_MACOSX.equals(os) && is32bitEclipse) {
+			message = MessageFormat.format(Messages.BrowserSimErrorDialog_ERROR_MESSAGE_MAC32, programName, jreNode.getLabelText());
+		} else {// Linux, 64-bit Mac
+			String bit = is32bitEclipse ? "32-bit" : "64-bit"; //$NON-NLS-1$ //$NON-NLS-2$
+			message = MessageFormat.format(Messages.BrowserSimErrorDialog_ERROR_MESSAGE_COMMON, programName, jreNode.getLabelText(), bit);
+		}
+
+	    link.setText(message);
 	    link.addSelectionListener(new SelectionAdapter(){
 	        @Override
 	        public void widgetSelected(SelectionEvent e) {

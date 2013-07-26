@@ -49,7 +49,7 @@ import org.jboss.tools.vpe.browsersim.util.BrowserSimImageList;
  * @author Yahor Radtsevich (yradtsevich)
  */
 public abstract class DeviceDialog extends Dialog {
-	private static final String ERROR_IMAGE_PATH = "icons/error.gif";
+	private static final String ERROR_IMAGE_PATH = "icons/error.gif"; //$NON-NLS-1$
 	
 	protected Device resultDevice;
 	protected Device initialDevice;

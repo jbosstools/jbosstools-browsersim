@@ -16,6 +16,7 @@ import java.util.EventObject;
  * @author Ilya Buziuk (ibuziuk)
  */
 public class ExitEvent extends EventObject {
+	private static final long serialVersionUID = 5461813256474674858L;
 
 	public ExitEvent(Object source) {
 		super(source);

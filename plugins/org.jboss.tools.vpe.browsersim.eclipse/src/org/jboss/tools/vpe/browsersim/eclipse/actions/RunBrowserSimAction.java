@@ -192,7 +192,7 @@ public class RunBrowserSimAction implements IWorkbenchWindowActionDelegate {
 			if (isSupportedFile(selectedFile)) {
 				url = toUrl(selectedFile);
 			}
-		} else if (Platform.getBundle("org.eclipse.wst.server.core") != null && Platform.getBundle("org.eclipse.wst.server.ui") != null) { //JBIDE-13879 - This bundles are optional 
+		} else if (Platform.getBundle("org.eclipse.wst.server.core") != null && Platform.getBundle("org.eclipse.wst.server.ui") != null) { //JBIDE-13879 - This bundles are optional  //$NON-NLS-1$ //$NON-NLS-2$
 			IServerModule serverModule = (IServerModule) ResourceUtil.getAdapter(firstSelectedElement, IServerModule.class, false);
 			if (serverModule != null) {
 				url = toUrl(serverModule);

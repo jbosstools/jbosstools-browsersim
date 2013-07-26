@@ -271,7 +271,7 @@ public abstract class ResizableSkin implements BrowserSimSkin {
 	public void setOrientationAndLocationAndSize(int orientation, Point location, Point browserSize, ResizableSkinSizeAdvisor sizeAdvisor) {
 		vertical = (orientation == SpecificPreferences.ORIENTATION_PORTRAIT || orientation == SpecificPreferences.ORIENTATION_PORTRAIT_INVERTED);
 		String urlTextText = deviceComposite.getUrlText().getText();
-		String pageTitle = deviceComposite.getPageTitleStyledText() != null ? deviceComposite.getPageTitleStyledText().getText() : "";
+		String pageTitle = deviceComposite.getPageTitleStyledText() != null ? deviceComposite.getPageTitleStyledText().getText() : ""; //$NON-NLS-1$
 		boolean backEnabled = deviceComposite.getBackButtonComposite().getEnabled();
 		boolean forwardEnabled = false;
 		if (deviceComposite.getForwardButtonComposite() != null) {

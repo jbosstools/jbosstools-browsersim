@@ -25,16 +25,16 @@ import org.jboss.tools.vpe.browsersim.util.PreferencesUtil;
  */
 
 public abstract class SpecificPreferencesStorage implements PreferencesStorage{
-	protected static final String PREFERENCES_ORIENTATION_ANGLE = "orientationAngle";
-	protected static final String PREFERENCES_LOCATION_Y = "y";
-	protected static final String PREFERENCES_LOCATION_X = "x";
-	protected static final String PREFERENCES_LOCATION = "location";
-	protected static final String PREFERENCES_USE_SKINS = "useSkins";
-	protected static final String PREFERENCES_LIVE_RELOAD = "enableLiveReload";
-	protected static final String PREFERENCES_LIVE_RELOAD_PORT = "liveReloadPort";
-	protected static final String PREFERENCES_TOUCH_EVENTS = "enableTouchEvents";
-	protected static final String PREFERENCES_SELECTED_DEVICE = "selectedDeviceId";
-	protected static final String PREFERENCES_VERSION = "version";
+	protected static final String PREFERENCES_ORIENTATION_ANGLE = "orientationAngle"; //$NON-NLS-1$
+	protected static final String PREFERENCES_LOCATION_Y = "y"; //$NON-NLS-1$
+	protected static final String PREFERENCES_LOCATION_X = "x"; //$NON-NLS-1$
+	protected static final String PREFERENCES_LOCATION = "location"; //$NON-NLS-1$
+	protected static final String PREFERENCES_USE_SKINS = "useSkins"; //$NON-NLS-1$
+	protected static final String PREFERENCES_LIVE_RELOAD = "enableLiveReload"; //$NON-NLS-1$
+	protected static final String PREFERENCES_LIVE_RELOAD_PORT = "liveReloadPort"; //$NON-NLS-1$
+	protected static final String PREFERENCES_TOUCH_EVENTS = "enableTouchEvents"; //$NON-NLS-1$
+	protected static final String PREFERENCES_SELECTED_DEVICE = "selectedDeviceId"; //$NON-NLS-1$
+	protected static final String PREFERENCES_VERSION = "version"; //$NON-NLS-1$
 
 	public static final int DEFAULT_LIVE_RELOAD_PORT = 35729;
 	

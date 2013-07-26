@@ -46,28 +46,28 @@ import org.xml.sax.SAXException;
  */
 
 public class CommonPreferencesStorage implements PreferencesStorage{
-	private static final String PREFERENCES_ID = "id";
-	private static final String PREFERENCES_DEVICE = "device";
-	private static final String PREFERENCES_DEVICE_HEIGHT = "height";
-	private static final String PREFERENCES_DEVICE_WIDTH = "width";
-	private static final String PREFERENCES_DEVICE_NAME = "name";
-	private static final String PREFERENCES_DEVICE_SKIN = "skin";
-	private static final String PREFERENCES_DEVICE_USER_AGENT = "userAgent";
-	private static final String PREFERENCES_DEVICE_PIXEL_RATIO = "pixelRatio";
-	private static final String PREFERENCES_DEVICES = "devices";
-	private static final String PREFERENCES_WEINRE_CLIENT_URL = "clientUrl";
-	private static final String PREFERENCES_WEINRE_SCRIPT_URL = "scriptUrl";
-	private static final String PREFERENCES_WEINRE = "weinre";
-	private static final String PREFERENCES_SCREENSHOTS_FOLDER = "screenshotsFolder";
-	private static final String PREFERENCES_TRUNCATE_WINDOW = "truncateWindow";
-	private static final String PREFERENCES_VERSION = "version";
+	private static final String PREFERENCES_ID = "id"; //$NON-NLS-1$
+	private static final String PREFERENCES_DEVICE = "device"; //$NON-NLS-1$
+	private static final String PREFERENCES_DEVICE_HEIGHT = "height"; //$NON-NLS-1$
+	private static final String PREFERENCES_DEVICE_WIDTH = "width"; //$NON-NLS-1$
+	private static final String PREFERENCES_DEVICE_NAME = "name"; //$NON-NLS-1$
+	private static final String PREFERENCES_DEVICE_SKIN = "skin"; //$NON-NLS-1$
+	private static final String PREFERENCES_DEVICE_USER_AGENT = "userAgent"; //$NON-NLS-1$
+	private static final String PREFERENCES_DEVICE_PIXEL_RATIO = "pixelRatio"; //$NON-NLS-1$
+	private static final String PREFERENCES_DEVICES = "devices"; //$NON-NLS-1$
+	private static final String PREFERENCES_WEINRE_CLIENT_URL = "clientUrl"; //$NON-NLS-1$
+	private static final String PREFERENCES_WEINRE_SCRIPT_URL = "scriptUrl"; //$NON-NLS-1$
+	private static final String PREFERENCES_WEINRE = "weinre"; //$NON-NLS-1$
+	private static final String PREFERENCES_SCREENSHOTS_FOLDER = "screenshotsFolder"; //$NON-NLS-1$
+	private static final String PREFERENCES_TRUNCATE_WINDOW = "truncateWindow"; //$NON-NLS-1$
+	private static final String PREFERENCES_VERSION = "version"; //$NON-NLS-1$
 
 	
-	private static final String DEFAULT_COMMON_PREFERENCES_RESOURCE = "config/commonPreferences.xml";
-	private static final String COMMON_PREFERENCES_FILE = "commonPreferences.xml";
+	private static final String DEFAULT_COMMON_PREFERENCES_RESOURCE = "config/commonPreferences.xml"; //$NON-NLS-1$
+	private static final String COMMON_PREFERENCES_FILE = "commonPreferences.xml"; //$NON-NLS-1$
 	
-	private static final String DEFAULT_WEINRE_SCRIPT_URL = "http://debug.phonegap.com/target/target-script-min.js";
-	private static final String DEFAULT_WEINRE_CLIENT_URL = "http://debug.phonegap.com/client/";
+	private static final String DEFAULT_WEINRE_SCRIPT_URL = "http://debug.phonegap.com/target/target-script-min.js"; //$NON-NLS-1$
+	private static final String DEFAULT_WEINRE_CLIENT_URL = "http://debug.phonegap.com/client/"; //$NON-NLS-1$
 	
 	private static final int CURRENT_CONFIG_VERSION = 11;
 	
@@ -106,7 +106,7 @@ public class CommonPreferencesStorage implements PreferencesStorage{
 	public CommonPreferences loadDefault(){
 		CommonPreferences commonPreferences = load(BrowserSimResourcesUtil.getResourceAsStream(DEFAULT_COMMON_PREFERENCES_RESOURCE));
 		if (commonPreferences == null) {
-			Device device = new Device(UUID.randomUUID().toString(), "Default", 1024, 768, 1.0, null, null);
+			Device device = new Device(UUID.randomUUID().toString(), "Default", 1024, 768, 1.0, null, null); //$NON-NLS-1$
 			Map<String, Device> devices = new LinkedHashMap<String, Device>();
 			
 			devices.put(device.getId(), device);
@@ -223,7 +223,7 @@ public class CommonPreferencesStorage implements PreferencesStorage{
 			DocumentBuilder docBuilder = docFactory.newDocumentBuilder();
 			Document doc = docBuilder.newDocument();
 			
-			Element rootElement = doc.createElement("browserSim");
+			Element rootElement = doc.createElement(PREFERENCES_BROWSERSIM);
 			rootElement.setAttribute(PREFERENCES_VERSION, String.valueOf(CURRENT_CONFIG_VERSION));
 			doc.appendChild(rootElement);
 
@@ -290,7 +290,7 @@ public class CommonPreferencesStorage implements PreferencesStorage{
 	}
 	
 	private static String getDefaultScreenshotsFolderPath() {
-		return "";
+		return ""; //$NON-NLS-1$
 	}
 	
 	private static String getDefaultWeinreScriptUrl() {

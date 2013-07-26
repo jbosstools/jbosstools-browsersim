@@ -47,6 +47,10 @@ public class Messages {
 	public static String BrowserSim_WEINRE;
 	public static String BrowserSim_WEINRE_ABOUT;
 	public static String BrowserSim_WEINRE_HELP;
+	public static String BrowserSim_WEINRE_HEADER;
+	public static String BrowserSim_ZERO_PIXEL_RATIO;
+	public static String BrowserSim_NO_SELECTED_DEVICE;
+	public static String BrowserSim_WEINRE_INSPECTOR;
 	public static String EditDeviceDialog_CANCEL;
 	public static String EditDeviceDialog_ADD_DEVICE;
 	public static String EditDeviceDialog_ADD_DEVICE_STATUS;
@@ -81,6 +85,9 @@ public class Messages {
 	public static String ManageDevicesDialog_DEVICES;
 	public static String ManageDevicesDialog_EDIT;
 	public static String ManageDevicesDialog_ENABLE_LIVE_RELOAD;
+	public static String ManageDevicesDialog_LIVE_RELOAD_PORT;
+	public static String ManageDevicesDialog_TOUCH_EVENTS_OPTIONS;
+	public static String ManageDevicesDialog_SIMULATE_TOUCH_EVENTS;
 	public static String ManageDevicesDialog_HEIGHT;
 	public static String ManageDevicesDialog_LIVE_RELOAD_OPTIONS;
 	public static String ManageDevicesDialog_LOAD_DEFAULTS;
@@ -120,7 +127,9 @@ public class Messages {
 	public static String SizeWarningDialog_DEVICE_SIZE_WILL_BE_TRUNCATED;
 	public static String SizeWarningDialog_OK;
 	public static String SizeWarningDialog_REMEMBER_MY_DECISION;
-
+	public static String BrowserSimSourceViewer_EDIT;
+	public static String BrowserSimSourceViewer_SELECT_ALL;
+	public static String BrowserSimSourceViewer_COPY;
 
 	static {
 		NLS.initializeMessages(BUNDLE_NAME, Messages.class);

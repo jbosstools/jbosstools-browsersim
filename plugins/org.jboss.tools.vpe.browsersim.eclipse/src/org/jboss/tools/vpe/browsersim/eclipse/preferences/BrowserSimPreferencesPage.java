@@ -10,6 +10,7 @@
  ******************************************************************************/
 package org.jboss.tools.vpe.browsersim.eclipse.preferences;
 
+import java.text.MessageFormat;
 import java.util.List;
 
 import org.eclipse.core.runtime.Platform;
@@ -36,13 +37,14 @@ import org.eclipse.ui.dialogs.PreferenceLinkArea;
 import org.eclipse.ui.preferences.IWorkbenchPreferenceContainer;
 import org.jboss.tools.vpe.browsersim.browser.PlatformUtil;
 import org.jboss.tools.vpe.browsersim.eclipse.Activator;
+import org.jboss.tools.vpe.browsersim.eclipse.Messages;
 
 /**
  * @author Konstantin Marmalyukov (kmarmaliykov)
  */
 public class BrowserSimPreferencesPage extends PreferencePage implements IWorkbenchPreferencePage{
-	public static final String BROWSERSIM_JVM_ID = "org.jboss.tools.vpe.browsersim.jvm";
-	public static final String BROWSERSIM_JVM_AUTOMATICALLY = "org.jboss.tools.vpe.browsersim.jvm.automatically";
+	public static final String BROWSERSIM_JVM_ID = "org.jboss.tools.vpe.browsersim.jvm"; //$NON-NLS-1$
+	public static final String BROWSERSIM_JVM_AUTOMATICALLY = "org.jboss.tools.vpe.browsersim.jvm.automatically"; //$NON-NLS-1$
 	
 	private Combo combo;
 	private Button automatically;
@@ -73,7 +75,7 @@ public class BrowserSimPreferencesPage extends PreferencePage implements IWorkbe
 		result.setLayout(layout);
 		
 		PreferenceLinkArea contentTypeArea = new PreferenceLinkArea(result, SWT.NONE,
-				"org.eclipse.jdt.debug.ui.preferences.VMPreferencePage", "See <a>''{0}''</a> for JRE definitions.",//$NON-NLS-1$
+				"org.eclipse.jdt.debug.ui.preferences.VMPreferencePage", Messages.BrowserSimPreferencesPage_JRE_LINK,//$NON-NLS-1$
 				(IWorkbenchPreferenceContainer) getContainer(), null);
 		GridData data = new GridData();
 		data.horizontalSpan = 2;
@@ -90,7 +92,7 @@ public class BrowserSimPreferencesPage extends PreferencePage implements IWorkbe
 		jreGroupLayoutData.horizontalSpan= 2;
 		jreGroup.setLayoutData(jreGroupLayoutData);
 		
-		jreGroup.setText("Select JRE to run BrowserSim");
+		jreGroup.setText(Messages.BrowserSimPreferencesPage_SELECT_JRE);
 		
 		radioListener = new SelectionListener() {
 			@Override
@@ -103,9 +105,9 @@ public class BrowserSimPreferencesPage extends PreferencePage implements IWorkbe
 			}
 		};
 		
-		automatically = addRadioButton(jreGroup, "Detect automatically", BROWSERSIM_JVM_AUTOMATICALLY, IPreferenceStore.TRUE, 0);
+		automatically = addRadioButton(jreGroup, Messages.BrowserSimPreferencesPage_DETECT_AUTOMATICALLY, BROWSERSIM_JVM_AUTOMATICALLY, IPreferenceStore.TRUE, 0);
 		automatically.addSelectionListener(radioListener);
-		select = addRadioButton(jreGroup, "Select", BROWSERSIM_JVM_AUTOMATICALLY, IPreferenceStore.FALSE, 0);
+		select = addRadioButton(jreGroup, Messages.BrowserSimPreferencesPage_SELECT, BROWSERSIM_JVM_AUTOMATICALLY, IPreferenceStore.FALSE, 0);
 		select.addSelectionListener(radioListener);
 		
 		combo = new Combo(jreGroup, SWT.READ_ONLY);
@@ -143,14 +145,13 @@ public class BrowserSimPreferencesPage extends PreferencePage implements IWorkbe
 			String os = Platform.getOS();
 			boolean is32bitEclipse = PlatformUtil.ARCH_X86.equals(PlatformUtil.getArch());
 			if (Platform.OS_WIN32.equals(os)) {
-				message = "BrowserSim/CordovaSim require a 32-bit JRE/JDK 6 or JDK 7 to be installed.";
+				message = Messages.BrowserSimPreferencesPage_REQUIREMENTS_WINDOWS;
 			} else if (PlatformUtil.OS_MACOSX.equals(os) && is32bitEclipse) {
-				message = "To run BrowserSim/CordovaSim from 32-bit Eclipse you must use Java 6.";
+				message = Messages.BrowserSimPreferencesPage_REQUIREMENTS_MAC32;
 			} else {// Linux, 64-bit Mac
-				message = "BrowserSim/CordovaSim require " + (is32bitEclipse ? "32-bit" : "64-bit")
-						+ " Java 6 and above to be installed.";
+				message = MessageFormat.format(Messages.BrowserSimPreferencesPage_REQUIREMENTS, is32bitEclipse ? "32-bit" : "64-bit"); //$NON-NLS-1$ //$NON-NLS-2$
 			}
-			setMessage(message, IMessageProvider.ERROR);//$NON-NLS-1$
+			setMessage(message, IMessageProvider.ERROR);
 			automatically.setSelection(true);
 			select.setEnabled(false);
 			combo.setEnabled(false);
@@ -171,7 +172,7 @@ public class BrowserSimPreferencesPage extends PreferencePage implements IWorkbe
 				controlChanged(automatically);
 			}
 			
-			automatically.setText(automatically.getText() + " (" + jvms.get(0).getName() + ")");
+			automatically.setText(automatically.getText() + " (" + jvms.get(0).getName() + ")"); //$NON-NLS-1$ //$NON-NLS-2$
 			combo.select(selectionIndex);
 		}
 	}

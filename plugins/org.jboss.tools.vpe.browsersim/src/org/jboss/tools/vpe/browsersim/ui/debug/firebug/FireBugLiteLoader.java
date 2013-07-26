@@ -35,51 +35,51 @@ public class FireBugLiteLoader {
 	private static final String FIREBUG_LITE_JS_URL = "https://getfirebug.com/firebug-lite.js"; //$NON-NLS-1$
 	
 	public static void startFireBugOpening(Browser browser) {
-		browser.execute("window._fireBugLiteLoading = true;");
-		Object fireBugScriptLoaded = browser.evaluate("return !!window.Firebug");
+		browser.execute("window._fireBugLiteLoading = true;"); //$NON-NLS-1$
+		Object fireBugScriptLoaded = browser.evaluate("return !!window.Firebug"); //$NON-NLS-1$
 		if (!Boolean.TRUE.equals(fireBugScriptLoaded)) {
 			browser.execute(
-				"(function() {" +
-				   "var initializeFireBug = function() {" +
+				"(function() {" + //$NON-NLS-1$
+				   "var initializeFireBug = function() {" + //$NON-NLS-1$
 						  /* Cordova's InAppBrowser API overrides window.open function, so we have to restore it
 						   * (see RippleInjector.java and JBIDE-14625) */
-						  "var cordovaOpen = window.open;" +
-						  "window.open = window._bsOriginalWindowOpen || window.open;" +
-						  "window.Firebug.chrome.toggle(true, true);" +
-						  "window.open = cordovaOpen;" +
-					"};" +
-					"var e = document.createElement('script');" +
-					"e.type = 'text/javascript';" +
-					"e.src = '" + FIREBUG_LITE_JS_URL + "';" +
-					"e.addEventListener('load'," +
-						"function() {" +
+						  "var cordovaOpen = window.open;" + //$NON-NLS-1$
+						  "window.open = window._bsOriginalWindowOpen || window.open;" + //$NON-NLS-1$
+						  "window.Firebug.chrome.toggle(true, true);" + //$NON-NLS-1$
+						  "window.open = cordovaOpen;" + //$NON-NLS-1$
+					"};" + //$NON-NLS-1$
+					"var e = document.createElement('script');" + //$NON-NLS-1$
+					"e.type = 'text/javascript';" + //$NON-NLS-1$
+					"e.src = '" + FIREBUG_LITE_JS_URL + "';" + //$NON-NLS-1$ //$NON-NLS-2$
+					"e.addEventListener('load'," + //$NON-NLS-1$
+						"function() {" + //$NON-NLS-1$
 							/* XXX: Two timeouts because we need to run our initializeFireBug method
 							 * AFTER two inner FireBug Lite timeouts */
-							"setTimeout(function() {" +
-								"setTimeout(initializeFireBug, 0)" +
-							 "}, 0)" +
-						"}, false);" +
-					"document.head.appendChild(e);" +
-				"})()");
+							"setTimeout(function() {" + //$NON-NLS-1$
+								"setTimeout(initializeFireBug, 0)" + //$NON-NLS-1$
+							 "}, 0)" + //$NON-NLS-1$
+						"}, false);" + //$NON-NLS-1$
+					"document.head.appendChild(e);" + //$NON-NLS-1$
+				"})()"); //$NON-NLS-1$
 		} else {
 			browser.execute(
-					"var cordovaOpen = window.open;" +
-					"window.open = window._bsOriginalWindowOpen || window.open;" +
-					"window.Firebug.chrome.close();" +  // cannot open FireBug Lite twice without this line 
-					"window.Firebug.chrome.toggle(true, true);" +
-					"window.open = cordovaOpen;"
+					"var cordovaOpen = window.open;" + //$NON-NLS-1$
+					"window.open = window._bsOriginalWindowOpen || window.open;" + //$NON-NLS-1$
+					"window.Firebug.chrome.close();" +  // cannot open FireBug Lite twice without this line //$NON-NLS-1$ 
+					"window.Firebug.chrome.toggle(true, true);" + //$NON-NLS-1$
+					"window.open = cordovaOpen;" //$NON-NLS-1$
 			);
 		}
 	}
 	
 	public static boolean isFireBugPopUp(WindowEvent openWindowEvent) {
 		Browser parentBrowser = (Browser) openWindowEvent.widget;
-		return Boolean.TRUE.equals(parentBrowser.evaluate("return !!window._fireBugLiteLoading"));
+		return Boolean.TRUE.equals(parentBrowser.evaluate("return !!window._fireBugLiteLoading")); //$NON-NLS-1$
 	}
 	
 	public static void processFireBugPopUp(WindowEvent openWindowEvent, BrowserSimSkin skin) {
 		final Browser parentBrowser = (Browser) openWindowEvent.widget;
-		parentBrowser.execute("window._fireBugLiteLoading = false;");
+		parentBrowser.execute("window._fireBugLiteLoading = false;"); //$NON-NLS-1$
 		
 		Shell shell = new Shell(BrowserSimUtil.getParentShell(skin), SWT.SHELL_TRIM);
 		shell.setLayout(new FillLayout());
@@ -123,7 +123,7 @@ public class FireBugLiteLoader {
 				@Override
 				public void shellClosed(ShellEvent e) {
 					if (!parentBrowser.isDisposed()) {
-						parentBrowser.execute("window.Firebug.chrome.close();");
+						parentBrowser.execute("window.Firebug.chrome.close();"); //$NON-NLS-1$
 					}
 				}
 			});

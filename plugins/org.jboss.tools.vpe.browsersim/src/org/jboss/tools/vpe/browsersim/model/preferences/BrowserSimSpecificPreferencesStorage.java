@@ -37,8 +37,8 @@ import org.xml.sax.SAXException;
  */
 public class BrowserSimSpecificPreferencesStorage extends SpecificPreferencesStorage{
 	private static final int CURRENT_CONFIG_VERSION = 11;
-	private static final String SPECIFIC_PREFERENCES_FILE = "specificPreferences.xml";
-	private static final String DEFAULT_SPECIFIC_PREFERENCES_RESOURCE = "config/specificPreferences.xml";
+	private static final String SPECIFIC_PREFERENCES_FILE = "specificPreferences.xml"; //$NON-NLS-1$
+	private static final String DEFAULT_SPECIFIC_PREFERENCES_RESOURCE = "config/specificPreferences.xml"; //$NON-NLS-1$
 	
 	public static BrowserSimSpecificPreferencesStorage INSTANCE = new BrowserSimSpecificPreferencesStorage();
 	
@@ -137,7 +137,7 @@ public class BrowserSimSpecificPreferencesStorage extends SpecificPreferencesSto
 			DocumentBuilder docBuilder = docFactory.newDocumentBuilder();
 			Document doc = docBuilder.newDocument();
 			
-			Element rootElement = doc.createElement("browserSim");
+			Element rootElement = doc.createElement(PREFERENCES_BROWSERSIM);
 			rootElement.setAttribute(PREFERENCES_VERSION, String.valueOf(CURRENT_CONFIG_VERSION));
 			doc.appendChild(rootElement);
 

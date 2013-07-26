@@ -33,6 +33,7 @@ import org.eclipse.swt.widgets.Listener;
  * >org.eclipse.ui.internal.cocoa.CocoaUIEnhancer</a>.
  * </p>
  */
+@SuppressWarnings("restriction")
 public class CocoaUIEnhancer {
 
     private static final int kAboutMenuItem = 0;
@@ -134,7 +135,7 @@ public class CocoaUIEnhancer {
         // Schedule disposal of callback object
         display.disposeExec( new Runnable() {
             public void run() {
-                invoke( proc3Args, "dispose" );
+                invoke( proc3Args, "dispose" ); //$NON-NLS-1$
             }
         } );
     }
@@ -142,7 +143,7 @@ public class CocoaUIEnhancer {
     private void initialize( Object callbackObject )
             throws Exception {
 
-        Class<?> osCls = classForName( "org.eclipse.swt.internal.cocoa.OS" );
+        Class<?> osCls = classForName( "org.eclipse.swt.internal.cocoa.OS" ); //$NON-NLS-1$
         
         // Register names in objective-c.
         if ( sel_toolbarButtonClicked_ == 0 ) {
@@ -154,47 +155,47 @@ public class CocoaUIEnhancer {
         // Create an SWT Callback object that will invoke the actionProc method of our internal
         // callbackObject.
         proc3Args = new Callback( callbackObject, "actionProc", 3 ); //$NON-NLS-1$
-        Method getAddress = Callback.class.getMethod( "getAddress", new Class[0] );
+        Method getAddress = Callback.class.getMethod( "getAddress", new Class[0] ); //$NON-NLS-1$
         Object object = getAddress.invoke( proc3Args, (Object[]) null );
         long proc3 = convertToLong( object );
         if ( proc3 == 0 ) {
             SWT.error( SWT.ERROR_NO_MORE_CALLBACKS );
         }
 
-        Class<?> nsmenuCls = classForName( "org.eclipse.swt.internal.cocoa.NSMenu" );
-        Class<?> nsmenuitemCls = classForName( "org.eclipse.swt.internal.cocoa.NSMenuItem" );
-        Class<?> nsstringCls = classForName( "org.eclipse.swt.internal.cocoa.NSString" );
-        Class<?> nsapplicationCls = classForName( "org.eclipse.swt.internal.cocoa.NSApplication" );
+        Class<?> nsmenuCls = classForName( "org.eclipse.swt.internal.cocoa.NSMenu" ); //$NON-NLS-1$
+        Class<?> nsmenuitemCls = classForName( "org.eclipse.swt.internal.cocoa.NSMenuItem" ); //$NON-NLS-1$
+        Class<?> nsstringCls = classForName( "org.eclipse.swt.internal.cocoa.NSString" ); //$NON-NLS-1$
+        Class<?> nsapplicationCls = classForName( "org.eclipse.swt.internal.cocoa.NSApplication" ); //$NON-NLS-1$
         
         // Instead of creating a new delegate class in objective-c,
         // just use the current SWTApplicationDelegate. An instance of this
         // is a field of the Cocoa Display object and is already the target
         // for the menuItems. So just get this class and add the new methods
         // to it.
-        object = invoke( osCls, "objc_lookUpClass", new Object[] { "SWTApplicationDelegate" } );
+        object = invoke( osCls, "objc_lookUpClass", new Object[] { "SWTApplicationDelegate" } );  //$NON-NLS-1$//$NON-NLS-2$
         long cls = convertToLong( object );
 
         // Add the action callbacks for Preferences and About menu items.
-        invoke( osCls, "class_addMethod", new Object[] {
+        invoke( osCls, "class_addMethod", new Object[] { //$NON-NLS-1$
                                                         wrapPointer( cls ),
                                                         wrapPointer( sel_preferencesMenuItemSelected_ ),
                                                         wrapPointer( proc3 ),
                                                         "@:@" } ); //$NON-NLS-1$
-        invoke( osCls, "class_addMethod", new Object[] {
+        invoke( osCls, "class_addMethod", new Object[] { //$NON-NLS-1$
                                                         wrapPointer( cls ),
                                                         wrapPointer( sel_aboutMenuItemSelected_ ),
                                                         wrapPointer( proc3 ),
                                                         "@:@" } ); //$NON-NLS-1$
 
         // Get the Mac OS X Application menu.
-        Object sharedApplication = invoke( nsapplicationCls, "sharedApplication" );
-        Object mainMenu = invoke( sharedApplication, "mainMenu" );
-        Object mainMenuItem = invoke( nsmenuCls, mainMenu, "itemAtIndex", new Object[] { wrapPointer( 0 ) } );
-        Object appMenu = invoke( mainMenuItem, "submenu" );
+        Object sharedApplication = invoke( nsapplicationCls, "sharedApplication" ); //$NON-NLS-1$
+        Object mainMenu = invoke( sharedApplication, "mainMenu" ); //$NON-NLS-1$
+        Object mainMenuItem = invoke( nsmenuCls, mainMenu, "itemAtIndex", new Object[] { wrapPointer( 0 ) } ); //$NON-NLS-1$
+        Object appMenu = invoke( mainMenuItem, "submenu" ); //$NON-NLS-1$
 
         // Create the About <application-name> menu command
         Object aboutMenuItem =
-            invoke( nsmenuCls, appMenu, "itemAtIndex", new Object[] { wrapPointer( kAboutMenuItem ) } );
+            invoke( nsmenuCls, appMenu, "itemAtIndex", new Object[] { wrapPointer( kAboutMenuItem ) } ); //$NON-NLS-1$
         
         /*  yradtsevich: The following lines in the original source are
          *  replaced by the call of initializeMacOSMenuBar(), which does the same job.
@@ -213,24 +214,24 @@ public class CocoaUIEnhancer {
 
         // Enable the Preferences menuItem.
         Object prefMenuItem =
-            invoke( nsmenuCls, appMenu, "itemAtIndex", new Object[] { wrapPointer( kPreferencesMenuItem ) } );
-        invoke( nsmenuitemCls, prefMenuItem, "setEnabled", new Object[] { true } );
+            invoke( nsmenuCls, appMenu, "itemAtIndex", new Object[] { wrapPointer( kPreferencesMenuItem ) } ); //$NON-NLS-1$
+        invoke( nsmenuitemCls, prefMenuItem, "setEnabled", new Object[] { true } ); //$NON-NLS-1$
 
         // Set the action to execute when the About or Preferences menuItem is invoked.
         //
         // We don't need to set the target here as the current target is the SWTApplicationDelegate
         // and we have registerd the new selectors on it. So just set the new action to invoke the
         // selector.
-        invoke( nsmenuitemCls, prefMenuItem, "setAction",
+        invoke( nsmenuitemCls, prefMenuItem, "setAction", //$NON-NLS-1$
                 new Object[] { wrapPointer( sel_preferencesMenuItemSelected_ ) } );
-        invoke( nsmenuitemCls, aboutMenuItem, "setAction",
+        invoke( nsmenuitemCls, aboutMenuItem, "setAction", //$NON-NLS-1$
                 new Object[] { wrapPointer( sel_aboutMenuItemSelected_ ) } );
     }
 
     private long registerName( Class<?> osCls, String name )
             throws IllegalArgumentException, SecurityException, IllegalAccessException,
             InvocationTargetException, NoSuchMethodException {
-        Object object = invoke( osCls, "sel_registerName", new Object[] { name } );
+        Object object = invoke( osCls, "sel_registerName", new Object[] { name } ); //$NON-NLS-1$
         return convertToLong( object );
     }
 

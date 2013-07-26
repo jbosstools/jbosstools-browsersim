@@ -337,7 +337,7 @@ public class ManageDevicesDialog extends Dialog {
 		data.horizontalIndent = 15;
 		liveReloadPortComposite.setLayoutData(data);
 		liveReloadPortLabel = new Label(liveReloadPortComposite, SWT.NONE);
-		liveReloadPortLabel.setText("LiveReload Port");
+		liveReloadPortLabel.setText(Messages.ManageDevicesDialog_LIVE_RELOAD_PORT);
 		liveReloadPortText = new Text(liveReloadPortComposite, SWT.BORDER);
 		liveReloadPortText.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, true, true));
 		liveReloadPortText.setText(Integer.toString(liveReloadPort));
@@ -346,7 +346,7 @@ public class ManageDevicesDialog extends Dialog {
 		liveReloadPortText.addFocusListener(new FocusAdapter() {
 			@Override
 			public void focusLost(FocusEvent e) {
-				if ("".equals(liveReloadPortText.getText())) {
+				if ("".equals(liveReloadPortText.getText())) { //$NON-NLS-1$
 					liveReloadPortText.setText(Integer.toString(SpecificPreferencesStorage.DEFAULT_LIVE_RELOAD_PORT));
 				}
 			}
@@ -363,11 +363,11 @@ public class ManageDevicesDialog extends Dialog {
 		
 		Group touchEventsGroup = new Group(settingsComposite, SWT.NONE);
 		touchEventsGroup.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, true, false, 1, 1));
-		touchEventsGroup.setText("Touch Events");
+		touchEventsGroup.setText(Messages.ManageDevicesDialog_TOUCH_EVENTS_OPTIONS);
 		touchEventsGroup.setLayout(new GridLayout(2, false));
 		touchEventsCheckBox = new Button(touchEventsGroup, SWT.CHECK);
 		touchEventsCheckBox.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, true, false, 2, 1));
-		touchEventsCheckBox.setText("Emulate Touch Events");
+		touchEventsCheckBox.setText(Messages.ManageDevicesDialog_SIMULATE_TOUCH_EVENTS);
 		
 		Group screnshotGroup = new Group(settingsComposite, SWT.NONE);
 		screnshotGroup.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, true, false, 1, 1));

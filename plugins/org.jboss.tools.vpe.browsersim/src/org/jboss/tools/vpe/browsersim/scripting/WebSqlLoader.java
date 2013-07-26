@@ -27,40 +27,40 @@ public class WebSqlLoader {
 			loadPureJsWebSqlFunction.dispose();
 		}
 		
-		loadPureJsWebSqlFunction = new BrowserFunction(browser, "loadPureJsWebSql") {
+		loadPureJsWebSqlFunction = new BrowserFunction(browser, "loadPureJsWebSql") { //$NON-NLS-1$
 			@Override
 			public Object function(Object[] arguments) {
 				super.function(arguments);
 				
-				String purejswebsql = BrowserSimResourcesUtil.getResourceAsString("javascript/purejswebsql.js");
+				String purejswebsql = BrowserSimResourcesUtil.getResourceAsString("javascript/purejswebsql.js"); //$NON-NLS-1$
 				browser.execute(purejswebsql);
 
-				String sql = BrowserSimResourcesUtil.getResourceAsString("javascript/sql.js");
+				String sql = BrowserSimResourcesUtil.getResourceAsString("javascript/sql.js"); //$NON-NLS-1$
 				browser.execute(sql);
 				return null;
 			}
 		};
 		
 		browser.execute(
-			"(function() {" +
-				"if (!window.purejsOpenDatabase) {" +
-					"var origOpenDatabase = window.openDatabase;" +
-					"window.openDatabase = function() {" +
-						"try {" +
-							"var result = origOpenDatabase.apply(this, arguments);" +
-							"window.openDatabase = origOpenDatabase;" + // always use origOpenDatabase
-							"return result;" +
-						"} catch (e) {" +
-							"if (e.code === 18) {" +
-								"loadPureJsWebSql();" +
-								"window.openDatabase = purejsOpenDatabase;" + // always use purejsOpenDatabase
-								"return window.openDatabase.apply(this, arguments);" +
-							"} else {" +
-								"throw e;" +
-							"}" +
-						"}" +
-					"};" +
-				"}" +
-			"})();");
+			"(function() {" + //$NON-NLS-1$
+				"if (!window.purejsOpenDatabase) {" + //$NON-NLS-1$
+					"var origOpenDatabase = window.openDatabase;" + //$NON-NLS-1$
+					"window.openDatabase = function() {" + //$NON-NLS-1$
+						"try {" + //$NON-NLS-1$
+							"var result = origOpenDatabase.apply(this, arguments);" + //$NON-NLS-1$
+							"window.openDatabase = origOpenDatabase;" + // always use origOpenDatabase //$NON-NLS-1$
+							"return result;" + //$NON-NLS-1$
+						"} catch (e) {" + //$NON-NLS-1$
+							"if (e.code === 18) {" + //$NON-NLS-1$
+								"loadPureJsWebSql();" + //$NON-NLS-1$
+								"window.openDatabase = purejsOpenDatabase;" + // always use purejsOpenDatabase //$NON-NLS-1$
+								"return window.openDatabase.apply(this, arguments);" + //$NON-NLS-1$
+							"} else {" + //$NON-NLS-1$
+								"throw e;" + //$NON-NLS-1$
+							"}" + //$NON-NLS-1$
+						"}" + //$NON-NLS-1$
+					"};" + //$NON-NLS-1$
+				"}" + //$NON-NLS-1$
+			"})();"); //$NON-NLS-1$
 	}
 }

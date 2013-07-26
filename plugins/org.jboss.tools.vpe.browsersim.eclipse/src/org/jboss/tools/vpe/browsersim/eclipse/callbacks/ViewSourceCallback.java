@@ -32,6 +32,7 @@ import org.eclipse.ui.PartInitException;
 import org.eclipse.ui.PlatformUI;
 import org.eclipse.ui.texteditor.ITextEditor;
 import org.jboss.tools.vpe.browsersim.eclipse.Activator;
+import org.jboss.tools.vpe.browsersim.eclipse.Messages;
 import org.jboss.tools.vpe.browsersim.eclipse.launcher.ExternalProcessCallback;
 import org.jboss.tools.vpe.browsersim.eclipse.launcher.TransparentReader;
 
@@ -119,7 +120,7 @@ public class ViewSourceCallback implements ExternalProcessCallback {
 				Activator.logError(e.getMessage(), e);
 			}
 		} else {
-			Activator.logError("Cannot obtain workbench page", null);
+			Activator.logError(Messages.Callback_CANNOT_OBTAIN_PAGE, null);
 		}
 	}
 }

@@ -21,7 +21,7 @@ import org.jboss.tools.vpe.browsersim.browser.AbstractWebKitBrowser;
 /**
  * @author Yahor Radtsevich (yradtsevich)
  */
-@SuppressWarnings({"nls", "restriction"})
+@SuppressWarnings("restriction")
 public class WebKitBrowser_win32_win32_x86 extends AbstractWebKitBrowser {
 	public WebKitBrowser_win32_win32_x86(Composite parent, int style) {
 		super(parent, style);
@@ -40,15 +40,15 @@ public class WebKitBrowser_win32_win32_x86 extends AbstractWebKitBrowser {
 				userAgentValue = 0;
 			}
 			
-			Field webBrowserField = Browser.class.getDeclaredField("webBrowser");
+			Field webBrowserField = Browser.class.getDeclaredField("webBrowser"); //$NON-NLS-1$
 			webBrowserField.setAccessible(true);
 			Object webKit = webBrowserField.get(this);
 
-			Field webViewField = webKit.getClass().getDeclaredField("webView");
+			Field webViewField = webKit.getClass().getDeclaredField("webView"); //$NON-NLS-1$
 			webViewField.setAccessible(true);
 			Object webView = webViewField.get(webKit);
 
-			Method setCustomUserAgentMethod = webView.getClass().getDeclaredMethod("setCustomUserAgent", int.class);
+			Method setCustomUserAgentMethod = webView.getClass().getDeclaredMethod("setCustomUserAgent", int.class); //$NON-NLS-1$
 			setCustomUserAgentMethod.invoke(webView, userAgentValue);
 			
 			if (userAgent != null) {
@@ -76,8 +76,8 @@ public class WebKitBrowser_win32_win32_x86 extends AbstractWebKitBrowser {
 	 * Invokes {@link org.eclipse.swt.internal.ole.win32.COM#SysAllocString(char[])}. 
 	 */
 	private int /*long*/ invokeCOM_SysAllocString(char [] sz) throws ClassNotFoundException, SecurityException, NoSuchMethodException, IllegalArgumentException, IllegalAccessException, InvocationTargetException {
-		Class<?> COM = Browser.class.getClassLoader().loadClass("org.eclipse.swt.internal.ole.win32.COM");
-		Method COM_SysAllocString = COM.getDeclaredMethod("SysAllocString", char[].class);
+		Class<?> COM = Browser.class.getClassLoader().loadClass("org.eclipse.swt.internal.ole.win32.COM"); //$NON-NLS-1$
+		Method COM_SysAllocString = COM.getDeclaredMethod("SysAllocString", char[].class); //$NON-NLS-1$
 		return (Integer) COM_SysAllocString.invoke(null, sz);
 	}
 	
@@ -85,8 +85,8 @@ public class WebKitBrowser_win32_win32_x86 extends AbstractWebKitBrowser {
 	 * Invokes {@link org.eclipse.swt.internal.ole.win32.COM#SysFreeString(int)}. 
 	 */
 	private void invokeCOM_SysFreeString(int /*long*/ bstr) throws ClassNotFoundException, SecurityException, NoSuchMethodException, IllegalArgumentException, IllegalAccessException, InvocationTargetException {
-		Class<?> COM = Browser.class.getClassLoader().loadClass("org.eclipse.swt.internal.ole.win32.COM");
-		Method COM_SysFreeString = COM.getDeclaredMethod("SysFreeString", int.class /*long.class*/);
+		Class<?> COM = Browser.class.getClassLoader().loadClass("org.eclipse.swt.internal.ole.win32.COM"); //$NON-NLS-1$
+		Method COM_SysFreeString = COM.getDeclaredMethod("SysFreeString", int.class /*long.class*/); //$NON-NLS-1$
 		COM_SysFreeString.invoke(null, bstr);
 	}
 }

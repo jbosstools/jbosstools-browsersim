@@ -24,25 +24,24 @@ import org.jboss.tools.vpe.browsersim.browser.internal.WebKitBrowser_win32_win32
 /**
  * @author "Yahor Radtsevich (yradtsevich)"
  */
-@SuppressWarnings("nls")
 public class WebKitBrowserFactory implements IBrowserSimBrowserFactory {
-	public static final String NO_SAFARI = "Safari must be installed to use a SWT.WEBKIT-style Browser"; 
+	public static final String NO_SAFARI = "Safari must be installed to use a SWT.WEBKIT-style Browser"; //$NON-NLS-1$
 	
 	@Override
 	public AbstractWebKitBrowser createBrowser(Composite parent, int style) {
-		if (PlatformUtil.CURRENT_PLATFORM.equals("gtk.linux.x86")) {
+		if (PlatformUtil.CURRENT_PLATFORM.equals("gtk.linux.x86")) { //$NON-NLS-1$
 			return new WebKitBrowser_gtk_linux_x86(parent, style);
-		} else if (PlatformUtil.CURRENT_PLATFORM.equals("gtk.linux.x86_64")) {
+		} else if (PlatformUtil.CURRENT_PLATFORM.equals("gtk.linux.x86_64")) { //$NON-NLS-1$
 			return new WebKitBrowser_gtk_linux_x86_64(parent, style);
-		} else if (PlatformUtil.CURRENT_PLATFORM.startsWith("cocoa.macosx")) {
+		} else if (PlatformUtil.CURRENT_PLATFORM.startsWith("cocoa.macosx")) { //$NON-NLS-1$
 			return new WebKitBrowser_webkit_cocoa_macos(parent, style);
-		} else if (PlatformUtil.CURRENT_PLATFORM.equals("win32.win32.x86")) {
+		} else if (PlatformUtil.CURRENT_PLATFORM.equals("win32.win32.x86")) { //$NON-NLS-1$
 			//due to last changes Safari is needed to run BrowerSim (against QuickTime)
 			//to avoid JVM crash we need to check Safari existance before creating a browser.(JBIDE-13044).
 			//If an exception is thrown during org.eclipse.swt.browser.WebKit.readInstallDir() invocation,
 			//this means that SWT internal API is changed and we just log it to the console.
 			try {
-				Method method = Class.forName("org.eclipse.swt.browser.WebKit").getDeclaredMethod("readInstallDir", String.class);
+				Method method = Class.forName("org.eclipse.swt.browser.WebKit").getDeclaredMethod("readInstallDir", String.class); //$NON-NLS-1$ //$NON-NLS-2$
 				method.setAccessible(true);
 				String AASDirectory = (String) method.invoke(null, "SOFTWARE\\Apple Computer, Inc.\\Safari");//$NON-NLS-1$
 				
@@ -73,6 +72,6 @@ public class WebKitBrowserFactory implements IBrowserSimBrowserFactory {
 			return new WebKitBrowser_win32_win32_x86(parent, style);
 		}
 
-		throw new SWTError("Unsupported Platform");
+		throw new SWTError("Unsupported Platform"); //$NON-NLS-1$
 	}
 }

@@ -21,13 +21,12 @@ import org.jboss.tools.vpe.browsersim.browser.AbstractWebKitBrowser;
 /**
  * @author Yahor Radtsevich (yradtsevich)
  */
-@SuppressWarnings("nls")
 public class WebKitBrowser_gtk_linux_x86 extends AbstractWebKitBrowser {
 	private static final byte[] USER_AGENT; // = WebKitGTK.user_agent
 	static {
-		int length = "user-agent".length();
+		int length = "user-agent".length(); //$NON-NLS-1$
 		char [] chars = new char[length];
-		"user-agent".getChars(0, length, chars, 0);
+		"user-agent".getChars(0, length, chars, 0); //$NON-NLS-1$
 		USER_AGENT = new byte[length + 1];
 		for (int i = 0; i < length; i++) {
 			USER_AGENT[i] = (byte) chars [i];
@@ -75,11 +74,11 @@ public class WebKitBrowser_gtk_linux_x86 extends AbstractWebKitBrowser {
 	// this.webBrowser.webView 
 	private int /*long*/ getThis_webBrowser_webView() throws NoSuchFieldException,
 			IllegalAccessException {
-		Field webBrowserField = Browser.class.getDeclaredField("webBrowser");
+		Field webBrowserField = Browser.class.getDeclaredField("webBrowser"); //$NON-NLS-1$
 		webBrowserField.setAccessible(true);
 		Object webKit = webBrowserField.get(this);
 
-		Field webViewField = webKit.getClass().getDeclaredField("webView");
+		Field webViewField = webKit.getClass().getDeclaredField("webView"); //$NON-NLS-1$
 		webViewField.setAccessible(true);
 		int /*long*/ webView = (Integer /*Long*/) webViewField.get(webKit);
 		return webView;
@@ -89,8 +88,8 @@ public class WebKitBrowser_gtk_linux_x86 extends AbstractWebKitBrowser {
 	private void invokeOS_g_object_set(int /*long*/ object, byte[] first_property_name, int data, int /*long*/ terminator)
 			throws ClassNotFoundException, NoSuchMethodException,
 			IllegalAccessException, InvocationTargetException {
-		Class<?> OS = Browser.class.getClassLoader().loadClass("org.eclipse.swt.internal.gtk.OS");
-		Method OS_g_object_set = OS.getDeclaredMethod("g_object_set", int/*long*/.class, byte[].class, int.class, int/*long*/.class);
+		Class<?> OS = Browser.class.getClassLoader().loadClass("org.eclipse.swt.internal.gtk.OS"); //$NON-NLS-1$
+		Method OS_g_object_set = OS.getDeclaredMethod("g_object_set", int/*long*/.class, byte[].class, int.class, int/*long*/.class); //$NON-NLS-1$
 		OS_g_object_set.invoke(null, object, first_property_name, data, terminator);
 	}
 
@@ -98,8 +97,8 @@ public class WebKitBrowser_gtk_linux_x86 extends AbstractWebKitBrowser {
 	private void invokeOS_g_object_set(int /*long*/ object, byte[] first_property_name, byte[] data, int /*long*/ terminator)
 			throws ClassNotFoundException, NoSuchMethodException,
 			IllegalAccessException, InvocationTargetException {
-		Class<?> OS = Browser.class.getClassLoader().loadClass("org.eclipse.swt.internal.gtk.OS");
-		Method OS_g_object_set = OS.getDeclaredMethod("g_object_set", int/*long*/.class, byte[].class, byte[].class, int/*long*/.class);
+		Class<?> OS = Browser.class.getClassLoader().loadClass("org.eclipse.swt.internal.gtk.OS"); //$NON-NLS-1$
+		Method OS_g_object_set = OS.getDeclaredMethod("g_object_set", int/*long*/.class, byte[].class, byte[].class, int/*long*/.class); //$NON-NLS-1$
 		OS_g_object_set.invoke(null, object, first_property_name, data, terminator);
 	}
 	
@@ -107,8 +106,8 @@ public class WebKitBrowser_gtk_linux_x86 extends AbstractWebKitBrowser {
 	private byte [] invokeConverter_wcsToMbcs (String codePage, String string, boolean terminate)
 			throws ClassNotFoundException, NoSuchMethodException,
 			IllegalAccessException, InvocationTargetException {
-		Class<?> Converter = Browser.class.getClassLoader().loadClass("org.eclipse.swt.internal.Converter");
-		Method Converter_wcsToMbcs = Converter.getDeclaredMethod("wcsToMbcs", String.class, String.class, boolean.class);
+		Class<?> Converter = Browser.class.getClassLoader().loadClass("org.eclipse.swt.internal.Converter"); //$NON-NLS-1$
+		Method Converter_wcsToMbcs = Converter.getDeclaredMethod("wcsToMbcs", String.class, String.class, boolean.class); //$NON-NLS-1$
 		return (byte[]) Converter_wcsToMbcs.invoke(null, codePage, string, terminate);
 	}
 	
@@ -116,8 +115,8 @@ public class WebKitBrowser_gtk_linux_x86 extends AbstractWebKitBrowser {
 	private int /*long*/ invokeWebKitGTK_webkit_web_view_get_settings(int /*long*/ webView)
 			throws ClassNotFoundException, NoSuchMethodException,
 			IllegalAccessException, InvocationTargetException {
-		Class<?> webKitGTKClass = Browser.class.getClassLoader().loadClass("org.eclipse.swt.internal.webkit.WebKitGTK");
-		Method webkit_web_view_get_settingsMethod = webKitGTKClass.getDeclaredMethod("webkit_web_view_get_settings", int/*long*/.class);
+		Class<?> webKitGTKClass = Browser.class.getClassLoader().loadClass("org.eclipse.swt.internal.webkit.WebKitGTK"); //$NON-NLS-1$
+		Method webkit_web_view_get_settingsMethod = webKitGTKClass.getDeclaredMethod("webkit_web_view_get_settings", int/*long*/.class); //$NON-NLS-1$
 		return (Integer/*Long*/) webkit_web_view_get_settingsMethod.invoke(null, webView);
 	}
 }

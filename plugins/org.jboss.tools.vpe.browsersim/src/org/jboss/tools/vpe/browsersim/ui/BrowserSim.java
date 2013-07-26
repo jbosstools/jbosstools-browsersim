@@ -119,7 +119,7 @@ public class BrowserSim {
 		initObservers();
 		Device defaultDevice = commonPreferences.getDevices().get(specificPreferences.getSelectedDeviceId()); 
 		if (defaultDevice == null) {
-			BrowserSimLogger.logError("Could not find selected device in devices list", new NullPointerException());
+			BrowserSimLogger.logError(Messages.BrowserSim_NO_SELECTED_DEVICE, new NullPointerException());
 			String id;
 			try {
 				id = commonPreferences.getDevices().keySet().iterator().next();
@@ -264,19 +264,18 @@ public class BrowserSim {
 					setCustomScrollbarStyles(browser);
 				}
 
-				@SuppressWarnings("nls")
 				private void setCustomScrollbarStyles(Browser browser) {
 				
 					browser.execute(
-						"if (window._browserSim_customScrollBarStylesSetter === undefined) {"
-							+"window._browserSim_customScrollBarStylesSetter = function () {"
-							+	"document.removeEventListener('DOMSubtreeModified', window._browserSim_customScrollBarStylesSetter, false);"
-							+	"var head = document.head;"
-							+	"var style = document.createElement('style');"
-							+	"style.type = 'text/css';"
-							+	"style.id='browserSimStyles';"
-							+	"head.appendChild(style);"
-							+	"style.innerText='"
+						"if (window._browserSim_customScrollBarStylesSetter === undefined) {" //$NON-NLS-1$
+							+"window._browserSim_customScrollBarStylesSetter = function () {" //$NON-NLS-1$
+							+	"document.removeEventListener('DOMSubtreeModified', window._browserSim_customScrollBarStylesSetter, false);" //$NON-NLS-1$
+							+	"var head = document.head;" //$NON-NLS-1$
+							+	"var style = document.createElement('style');" //$NON-NLS-1$
+							+	"style.type = 'text/css';" //$NON-NLS-1$
+							+	"style.id='browserSimStyles';" //$NON-NLS-1$
+							+	"head.appendChild(style);" //$NON-NLS-1$
+							+	"style.innerText='" //$NON-NLS-1$
 							// The following two rules fix a problem with showing scrollbars in Google Mail and similar,
 							// but autohiding of navigation bar stops to work with it. That is why they are commented.
 							//+	"html {"
@@ -292,20 +291,20 @@ public class BrowserSim {
 							//+		"overflow-y: auto;"
 							//+		"overflow-x: auto;"
 							//+	"}"
-							+		"::-webkit-scrollbar {"
-							+			"width: 5px;"
-							+			"height: 5px;"
-							+		"}"
-							+		"::-webkit-scrollbar-thumb {"
-							+			"background: rgba(0,0,0,0.4); "
-							+		"}"
-							+		"::-webkit-scrollbar-corner, ::-webkit-scrollbar-thumb:window-inactive {"
-							+			"background: rgba(0,0,0,0.0);"
-							+		"};"
-							+	"';"
-							+"};"
-							+ "document.addEventListener('DOMSubtreeModified', window._browserSim_customScrollBarStylesSetter, false);"
-						+ "}"
+							+		"::-webkit-scrollbar {" //$NON-NLS-1$
+							+			"width: 5px;" //$NON-NLS-1$
+							+			"height: 5px;" //$NON-NLS-1$
+							+		"}" //$NON-NLS-1$
+							+		"::-webkit-scrollbar-thumb {" //$NON-NLS-1$
+							+			"background: rgba(0,0,0,0.4); " //$NON-NLS-1$
+							+		"}" //$NON-NLS-1$
+							+		"::-webkit-scrollbar-corner, ::-webkit-scrollbar-thumb:window-inactive {" //$NON-NLS-1$
+							+			"background: rgba(0,0,0,0.0);" //$NON-NLS-1$
+							+		"};" //$NON-NLS-1$
+							+	"';" //$NON-NLS-1$
+							+"};" //$NON-NLS-1$
+							+ "document.addEventListener('DOMSubtreeModified', window._browserSim_customScrollBarStylesSetter, false);" //$NON-NLS-1$
+						+ "}" //$NON-NLS-1$
 					);
 				}
 			});
@@ -324,12 +323,11 @@ public class BrowserSim {
 		browser.addLocationListener(new LocationListener() {
 			private BrowserFunction scrollListener = null;
 
-			@SuppressWarnings("nls")
 			public void changed(LocationEvent event) {
 				if (scrollListener != null) {
 					scrollListener.dispose();
 				}
-				scrollListener = new BrowserFunction(((Browser)event.widget), "_browserSim_scrollListener") {
+				scrollListener = new BrowserFunction(((Browser)event.widget), "_browserSim_scrollListener") { //$NON-NLS-1$
 					public Object function(Object[] arguments) {
 						double pageYOffset = (Double) arguments[0];
 						if (pageYOffset > 0.0) {
@@ -347,16 +345,16 @@ public class BrowserSim {
 
 				Browser browser = (Browser)event.widget;
 				browser.execute(
-								"(function() {" +
-									"var scrollListener = function(e){" +
-										"window._browserSim_scrollListener(window.pageYOffset)" +
-									"};" +
-									"window.addEventListener('scroll', scrollListener);" +
-									"window.addEventListener('beforeunload', function(e){" +
-										"window.removeEventListener('scroll', scrollListener);" +
-										"delete window._browserSim_scrollListener;" +
-									"})" +
-								"})();");
+								"(function() {" + //$NON-NLS-1$
+									"var scrollListener = function(e){" + //$NON-NLS-1$
+										"window._browserSim_scrollListener(window.pageYOffset)" + //$NON-NLS-1$
+									"};" + //$NON-NLS-1$
+									"window.addEventListener('scroll', scrollListener);" + //$NON-NLS-1$
+									"window.addEventListener('beforeunload', function(e){" + //$NON-NLS-1$
+										"window.removeEventListener('scroll', scrollListener);" + //$NON-NLS-1$
+										"delete window._browserSim_scrollListener;" + //$NON-NLS-1$
+									"})" + //$NON-NLS-1$
+								"})();"); //$NON-NLS-1$
 
 			}
 			
@@ -488,15 +486,15 @@ public class BrowserSim {
 			@Override
 			public void changed(LocationEvent event) {
 				Browser browser = (Browser) event.widget;
-				browser.execute("if (!window.LiveReload) {" +
-									"window.addEventListener('load', function(){" +
-										"var e = document.createElement('script');" +
-										"e.type = 'text/javascript';" +
-										"e.async = 'true';" +
-										"e.src = 'http://localhost:" + specificPreferences.getLiveReloadPort() + "/livereload.js';" +
-										"document.head.appendChild(e);" +
-									"});" +
-								"}");
+				browser.execute("if (!window.LiveReload) {" + //$NON-NLS-1$
+									"window.addEventListener('load', function(){" + //$NON-NLS-1$
+										"var e = document.createElement('script');" + //$NON-NLS-1$
+										"e.type = 'text/javascript';" + //$NON-NLS-1$
+										"e.async = 'true';" + //$NON-NLS-1$
+										"e.src = 'http://localhost:" + specificPreferences.getLiveReloadPort() + "/livereload.js';" + //$NON-NLS-1$ //$NON-NLS-2$
+										"document.head.appendChild(e);" + //$NON-NLS-1$
+									"});" + //$NON-NLS-1$
+								"}"); //$NON-NLS-1$
 			}
 		};
 	}
@@ -510,9 +508,8 @@ public class BrowserSim {
 		};
 	}
 
-	@SuppressWarnings("nls")
 	private void initOrientation(int orientation) {
-		getBrowser().execute("window.onorientationchange = null;" + "window.orientation = " + orientation + ";");
+		getBrowser().execute("window.onorientationchange = null;" + "window.orientation = " + orientation + ";"); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
 	}
 
 	@SuppressWarnings("nls")
@@ -527,15 +524,15 @@ public class BrowserSim {
 		}
 
 		skin.setOrientationAndLocationAndSize(orientationAngle, currentLocation, browserSize, resizableSkinSizeAdvisor);
-		getBrowser().execute("window.orientation = " + orientationAngle + ";"
-				+ "(function(){"
-				+ 		"var event = document.createEvent('Event');"
-				+ 		"event.initEvent('orientationchange', false, false);" // http://jsbin.com/azefow/6   https://developer.mozilla.org/en/DOM/document.createEvent
-				+ 		"window.dispatchEvent(event);"
-				+ 		"if (typeof window.onorientationchange === 'function') {"
-				+			"window.onorientationchange(event);"
-				+ 		"}"
-				+	"})();"
+		getBrowser().execute("window.orientation = " + orientationAngle + ";" //$NON-NLS-1$
+				+ "(function(){" //$NON-NLS-1$
+				+ 		"var event = document.createEvent('Event');" //$NON-NLS-1$
+				+ 		"event.initEvent('orientationchange', false, false);" // http://jsbin.com/azefow/6   https://developer.mozilla.org/en/DOM/document.createEvent //$NON-NLS-1$
+				+ 		"window.dispatchEvent(event);" //$NON-NLS-1$
+				+ 		"if (typeof window.onorientationchange === 'function') {" //$NON-NLS-1$
+				+			"window.onorientationchange(event);" //$NON-NLS-1$
+				+ 		"}" //$NON-NLS-1$
+				+	"})();" //$NON-NLS-1$
 		);
 	}
 

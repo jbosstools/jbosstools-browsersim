@@ -21,6 +21,7 @@ import org.eclipse.core.runtime.FileLocator;
 import org.eclipse.core.runtime.Platform;
 import org.eclipse.core.runtime.preferences.ConfigurationScope;
 import org.eclipse.jdt.launching.IVMInstall;
+import org.eclipse.jface.dialogs.IDialogConstants;
 import org.eclipse.jface.dialogs.MessageDialog;
 import org.eclipse.jface.preference.IPreferenceStore;
 import org.eclipse.swt.SWT;
@@ -29,6 +30,7 @@ import org.eclipse.swt.widgets.Shell;
 import org.eclipse.ui.IWorkbenchListener;
 import org.eclipse.ui.PlatformUI;
 import org.jboss.tools.vpe.browsersim.eclipse.Activator;
+import org.jboss.tools.vpe.browsersim.eclipse.Messages;
 import org.jboss.tools.vpe.browsersim.eclipse.dialog.BrowserSimErrorDialog;
 import org.jboss.tools.vpe.browsersim.eclipse.launcher.internal.ExternalProcessPostShutdownDestroyer;
 import org.jboss.tools.vpe.browsersim.eclipse.preferences.BrowserSimPreferencesPage;
@@ -126,8 +128,8 @@ public class ExternalProcessLauncher {
 					@Override
 					public void run() {
 						Shell shell = Display.getDefault().getActiveShell();
-						BrowserSimErrorDialog e = new BrowserSimErrorDialog(shell, "Error", shell.getDisplay().getSystemImage(SWT.ICON_ERROR),
-								programName, MessageDialog.ERROR, new String[] {"OK"}, 0); 
+						BrowserSimErrorDialog e = new BrowserSimErrorDialog(shell, Messages.ExternalProcessLauncher_ERROR, shell.getDisplay().getSystemImage(SWT.ICON_ERROR),
+								programName, MessageDialog.ERROR, new String[] {IDialogConstants.OK_LABEL}, 0); 
 						e.open();
 					}
 				});
@@ -179,7 +181,7 @@ public class ExternalProcessLauncher {
 	
 			return bundleLocation.getCanonicalPath();
 		} catch (IOException e) {
-			throw new IOException("Cannot resolve the path to bundle: " + bundle.getSymbolicName(), e);
+			throw new IOException(Messages.ExternalProcessLauncher_NO_BUNDLE + bundle.getSymbolicName(), e);
 		}
 	}
 	
@@ -188,7 +190,7 @@ public class ExternalProcessLauncher {
 		
 		//URL[] res = FileLocator.findEntries(bundle, new Path("plugins"));
 		String location = FileLocator.getBundleFile(bundle).getCanonicalPath(); 
-		File resources = new File(location + "/plugins");
+		File resources = new File(location + "/plugins"); //$NON-NLS-1$
 		if (resources.exists()) {
 			for(File resource : resources.listFiles()) {
 				result.append(PATH_SEPARATOR);

@@ -105,7 +105,7 @@ public class BrowserSimUtil {
 		double pixelRatio = device.getPixelRatio();
 		if (device.getPixelRatio() == 0.0) {
 			pixelRatio = 1.0;
-			RuntimeException e = new RuntimeException("Pixel Ratio is 0.0");
+			RuntimeException e = new RuntimeException(Messages.BrowserSim_ZERO_PIXEL_RATIO);
 			BrowserSimLogger.logError(e.getMessage(), e);
 		}
 		int width = (int) Math.round(device.getWidth() / pixelRatio);

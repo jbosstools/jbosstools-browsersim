@@ -12,6 +12,7 @@ package org.jboss.tools.vpe.browsersim.eclipse.callbacks;
 
 import java.io.File;
 import java.io.FileNotFoundException;
+import java.text.MessageFormat;
 
 import org.eclipse.core.filesystem.EFS;
 import org.eclipse.core.filesystem.IFileStore;
@@ -22,6 +23,7 @@ import org.eclipse.ui.PartInitException;
 import org.eclipse.ui.PlatformUI;
 import org.eclipse.ui.ide.IDE;
 import org.jboss.tools.vpe.browsersim.eclipse.Activator;
+import org.jboss.tools.vpe.browsersim.eclipse.Messages;
 import org.jboss.tools.vpe.browsersim.eclipse.launcher.ExternalProcessCallback;
 import org.jboss.tools.vpe.browsersim.eclipse.launcher.TransparentReader;
 
@@ -66,11 +68,11 @@ public class OpenFileCallback implements ExternalProcessCallback {
 							Activator.logError(e.getMessage(), e);
 						}
 					} else {
-						Exception e = new Exception("Cannot obtain workbench page");
+						Exception e = new Exception(Messages.Callback_CANNOT_OBTAIN_PAGE);
 						Activator.logError(e.getMessage(), e);
 					}
 				} else {
-					FileNotFoundException e = new FileNotFoundException("Cannot open file: " + fileNameToOpen);
+					FileNotFoundException e = new FileNotFoundException(MessageFormat.format(Messages.OpenFileCallback_CANNOT_OPEN_FILE, fileNameToOpen));
 					Activator.logError(e.getMessage(), e);
 				}
 			}

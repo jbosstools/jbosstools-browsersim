@@ -16,6 +16,8 @@ import org.jboss.tools.vpe.browsersim.ui.BrowserSim;
 import org.jboss.tools.vpe.browsersim.ui.skin.BrowserSimSkin;
 
 public class SkinChangeEvent extends EventObject {
+	private static final long serialVersionUID = 2734715406829337324L;
+	
 	private BrowserSimSkin newSkin;
 
 	public SkinChangeEvent(BrowserSim source, BrowserSimSkin newSkin) {
