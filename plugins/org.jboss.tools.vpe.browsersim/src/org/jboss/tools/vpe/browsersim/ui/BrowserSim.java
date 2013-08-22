@@ -17,7 +17,6 @@ import java.util.Observable;
 import java.util.Observer;
 
 import org.eclipse.swt.SWT;
-import org.eclipse.swt.SWTError;
 import org.eclipse.swt.browser.Browser;
 import org.eclipse.swt.browser.BrowserFunction;
 import org.eclipse.swt.browser.LocationAdapter;
@@ -513,8 +512,7 @@ public class BrowserSim {
 			browserSize = size;
 		}
 
-		skin.setOrientationAndSize(orientationAngle, browserSize, resizableSkinSizeAdvisor);
-		BrowserSimUtil.fixShellLocation(skin.getShell());
+		skin.setOrientationAndLocationAndSize(orientationAngle, currentLocation, browserSize, resizableSkinSizeAdvisor);
 		getBrowser().execute("window.orientation = " + orientationAngle + ";"
 				+ "(function(){"
 				+ 		"var event = document.createEvent('Event');"

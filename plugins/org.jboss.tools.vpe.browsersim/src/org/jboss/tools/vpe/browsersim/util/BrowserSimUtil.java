@@ -34,7 +34,7 @@ import org.jboss.tools.vpe.browsersim.ui.skin.BrowserSimSkin;
  */
 
 public class BrowserSimUtil {
-	public static void fixShellLocation(Shell shell) {
+	private static void fixShellLocation(Shell shell) {
 		Rectangle allClientArea = shell.getMonitor().getClientArea();
 		
 		Point shellLocation = shell.getLocation();
@@ -44,7 +44,7 @@ public class BrowserSimUtil {
 			if (shellLocation.y > bottomOverlap) {
 				shellLocation.y -= bottomOverlap;
 			} else {
-				shellLocation.y = 0;
+				shellLocation.y = allClientArea.y;
 			}
 		}
 
@@ -53,10 +53,28 @@ public class BrowserSimUtil {
 			if (shellLocation.x > rightOverlap) {
 				shellLocation.x -= rightOverlap;
 			} else {
-				shellLocation.x = 0;
+				shellLocation.x = allClientArea.x;
 			}
 		}
 
+		int leftOverlap = shellLocation.x - allClientArea.x;
+		if (leftOverlap < 0) {
+			if (shellLocation.x < leftOverlap) {
+				shellLocation.x -= leftOverlap;
+			} else {
+				shellLocation.x = allClientArea.x;
+			}
+		}
+		
+		int topOverlap = shellLocation.y - allClientArea.y;
+		if (topOverlap < 0) {
+			if (shellLocation.y < topOverlap) {
+				shellLocation.y -= topOverlap;
+			} else {
+				shellLocation.y = allClientArea.y;
+			}
+		}
+		
 		shell.setLocation(shellLocation);
 	}
 	
@@ -115,5 +133,13 @@ public class BrowserSimUtil {
 	
 	public static Shell getParentShell(BrowserSimSkin skin) {
 		return PlatformUtil.OS_MACOSX.equals(PlatformUtil.getOs()) ? null : skin.getShell().getParent().getShell();
+	}
+	
+	public static void setShellLocation(Shell shell, Point shellSize, Point location) {
+		Rectangle r = new Rectangle(location.x, location.y, shellSize.x, shellSize.y);
+		if (shell.getDisplay().getClientArea().intersects(r)) {
+			shell.setLocation(location);
+		}
+		BrowserSimUtil.fixShellLocation(shell);
 	}
 }

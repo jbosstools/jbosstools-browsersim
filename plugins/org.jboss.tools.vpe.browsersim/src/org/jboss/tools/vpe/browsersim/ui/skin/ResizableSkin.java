@@ -35,8 +35,8 @@ import org.jboss.tools.vpe.browsersim.browser.BrowserSimBrowser;
 import org.jboss.tools.vpe.browsersim.browser.IBrowserSimBrowserFactory;
 import org.jboss.tools.vpe.browsersim.model.preferences.SpecificPreferences;
 import org.jboss.tools.vpe.browsersim.ui.ControlHandler;
-import org.jboss.tools.vpe.browsersim.util.BrowserSimUtil;
 import org.jboss.tools.vpe.browsersim.util.BrowserSimImageList;
+import org.jboss.tools.vpe.browsersim.util.BrowserSimUtil;
 
 public abstract class ResizableSkin implements BrowserSimSkin {
 	protected DeviceComposite deviceComposite;
@@ -74,9 +74,9 @@ public abstract class ResizableSkin implements BrowserSimSkin {
 		}
 		shell.setLayout(new FillLayout());
 
-		if (location != null && display.getClientArea().contains(location)) {
-			shell.setLocation(location);
-		}
+//		if (location != null && display.getClientArea().contains(location)) {
+//			shell.setLocation(location);
+//		}
 		
 		vertical = true;
 		deviceComposite = createDeviceComposite(shell, vertical);
@@ -268,7 +268,7 @@ public abstract class ResizableSkin implements BrowserSimSkin {
 	}
 	
 	@Override
-	public void setOrientationAndSize(int orientation, Point browserSize, ResizableSkinSizeAdvisor sizeAdvisor) {
+	public void setOrientationAndLocationAndSize(int orientation, Point location, Point browserSize, ResizableSkinSizeAdvisor sizeAdvisor) {
 		vertical = (orientation == SpecificPreferences.ORIENTATION_PORTRAIT || orientation == SpecificPreferences.ORIENTATION_PORTRAIT_INVERTED);
 		String urlTextText = deviceComposite.getUrlText().getText();
 		String pageTitle = deviceComposite.getPageTitleStyledText() != null ? deviceComposite.getPageTitleStyledText().getText() : "";
@@ -305,6 +305,8 @@ public abstract class ResizableSkin implements BrowserSimSkin {
 		Point prefferedShellSize = shell.computeSize(shellWidthHint, shellHeightHint);
 		Point shellSize = sizeAdvisor.checkWindowSize(orientation, browserSize, prefferedShellSize);
 		shell.setSize(shellSize);
+		BrowserSimUtil.setShellLocation(shell, shellSize, location);
+		
 		shell.layout(true);
 		setShellRegion();
 		

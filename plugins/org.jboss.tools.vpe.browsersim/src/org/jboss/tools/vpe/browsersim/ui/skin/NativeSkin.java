@@ -35,6 +35,7 @@ import org.jboss.tools.vpe.browsersim.model.Device;
 import org.jboss.tools.vpe.browsersim.ui.ControlHandler;
 import org.jboss.tools.vpe.browsersim.ui.Messages;
 import org.jboss.tools.vpe.browsersim.util.BrowserSimResourcesUtil;
+import org.jboss.tools.vpe.browsersim.util.BrowserSimUtil;
 
 /**
  * @author Yahor Radtsevich (yradtsevich)
@@ -261,7 +262,7 @@ public class NativeSkin implements BrowserSimSkin {
 	}
 	
 	@Override
-	public void setOrientationAndSize(int orientation, Point browserSize, ResizableSkinSizeAdvisor sizeAdvisor) {
+	public void setOrientationAndLocationAndSize(int orientation, Point location, Point browserSize, ResizableSkinSizeAdvisor sizeAdvisor) {
 		GridData data = (GridData) browser.getLayoutData();
 		
 		if (browserSize.x != Device.DEFAULT_SIZE) {
@@ -276,6 +277,7 @@ public class NativeSkin implements BrowserSimSkin {
 		
 		Point shellSize = sizeAdvisor.checkWindowSize(orientation, browserSize, prefferedShellSize);
 		shell.setSize(shellSize);
+		BrowserSimUtil.setShellLocation(shell, shellSize, location);
 	}
 	
 	@Override
