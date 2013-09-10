@@ -135,11 +135,21 @@ public class BrowserSimUtil {
 		return PlatformUtil.OS_MACOSX.equals(PlatformUtil.getOs()) ? null : skin.getShell().getParent().getShell();
 	}
 	
+	/**
+	 * Sets the location of the shell.
+	 * 
+	 * @param shell - shell.
+	 * @param shellSize - size of the shell. Must not be <code>null</code>.
+	 * @param location - location of shell's left top corner. If location is <code>null</code>,
+	 * shell location will stay as it is(sets automatically by SWT). 
+	 */
 	public static void setShellLocation(Shell shell, Point shellSize, Point location) {
-		Rectangle r = new Rectangle(location.x, location.y, shellSize.x, shellSize.y);
-		if (shell.getDisplay().getClientArea().intersects(r)) {
-			shell.setLocation(location);
+		if (location != null && shellSize != null) {
+			Rectangle browserSimArea = new Rectangle(location.x, location.y, shellSize.x, shellSize.y);
+			if (shell.getDisplay().getClientArea().intersects(browserSimArea)) {
+				shell.setLocation(location);
+			}
+			fixShellLocation(shell);
 		}
-		BrowserSimUtil.fixShellLocation(shell);
 	}
 }
