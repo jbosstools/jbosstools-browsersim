@@ -75,7 +75,7 @@ public class BrowserSim {
 	private static CommonPreferences commonPreferences;
 	private SpecificPreferences specificPreferences;
 	private ResizableSkinSizeAdvisor resizableSkinSizeAdvisor;
-	private BrowserSimSkin skin;
+	protected BrowserSimSkin skin;
 	private ControlHandler controlHandler;
 	private Point currentLocation;
 	private ProgressListener progressListener;
@@ -243,17 +243,8 @@ public class BrowserSim {
 				skin.statusTextChanged(event.text);
 			}
 		});
-		browser.addLocationListener(new LocationListener() {
-			public void changed(LocationEvent event) {
-				if (event.top) {
-					BrowserSimBrowser browser = (BrowserSimBrowser) event.widget;
-					skin.locationChanged(event.location, browser.isBackEnabled(), browser.isForwardEnabled());
-				}
-			}
-
-			public void changing(LocationEvent event) {
-			}
-		});
+		
+		browser.addLocationListener(createNavButtonsListener());
 
 		browser.addLocationListener(new LocationAdapter() {
 			public void changed(LocationEvent event) {
@@ -576,5 +567,21 @@ public class BrowserSim {
 	}
 	public SpecificPreferences getSpecificPreferences() {
 		return specificPreferences;
+	}
+	
+	/**
+	 * Factory method. Override this method if you need to change appearance of back and forward buttons on UI.
+	 * 
+	 * @return {@link LocationListener} which controls back and forward buttons on UI
+	 */
+	protected LocationListener createNavButtonsListener() {
+		return new LocationAdapter() {
+			public void changed(LocationEvent event) {
+				if (event.top) {
+					BrowserSimBrowser browser = (BrowserSimBrowser) event.widget;
+					skin.locationChanged(event.location, browser.isBackEnabled(), browser.isForwardEnabled());
+				}
+			}
+		};
 	}
 }
