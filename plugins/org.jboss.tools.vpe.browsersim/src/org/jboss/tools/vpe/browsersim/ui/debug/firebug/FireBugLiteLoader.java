@@ -19,7 +19,10 @@ import org.eclipse.swt.events.DisposeEvent;
 import org.eclipse.swt.events.DisposeListener;
 import org.eclipse.swt.events.ShellAdapter;
 import org.eclipse.swt.events.ShellEvent;
+import org.eclipse.swt.graphics.Point;
+import org.eclipse.swt.graphics.Rectangle;
 import org.eclipse.swt.layout.FillLayout;
+import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Shell;
 import org.jboss.tools.vpe.browsersim.browser.PlatformUtil;
 import org.jboss.tools.vpe.browsersim.ui.skin.BrowserSimSkin;
@@ -89,8 +92,10 @@ public class FireBugLiteLoader {
 			public void show(WindowEvent event) {
 				Browser fblBrowser = (Browser)event.widget;
 				final Shell shell = fblBrowser.getShell();
-				if (event.location != null) {
-					shell.setLocation(event.location);
+				Point location = event.location;
+				if (location != null && Display.getDefault().getClientArea().intersects(
+						new Rectangle(location.x, location.y, event.size.x, event.size.y))) {
+					shell.setLocation(location);
 				}
 				shell.open();
 			}
