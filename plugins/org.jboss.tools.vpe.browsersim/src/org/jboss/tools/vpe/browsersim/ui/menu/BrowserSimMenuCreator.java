@@ -101,7 +101,7 @@ public class BrowserSimMenuCreator {
 				addToolsItems(contextMenu, skin, commonPreferences, specificPreferences, homeUrl);
 
 				new MenuItem(contextMenu, SWT.BAR);
-				FileMenuCreator.addItems(contextMenu, skin, commonPreferences, specificPreferences);
+				addFileItems(contextMenu, skin, commonPreferences, specificPreferences);
 
 				new MenuItem(contextMenu, SWT.BAR);
 				addAboutItem(contextMenu);
@@ -114,7 +114,7 @@ public class BrowserSimMenuCreator {
 
 	private void createMenusForMenuBar(Menu appMenuBar) {
 		Menu file = createDropDownMenu(appMenuBar, Messages.BrowserSim_FILE);
-		FileMenuCreator.addItems(file, skin, commonPreferences, specificPreferences);
+		addFileItems(file, skin, commonPreferences, specificPreferences);
 
 		// If Platform is Mac OS X, application will have no duplicated menu items (Exit/Quit BrowserSim)
 		if (!PlatformUtil.OS_MACOSX.equals(PlatformUtil.getOs())) {
@@ -168,6 +168,10 @@ public class BrowserSimMenuCreator {
 		ToolsMenuCreator.addTouchEventsItem(contextMenu, specificPreferences);
 	}
 
+	protected void addFileItems(final Menu menu, final BrowserSimSkin skin, final CommonPreferences commonPreferences, final SpecificPreferences specificPreferences) {
+		new FileMenuCreator().addItems(menu, skin, commonPreferences, specificPreferences);
+	}
+	
 	private Menu createDropDownMenu(Menu menuBar, String name) {
 		MenuItem menuItem = new MenuItem(menuBar, SWT.CASCADE);
 		menuItem.setText(name);

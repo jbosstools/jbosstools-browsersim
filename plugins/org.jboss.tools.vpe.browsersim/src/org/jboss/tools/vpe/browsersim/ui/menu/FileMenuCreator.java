@@ -19,6 +19,7 @@ import java.net.URL;
 import javax.xml.bind.DatatypeConverter;
 
 import org.eclipse.swt.SWT;
+import org.eclipse.swt.browser.Browser;
 import org.eclipse.swt.events.DisposeEvent;
 import org.eclipse.swt.events.DisposeListener;
 import org.eclipse.swt.events.SelectionAdapter;
@@ -48,11 +49,11 @@ import org.jboss.tools.vpe.browsersim.util.BrowserSimUtil;
 
 public class FileMenuCreator {
 	/** @see org.jboss.tools.vpe.browsersim.eclipse.callbacks.OpenFileCallback */
-	private static final String OPEN_FILE_COMMAND = "org.jboss.tools.vpe.browsersim.command.openFile:"; //$NON-NLS-1$
+	protected static final String OPEN_FILE_COMMAND = "org.jboss.tools.vpe.browsersim.command.openFile:"; //$NON-NLS-1$
 	/** @see org.jboss.tools.vpe.browsersim.eclipse.callbacks.ViewSourceCallback */
 	private static final String VIEW_SOURCE_COMMAND = "org.jboss.tools.vpe.browsersim.command.viewSource:"; //$NON-NLS-1$
 
-	public static void addItems(final Menu menu, final BrowserSimSkin skin, final CommonPreferences commonPreferences, final SpecificPreferences specificPreferences) {
+	public void addItems(final Menu menu, final BrowserSimSkin skin, final CommonPreferences commonPreferences, final SpecificPreferences specificPreferences) {
 		addOpenInDefaultBrowserItem(menu, skin);
 		addViewSourceItem(menu, skin);
 
@@ -62,7 +63,7 @@ public class FileMenuCreator {
 		}
 	}
 	
-	private static void addOpenInDefaultBrowserItem(final Menu menu, final BrowserSimSkin skin) {
+	private void addOpenInDefaultBrowserItem(final Menu menu, final BrowserSimSkin skin) {
 		MenuItem openInDefaultBrowser = new MenuItem(menu, SWT.PUSH);
 		openInDefaultBrowser.setText(Messages.BrowserSim_OPEN_IN_DEFAULT_BROWSER);
 		openInDefaultBrowser.addSelectionListener(new SelectionAdapter() {
@@ -79,47 +80,59 @@ public class FileMenuCreator {
 		});
 	}
 	
-	private static void addViewSourceItem(final Menu menu, final BrowserSimSkin skin) {
+	private void addViewSourceItem(final Menu menu, final BrowserSimSkin skin) {
 		MenuItem openInDefaultBrowser = new MenuItem(menu, SWT.PUSH);
 		openInDefaultBrowser.setText(Messages.BrowserSim_VIEW_PAGE_SOURCE);
 		openInDefaultBrowser.addSelectionListener(new SelectionAdapter() {
 			public void widgetSelected(SelectionEvent event) {
 				if (BrowserSimArgs.standalone) {
-					final BrowserSimSourceViewer sourceViewer = new BrowserSimSourceViewer(BrowserSimUtil.getParentShell(skin));
-					sourceViewer.setText(skin.getBrowser().getText());
-					sourceViewer.open();
-					
-					skin.getShell().addDisposeListener(new DisposeListener() {
-						@Override
-						public void widgetDisposed(DisposeEvent arg0) {
-							Shell sourceShell = sourceViewer.getShell();
-							if (!sourceShell.isDisposed()) {
-								sourceShell.dispose();
-							}
-						}
-					});
+					viewSource(skin);
 				} else {
 					if (skin.getBrowser().getUrl().startsWith("file:")) { //$NON-NLS-1$
-						URI uri = null;
-						try {
-							uri = new URI(skin.getBrowser().getUrl());
-							File sourceFile = new File(uri);
-							System.out.println(OPEN_FILE_COMMAND + sourceFile.getAbsolutePath()); // send command to Eclipse
-						} catch (URISyntaxException e) {
-							BrowserSimLogger.logError(e.getMessage(), e);
-						}
+						openFile(skin.getBrowser().getUrl());
 					} else {
-						System.out.println(VIEW_SOURCE_COMMAND + skin.getBrowser().getUrl()); // send command to Eclipse
-						String source = skin.getBrowser().getText();
-						String base64Source = DatatypeConverter.printBase64Binary(source.getBytes());
-						System.out.println(base64Source);
+						viewServerSource(skin.getBrowser());
 					}
 				}
 			}
 		});
 	}
 	
-	static void addPreferencesItem(Menu menu, final CommonPreferences commonPreferences, final SpecificPreferences specificPreferences) {
+	private void viewSource(BrowserSimSkin skin) {
+		final BrowserSimSourceViewer sourceViewer = new BrowserSimSourceViewer(BrowserSimUtil.getParentShell(skin));
+		sourceViewer.setText(skin.getBrowser().getText());
+		sourceViewer.open();
+		
+		skin.getShell().addDisposeListener(new DisposeListener() {
+			@Override
+			public void widgetDisposed(DisposeEvent arg0) {
+				Shell sourceShell = sourceViewer.getShell();
+				if (!sourceShell.isDisposed()) {
+					sourceShell.dispose();
+				}
+			}
+		});		
+	}
+	
+	protected void openFile(String path) {		
+		URI uri = null;
+		try {
+			uri = new URI(path);
+			File sourceFile = new File(uri);
+			System.out.println(OPEN_FILE_COMMAND + sourceFile.getAbsolutePath()); // send command to Eclipse
+		} catch (URISyntaxException e) {
+			BrowserSimLogger.logError(e.getMessage(), e);
+		}
+	}
+	
+	protected void viewServerSource(Browser browser) {
+		System.out.println(VIEW_SOURCE_COMMAND + browser.getUrl()); // send command to Eclipse
+		String source = browser.getText();
+		String base64Source = DatatypeConverter.printBase64Binary(source.getBytes());
+		System.out.println(base64Source);
+	}
+	
+	private void addPreferencesItem(Menu menu, final CommonPreferences commonPreferences, final SpecificPreferences specificPreferences) {
 		MenuItem preferences = new MenuItem(menu, SWT.PUSH);
 		preferences.setText(Messages.BrowserSim_PREFERENCES);
 		preferences.addSelectionListener(new SelectionAdapter() {
