@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <feature
       id="org.jboss.tools.vpe.win32_win32_x86.feature"
-      version="3.5.0.qualifier">
+      version="3.5.100.qualifier">
 
    <plugin
          id="org.eclipse.swt"
