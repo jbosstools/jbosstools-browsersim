@@ -56,7 +56,9 @@ public class NativeSkin implements BrowserSimSkin {
 	private ToolItem itemRotateCounterclockwise;
 	private ToolItem itemRotateClockwise;
 	private Composite skinComposite;
+	private Composite innerBrowserContainer;
 	private IBrowserSimBrowserFactory browserFactory;
+
 	
 	public NativeSkin() {
 	}
@@ -121,14 +123,16 @@ public class NativeSkin implements BrowserSimSkin {
 		data.widthHint = 0;
 		locationText.setLayoutData(data);
 		
-		browser = browserFactory.createBrowser(skinComposite, SWT.NONE);
+		innerBrowserContainer = new Composite(skinComposite, SWT.NONE);
+		browser = browserFactory.createBrowser(innerBrowserContainer, SWT.NONE);
 		GridData browserData = new GridData();
 		browserData.horizontalAlignment = GridData.FILL;
 		browserData.verticalAlignment = GridData.FILL;
 		browserData.horizontalSpan = 3;
 		browserData.grabExcessHorizontalSpace = true;
 		browserData.grabExcessVerticalSpace = true;
-		browser.setLayoutData(browserData);
+		innerBrowserContainer.setLayout(new FillLayout());
+		innerBrowserContainer.setLayoutData(browserData);
 		
 		Composite statusComposite = new Composite(skinComposite, SWT.NONE);
 		GridData statusData = new GridData();
@@ -263,7 +267,7 @@ public class NativeSkin implements BrowserSimSkin {
 	
 	@Override
 	public void setOrientationAndLocationAndSize(int orientation, Point location, Point browserSize, ResizableSkinSizeAdvisor sizeAdvisor) {
-		GridData data = (GridData) browser.getLayoutData();
+		GridData data = (GridData) innerBrowserContainer.getLayoutData();
 		
 		if (browserSize.x != Device.DEFAULT_SIZE) {
 			data.widthHint = browserSize.x;
