@@ -163,8 +163,9 @@ public class BrowserSimMenuCreator {
 		ToolsMenuCreator.addScreenshotMenuItem(contextMenu, skin, commonPreferences);
 		ToolsMenuCreator.addSyncronizedWindowItem(contextMenu, skin, commonPreferences.getDevices(),
 				specificPreferences.getUseSkins(), specificPreferences.isEnableLiveReload(),
-				specificPreferences.getLiveReloadPort(), specificPreferences.getOrientationAngle(), homeUrl);
+				specificPreferences.getLiveReloadPort(), specificPreferences.isEnableTouchEvents(), specificPreferences.getOrientationAngle(), homeUrl);
 		ToolsMenuCreator.addLiveReloadItem(contextMenu, specificPreferences);
+		ToolsMenuCreator.addTouchEventsItem(contextMenu, specificPreferences);
 	}
 
 	private Menu createDropDownMenu(Menu menuBar, String name) {

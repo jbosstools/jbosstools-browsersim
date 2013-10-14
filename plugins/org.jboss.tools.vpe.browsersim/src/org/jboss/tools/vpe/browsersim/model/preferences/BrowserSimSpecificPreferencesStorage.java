@@ -51,6 +51,7 @@ public class BrowserSimSpecificPreferencesStorage extends SpecificPreferencesSto
 		boolean useSkins = true;
 		boolean enableLiveReload = false;
 		int liveReloadPort = DEFAULT_LIVE_RELOAD_PORT;
+		boolean enableTouchEvents = false;
 
 		try {
 			DocumentBuilderFactory dbFactory = DocumentBuilderFactory.newInstance();
@@ -83,6 +84,11 @@ public class BrowserSimSpecificPreferencesStorage extends SpecificPreferencesSto
 					liveReloadPort = Integer.parseInt(node.getTextContent());
 				}
 				
+				node = document.getElementsByTagName(PREFERENCES_TOUCH_EVENTS).item(0);
+				if (!PreferencesUtil.isNullOrEmpty(node)) {
+					enableTouchEvents = Boolean.parseBoolean(node.getTextContent());
+				}
+				
 				node = document.getElementsByTagName(PREFERENCES_ORIENTATION_ANGLE).item(0);
 				if (!PreferencesUtil.isNullOrEmpty(node)) {
 					orientationAngle = Integer.parseInt(node.getTextContent());
@@ -99,7 +105,7 @@ public class BrowserSimSpecificPreferencesStorage extends SpecificPreferencesSto
 								.getTextContent()));
 					}
 				}
-				return new BrowserSimSpecificPreferences(selectedDeviceId, useSkins, enableLiveReload, liveReloadPort, orientationAngle, currentlocation);
+				return new BrowserSimSpecificPreferences(selectedDeviceId, useSkins, enableLiveReload, liveReloadPort, enableTouchEvents, orientationAngle, currentlocation);
 			}
 		} catch (SAXException e) {
 			BrowserSimLogger.logError(e.getMessage(), e);
@@ -165,6 +171,10 @@ public class BrowserSimSpecificPreferencesStorage extends SpecificPreferencesSto
 			liveReloadPort.setTextContent(String.valueOf(sp.getLiveReloadPort()));
 			rootElement.appendChild(liveReloadPort);
 			
+			Element enableTouchEvents = doc.createElement(PREFERENCES_TOUCH_EVENTS);
+			enableTouchEvents.setTextContent(String.valueOf(sp.isEnableTouchEvents()));
+			rootElement.appendChild(enableTouchEvents);
+			
 			// write the content into xml file
 			TransformerFactory transformerFactory = TransformerFactory.newInstance();
 			transformerFactory.newTransformer().transform(new DOMSource(doc), new StreamResult(file));
@@ -178,7 +188,7 @@ public class BrowserSimSpecificPreferencesStorage extends SpecificPreferencesSto
 
 	@Override
 	protected SpecificPreferences createBlankPreferences() {
-		return new BrowserSimSpecificPreferences(null, true, false, DEFAULT_LIVE_RELOAD_PORT, 0, null);
+		return new BrowserSimSpecificPreferences(null, true, false, DEFAULT_LIVE_RELOAD_PORT, false, 0, null);
 	}
 
 	@Override

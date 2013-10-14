@@ -51,6 +51,7 @@ import org.jboss.tools.vpe.browsersim.model.preferences.CommonPreferences;
 import org.jboss.tools.vpe.browsersim.model.preferences.CommonPreferencesStorage;
 import org.jboss.tools.vpe.browsersim.model.preferences.SpecificPreferences;
 import org.jboss.tools.vpe.browsersim.model.preferences.SpecificPreferencesStorage;
+import org.jboss.tools.vpe.browsersim.scripting.TouchSupportLoader;
 import org.jboss.tools.vpe.browsersim.scripting.WebSqlLoader;
 import org.jboss.tools.vpe.browsersim.ui.debug.firebug.FireBugLiteLoader;
 import org.jboss.tools.vpe.browsersim.ui.events.ExitListener;
@@ -81,6 +82,7 @@ public class BrowserSim {
 	private ProgressListener progressListener;
 	private Observer commonPreferencesObserver;
 	private LocationAdapter liveReloadLocationAdapter;
+	private LocationAdapter touchEventsLocationAdapter;
 	private List<SkinChangeListener> skinChangeListenerList = new ArrayList<SkinChangeListener>();
 	private List<ExitListener> exitListenerList = new ArrayList<ExitListener>();
 	
@@ -439,6 +441,7 @@ public class BrowserSim {
 	 		}
 			
 			processLiveReload(specificPreferences.isEnableLiveReload());
+			processTouchEvents(specificPreferences.isEnableTouchEvents());
 	
 			skin.getShell().open();
 		} 
@@ -469,6 +472,17 @@ public class BrowserSim {
 		}
 	}
 	
+	private void processTouchEvents(boolean isTouchEventsEnabled) {
+		if (isTouchEventsEnabled) {
+			if (touchEventsLocationAdapter == null) {
+				initTouchEventsLocationAdapter();
+			}
+			skin.getBrowser().addLocationListener(touchEventsLocationAdapter);
+		} else if (touchEventsLocationAdapter != null) {
+			skin.getBrowser().removeLocationListener(touchEventsLocationAdapter);
+		}
+	}
+	
 	private void initLiveReloadLocationAdapter() {
 		liveReloadLocationAdapter = new LocationAdapter() {
 			@Override
@@ -483,6 +497,15 @@ public class BrowserSim {
 										"document.head.appendChild(e);" +
 									"});" +
 								"}");
+			}
+		};
+	}
+	
+	private void initTouchEventsLocationAdapter() {
+		touchEventsLocationAdapter = new LocationAdapter() {
+			@Override
+			public void changed(LocationEvent event) {
+				TouchSupportLoader.initTouchEvents((Browser) event.widget);
 			}
 		};
 	}

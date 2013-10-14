@@ -32,6 +32,7 @@ public abstract class SpecificPreferencesStorage implements PreferencesStorage{
 	protected static final String PREFERENCES_USE_SKINS = "useSkins";
 	protected static final String PREFERENCES_LIVE_RELOAD = "enableLiveReload";
 	protected static final String PREFERENCES_LIVE_RELOAD_PORT = "liveReloadPort";
+	protected static final String PREFERENCES_TOUCH_EVENTS = "enableTouchEvents";
 	protected static final String PREFERENCES_SELECTED_DEVICE = "selectedDeviceId";
 	protected static final String PREFERENCES_VERSION = "version";
 

@@ -68,12 +68,14 @@ public class ManageDevicesDialog extends Dialog {
 	protected boolean useSkins;
 	protected boolean enableLiveReload;
 	protected int liveReloadPort;
+	protected boolean enableTouchEvents;
 	protected TruncateWindow truncateWindow;
 	protected Button askBeforeTruncateRadio;
 	protected Button alwaysTruncateRadio;
 	protected Button neverTruncateRadio;
 	protected Button useSkinsCheckbox;
 	protected Button liveReloadCheckBox;
+	protected Button touchEventsCheckBox;
 	protected Label liveReloadPortLabel;
 	protected Text liveReloadPortText;
 
@@ -98,6 +100,7 @@ public class ManageDevicesDialog extends Dialog {
 		this.useSkins = oldSpecificPreferences.getUseSkins();
 		this.enableLiveReload = oldSpecificPreferences.isEnableLiveReload();
 		this.liveReloadPort = oldSpecificPreferences.getLiveReloadPort();
+		this.enableTouchEvents = oldSpecificPreferences.isEnableTouchEvents();
 		this.truncateWindow = oldCommonPreferences.getTruncateWindow();
 	} 
 	
@@ -358,6 +361,14 @@ public class ManageDevicesDialog extends Dialog {
 			}
 		});
 		
+		Group touchEventsGroup = new Group(settingsComposite, SWT.NONE);
+		touchEventsGroup.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, true, false, 1, 1));
+		touchEventsGroup.setText("Touch Events");
+		touchEventsGroup.setLayout(new GridLayout(2, false));
+		touchEventsCheckBox = new Button(touchEventsGroup, SWT.CHECK);
+		touchEventsCheckBox.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, true, false, 2, 1));
+		touchEventsCheckBox.setText("Emulate Touch Events");
+		
 		Group screnshotGroup = new Group(settingsComposite, SWT.NONE);
 		screnshotGroup.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, true, false, 1, 1));
 		screnshotGroup.setText(Messages.ManageDevicesDialog_SCREENSHOTS);
@@ -423,6 +434,7 @@ public class ManageDevicesDialog extends Dialog {
 				useSkins = sp.getUseSkins();
 				enableLiveReload = sp.isEnableLiveReload();
 				liveReloadPortText.setText(Integer.toString(sp.getLiveReloadPort()));
+				enableTouchEvents = sp.isEnableTouchEvents();
 				truncateWindow = cp.getTruncateWindow();
 				screenshotsPath.setText(cp.getScreenshotsFolder());
 				weinreScriptUrlText.setText(cp.getWeinreScriptUrl());
@@ -440,7 +452,7 @@ public class ManageDevicesDialog extends Dialog {
 			public void widgetSelected(SelectionEvent e) {
 				newCommonPreferences = new CommonPreferences(devices, truncateWindow, screenshotsPath.getText(),
 						weinreScriptUrlText.getText(), weinreClientUrlText.getText());
-				newSpecificPreferences = create(checkedDeviceId, useSkins, enableLiveReload, getLiveReloadPort());
+				newSpecificPreferences = create(selectedDeviceId, useSkins, enableLiveReload, getLiveReloadPort(), touchEventsCheckBox.getSelection());
 				shell.close();
 			}
 		});
@@ -490,7 +502,8 @@ public class ManageDevicesDialog extends Dialog {
 		useSkinsCheckbox.setSelection(useSkins);
 		liveReloadCheckBox.setSelection(enableLiveReload);
 		enableLiveReloadPort(enableLiveReload);
-		
+		touchEventsCheckBox.setSelection(enableTouchEvents);
+
 		askBeforeTruncateRadio.setSelection(TruncateWindow.PROMPT.equals(truncateWindow));
 		alwaysTruncateRadio.setSelection(TruncateWindow.ALWAYS_TRUNCATE.equals(truncateWindow));
 		neverTruncateRadio.setSelection(TruncateWindow.NEVER_TRUNCATE.equals(truncateWindow));
@@ -515,8 +528,8 @@ public class ManageDevicesDialog extends Dialog {
 		return BrowserSimSpecificPreferencesStorage.INSTANCE;
 	}
 	
-	protected SpecificPreferences create(String selectedDeviceId, boolean useSkins, boolean enableLiveReload, int liveReloadPort) {
-		return new BrowserSimSpecificPreferences(selectedDeviceId, useSkins, enableLiveReload, liveReloadPort,
+	protected SpecificPreferences create(String selectedDeviceId, boolean useSkins, boolean enableLiveReload, int liveReloadPort, boolean enableTouchEvents) {
+		return new BrowserSimSpecificPreferences(selectedDeviceId, useSkins, enableLiveReload, liveReloadPort, enableTouchEvents,
 				oldSpecificPreferences.getOrientationAngle(), oldSpecificPreferences.getLocation());
 	}
 }
