@@ -371,7 +371,7 @@ public class BrowserSim {
 		});
 	}
 
-	private void setSelectedDevice(Boolean refreshRequired) {
+	protected void setSelectedDevice(Boolean refreshRequired) {
 		final Device device = commonPreferences.getDevices().get(specificPreferences.getSelectedDeviceId());
 		if (device == null) {
 			skin.getShell().close();
