@@ -175,4 +175,9 @@ public class GalaxyS3Skin  extends ResizableSkin {
 	protected DeviceComposite createDeviceComposite(Composite parent, boolean vertical) {
 		return new AndroidComposite(parent, vertical ? VERTICAL_DESCRIPTOR : HORIZONTAL_DESCRIPTOR);
 	}
+
+	@Override
+	public boolean automaticallyHideAddressBar() {
+		return true;
+	}
 }

@@ -11,6 +11,8 @@
 package org.jboss.tools.vpe.browsersim.ui.skin.ios;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.custom.StyledText;
+import org.eclipse.swt.events.MouseAdapter;
+import org.eclipse.swt.events.MouseEvent;
 import org.eclipse.swt.layout.FormAttachment;
 import org.eclipse.swt.layout.FormData;
 import org.eclipse.swt.layout.FormLayout;
@@ -32,8 +34,6 @@ public class AppleIPadComposite extends DeviceComposite {
 	private Composite iOsCompositeContainer;
 	private Composite browserContainer;
 	private IPadNavBarComposite navBarComposite;
-	private ImageButtonComposite forwardButtonComposite;
-	private ImageButtonComposite backButtonComposite;
 	private int cornersSize;
 
 	/**
@@ -47,9 +47,6 @@ public class AppleIPadComposite extends DeviceComposite {
 		
 		imageList = new BrowserSimImageList(this);
 		setLayout(new FormLayout());
-		
-		backButtonComposite = new ImageButtonComposite(this, imageList, skinDescriptor.getBackButton());
-		forwardButtonComposite = new ImageButtonComposite(this, imageList, skinDescriptor.getForwardButton());
 		
 		bodyComposite = new Composite(this, SWT.NONE);
 		FormData formData = new FormData();
@@ -92,6 +89,14 @@ public class AppleIPadComposite extends DeviceComposite {
 		browserContainer.setLayoutData(gridData);
 		
 		cornersSize = skinDescriptor.getCornersSize();
+		
+		timeComposite.addMouseListener(new MouseAdapter() {
+			public void mouseDown(MouseEvent e) {
+				if (e.button == 1) {
+					setNavBarCompositeVisible(!isNavBarCompositeVisible());
+				}
+			}
+		});
 	}
 	
 	/* (non-Javadoc)
@@ -99,7 +104,7 @@ public class AppleIPadComposite extends DeviceComposite {
 	 */
 	@Override
 	public ImageButtonComposite getBackButtonComposite() {
-		return backButtonComposite;
+		return navBarComposite.getBackButtonComposite();
 	}
 	
 	/* (non-Javadoc)
@@ -107,7 +112,7 @@ public class AppleIPadComposite extends DeviceComposite {
 	 */
 	@Override
 	public ImageButtonComposite getForwardButtonComposite() {
-		return forwardButtonComposite;
+		return navBarComposite.getForwardButtonComposite();
 	}
 	
 	/* (non-Javadoc)

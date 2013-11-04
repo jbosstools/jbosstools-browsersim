@@ -342,5 +342,10 @@ public class NativeSkin implements BrowserSimSkin {
 	public void setContextMenu(Menu contextMenu) {
 		// not supported
 	}
+
+	@Override
+	public boolean automaticallyHideAddressBar() {
+		return false;
+	}
 	
 }

@@ -131,4 +131,9 @@ public class AppleIPhone4ResizableSkin extends ResizableSkin {
 		}
 		return new AppleIPhoneComposite(parent, skinDescriptor);
 	}
+
+	@Override
+	public boolean automaticallyHideAddressBar() {
+		return true;
+	}
 }

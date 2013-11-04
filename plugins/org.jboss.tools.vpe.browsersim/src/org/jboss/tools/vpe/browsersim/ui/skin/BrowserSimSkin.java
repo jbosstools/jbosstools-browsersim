@@ -17,6 +17,8 @@ import org.eclipse.swt.widgets.Shell;
 import org.jboss.tools.vpe.browsersim.browser.IBrowser;
 import org.jboss.tools.vpe.browsersim.browser.IBrowserSimBrowserFactory;
 import org.jboss.tools.vpe.browsersim.ui.ControlHandler;
+import org.jboss.tools.vpe.browsersim.ui.skin.ios.AppleIPadMiniResizableSkin;
+import org.jboss.tools.vpe.browsersim.ui.skin.ios.AppleIPadResizableSkin;
 
 /**
  * @author Yahor Radtsevich (yradtsevich)
@@ -37,4 +39,13 @@ public interface BrowserSimSkin {
 	void setOrientationAndLocationAndSize(int orientation, Point location, Point browserSize, ResizableSkinSizeAdvisor sizeAdvisor);
 	void setAddressBarVisible(boolean visible);
 	void setContextMenu(Menu contextMenu);
+	
+	/**
+	 * Indicates whether address bar should be hidden automatically.  
+	 * {@link NativeSkin}, {@link AppleIPadResizableSkin} and {@link AppleIPadMiniResizableSkin} 
+	 * should not hide the adressBar on scroll, whereas other skins should. 
+	 * 
+	 * @return <tt>true</tt> if address bar should be hidden automatically
+	 */
+	boolean automaticallyHideAddressBar();
 }

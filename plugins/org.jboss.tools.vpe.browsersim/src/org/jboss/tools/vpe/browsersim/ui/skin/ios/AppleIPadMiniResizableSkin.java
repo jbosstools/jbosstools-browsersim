@@ -130,7 +130,8 @@ public class AppleIPadMiniResizableSkin extends ResizableSkin {
 	}
 
 	@Override
-	public void setAddressBarVisible(boolean visible) {
-		return;
+	public boolean automaticallyHideAddressBar() {
+		return false;
 	}
+
 }

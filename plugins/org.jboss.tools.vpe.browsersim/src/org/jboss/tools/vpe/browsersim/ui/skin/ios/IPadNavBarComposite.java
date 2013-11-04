@@ -36,6 +36,9 @@ public class IPadNavBarComposite extends Composite {
 	};
 	private ImageButtonComposite stopButtonComposite;
 	private ImageButtonComposite refreshButtonComposite;
+	private ImageButtonComposite backButtonComposite;
+	private ImageButtonComposite forwardButtonComposite;
+	
 	private Text urlText;
 	private ProgressBar progressBar;
 	private StyledText pageTitleStyledText;
@@ -84,6 +87,24 @@ public class IPadNavBarComposite extends Composite {
 		formData.height = stopImageBounds.height;
 		stopButtonComposite.setLayoutData(formData);
 		
+		backButtonComposite = new ImageButtonComposite(this, imageList.getImage(BD + "back.png"), imageList.getImage(BD + "back-disabled.png"), imageList.getImage(BD + "back-selected.png"));
+		formData = new FormData();
+		Rectangle backImageBounds = imageList.getImage(BD + "back.png").getBounds();
+		formData.right = new FormAttachment(0, 40);
+		formData.bottom = new FormAttachment(0, 35);
+		formData.width = backImageBounds.width;
+		formData.height = backImageBounds.height;
+		backButtonComposite.setLayoutData(formData);
+		
+		forwardButtonComposite = new ImageButtonComposite(this, imageList.getImage(BD + "forward.png"), imageList.getImage(BD + "forward-disabled.png"), imageList.getImage(BD + "forward-selected.png"));
+		formData = new FormData();
+		Rectangle forwardImageBounds = imageList.getImage(BD + "forward.png").getBounds();
+		formData.right = new FormAttachment(0, 85);
+		formData.bottom = new FormAttachment(0, 35);
+		formData.width = forwardImageBounds.width;
+		formData.height = forwardImageBounds.height;
+		forwardButtonComposite.setLayoutData(formData);
+		
 		progressBar = new ProgressBar(this, SWT.NONE);
 		progressBar.setBackground(getDisplay().getSystemColor(SWT.COLOR_BLUE));
 		progressBar.setVisible(false);
@@ -126,6 +147,14 @@ public class IPadNavBarComposite extends Composite {
 
 	public ImageButtonComposite getRefreshButtonComposite() {
 		return refreshButtonComposite;
+	}
+	
+	public ImageButtonComposite getBackButtonComposite() {
+		return backButtonComposite;
+	}
+
+	public ImageButtonComposite getForwardButtonComposite() {
+		return forwardButtonComposite;
 	}
 
 	public Text getUrlText() {

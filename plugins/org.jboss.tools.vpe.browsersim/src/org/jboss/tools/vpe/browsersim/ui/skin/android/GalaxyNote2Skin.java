@@ -166,4 +166,9 @@ public class GalaxyNote2Skin  extends ResizableSkin {
 		}
 		return new AndroidComposite(parent, skinDescriptor);
 	}
+
+	@Override
+	public boolean automaticallyHideAddressBar() {
+		return true;
+	}
 }

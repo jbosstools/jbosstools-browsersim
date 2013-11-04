@@ -17,12 +17,9 @@ import java.util.Observable;
 import java.util.Observer;
 
 import org.eclipse.swt.SWT;
-import org.jboss.tools.vpe.browsersim.browser.IBrowser;
-import org.eclipse.swt.browser.BrowserFunction;
 import org.eclipse.swt.browser.LocationAdapter;
 import org.eclipse.swt.browser.LocationEvent;
 import org.eclipse.swt.browser.LocationListener;
-import org.eclipse.swt.browser.OpenWindowListener;
 import org.eclipse.swt.browser.ProgressEvent;
 import org.eclipse.swt.browser.ProgressListener;
 import org.eclipse.swt.browser.StatusTextEvent;
@@ -156,6 +153,7 @@ public class BrowserSim {
 		Display display = Display.getDefault();
 		
 		skin.createControls(display, location, parentShell);
+		skin.setAddressBarVisible(isAddressBarVisibleByDefault());
 		currentLocation = location;
 		
 		final Shell shell = skin.getShell();
@@ -298,9 +296,11 @@ public class BrowserSim {
 									skin.getShell().getDisplay().asyncExec(new Runnable() {
 										public void run() {
 											if (skin != null && skin.getShell() != null && !skin.getShell().isDisposed()) {
-												skin.setAddressBarVisible(false);
-											}
+										if (skin.automaticallyHideAddressBar()) {
+											skin.setAddressBarVisible(false);
 										}
+									}
+								}
 									});
 								}
 								return null;
@@ -323,7 +323,9 @@ public class BrowserSim {
 			}
 			
 			public void changing(LocationEvent event) {
-				skin.setAddressBarVisible(true);
+				if (skin.automaticallyHideAddressBar() && isAddressBarVisibleByDefault()) {
+					skin.setAddressBarVisible(true);
+				}
 			}
 		});
 
@@ -526,6 +528,10 @@ public class BrowserSim {
 	
 	public static List<BrowserSim> getInstances() {
 		return instances;
+	}
+	
+	protected boolean isAddressBarVisibleByDefault() {
+		return true;
 	}
 
 	/**
