@@ -11,6 +11,7 @@ Bundle-RequiredExecutionEnvironment: JavaSE-1.6
 Require-Bundle: org.eclipse.swt;bundle-version="3.7.0",
  org.jboss.tools.vpe.browsersim.browser;bundle-version="1.0.0"
 Export-Package: org.jboss.tools.vpe.browsersim,
+ org.jboss.tools.vpe.browsersim.model,
  org.jboss.tools.vpe.browsersim.model.preferences,
  org.jboss.tools.vpe.browsersim.ui,
  org.jboss.tools.vpe.browsersim.ui.events,

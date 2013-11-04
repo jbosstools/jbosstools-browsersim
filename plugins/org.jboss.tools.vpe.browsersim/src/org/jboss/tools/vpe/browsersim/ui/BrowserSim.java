@@ -261,52 +261,9 @@ public class BrowserSim {
 				@Override
 				public void changed(LocationEvent event) {
 					Browser browser = (Browser) event.widget;
-					setCustomScrollbarStyles(browser);
+					BrowserSimUtil.setCustomScrollbarStyles(browser);
 				}
-
-				private void setCustomScrollbarStyles(Browser browser) {
 				
-					browser.execute(
-						"if (window._browserSim_customScrollBarStylesSetter === undefined) {" //$NON-NLS-1$
-							+"window._browserSim_customScrollBarStylesSetter = function () {" //$NON-NLS-1$
-							+	"document.removeEventListener('DOMSubtreeModified', window._browserSim_customScrollBarStylesSetter, false);" //$NON-NLS-1$
-							+	"var head = document.head;" //$NON-NLS-1$
-							+	"var style = document.createElement('style');" //$NON-NLS-1$
-							+	"style.type = 'text/css';" //$NON-NLS-1$
-							+	"style.id='browserSimStyles';" //$NON-NLS-1$
-							+	"head.appendChild(style);" //$NON-NLS-1$
-							+	"style.innerText='" //$NON-NLS-1$
-							// The following two rules fix a problem with showing scrollbars in Google Mail and similar,
-							// but autohiding of navigation bar stops to work with it. That is why they are commented.
-							//+	"html {"
-							//+		"overflow: hidden;"
-							//+	"}"
-							//+	"body {"
-							//+		"position: absolute;"
-							//+		"top: 0px;"
-							//+		"left: 0px;"
-							//+		"bottom: 0px;"
-							//+		"right: 0px;"
-							//+		"margin: 0px;"
-							//+		"overflow-y: auto;"
-							//+		"overflow-x: auto;"
-							//+	"}"
-							+		"::-webkit-scrollbar {" //$NON-NLS-1$
-							+			"width: 5px;" //$NON-NLS-1$
-							+			"height: 5px;" //$NON-NLS-1$
-							+		"}" //$NON-NLS-1$
-							+		"::-webkit-scrollbar-thumb {" //$NON-NLS-1$
-							+			"background: rgba(0,0,0,0.4); " //$NON-NLS-1$
-							+		"}" //$NON-NLS-1$
-							+		"::-webkit-scrollbar-corner, ::-webkit-scrollbar-thumb:window-inactive {" //$NON-NLS-1$
-							+			"background: rgba(0,0,0,0.0);" //$NON-NLS-1$
-							+		"};" //$NON-NLS-1$
-							+	"';" //$NON-NLS-1$
-							+"};" //$NON-NLS-1$
-							+ "document.addEventListener('DOMSubtreeModified', window._browserSim_customScrollBarStylesSetter, false);" //$NON-NLS-1$
-						+ "}" //$NON-NLS-1$
-					);
-				}
 			});
 		};
 
@@ -414,7 +371,7 @@ public class BrowserSim {
 		});
 	}
 
-	private void setSelectedDevice(Boolean refreshRequired) {
+	protected void setSelectedDevice(Boolean refreshRequired) {
 		final Device device = commonPreferences.getDevices().get(specificPreferences.getSelectedDeviceId());
 		if (device == null) {
 			skin.getShell().close();
@@ -554,6 +511,10 @@ public class BrowserSim {
 		for (SkinChangeListener listener : skinChangeListenerList) {
 			listener.skinChanged(event);
 		}
+	}
+	
+	public Device getCurrentDevice() {
+		return commonPreferences.getDevices().get(specificPreferences.getSelectedDeviceId());
 	}
 	
 	public static List<BrowserSim> getInstances() {
