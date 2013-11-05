@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2007-2011 Red Hat, Inc.
+ * Copyright (c) 2007-2013 Red Hat, Inc.
  * Distributed under license by Red Hat, Inc. All rights reserved.
  * This program is made available under the terms of the
  * Eclipse Public License v1.0 which accompanies this distribution,
@@ -29,7 +29,7 @@ import org.eclipse.swt.widgets.Shell;
 import org.eclipse.swt.widgets.Text;
 import org.eclipse.swt.widgets.ToolBar;
 import org.eclipse.swt.widgets.ToolItem;
-import org.jboss.tools.vpe.browsersim.browser.BrowserSimBrowser;
+import org.jboss.tools.vpe.browsersim.browser.IBrowser;
 import org.jboss.tools.vpe.browsersim.browser.IBrowserSimBrowserFactory;
 import org.jboss.tools.vpe.browsersim.model.Device;
 import org.jboss.tools.vpe.browsersim.ui.ControlHandler;
@@ -45,7 +45,7 @@ public class NativeSkin implements BrowserSimSkin {
 	private Label statusLabel;
 	private Text locationText;
 	private Shell shell;
-	private BrowserSimBrowser browser;
+	private IBrowser browser;
 	private Menu menuBar;
 	private ControlHandler controlHandler;
 	private ToolItem itemBack;
@@ -285,7 +285,7 @@ public class NativeSkin implements BrowserSimSkin {
 	}
 	
 	@Override
-	public BrowserSimBrowser getBrowser() {
+	public IBrowser getBrowser() {
 		return browser;
 	}
 	

@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2007-2011 Red Hat, Inc.
+ * Copyright (c) 2007-2013 Red Hat, Inc.
  * Distributed under license by Red Hat, Inc. All rights reserved.
  * This program is made available under the terms of the
  * Eclipse Public License v1.0 which accompanies this distribution,
@@ -11,6 +11,7 @@
 package org.jboss.tools.vpe.browsersim.browser;
 
 import org.eclipse.swt.SWT;
+import org.eclipse.swt.browser.BrowserFunction;
 import org.eclipse.swt.widgets.Composite;
 
 /**
@@ -18,7 +19,7 @@ import org.eclipse.swt.widgets.Composite;
  */
 public abstract class AbstractWebKitBrowser extends BrowserSimBrowser {
 
-	private String defaultUserAgent;
+	private String userAgent;
 
 	public AbstractWebKitBrowser(Composite parent, int style) {
 		super(parent, style | SWT.WEBKIT);
@@ -33,18 +34,40 @@ public abstract class AbstractWebKitBrowser extends BrowserSimBrowser {
 			 * will throw an IllegalArgumentException, thus we do not need to handle this).*/
 			return false;
 		} else {
-			setCustomUserAgent(defaultUserAgent);
-			boolean result = super.setUrl(url, postData, headers);
-			setCustomUserAgent(defaultUserAgent);
+			setUserAgentImpl(userAgent);
+			boolean result = super.setUrl(url, postData, headers); // setUrl resets user-agent
+			setUserAgentImpl(userAgent);
 			return result;
 		}
 	}
 
 	@Override
-	public void setDefaultUserAgent(String defaultUserAgent) {
-		this.defaultUserAgent = defaultUserAgent;
-		setCustomUserAgent(defaultUserAgent);
+	public void setUserAgent(String defaultUserAgent) {
+		this.userAgent = defaultUserAgent;
+		setUserAgentImpl(defaultUserAgent);
 	}
 	
-	protected abstract void setCustomUserAgent(String userAgent);
+	protected abstract void setUserAgentImpl(String userAgent);
+	
+	@Override
+	public IDisposable registerBrowserFunction(String name, final IBrowserFunction iBrowserFunction) {
+		final BrowserFunction function = new BrowserFunction(this, name) {
+			@Override
+			public Object function(Object[] arguments) {
+				return iBrowserFunction.function(arguments);
+			}
+		}; 
+		
+		return new IDisposable() {
+			@Override
+			public boolean isDisposed() {
+				return function.isDisposed();
+			}
+			
+			@Override
+			public void dispose() {
+				function.dispose();
+			}
+		};
+	}
 }

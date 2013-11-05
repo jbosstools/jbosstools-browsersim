@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2007-2011 Red Hat, Inc.
+ * Copyright (c) 2007-2013 Red Hat, Inc.
  * Distributed under license by Red Hat, Inc. All rights reserved.
  * This program is made available under the terms of the
  * Eclipse Public License v1.0 which accompanies this distribution,
@@ -28,7 +28,7 @@ public class WebKitBrowserFactory implements IBrowserSimBrowserFactory {
 	public static final String NO_SAFARI = "Safari must be installed to use a SWT.WEBKIT-style Browser"; //$NON-NLS-1$
 	
 	@Override
-	public AbstractWebKitBrowser createBrowser(Composite parent, int style) {
+	public IBrowser createBrowser(Composite parent, int style) {
 		if (PlatformUtil.CURRENT_PLATFORM.equals("gtk.linux.x86")) { //$NON-NLS-1$
 			return new WebKitBrowser_gtk_linux_x86(parent, style);
 		} else if (PlatformUtil.CURRENT_PLATFORM.equals("gtk.linux.x86_64")) { //$NON-NLS-1$
@@ -37,7 +37,7 @@ public class WebKitBrowserFactory implements IBrowserSimBrowserFactory {
 			return new WebKitBrowser_webkit_cocoa_macos(parent, style);
 		} else if (PlatformUtil.CURRENT_PLATFORM.equals("win32.win32.x86")) { //$NON-NLS-1$
 			//due to last changes Safari is needed to run BrowerSim (against QuickTime)
-			//to avoid JVM crash we need to check Safari existance before creating a browser.(JBIDE-13044).
+			//to avoid JVM crash we need to check Safari existnce before creating a browser.(JBIDE-13044).
 			//If an exception is thrown during org.eclipse.swt.browser.WebKit.readInstallDir() invocation,
 			//this means that SWT internal API is changed and we just log it to the console.
 			try {

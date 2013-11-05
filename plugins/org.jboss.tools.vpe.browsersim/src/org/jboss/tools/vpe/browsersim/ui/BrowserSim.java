@@ -17,7 +17,7 @@ import java.util.Observable;
 import java.util.Observer;
 
 import org.eclipse.swt.SWT;
-import org.eclipse.swt.browser.Browser;
+import org.jboss.tools.vpe.browsersim.browser.IBrowser;
 import org.eclipse.swt.browser.BrowserFunction;
 import org.eclipse.swt.browser.LocationAdapter;
 import org.eclipse.swt.browser.LocationEvent;
@@ -29,7 +29,6 @@ import org.eclipse.swt.browser.StatusTextEvent;
 import org.eclipse.swt.browser.StatusTextListener;
 import org.eclipse.swt.browser.TitleEvent;
 import org.eclipse.swt.browser.TitleListener;
-import org.eclipse.swt.browser.WindowEvent;
 import org.eclipse.swt.events.ControlAdapter;
 import org.eclipse.swt.events.ControlEvent;
 import org.eclipse.swt.events.ShellEvent;
@@ -42,7 +41,11 @@ import org.eclipse.swt.widgets.Menu;
 import org.eclipse.swt.widgets.Shell;
 import org.jboss.tools.vpe.browsersim.BrowserSimLogger;
 import org.jboss.tools.vpe.browsersim.BrowserSimRunner;
-import org.jboss.tools.vpe.browsersim.browser.BrowserSimBrowser;
+import org.jboss.tools.vpe.browsersim.browser.ExtendedOpenWindowListener;
+import org.jboss.tools.vpe.browsersim.browser.ExtendedWindowEvent;
+import org.jboss.tools.vpe.browsersim.browser.IBrowser;
+import org.jboss.tools.vpe.browsersim.browser.IBrowserFunction;
+import org.jboss.tools.vpe.browsersim.browser.IDisposable;
 import org.jboss.tools.vpe.browsersim.browser.PlatformUtil;
 import org.jboss.tools.vpe.browsersim.browser.WebKitBrowserFactory;
 import org.jboss.tools.vpe.browsersim.model.Device;
@@ -187,7 +190,7 @@ public class BrowserSim {
 			}
 		});
 
-		final BrowserSimBrowser browser = getBrowser();
+		final IBrowser browser = getBrowser();
 		controlHandler = createControlHandler(browser, homeUrl, specificPreferences);
 		final BrowserSimMenuCreator menuCreator = createMenuCreator(skin, commonPreferences, specificPreferences, controlHandler, homeUrl);
 		
@@ -260,15 +263,17 @@ public class BrowserSim {
 			browser.addLocationListener(new LocationAdapter() {
 				@Override
 				public void changed(LocationEvent event) {
-					Browser browser = (Browser) event.widget;
+					IBrowser browser = (IBrowser) event.widget;
 					BrowserSimUtil.setCustomScrollbarStyles(browser);
 				}
 				
 			});
 		};
 
-		browser.addOpenWindowListener(new OpenWindowListener() {
-			public void open(WindowEvent event) {
+		browser.addOpenWindowListener(new ExtendedOpenWindowListener() {
+			
+			@Override
+			public void open(ExtendedWindowEvent event) {
 				if (FireBugLiteLoader.isFireBugPopUp(event)) {
 					FireBugLiteLoader.processFireBugPopUp(event, skin);
 				} else {
@@ -278,29 +283,31 @@ public class BrowserSim {
 		});
 
 		browser.addLocationListener(new LocationListener() {
-			private BrowserFunction scrollListener = null;
+			private IDisposable scrollListener = null;
 
 			public void changed(LocationEvent event) {
 				if (scrollListener != null) {
 					scrollListener.dispose();
 				}
-				scrollListener = new BrowserFunction(((Browser)event.widget), "_browserSim_scrollListener") { //$NON-NLS-1$
-					public Object function(Object[] arguments) {
-						double pageYOffset = (Double) arguments[0];
-						if (pageYOffset > 0.0) {
-							skin.getShell().getDisplay().asyncExec(new Runnable() {
-								public void run() {
-									if (skin != null && skin.getShell() != null && !skin.getShell().isDisposed()) {
-										skin.setAddressBarVisible(false);
-									}
+				scrollListener = ((IBrowser)event.widget).registerBrowserFunction("_browserSim_scrollListener", //$NON-NLS-1$
+						new IBrowserFunction() {							
+							@Override
+							public Object function(Object[] arguments) {
+								double pageYOffset = (Double) arguments[0];
+								if (pageYOffset > 0.0) {
+									skin.getShell().getDisplay().asyncExec(new Runnable() {
+										public void run() {
+											if (skin != null && skin.getShell() != null && !skin.getShell().isDisposed()) {
+												skin.setAddressBarVisible(false);
+											}
+										}
+									});
 								}
-							});
-						}
-						return null;
+								return null;
 					}
-				};
+				});
 
-				Browser browser = (Browser)event.widget;
+				IBrowser browser = (IBrowser)event.widget;
 				browser.execute(
 								"(function() {" + //$NON-NLS-1$
 									"var scrollListener = function(e){" + //$NON-NLS-1$
@@ -387,7 +394,7 @@ public class BrowserSim {
 				fireSkinChangeEvent();
 			}
 			setOrientation(specificPreferences.getOrientationAngle(), device);
-			skin.getBrowser().setDefaultUserAgent(device.getUserAgent());
+			skin.getBrowser().setUserAgent(device.getUserAgent());
 	
 			if (oldSkinUrl != null) {
 				skin.getBrowser().setUrl(oldSkinUrl); // skin (and browser instance) is changed
@@ -411,7 +418,7 @@ public class BrowserSim {
 		skin.getBrowser().getShell().dispose();
 		initSkin(newSkinClass, currentLocation, parentShell);
 		setOrientation(specificPreferences.getOrientationAngle(), device);
-		skin.getBrowser().setDefaultUserAgent(device.getUserAgent());
+		skin.getBrowser().setUserAgent(device.getUserAgent());
 		skin.getBrowser().setUrl(oldSkinUrl); 
 		skin.getShell().open();
 	}
@@ -442,7 +449,7 @@ public class BrowserSim {
 		liveReloadLocationAdapter = new LocationAdapter() {
 			@Override
 			public void changed(LocationEvent event) {
-				Browser browser = (Browser) event.widget;
+				IBrowser browser = (IBrowser) event.widget;
 				browser.execute("if (!window.LiveReload) {" + //$NON-NLS-1$
 									"window.addEventListener('load', function(){" + //$NON-NLS-1$
 										"var e = document.createElement('script');" + //$NON-NLS-1$
@@ -460,7 +467,7 @@ public class BrowserSim {
 		touchEventsLocationAdapter = new LocationAdapter() {
 			@Override
 			public void changed(LocationEvent event) {
-				TouchSupportLoader.initTouchEvents((Browser) event.widget);
+				TouchSupportLoader.initTouchEvents((IBrowser) event.widget);
 			}
 		};
 	}
@@ -493,7 +500,7 @@ public class BrowserSim {
 		);
 	}
 
-	public BrowserSimBrowser getBrowser() {
+	public IBrowser getBrowser() {
 		return skin != null ? skin.getBrowser() : null;
 	}
 	
@@ -526,7 +533,7 @@ public class BrowserSim {
 	 * 
 	 * Override this method if you need a custom {@link ControlHandler}
 	 */
-	protected ControlHandler createControlHandler(BrowserSimBrowser browser, String homeUrl, SpecificPreferences specificPreferences) {
+	protected ControlHandler createControlHandler(IBrowser browser, String homeUrl, SpecificPreferences specificPreferences) {
 		return new BrowserSimControlHandler(browser, homeUrl, specificPreferences);
 	}
 	
@@ -559,7 +566,7 @@ public class BrowserSim {
 		return new LocationAdapter() {
 			public void changed(LocationEvent event) {
 				if (event.top) {
-					BrowserSimBrowser browser = (BrowserSimBrowser) event.widget;
+					IBrowser browser = (IBrowser) event.widget;
 					skin.locationChanged(event.location, browser.isBackEnabled(), browser.isForwardEnabled());
 				}
 			}

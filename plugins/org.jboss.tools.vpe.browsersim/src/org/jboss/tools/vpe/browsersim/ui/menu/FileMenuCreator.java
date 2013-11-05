@@ -19,7 +19,7 @@ import java.net.URL;
 import javax.xml.bind.DatatypeConverter;
 
 import org.eclipse.swt.SWT;
-import org.eclipse.swt.browser.Browser;
+import org.jboss.tools.vpe.browsersim.browser.IBrowser;
 import org.eclipse.swt.events.DisposeEvent;
 import org.eclipse.swt.events.DisposeListener;
 import org.eclipse.swt.events.SelectionAdapter;
@@ -125,7 +125,7 @@ public class FileMenuCreator {
 		}
 	}
 	
-	protected void viewServerSource(Browser browser) {
+	protected void viewServerSource(IBrowser browser) {
 		System.out.println(VIEW_SOURCE_COMMAND + browser.getUrl()); // send command to Eclipse
 		String source = browser.getText();
 		String base64Source = DatatypeConverter.printBase64Binary(source.getBytes());

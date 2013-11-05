@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2007-2011 Red Hat, Inc.
+ * Copyright (c) 2007-2013 Red Hat, Inc.
  * Distributed under license by Red Hat, Inc. All rights reserved.
  * This program is made available under the terms of the
  * Eclipse Public License v1.0 which accompanies this distribution,
@@ -27,7 +27,7 @@ public class WebKitBrowser_webkit_cocoa_macos extends AbstractWebKitBrowser {
 		super(parent, style);
 	}
 
-	protected void setCustomUserAgent(String userAgent) {
+	protected void setUserAgentImpl(String userAgent) {
 		try {
 			Field webBrowserField = Browser.class.getDeclaredField("webBrowser"); //$NON-NLS-1$
 			webBrowserField.setAccessible(true);

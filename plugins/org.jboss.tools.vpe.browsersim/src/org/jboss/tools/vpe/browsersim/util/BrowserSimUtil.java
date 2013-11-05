@@ -10,7 +10,7 @@
  ******************************************************************************/
 package org.jboss.tools.vpe.browsersim.util;
 
-import org.eclipse.swt.browser.Browser;
+import org.jboss.tools.vpe.browsersim.browser.IBrowser;
 import org.eclipse.swt.events.DisposeEvent;
 import org.eclipse.swt.events.DisposeListener;
 import org.eclipse.swt.graphics.Image;
@@ -33,7 +33,6 @@ import org.jboss.tools.vpe.browsersim.ui.skin.BrowserSimSkin;
  * @author Yahor Radtsevich (yradtsevich)
  * @author Konstantin Marmalyukov (kmarmaliykov)
  */
-
 public class BrowserSimUtil {
 	private static void fixShellLocation(Shell shell) {
 		Rectangle allClientArea = shell.getMonitor().getClientArea();
@@ -154,7 +153,7 @@ public class BrowserSimUtil {
 		}
 	}
 	
-	public static void setCustomScrollbarStyles(Browser browser) {
+	public static void setCustomScrollbarStyles(IBrowser browser) {
 		if (browser != null) {
 			browser.execute(
 				"if (window._browserSim_customScrollBarStylesSetter === undefined) {"

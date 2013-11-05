@@ -10,8 +10,9 @@
  ******************************************************************************/
 package org.jboss.tools.vpe.browsersim.scripting;
 
-import org.eclipse.swt.browser.Browser;
-import org.eclipse.swt.browser.BrowserFunction;
+import org.jboss.tools.vpe.browsersim.browser.IBrowser;
+import org.jboss.tools.vpe.browsersim.browser.IBrowserFunction;
+import org.jboss.tools.vpe.browsersim.browser.IDisposable;
 import org.jboss.tools.vpe.browsersim.util.BrowserSimResourcesUtil;
 
 /**
@@ -20,18 +21,16 @@ import org.jboss.tools.vpe.browsersim.util.BrowserSimResourcesUtil;
 public class WebSqlLoader {
 	
 	
-	private static BrowserFunction loadPureJsWebSqlFunction;
+	private static IDisposable loadPureJsWebSqlFunction;
 
-	public static void initWebSql(final Browser browser) {
+	public static void initWebSql(final IBrowser browser) {
 		if (loadPureJsWebSqlFunction != null && !loadPureJsWebSqlFunction.isDisposed()) {
 			loadPureJsWebSqlFunction.dispose();
 		}
 		
-		loadPureJsWebSqlFunction = new BrowserFunction(browser, "loadPureJsWebSql") { //$NON-NLS-1$
+		loadPureJsWebSqlFunction = browser.registerBrowserFunction("loadPureJsWebSql", new IBrowserFunction() {
 			@Override
 			public Object function(Object[] arguments) {
-				super.function(arguments);
-				
 				String purejswebsql = BrowserSimResourcesUtil.getResourceAsString("javascript/purejswebsql.js"); //$NON-NLS-1$
 				browser.execute(purejswebsql);
 
@@ -39,7 +38,7 @@ public class WebSqlLoader {
 				browser.execute(sql);
 				return null;
 			}
-		};
+		});
 		
 		browser.execute(
 			"(function() {" + //$NON-NLS-1$

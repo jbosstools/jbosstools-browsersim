@@ -10,19 +10,18 @@
  ******************************************************************************/
 package org.jboss.tools.vpe.browsersim.ui;
 
-import org.eclipse.swt.browser.Browser;
+import org.jboss.tools.vpe.browsersim.browser.IBrowser;
 import org.jboss.tools.vpe.browsersim.model.preferences.SpecificPreferences;
 
 /**
- * 
  * @author Yahor Radtsevich (yradtsevich)
  */
 public class BrowserSimControlHandler implements ControlHandler {
-	protected Browser browser;
+	protected IBrowser browser;
 	protected SpecificPreferences specificPreferences;
 	protected String homeUrl;
 
-	public BrowserSimControlHandler(Browser browser, String homeUrl, SpecificPreferences specificPreferences) {
+	public BrowserSimControlHandler(IBrowser browser, String homeUrl, SpecificPreferences specificPreferences) {
 		this.browser = browser;
 		this.specificPreferences = specificPreferences;
 		this.homeUrl = homeUrl;

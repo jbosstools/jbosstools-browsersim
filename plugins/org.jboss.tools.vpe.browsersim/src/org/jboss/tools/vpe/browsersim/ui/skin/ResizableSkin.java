@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2007-2012 Red Hat, Inc.
+ * Copyright (c) 2007-2013 Red Hat, Inc.
  * Distributed under license by Red Hat, Inc. All rights reserved.
  * This program is made available under the terms of the
  * Eclipse Public License v1.0 which accompanies this distribution,
@@ -31,7 +31,7 @@ import org.eclipse.swt.widgets.Menu;
 import org.eclipse.swt.widgets.ProgressBar;
 import org.eclipse.swt.widgets.Shell;
 import org.eclipse.swt.widgets.Text;
-import org.jboss.tools.vpe.browsersim.browser.BrowserSimBrowser;
+import org.jboss.tools.vpe.browsersim.browser.IBrowser;
 import org.jboss.tools.vpe.browsersim.browser.IBrowserSimBrowserFactory;
 import org.jboss.tools.vpe.browsersim.model.preferences.SpecificPreferences;
 import org.jboss.tools.vpe.browsersim.ui.ControlHandler;
@@ -45,7 +45,7 @@ public abstract class ResizableSkin implements BrowserSimSkin {
 	private IBrowserSimBrowserFactory browserFactory;
 	private Display display;
 	private Shell shell;
-	private BrowserSimBrowser browser;
+	private IBrowser browser;
 	private boolean vertical;
 	
 	private int[] visibleRegionHorizontal;
@@ -375,7 +375,7 @@ public abstract class ResizableSkin implements BrowserSimSkin {
 	}
 	
 	@Override
-	public BrowserSimBrowser getBrowser() {
+	public IBrowser getBrowser() {
 		return browser;
 	}
 

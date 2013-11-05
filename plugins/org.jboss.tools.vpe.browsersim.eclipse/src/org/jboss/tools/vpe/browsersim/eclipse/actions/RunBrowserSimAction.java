@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2007-2011 Red Hat, Inc.
+ * Copyright (c) 2007-2013 Red Hat, Inc.
  * Distributed under license by Red Hat, Inc. All rights reserved.
  * This program is made available under the terms of the
  * Eclipse Public License v1.0 which accompanies this distribution,
@@ -103,7 +103,7 @@ public class RunBrowserSimAction implements IWorkbenchWindowActionDelegate {
 	}
 
 	/**
-	 * If {@code part} is Internal Web Browser, returns opened URL. Otherwise
+	 * If {@code part} is Internal Web IBrowser, returns opened URL. Otherwise
 	 * returns {@code null}. 
 	 */
 	private String getInternalWebBrowserUrl(IWorkbenchPart part) {
@@ -131,7 +131,7 @@ public class RunBrowserSimAction implements IWorkbenchWindowActionDelegate {
 	}
 	
 	/**
-	 * If {@code part} is Internal Web Browser, returns opened URL. Otherwise
+	 * If {@code part} is Internal Web IBrowser, returns opened URL. Otherwise
 	 * returns {@code null}. 
 	 */
 	private IFile getEditorFile(IWorkbenchPart part) {

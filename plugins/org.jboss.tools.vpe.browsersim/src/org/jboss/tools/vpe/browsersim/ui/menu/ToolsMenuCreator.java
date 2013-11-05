@@ -14,7 +14,8 @@ import java.util.Map;
 import java.util.UUID;
 
 import org.eclipse.swt.SWT;
-import org.eclipse.swt.browser.Browser;
+import org.jboss.tools.vpe.browsersim.browser.IBrowser;
+import org.jboss.tools.vpe.browsersim.browser.WebKitBrowserFactory;
 import org.eclipse.swt.browser.LocationAdapter;
 import org.eclipse.swt.browser.LocationEvent;
 import org.eclipse.swt.browser.ProgressEvent;
@@ -153,7 +154,7 @@ public class ToolsMenuCreator {
 		});
 	}
 	
-	private static void injectUrl(Browser browser, String scriptUrl, String ID) {
+	private static void injectUrl(IBrowser browser, String scriptUrl, String ID) {
 		browser.execute("var head = document.head;" //$NON-NLS-1$
 				+		"var script = document.createElement('script');" //$NON-NLS-1$
 				+		"head.appendChild(script);" //$NON-NLS-1$
@@ -166,14 +167,14 @@ public class ToolsMenuCreator {
 		shell.setText(Messages.BrowserSim_WEINRE_INSPECTOR);
 		
 		Composite browserComposite = createBrowserComposite(shell, clientUrl);
-		final Browser weinreBrowser = createWeinreBrowser(browserComposite);
+		final IBrowser weinreBrowser = createWeinreBrowser(browserComposite);
 		weinreBrowser.setUrl(clientUrl);
 		
 		final LocationAdapter locationAdapter = new LocationAdapter() {
 			@Override
 			public void changed(LocationEvent event) {
 				if (event.top) {
-					Browser browser = (Browser) event.widget;
+					IBrowser browser = (IBrowser) event.widget;
 					browser.execute(
 						  "window.addEventListener('load', function() {" //$NON-NLS-1$
 						+	"var head = document.head;" //$NON-NLS-1$
@@ -245,8 +246,8 @@ public class ToolsMenuCreator {
 		return browserComposite;
 	}
 	
-	private static Browser createWeinreBrowser(Composite browserComposite) {
-		final Browser browser = new Browser(browserComposite, SWT.WEBKIT);
+	private static IBrowser createWeinreBrowser(Composite browserComposite) {
+		final IBrowser browser = new WebKitBrowserFactory().createBrowser(browserComposite, SWT.WEBKIT);
 		GridData browserData = new GridData();
 		browserData.horizontalAlignment = GridData.FILL;
 		browserData.verticalAlignment = GridData.FILL;

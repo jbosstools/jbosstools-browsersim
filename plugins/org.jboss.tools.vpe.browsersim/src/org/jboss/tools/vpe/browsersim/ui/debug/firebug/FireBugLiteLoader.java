@@ -11,10 +11,6 @@
 package org.jboss.tools.vpe.browsersim.ui.debug.firebug;
 
 import org.eclipse.swt.SWT;
-import org.eclipse.swt.browser.Browser;
-import org.eclipse.swt.browser.CloseWindowListener;
-import org.eclipse.swt.browser.VisibilityWindowListener;
-import org.eclipse.swt.browser.WindowEvent;
 import org.eclipse.swt.events.DisposeEvent;
 import org.eclipse.swt.events.DisposeListener;
 import org.eclipse.swt.events.ShellAdapter;
@@ -24,7 +20,12 @@ import org.eclipse.swt.graphics.Rectangle;
 import org.eclipse.swt.layout.FillLayout;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Shell;
+import org.jboss.tools.vpe.browsersim.browser.ExtendedCloseWindowListener;
+import org.jboss.tools.vpe.browsersim.browser.ExtendedVisibilityWindowListener;
+import org.jboss.tools.vpe.browsersim.browser.ExtendedWindowEvent;
+import org.jboss.tools.vpe.browsersim.browser.IBrowser;
 import org.jboss.tools.vpe.browsersim.browser.PlatformUtil;
+import org.jboss.tools.vpe.browsersim.browser.WebKitBrowserFactory;
 import org.jboss.tools.vpe.browsersim.ui.skin.BrowserSimSkin;
 import org.jboss.tools.vpe.browsersim.util.BrowserSimUtil;
 
@@ -34,7 +35,7 @@ import org.jboss.tools.vpe.browsersim.util.BrowserSimUtil;
 public class FireBugLiteLoader {
 	private static final String FIREBUG_LITE_JS_URL = "https://getfirebug.com/firebug-lite.js"; //$NON-NLS-1$
 	
-	public static void startFireBugOpening(Browser browser) {
+	public static void startFireBugOpening(IBrowser browser) {
 		browser.execute("window._fireBugLiteLoading = true;"); //$NON-NLS-1$
 		Object fireBugScriptLoaded = browser.evaluate("return !!window.Firebug"); //$NON-NLS-1$
 		if (!Boolean.TRUE.equals(fireBugScriptLoaded)) {
@@ -72,25 +73,25 @@ public class FireBugLiteLoader {
 		}
 	}
 	
-	public static boolean isFireBugPopUp(WindowEvent openWindowEvent) {
-		Browser parentBrowser = (Browser) openWindowEvent.widget;
+	public static boolean isFireBugPopUp(ExtendedWindowEvent openWindowEvent) {
+		IBrowser parentBrowser = (IBrowser) openWindowEvent.widget;
 		return Boolean.TRUE.equals(parentBrowser.evaluate("return !!window._fireBugLiteLoading")); //$NON-NLS-1$
 	}
 	
-	public static void processFireBugPopUp(WindowEvent openWindowEvent, BrowserSimSkin skin) {
-		final Browser parentBrowser = (Browser) openWindowEvent.widget;
+	public static void processFireBugPopUp(ExtendedWindowEvent openWindowEvent, BrowserSimSkin skin) {
+		final IBrowser parentBrowser = (IBrowser) openWindowEvent.widget;
 		parentBrowser.execute("window._fireBugLiteLoading = false;"); //$NON-NLS-1$
 		
 		Shell shell = new Shell(BrowserSimUtil.getParentShell(skin), SWT.SHELL_TRIM);
 		shell.setLayout(new FillLayout());
 		
-		final Browser fireBugBrowser = new Browser(shell, SWT.WEBKIT);
+		final IBrowser fireBugBrowser = new WebKitBrowserFactory().createBrowser(shell, SWT.WEBKIT);
 		openWindowEvent.browser = fireBugBrowser;
 		
-		fireBugBrowser.addVisibilityWindowListener(new VisibilityWindowListener() {
+		fireBugBrowser.addVisibilityWindowListener(new ExtendedVisibilityWindowListener() {
 			@Override
-			public void show(WindowEvent event) {
-				Browser fblBrowser = (Browser)event.widget;
+			public void show(ExtendedWindowEvent event) {
+				IBrowser fblBrowser = (IBrowser)event.widget;
 				final Shell shell = fblBrowser.getShell();
 				Point location = event.location;
 				if (location != null && Display.getDefault().getClientArea().intersects(
@@ -101,8 +102,8 @@ public class FireBugLiteLoader {
 			}
 			
 			@Override
-			public void hide(WindowEvent event) {
-				Browser browser = (Browser)event.widget;
+			public void hide(ExtendedWindowEvent event) {
+				IBrowser browser = (IBrowser)event.widget;
 				Shell shell = browser.getShell();
 				shell.setVisible(false);
 			}
@@ -128,9 +129,10 @@ public class FireBugLiteLoader {
 				}
 			});
 		} else {
-			fireBugBrowser.addCloseWindowListener(new CloseWindowListener() {
-				public void close(WindowEvent event) {
-					Browser browser = (Browser)event.widget;
+			fireBugBrowser.addCloseWindowListener(new ExtendedCloseWindowListener() {
+				@Override
+				public void close(ExtendedWindowEvent event) {
+					IBrowser browser = (IBrowser)event.widget;
 					Shell shell = browser.getShell();
 					shell.close();
 				}
