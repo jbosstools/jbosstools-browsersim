@@ -326,7 +326,7 @@ public class JavaFXBrowser extends FXCanvas implements IBrowser {
 		String doctypeScript = 
 			"var node = document.doctype;" +
 			"var doctypeText = \"<!DOCTYPE \"" +
-			         "+ node.name" + 
+			         "+ node.name" +  
 			         "+ (node.publicId ? ' PUBLIC \"' + node.publicId + '\"' : '')" +
 			         "+ (!node.publicId && node.systemId ? ' SYSTEM' : '')" + 
 			         "+ (node.systemId ? ' \"' + node.systemId + '\"' : '')" +

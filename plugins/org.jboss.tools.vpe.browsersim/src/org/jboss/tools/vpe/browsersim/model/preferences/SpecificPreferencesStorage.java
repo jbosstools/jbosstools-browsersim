@@ -34,6 +34,7 @@ public abstract class SpecificPreferencesStorage implements PreferencesStorage{
 	protected static final String PREFERENCES_LIVE_RELOAD_PORT = "liveReloadPort"; //$NON-NLS-1$
 	protected static final String PREFERENCES_TOUCH_EVENTS = "enableTouchEvents"; //$NON-NLS-1$
 	protected static final String PREFERENCES_SELECTED_DEVICE = "selectedDeviceId"; //$NON-NLS-1$
+	protected static final String PREFERENCES_IS_JAVAFX = "javafx"; //$NON-NLS-1$
 	protected static final String PREFERENCES_VERSION = "version"; //$NON-NLS-1$
 
 	public static final int DEFAULT_LIVE_RELOAD_PORT = 35729;

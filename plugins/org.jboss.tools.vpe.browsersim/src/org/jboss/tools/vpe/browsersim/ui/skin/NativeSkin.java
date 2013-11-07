@@ -71,7 +71,7 @@ public class NativeSkin implements BrowserSimSkin {
 	};
 	
 	@Override
-	public void createControls(Display display, Point location, Shell parentShell) {
+	public void createControls(Display display, Point location, Shell parentShell, boolean javaFx) {
 		if (parentShell == null) {
 			shell = new Shell(display);
 		} else {
@@ -126,7 +126,7 @@ public class NativeSkin implements BrowserSimSkin {
 		locationText.setLayoutData(data);
 		
 		innerBrowserContainer = new Composite(skinComposite, SWT.NONE);
-		browser = browserFactory.createBrowser(innerBrowserContainer, SWT.NONE);
+		browser = browserFactory.createBrowser(innerBrowserContainer, SWT.NONE, javaFx);
 		StackLayout stackLayout = new StackLayout();
 		innerBrowserContainer.setLayout(stackLayout);
 		stackLayout.topControl = (Control) browser;

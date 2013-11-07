@@ -159,11 +159,11 @@ public class BrowserSimMenuCreator {
 	
 	protected void addToolsItems(Menu contextMenu, BrowserSimSkin skin, CommonPreferences commonPreferences,
 			SpecificPreferences specificPreferences, String homeUrl) {
-		ToolsMenuCreator.addDebugItem(contextMenu, skin, commonPreferences.getWeinreScriptUrl(), commonPreferences.getWeinreClientUrl());
+		ToolsMenuCreator.addDebugItem(contextMenu, skin, commonPreferences.getWeinreScriptUrl(), commonPreferences.getWeinreClientUrl(), specificPreferences.isJavaFx());
 		ToolsMenuCreator.addScreenshotMenuItem(contextMenu, skin, commonPreferences);
 		ToolsMenuCreator.addSyncronizedWindowItem(contextMenu, skin, commonPreferences.getDevices(),
 				specificPreferences.getUseSkins(), specificPreferences.isEnableLiveReload(),
-				specificPreferences.getLiveReloadPort(), specificPreferences.isEnableTouchEvents(), specificPreferences.getOrientationAngle(), homeUrl);
+				specificPreferences.getLiveReloadPort(), specificPreferences.isEnableTouchEvents(), specificPreferences.getOrientationAngle(), homeUrl, specificPreferences.isJavaFx());
 		ToolsMenuCreator.addLiveReloadItem(contextMenu, specificPreferences);
 		ToolsMenuCreator.addTouchEventsItem(contextMenu, specificPreferences);
 	}

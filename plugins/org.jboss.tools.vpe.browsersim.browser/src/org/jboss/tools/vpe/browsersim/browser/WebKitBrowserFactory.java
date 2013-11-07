@@ -20,6 +20,7 @@ import org.jboss.tools.vpe.browsersim.browser.internal.WebKitBrowser_gtk_linux_x
 import org.jboss.tools.vpe.browsersim.browser.internal.WebKitBrowser_gtk_linux_x86_64;
 import org.jboss.tools.vpe.browsersim.browser.internal.WebKitBrowser_webkit_cocoa_macos;
 import org.jboss.tools.vpe.browsersim.browser.internal.WebKitBrowser_win32_win32_x86;
+import org.jboss.tools.vpe.browsersim.browser.javafx.JavaFXBrowser;
 
 /**
  * @author "Yahor Radtsevich (yradtsevich)"
@@ -28,7 +29,10 @@ public class WebKitBrowserFactory implements IBrowserSimBrowserFactory {
 	public static final String NO_SAFARI = "Safari must be installed to use a SWT.WEBKIT-style Browser"; //$NON-NLS-1$
 	
 	@Override
-	public IBrowser createBrowser(Composite parent, int style) {
+	public IBrowser createBrowser(Composite parent, int style, boolean isJavaFx) {
+		if (isJavaFx) {
+			return new JavaFXBrowser(parent);
+		}
 		if (PlatformUtil.CURRENT_PLATFORM.equals("gtk.linux.x86")) { //$NON-NLS-1$
 			return new WebKitBrowser_gtk_linux_x86(parent, style);
 		} else if (PlatformUtil.CURRENT_PLATFORM.equals("gtk.linux.x86_64")) { //$NON-NLS-1$

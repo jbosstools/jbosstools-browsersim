@@ -24,6 +24,7 @@ import org.jboss.tools.vpe.browsersim.ui.CocoaUIEnhancer;
 import org.jboss.tools.vpe.browsersim.ui.ExceptionNotifier;
 import org.jboss.tools.vpe.browsersim.ui.Messages;
 import org.jboss.tools.vpe.browsersim.util.BrowserSimImageList;
+import org.jboss.tools.vpe.browsersim.util.BrowserSimUtil;
 
 /**
  * @author Konstantin Marmalyukov (kmarmaliykov)
@@ -42,8 +43,16 @@ public class BrowserSimRunner {
 			if (PlatformUtil.OS_MACOSX.equals(PlatformUtil.getOs())) {
 				CocoaUIEnhancer.initializeMacOSMenuBar(Messages.BrowserSim_BROWSER_SIM);
 			}
+			
+			boolean isJavaFxAvailable;
+			if (PlatformUtil.OS_LINUX.equals(PlatformUtil.getOs())) {
+				isJavaFxAvailable = false; // JavaFx web engine is not supported on Linux
+			} else {
+				isJavaFxAvailable = BrowserSimUtil.loadJavaFX();
+			}
+			
 			BrowserSimArgs browserSimArgs = BrowserSimArgs.parseArgs(args);
-	
+			
 			String path = browserSimArgs.getPath();
 			String url;
 			if (path != null) {
@@ -64,9 +73,14 @@ public class BrowserSimRunner {
 				setShellAttributes(parent);
 				parent.open();
 			}
+			
+			if (isJavaFxAvailable) {
+				BrowserSimUtil.loadEngines();
+			}
+			
 			BrowserSim browserSim = new BrowserSim(url, parent);
-			browserSim.open();
-	
+			browserSim.open(isJavaFxAvailable);
+
 			display = Display.getDefault();
 			while (!display.isDisposed() && BrowserSim.getInstances().size() > 0) {
 				if (!display.readAndDispatch()) {
@@ -99,5 +113,4 @@ public class BrowserSimRunner {
 		shell.setImages(icons);
 		shell.setText(Messages.BrowserSim_BROWSER_SIM);
 	}
-
 }

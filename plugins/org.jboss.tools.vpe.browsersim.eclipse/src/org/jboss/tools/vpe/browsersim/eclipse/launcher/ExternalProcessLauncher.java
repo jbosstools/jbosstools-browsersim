@@ -23,7 +23,6 @@ import org.eclipse.core.runtime.preferences.ConfigurationScope;
 import org.eclipse.jdt.launching.IVMInstall;
 import org.eclipse.jface.dialogs.IDialogConstants;
 import org.eclipse.jface.dialogs.MessageDialog;
-import org.eclipse.jface.preference.IPreferenceStore;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Shell;
@@ -33,7 +32,6 @@ import org.jboss.tools.vpe.browsersim.eclipse.Activator;
 import org.jboss.tools.vpe.browsersim.eclipse.Messages;
 import org.jboss.tools.vpe.browsersim.eclipse.dialog.BrowserSimErrorDialog;
 import org.jboss.tools.vpe.browsersim.eclipse.launcher.internal.ExternalProcessPostShutdownDestroyer;
-import org.jboss.tools.vpe.browsersim.eclipse.preferences.BrowserSimPreferencesPage;
 import org.jboss.tools.vpe.browsersim.eclipse.preferences.PreferencesUtil;
 import org.osgi.framework.Bundle;
 
@@ -44,22 +42,9 @@ public class ExternalProcessLauncher {
 	private static String PATH_SEPARATOR = System.getProperty("path.separator"); //$NON-NLS-1$
 	
 	public static void launchAsExternalProcess(List<String> bundles, List<String> resourcesBundles,
-			final List<ExternalProcessCallback> callbacks, String className, List<String> parameters, final String programName) {
+			final List<ExternalProcessCallback> callbacks, String className, List<String> parameters, final String programName, IVMInstall jvm) {
 		try {			
 			String classPath = getClassPathString(bundles, resourcesBundles);
-			IPreferenceStore store = Activator.getDefault().getPreferenceStore();
-			IVMInstall jvm = null;
-			if (IPreferenceStore.FALSE.equals(store.getString(BrowserSimPreferencesPage.BROWSERSIM_JVM_AUTOMATICALLY))) {
-				// path to browserSim jvm is located in preferences
-				String jvmId = store.getString(BrowserSimPreferencesPage.BROWSERSIM_JVM_ID);
-				jvm = PreferencesUtil.getJVM(jvmId);
-			} else {
-				// detect jvm automatically
-				List<IVMInstall> jvms = PreferencesUtil.getSuitableJvms(1);
-				if (!jvms.isEmpty()) {
-					jvm = jvms.get(0);
-				}
-			}
 			
 			String javaCommand = PreferencesUtil.getJavaCommand(jvm);
 			if (javaCommand != null) {

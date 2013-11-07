@@ -67,7 +67,7 @@ public abstract class ResizableSkin implements BrowserSimSkin {
 	}
 	
 	@Override
-	public void createControls(Display display, Point location, Shell parentShell) {
+	public void createControls(Display display, Point location, Shell parentShell, boolean javaFx) {
 		this.display = display;
 		if (parentShell == null) {
 			shell = new Shell(display, SWT.NO_TRIM | SWT.NO_BACKGROUND);
@@ -89,7 +89,7 @@ public abstract class ResizableSkin implements BrowserSimSkin {
 		StackLayout stackLayout = new StackLayout();
 		innerBrowserContainer = new Composite(browserContainer, SWT.NONE);
 		innerBrowserContainer.setLayout(stackLayout);
-		browser = browserFactory.createBrowser(innerBrowserContainer, SWT.NONE);
+		browser = browserFactory.createBrowser(innerBrowserContainer, SWT.NONE, javaFx);
 		stackLayout.topControl = (Control) browser; 
 		shell.setSize(/*shell.computeSize(SWT.DEFAULT, SWT.DEFAULT)*/ 384, 727);
 		setShellRegion();		

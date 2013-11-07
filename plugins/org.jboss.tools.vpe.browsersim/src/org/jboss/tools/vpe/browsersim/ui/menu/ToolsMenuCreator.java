@@ -14,6 +14,7 @@ import java.util.Map;
 import java.util.UUID;
 
 import org.eclipse.swt.SWT;
+import org.jboss.tools.vpe.browsersim.BrowserSimArgs;
 import org.jboss.tools.vpe.browsersim.browser.IBrowser;
 import org.jboss.tools.vpe.browsersim.browser.WebKitBrowserFactory;
 import org.eclipse.swt.browser.LocationAdapter;
@@ -51,12 +52,12 @@ import org.jboss.tools.vpe.browsersim.util.BrowserSimUtil;
 
 public class ToolsMenuCreator {
 	
-	public static void addDebugItem(Menu menu, BrowserSimSkin skin, String weinreScriptUrl, String weinreClientUrl) {
+	public static void addDebugItem(Menu menu, BrowserSimSkin skin, String weinreScriptUrl, String weinreClientUrl, boolean isJavaFx) {
 		MenuItem debug = new MenuItem(menu, SWT.CASCADE);
 		debug.setText(Messages.BrowserSim_DEBUG);
 		Menu subMenu = new Menu(debug);
 		addFireBugLiteItem(subMenu, skin);
-		addWeinreItem(subMenu, skin, weinreScriptUrl, weinreClientUrl);
+		addWeinreItem(subMenu, skin, weinreScriptUrl, weinreClientUrl, isJavaFx);
 		debug.setMenu(subMenu);
 	}
 	
@@ -71,7 +72,7 @@ public class ToolsMenuCreator {
 	}
 	
 	private static void addWeinreItem(Menu menu, final BrowserSimSkin skin, final String weinreScriptUrl,
-			final String weinreClientUrl) {
+			final String weinreClientUrl, final boolean isJavaFx) {
 		
 		MenuItem weinre = new MenuItem(menu, SWT.PUSH);
 		weinre.setText(Messages.BrowserSim_WEINRE);
@@ -87,7 +88,7 @@ public class ToolsMenuCreator {
 					injectUrl(skin.getBrowser(), weinreScriptUrl, id);
 				}
 
-				createWeinreShell(skin, clientUrl + "#" + id, weinreScriptUrl, id).open();
+				createWeinreShell(skin, clientUrl + "#" + id, weinreScriptUrl, id, isJavaFx).open(); //$NON-NLS-1$
 			}
 		});
 	}
@@ -101,7 +102,7 @@ public class ToolsMenuCreator {
 	}
 	
 	public static void addSyncronizedWindowItem(Menu menu, final BrowserSimSkin skin,
-			final Map<String, Device> devices, final Boolean useSkins, final Boolean enableLiveReload, final int liveReloadPort, final boolean enableTouchEvents, final int orientationAngle, final String homeUrl) {
+			final Map<String, Device> devices, final Boolean useSkins, final Boolean enableLiveReload, final int liveReloadPort, final boolean enableTouchEvents, final int orientationAngle, final String homeUrl, final boolean isJavaFx) {
 		MenuItem syncWindow = new MenuItem(menu, SWT.CASCADE);
 		syncWindow.setText(Messages.BrowserSim_SYNCHRONIZED_WINDOW);
 		Menu subMenu = new Menu(menu);
@@ -118,7 +119,7 @@ public class ToolsMenuCreator {
 					if (menuItem.getSelection()) {
 						Device selected = devices.get(menuItem.getData());
 						SpecificPreferences sp = new BrowserSimSpecificPreferences(selected.getId(), useSkins,
-								enableLiveReload, liveReloadPort, enableTouchEvents, orientationAngle, null);
+								enableLiveReload, liveReloadPort, enableTouchEvents, orientationAngle, null, isJavaFx);
 
 						BrowserSim browserSim1 = new BrowserSim(homeUrl, BrowserSimUtil.getParentShell(skin));
 						browserSim1.open(sp, skin.getBrowser().getUrl());
@@ -161,13 +162,13 @@ public class ToolsMenuCreator {
 				+		"script.src='" + scriptUrl + "#" + ID + "'"); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
 	}
 	
-	private static Shell createWeinreShell(final BrowserSimSkin skin, String clientUrl, final String scriptUrl, final String id) {
+	private static Shell createWeinreShell(final BrowserSimSkin skin, String clientUrl, final String scriptUrl, final String id, boolean isJavaFx) {
 		final Shell shell = new Shell(BrowserSimUtil.getParentShell(skin), SWT.SHELL_TRIM);
 		shell.setLayout(new FillLayout(SWT.VERTICAL | SWT.HORIZONTAL));
 		shell.setText(Messages.BrowserSim_WEINRE_INSPECTOR);
 		
 		Composite browserComposite = createBrowserComposite(shell, clientUrl);
-		final IBrowser weinreBrowser = createWeinreBrowser(browserComposite);
+		final IBrowser weinreBrowser = createWeinreBrowser(browserComposite, isJavaFx);
 		weinreBrowser.setUrl(clientUrl);
 		
 		final LocationAdapter locationAdapter = new LocationAdapter() {
@@ -246,8 +247,8 @@ public class ToolsMenuCreator {
 		return browserComposite;
 	}
 	
-	private static IBrowser createWeinreBrowser(Composite browserComposite) {
-		final IBrowser browser = new WebKitBrowserFactory().createBrowser(browserComposite, SWT.WEBKIT);
+	private static IBrowser createWeinreBrowser(Composite browserComposite, boolean isJavaFX) {
+		final IBrowser browser = new WebKitBrowserFactory().createBrowser(browserComposite, SWT.WEBKIT, isJavaFX);
 		GridData browserData = new GridData();
 		browserData.horizontalAlignment = GridData.FILL;
 		browserData.verticalAlignment = GridData.FILL;

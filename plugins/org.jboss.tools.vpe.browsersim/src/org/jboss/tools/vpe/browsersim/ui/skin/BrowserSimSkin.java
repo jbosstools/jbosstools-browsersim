@@ -25,7 +25,7 @@ import org.jboss.tools.vpe.browsersim.ui.skin.ios.AppleIPadResizableSkin;
  */
 public interface BrowserSimSkin {
 	void setBrowserFactory(IBrowserSimBrowserFactory browserFactory);
-	void createControls(Display display, Point location, Shell parentShell);
+	void createControls(Display display, Point location, Shell parentShell, boolean javaFx);
 	IBrowser getBrowser();
 	Shell getShell();
 	Menu getMenuBar();

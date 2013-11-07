@@ -10,7 +10,14 @@
  ******************************************************************************/
 package org.jboss.tools.vpe.browsersim.util;
 
+import java.io.File;
+import java.lang.reflect.Method;
+import java.net.URL;
+import java.net.URLClassLoader;
+
 import org.jboss.tools.vpe.browsersim.browser.IBrowser;
+import org.eclipse.swt.SWT;
+import org.eclipse.swt.browser.Browser;
 import org.eclipse.swt.browser.LocationAdapter;
 import org.eclipse.swt.browser.LocationEvent;
 import org.eclipse.swt.events.DisposeEvent;
@@ -25,6 +32,7 @@ import org.eclipse.swt.widgets.Shell;
 import org.eclipse.swt.widgets.Widget;
 import org.jboss.tools.vpe.browsersim.BrowserSimLogger;
 import org.jboss.tools.vpe.browsersim.browser.PlatformUtil;
+import org.jboss.tools.vpe.browsersim.browser.javafx.JavaFXBrowser;
 import org.jboss.tools.vpe.browsersim.model.Device;
 import org.jboss.tools.vpe.browsersim.model.SkinMap;
 import org.jboss.tools.vpe.browsersim.ui.MessageBoxWithLinks;
@@ -156,7 +164,7 @@ public class BrowserSimUtil {
 	}
 	
 	public static void setCustomScrollbarStylesForWindows(IBrowser browser) {
-		if (PlatformUtil.OS_WIN32.equals(PlatformUtil.getOs())) {
+		if (PlatformUtil.OS_WIN32.equals(PlatformUtil.getOs()) && !(browser instanceof JavaFXBrowser)) {
 			browser.addLocationListener(new LocationAdapter() {
 				@SuppressWarnings("nls")
 				@Override
@@ -209,4 +217,71 @@ public class BrowserSimUtil {
 		};
 	}
 	
+	public static boolean loadJavaFX() {
+		String javaHome = System.getProperty("java.home"); //$NON-NLS-1$
+		File jfxrt7 = new File(javaHome + File.separator
+				+ "lib" + File.separator + "jfxrt.jar"); //$NON-NLS-1$ //$NON-NLS-2$
+		if (jfxrt7.exists()) {
+			loadJar(jfxrt7);
+			return true;
+		} else {
+			//java 8 case
+			File jfxrt8 = new File(javaHome + File.separator
+					+ "lib" + File.separator + "ext" + File.separator + "jfxrt.jar"); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
+			File jfxswt8 = new File(javaHome + File.separator
+					+ "lib" + File.separator + "jfxswt.jar"); //$NON-NLS-1$ //$NON-NLS-2$
+			if (jfxrt8.exists() && jfxswt8.exists()) {
+				loadJar(jfxrt8);
+				loadJar(jfxswt8);
+				return true;
+			}
+		}
+		return false;
+	}
+	
+	public static boolean isJavaFxAvailable() {
+		String javaHome = System.getProperty("java.home"); //$NON-NLS-1$
+		return isJavaFxAvailable(javaHome);
+	}
+	
+	public static boolean isJavaFxAvailable(String javaHome) {
+		File jfxrt7 = new File(javaHome + File.separator
+				+ "lib" + File.separator + "jfxrt.jar"); //$NON-NLS-1$ //$NON-NLS-2$
+		File jfxrt8 = new File(javaHome + File.separator
+				+ "lib" + File.separator + "ext" + File.separator + "jfxrt.jar"); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
+		File jfxswt8 = new File(javaHome + File.separator
+				+ "lib" + File.separator + "jfxswt.jar"); //$NON-NLS-1$ //$NON-NLS-2$
+	
+		if (jfxrt7.exists() || (jfxrt8.exists() && jfxswt8.exists())) {
+			return true;
+		}
+		return false;
+	}
+	
+	private static void loadJar(File file) {
+		try {
+			URL u = file.toURI().toURL();
+
+			URLClassLoader sysloader = (URLClassLoader) ClassLoader
+					.getSystemClassLoader();
+			@SuppressWarnings("rawtypes")
+			Class sysclass = URLClassLoader.class;
+			@SuppressWarnings("unchecked")
+			Method method = sysclass.getDeclaredMethod("addURL", new Class[] { URL.class }); //$NON-NLS-1$
+			method.setAccessible(true);
+			method.invoke(sysloader, new Object[] { u });
+		} catch (Throwable t) {
+			BrowserSimLogger.logError("Unable to add " + file.getName() + " to classpath.", t); //$NON-NLS-1$ //$NON-NLS-2$
+		}
+	}
+
+	/**
+	 * Load SWT.WEBKIT and JavaFX WebKit - TODO need to do this better
+	 */
+	public static void loadEngines() {
+		Shell tempShell = new Shell(Display.getDefault());
+		Browser tempSWTBrowser = new Browser(tempShell, SWT.WEBKIT);
+		JavaFXBrowser tempJavaFXBrowser = new JavaFXBrowser(tempShell);	
+		tempSWTBrowser.dispose();
+	}
 }

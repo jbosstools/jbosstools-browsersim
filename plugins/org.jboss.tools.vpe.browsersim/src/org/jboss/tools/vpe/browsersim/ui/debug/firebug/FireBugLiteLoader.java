@@ -20,6 +20,7 @@ import org.eclipse.swt.graphics.Rectangle;
 import org.eclipse.swt.layout.FillLayout;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Shell;
+import org.jboss.tools.vpe.browsersim.BrowserSimArgs;
 import org.jboss.tools.vpe.browsersim.browser.ExtendedCloseWindowListener;
 import org.jboss.tools.vpe.browsersim.browser.ExtendedVisibilityWindowListener;
 import org.jboss.tools.vpe.browsersim.browser.ExtendedWindowEvent;
@@ -78,14 +79,14 @@ public class FireBugLiteLoader {
 		return Boolean.TRUE.equals(parentBrowser.evaluate("return !!window._fireBugLiteLoading")); //$NON-NLS-1$
 	}
 	
-	public static void processFireBugPopUp(ExtendedWindowEvent openWindowEvent, BrowserSimSkin skin) {
+	public static void processFireBugPopUp(ExtendedWindowEvent openWindowEvent, BrowserSimSkin skin, boolean isJavaFx) {
 		final IBrowser parentBrowser = (IBrowser) openWindowEvent.widget;
 		parentBrowser.execute("window._fireBugLiteLoading = false;"); //$NON-NLS-1$
 		
 		Shell shell = new Shell(BrowserSimUtil.getParentShell(skin), SWT.SHELL_TRIM);
 		shell.setLayout(new FillLayout());
 		
-		final IBrowser fireBugBrowser = new WebKitBrowserFactory().createBrowser(shell, SWT.WEBKIT);
+		final IBrowser fireBugBrowser = new WebKitBrowserFactory().createBrowser(shell, SWT.WEBKIT, isJavaFx);
 		openWindowEvent.browser = fireBugBrowser;
 		
 		fireBugBrowser.addVisibilityWindowListener(new ExtendedVisibilityWindowListener() {

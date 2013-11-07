@@ -33,9 +33,10 @@ public abstract class SpecificPreferences extends Observable {
 	private boolean enableTouchEvents;
 	private int orientationAngle;
 	private Point location;
+	private boolean isJavaFx;
 	
 
-	public SpecificPreferences(String selectedDeviceId, boolean useSkins, boolean enableLiveReload, int liveReloadPort, boolean enableTouchEvents, int orientationAngle, Point location) {
+	public SpecificPreferences(String selectedDeviceId, boolean useSkins, boolean enableLiveReload, int liveReloadPort, boolean enableTouchEvents, int orientationAngle, Point location, boolean isJavaFx) {
 		this.selectedDeviceId = selectedDeviceId;
 		this.useSkins = useSkins;
 		this.enableLiveReload = enableLiveReload;
@@ -43,6 +44,7 @@ public abstract class SpecificPreferences extends Observable {
 		this.enableTouchEvents = enableTouchEvents;
 		this.orientationAngle = orientationAngle;
 		this.location = location;
+		this.isJavaFx = isJavaFx;
 	}
 
 	public String getSelectedDeviceId() {
@@ -123,6 +125,17 @@ public abstract class SpecificPreferences extends Observable {
 		this.location = location;
 	}
 
+	public boolean isJavaFx() {
+		return isJavaFx;
+	}
+
+	public void setJavaFx(boolean isJavaFx) {
+		if (this.isJavaFx != isJavaFx) {
+			this.isJavaFx = isJavaFx;
+			setChanged();
+		}
+	}
+
 	public void copyProperties(SpecificPreferences sp) {
 		setSelectedDeviceId(sp.getSelectedDeviceId());
 		setUseSkins(sp.getUseSkins());
@@ -131,6 +144,7 @@ public abstract class SpecificPreferences extends Observable {
 		setEnableTouchEvents(sp.isEnableTouchEvents());
 		setOrientationAngle(sp.getOrientationAngle());
 		setLocation(sp.getLocation());
+		setJavaFx(sp.isJavaFx());
 	}
 
 }

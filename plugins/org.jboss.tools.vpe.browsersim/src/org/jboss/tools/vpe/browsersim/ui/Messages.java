@@ -81,6 +81,11 @@ public class Messages {
 	public static String ManageDevicesDialog_ADD;
 	public static String ManageDevicesDialog_ALWAYS_TRUNCATE;
 	public static String ManageDevicesDialog_BROWSE;
+	public static String ManageDevicesDialog_BROWSER_ENGINE;
+	public static String ManageDevicesDialog_BROWSER_ENGINE_WARNING;
+	public static String ManageDevicesDialog_BROWSER_ENGINE_WARNING_ON_LINUX;
+	public static String ManageDevicesDialog_BROWSER_TYPE_SWT;
+	public static String ManageDevicesDialog_BROWSER_TYPE_JAVAFX;
 	public static String ManageDevicesDialog_CANCEL;
 	public static String ManageDevicesDialog_DEFAULT;
 	public static String ManageDevicesDialog_DEVICES;
