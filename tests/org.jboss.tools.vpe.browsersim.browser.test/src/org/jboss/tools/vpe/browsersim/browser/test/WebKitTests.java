@@ -13,12 +13,11 @@ package org.jboss.tools.vpe.browsersim.browser.test;
 import junit.framework.TestCase;
 
 import org.eclipse.swt.SWT;
-import org.eclipse.swt.browser.Browser;
-import org.eclipse.swt.browser.BrowserFunction;
 import org.eclipse.swt.layout.FillLayout;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Shell;
-import org.jboss.tools.vpe.browsersim.browser.AbstractWebKitBrowser;
+import org.jboss.tools.vpe.browsersim.browser.IBrowser;
+import org.jboss.tools.vpe.browsersim.browser.IBrowserFunction;
 import org.jboss.tools.vpe.browsersim.browser.WebKitBrowserFactory;
 
 /**
@@ -36,21 +35,21 @@ public class WebKitTests extends TestCase {
 		Display display = Display.getDefault();
 		Shell shell = new Shell(display);
 		shell.setLayout(new FillLayout());
-		final AbstractWebKitBrowser webKitBrowser = new WebKitBrowserFactory().createBrowser(shell, SWT.NONE);
+		final IBrowser webKitBrowser = new WebKitBrowserFactory().createBrowser(shell, SWT.NONE);
 		assertNotNull(webKitBrowser);
 		ExpressionsEvaluator expressionsEvaluator = new ExpressionsEvaluator(webKitBrowser);
 		
 		String initialUserAgent = (String) expressionsEvaluator.evaluate("navigator.userAgent");
 		
-		webKitBrowser.setDefaultUserAgent(CUSTOM_USER_AGENT);
+		webKitBrowser.setUserAgent(CUSTOM_USER_AGENT);
 		String customUserAgent = (String) expressionsEvaluator.evaluate("navigator.userAgent");
 		assertEquals(CUSTOM_USER_AGENT, customUserAgent);
 		
-		webKitBrowser.setDefaultUserAgent(null);
+		webKitBrowser.setUserAgent(null);
 		String finalUserAgent = (String) expressionsEvaluator.evaluate("navigator.userAgent");
 		assertEquals(initialUserAgent, finalUserAgent);
 		
-		expressionsEvaluator.dispose();
+		shell.dispose();
 //		display.dispose();
 	}
 }
@@ -69,16 +68,13 @@ class ExpressionsEvaluator {
 	private static long expressionExecutorFunctionId = 0;
 	
 	private final String EXPRESSION_EXECUTOR_RESULT_EXTRACTOR_FUNCTION_NAME = "__resultExtractor" + expressionExecutorFunctionId++;
-	private Browser browser;
+	private IBrowser browser;
 	private ResultExtractorFunction resultExtractorFunction;
 
-	public ExpressionsEvaluator(Browser browser) {
+	public ExpressionsEvaluator(IBrowser browser) {
 		this.browser = browser;
-		resultExtractorFunction = new ResultExtractorFunction(browser, EXPRESSION_EXECUTOR_RESULT_EXTRACTOR_FUNCTION_NAME);
-	}
-	
-	public void dispose() {
-		resultExtractorFunction.dispose();
+		resultExtractorFunction = new ResultExtractorFunction();
+		browser.registerBrowserFunction(EXPRESSION_EXECUTOR_RESULT_EXTRACTOR_FUNCTION_NAME, resultExtractorFunction);
 	}
 	
 	public Object evaluate(String expression) {
@@ -90,12 +86,8 @@ class ExpressionsEvaluator {
 	/**
 	 * @author Yahor Radtsevich (yradtsevich)
 	 */
-	private class ResultExtractorFunction extends BrowserFunction {
+	private class ResultExtractorFunction implements IBrowserFunction {
 		private Object[] result;
-		
-		public ResultExtractorFunction(Browser browser, String name) {
-			super(browser, name);
-		}
 
 		public Object function(Object[] arguments) {
 			result = arguments;
