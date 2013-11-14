@@ -386,8 +386,9 @@ public class BrowserSim {
 			skin.getShell().close();
 		} else {
 			Class<? extends BrowserSimSkin> newSkinClass = BrowserSimUtil.getSkinClass(device, specificPreferences.getUseSkins());
+			boolean needToChangeSkin = newSkinClass != skin.getClass();
 			String oldSkinUrl = null;
-			if (newSkinClass != skin.getClass()) {
+			if (needToChangeSkin) {
 				oldSkinUrl = skin.getBrowser().getUrl();
 				Point currentLocation = skin.getShell().getLocation();
 				skin.getBrowser().removeProgressListener(progressListener);
@@ -397,13 +398,17 @@ public class BrowserSim {
 			}
 			setOrientation(specificPreferences.getOrientationAngle(), device);
 			skin.getBrowser().setUserAgent(device.getUserAgent());
-	
-			if (oldSkinUrl != null) {
-				skin.getBrowser().setUrl(oldSkinUrl); // skin (and browser instance) is changed
-			} else if(!Boolean.FALSE.equals(refreshRequired)){
-				getBrowser().refresh(); // only user agent and size of the browser is changed and orientation is not changed
-	 		}
 			
+			if (needToChangeSkin) {
+				if (oldSkinUrl != null && isUrlResettingNeededAfterSkinChange()) {
+					skin.getBrowser().setUrl(oldSkinUrl); // skin (and browser instance) is changed
+				}
+			} else {
+				if (!Boolean.FALSE.equals(refreshRequired)) {
+					getBrowser().refresh(); // only user agent and size of the browser is changed and orientation is not changed
+				}
+			}
+
 			processLiveReload(specificPreferences.isEnableLiveReload());
 			processTouchEvents(specificPreferences.isEnableTouchEvents());
 	
@@ -411,6 +416,10 @@ public class BrowserSim {
 		} 
 	} 
 	
+	protected boolean isUrlResettingNeededAfterSkinChange() {
+		return true; // JBIDE-14636
+	}
+
 	public void reinitSkin() {
 		final Device device = commonPreferences.getDevices().get(specificPreferences.getSelectedDeviceId());
 		Class<? extends BrowserSimSkin> newSkinClass = BrowserSimUtil.getSkinClass(device, specificPreferences.getUseSkins());
