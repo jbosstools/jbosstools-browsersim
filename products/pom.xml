@@ -12,6 +12,7 @@
 	<packaging>pom</packaging>
 
 	<modules>
+		<module>../plugins/org.jboss.tools.vpe.browsersim.javafx.mock</module>
 		<module>../plugins/org.jboss.tools.vpe.browsersim</module>
 		<module>../plugins/org.jboss.tools.vpe.browsersim.browser</module>
 		<module>browsersim-standalone</module>
