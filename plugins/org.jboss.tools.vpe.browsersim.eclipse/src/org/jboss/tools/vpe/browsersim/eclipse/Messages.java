@@ -6,7 +6,7 @@ import org.eclipse.osgi.util.NLS;
  * @author kmarmaliykov
  */
 public class Messages extends NLS {
-	private static final String BUNDLE_NAME = "org.jboss.tools.vpe.browsersim.eclipse.callbacks.messages"; //$NON-NLS-1$
+	private static final String BUNDLE_NAME = "org.jboss.tools.vpe.browsersim.eclipse.messages"; //$NON-NLS-1$
 	public static String Callback_CANNOT_OBTAIN_PAGE;
 	public static String OpenFileCallback_CANNOT_OPEN_FILE;
 	public static String BrowserSim;
