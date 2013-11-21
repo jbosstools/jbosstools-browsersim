@@ -13,6 +13,7 @@ package org.jboss.tools.vpe.browsersim.ui.skin;
 import java.util.Arrays;
 
 import org.eclipse.swt.SWT;
+import org.eclipse.swt.custom.StackLayout;
 import org.eclipse.swt.events.DisposeEvent;
 import org.eclipse.swt.events.DisposeListener;
 import org.eclipse.swt.events.MouseAdapter;
@@ -85,10 +86,11 @@ public abstract class ResizableSkin implements BrowserSimSkin {
 		bindDeviceCompositeControls();
 		Composite browserContainer = deviceComposite.getBrowserContainer();
 		browserContainer.setLayout(new FillLayout());
+		StackLayout stackLayout = new StackLayout();
 		innerBrowserContainer = new Composite(browserContainer, SWT.NONE);
-		innerBrowserContainer.setLayout(new FillLayout());
+		innerBrowserContainer.setLayout(stackLayout);
 		browser = browserFactory.createBrowser(innerBrowserContainer, SWT.NONE);
-		
+		stackLayout.topControl = (Control) browser; 
 		shell.setSize(/*shell.computeSize(SWT.DEFAULT, SWT.DEFAULT)*/ 384, 727);
 		setShellRegion();		
 	}

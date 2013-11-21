@@ -11,6 +11,7 @@
 package org.jboss.tools.vpe.browsersim.ui.skin;
 
 import org.eclipse.swt.SWT;
+import org.eclipse.swt.custom.StackLayout;
 import org.eclipse.swt.events.DisposeEvent;
 import org.eclipse.swt.events.DisposeListener;
 import org.eclipse.swt.graphics.Image;
@@ -19,6 +20,7 @@ import org.eclipse.swt.layout.FillLayout;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Composite;
+import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Event;
 import org.eclipse.swt.widgets.Label;
@@ -125,13 +127,16 @@ public class NativeSkin implements BrowserSimSkin {
 		
 		innerBrowserContainer = new Composite(skinComposite, SWT.NONE);
 		browser = browserFactory.createBrowser(innerBrowserContainer, SWT.NONE);
+		StackLayout stackLayout = new StackLayout();
+		innerBrowserContainer.setLayout(stackLayout);
+		stackLayout.topControl = (Control) browser;
+		
 		GridData browserData = new GridData();
 		browserData.horizontalAlignment = GridData.FILL;
 		browserData.verticalAlignment = GridData.FILL;
 		browserData.horizontalSpan = 3;
 		browserData.grabExcessHorizontalSpace = true;
 		browserData.grabExcessVerticalSpace = true;
-		innerBrowserContainer.setLayout(new FillLayout());
 		innerBrowserContainer.setLayoutData(browserData);
 		
 		Composite statusComposite = new Composite(skinComposite, SWT.NONE);
