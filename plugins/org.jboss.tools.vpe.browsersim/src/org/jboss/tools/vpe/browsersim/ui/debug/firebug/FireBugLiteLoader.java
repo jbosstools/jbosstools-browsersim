@@ -111,10 +111,14 @@ public class FireBugLiteLoader {
 		
 		skin.getShell().addDisposeListener(new DisposeListener() {
 			@Override
-			public void widgetDisposed(DisposeEvent arg0) {
-				if (!fireBugBrowser.isDisposed() && !fireBugBrowser.getShell().isDisposed()) {
-					fireBugBrowser.getShell().dispose();
-				}
+			public void widgetDisposed(DisposeEvent event) {
+				Display.getDefault().asyncExec(new Runnable() {
+					public void run() {
+						if (!fireBugBrowser.isDisposed() && !fireBugBrowser.getShell().isDisposed()) {
+							fireBugBrowser.getShell().dispose();
+						}
+					}
+				});
 			}
 		});
 		
@@ -128,15 +132,16 @@ public class FireBugLiteLoader {
 					}
 				}
 			});
-		} else {
-			fireBugBrowser.addCloseWindowListener(new ExtendedCloseWindowListener() {
-				@Override
-				public void close(ExtendedWindowEvent event) {
-					IBrowser browser = (IBrowser)event.widget;
-					Shell shell = browser.getShell();
-					shell.close();
-				}
-			});
-		}
+		} 
+		
+		fireBugBrowser.addCloseWindowListener(new ExtendedCloseWindowListener() {
+			@Override
+			public void close(ExtendedWindowEvent event) {
+				IBrowser browser = (IBrowser) event.widget;
+				Shell shell = browser.getShell();
+				shell.close();
+			}
+		});
+		
 	}
 }
