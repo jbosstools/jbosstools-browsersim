@@ -143,7 +143,7 @@ public class ToolsMenuCreator {
 	
 	public static void addTouchEventsItem(Menu menu, final SpecificPreferences specificPreferences) {
 		MenuItem liveReloadMenuItem = new MenuItem(menu, SWT.CHECK);
-		liveReloadMenuItem.setText("Enable Touch Events");
+		liveReloadMenuItem.setText(Messages.ManageDevicesDialog_SIMULATE_TOUCH_EVENTS);
 		liveReloadMenuItem.setSelection(specificPreferences.isEnableTouchEvents());
 		liveReloadMenuItem.addSelectionListener(new SelectionAdapter() {
 			public void widgetSelected(SelectionEvent e) {
