@@ -257,16 +257,7 @@ public class BrowserSim {
 		});
 
 		//JBIDE-12191 - custom scrollbars work satisfactorily on windows only
-		if (PlatformUtil.OS_WIN32.equals(PlatformUtil.getOs())) {
-			browser.addLocationListener(new LocationAdapter() {
-				@Override
-				public void changed(LocationEvent event) {
-					IBrowser browser = (IBrowser) event.widget;
-					BrowserSimUtil.setCustomScrollbarStyles(browser);
-				}
-				
-			});
-		};
+		BrowserSimUtil.setCustomScrollbarStylesForWindows(browser);
 
 		browser.addOpenWindowListener(new ExtendedOpenWindowListener() {
 			

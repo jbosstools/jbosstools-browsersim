@@ -11,6 +11,8 @@
 package org.jboss.tools.vpe.browsersim.util;
 
 import org.jboss.tools.vpe.browsersim.browser.IBrowser;
+import org.eclipse.swt.browser.LocationAdapter;
+import org.eclipse.swt.browser.LocationEvent;
 import org.eclipse.swt.events.DisposeEvent;
 import org.eclipse.swt.events.DisposeListener;
 import org.eclipse.swt.graphics.Image;
@@ -153,49 +155,58 @@ public class BrowserSimUtil {
 		}
 	}
 	
-	public static void setCustomScrollbarStyles(IBrowser browser) {
-		if (browser != null) {
-			browser.execute(
-				"if (window._browserSim_customScrollBarStylesSetter === undefined) {"
-					+"window._browserSim_customScrollBarStylesSetter = function () {"
-					+	"document.removeEventListener('DOMSubtreeModified', window._browserSim_customScrollBarStylesSetter, false);"
-					+	"var head = document.head;"
-					+	"var style = document.createElement('style');"
-					+	"style.type = 'text/css';"
-					+	"style.id='browserSimStyles';"
-					+	"head.appendChild(style);"
-					+	"style.innerText='"
-					// The following two rules fix a problem with showing scrollbars in Google Mail and similar,
-					// but autohiding of navigation bar stops to work with it. That is why they are commented.
-					//+	"html {"
-					//+		"overflow: hidden;"
-					//+	"}"
-					//+	"body {"
-					//+		"position: absolute;"
-					//+		"top: 0px;"
-					//+		"left: 0px;"
-					//+		"bottom: 0px;"
-					//+		"right: 0px;"
-					//+		"margin: 0px;"
-					//+		"overflow-y: auto;"
-					//+		"overflow-x: auto;"
-					//+	"}"
-					+		"::-webkit-scrollbar {"
-					+			"width: 5px;"
-					+			"height: 5px;"
-					+		"}"
-					+		"::-webkit-scrollbar-thumb {"
-					+			"background: rgba(0,0,0,0.4); "
-					+		"}"
-					+		"::-webkit-scrollbar-corner, ::-webkit-scrollbar-thumb:window-inactive {"
-					+			"background: rgba(0,0,0,0.0);"
-					+		"};"
-					+	"';"
-					+"};"
-					+ "document.addEventListener('DOMSubtreeModified', window._browserSim_customScrollBarStylesSetter, false);"
-				+ "}"
-			);
-		}
+	public static void setCustomScrollbarStylesForWindows(IBrowser browser) {
+		if (PlatformUtil.OS_WIN32.equals(PlatformUtil.getOs())) {
+			browser.addLocationListener(new LocationAdapter() {
+				@SuppressWarnings("nls")
+				@Override
+				public void changed(LocationEvent event) {
+					IBrowser browser = (IBrowser) event.widget;
+					if (browser != null) {
+						browser.execute(
+							"if (window._browserSim_customScrollBarStylesSetter === undefined) {"
+								+"window._browserSim_customScrollBarStylesSetter = function () {"
+								+	"document.removeEventListener('DOMSubtreeModified', window._browserSim_customScrollBarStylesSetter, false);"
+								+	"var head = document.head;"
+								+	"var style = document.createElement('style');"
+								+	"style.type = 'text/css';"
+								+	"style.id='browserSimStyles';"
+								+	"head.appendChild(style);"
+								+	"style.innerText='"
+								// The following two rules fix a problem with showing scrollbars in Google Mail and similar,
+								// but autohiding of navigation bar stops to work with it. That is why they are commented.
+								//+	"html {"
+								//+		"overflow: hidden;"
+								//+	"}"
+								//+	"body {"
+								//+		"position: absolute;"
+								//+		"top: 0px;"
+								//+		"left: 0px;"
+								//+		"bottom: 0px;"
+								//+		"right: 0px;"
+								//+		"margin: 0px;"
+								//+		"overflow-y: auto;"
+								//+		"overflow-x: auto;"
+								//+	"}"
+								+		"::-webkit-scrollbar {"
+								+			"width: 5px;"
+								+			"height: 5px;"
+								+		"}"
+								+		"::-webkit-scrollbar-thumb {"
+								+			"background: rgba(0,0,0,0.4); "
+								+		"}"
+								+		"::-webkit-scrollbar-corner, ::-webkit-scrollbar-thumb:window-inactive {"
+								+			"background: rgba(0,0,0,0.0);"
+								+		"};"
+								+	"';"
+								+"};"
+								+ "document.addEventListener('DOMSubtreeModified', window._browserSim_customScrollBarStylesSetter, false);"
+							+ "}"
+						);
+					}
+				}
+			});
+		};
 	}
 	
 }
