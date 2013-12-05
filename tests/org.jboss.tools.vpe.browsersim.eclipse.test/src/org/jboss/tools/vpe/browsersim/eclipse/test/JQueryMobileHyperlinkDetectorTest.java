@@ -17,9 +17,9 @@ import junit.framework.TestCase;
 import org.eclipse.core.resources.IProject;
 import org.eclipse.core.resources.ResourcesPlugin;
 import org.eclipse.ui.PlatformUI;
-import org.jboss.tools.jst.text.ext.test.HyperlinkTestUtil;
-import org.jboss.tools.jst.text.ext.test.HyperlinkTestUtil.TestHyperlink;
-import org.jboss.tools.jst.text.ext.test.HyperlinkTestUtil.TestRegion;
+import org.jboss.tools.jst.web.ui.openon.test.HyperlinkTestUtil;
+import org.jboss.tools.jst.web.ui.openon.test.HyperlinkTestUtil.TestHyperlink;
+import org.jboss.tools.jst.web.ui.openon.test.HyperlinkTestUtil.TestRegion;
 import org.jboss.tools.jst.web.ui.internal.text.ext.hyperlink.JQueryMobileHyperlinkDetector;
 import org.jboss.tools.jst.web.ui.internal.text.ext.hyperlink.OpenWithEditorHyperlink;
 
