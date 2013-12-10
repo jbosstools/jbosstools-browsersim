@@ -10,6 +10,8 @@
  ******************************************************************************/
 package org.jboss.tools.vpe.browsersim.ui;
 
+import java.net.HttpURLConnection;
+import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.NoSuchElementException;
@@ -35,6 +37,7 @@ import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Event;
 import org.eclipse.swt.widgets.Listener;
 import org.eclipse.swt.widgets.Menu;
+import org.eclipse.swt.widgets.MessageBox;
 import org.eclipse.swt.widgets.Shell;
 import org.jboss.tools.vpe.browsersim.BrowserSimLogger;
 import org.jboss.tools.vpe.browsersim.BrowserSimRunner;
@@ -43,7 +46,6 @@ import org.jboss.tools.vpe.browsersim.browser.ExtendedWindowEvent;
 import org.jboss.tools.vpe.browsersim.browser.IBrowser;
 import org.jboss.tools.vpe.browsersim.browser.IBrowserFunction;
 import org.jboss.tools.vpe.browsersim.browser.IDisposable;
-import org.jboss.tools.vpe.browsersim.browser.PlatformUtil;
 import org.jboss.tools.vpe.browsersim.browser.WebKitBrowserFactory;
 import org.jboss.tools.vpe.browsersim.model.Device;
 import org.jboss.tools.vpe.browsersim.model.preferences.BrowserSimSpecificPreferencesStorage;
@@ -390,6 +392,9 @@ public class BrowserSim {
 			setOrientation(specificPreferences.getOrientationAngle(), device);
 			skin.getBrowser().setUserAgent(device.getUserAgent());
 			
+			processLiveReload(specificPreferences.isEnableLiveReload());
+			processTouchEvents(specificPreferences.isEnableTouchEvents());
+			
 			if (needToChangeSkin) {
 				if (oldSkinUrl != null && isUrlResettingNeededAfterSkinChange()) {
 					skin.getBrowser().setUrl(oldSkinUrl); // skin (and browser instance) is changed
@@ -400,8 +405,6 @@ public class BrowserSim {
 				}
 			}
 
-			processLiveReload(specificPreferences.isEnableLiveReload());
-			processTouchEvents(specificPreferences.isEnableTouchEvents());
 	
 			skin.getShell().open();
 		} 
@@ -431,8 +434,10 @@ public class BrowserSim {
 				initLiveReloadLocationAdapter();
 			}
 			skin.getBrowser().addLocationListener(liveReloadLocationAdapter);
-		} else if (liveReloadLocationAdapter != null) {
-			skin.getBrowser().removeLocationListener(liveReloadLocationAdapter);
+		} else {
+			if (liveReloadLocationAdapter != null) {
+				skin.getBrowser().removeLocationListener(liveReloadLocationAdapter);
+			}
 		}
 	}
 	
@@ -451,18 +456,40 @@ public class BrowserSim {
 		liveReloadLocationAdapter = new LocationAdapter() {
 			@Override
 			public void changed(LocationEvent event) {
-				IBrowser browser = (IBrowser) event.widget;
-				browser.execute("if (!window.LiveReload) {" + //$NON-NLS-1$
-									"window.addEventListener('load', function(){" + //$NON-NLS-1$
-										"var e = document.createElement('script');" + //$NON-NLS-1$
-										"e.type = 'text/javascript';" + //$NON-NLS-1$
-										"e.async = 'true';" + //$NON-NLS-1$
-										"e.src = 'http://localhost:" + specificPreferences.getLiveReloadPort() + "/livereload.js';" + //$NON-NLS-1$ //$NON-NLS-2$
-										"document.head.appendChild(e);" + //$NON-NLS-1$
-									"});" + //$NON-NLS-1$
-								"}"); //$NON-NLS-1$
+				if (isLivereloadAvailable()) {
+					IBrowser browser = (IBrowser) event.widget;
+					browser.execute("if (!window.LiveReload) {" + //$NON-NLS-1$
+										"window.addEventListener('load', function(){" + //$NON-NLS-1$
+											"var e = document.createElement('script');" + //$NON-NLS-1$
+											"e.type = 'text/javascript';" + //$NON-NLS-1$
+											"e.async = 'true';" + //$NON-NLS-1$
+											"e.src = 'http://localhost:" + specificPreferences.getLiveReloadPort() + "/livereload.js';" + //$NON-NLS-1$ //$NON-NLS-2$
+											"document.head.appendChild(e);" + //$NON-NLS-1$
+										"});" + //$NON-NLS-1$
+									"}"); //$NON-NLS-1$
+				} else {
+					MessageBox warning = new MessageBox(parentShell, SWT.ICON_WARNING);
+					warning.setText(Messages.WARNING);
+					warning.setMessage(Messages.BrowserSim_LIVERELOAD_WARNING);
+					warning.open();
+					
+					skin.getBrowser().removeLocationListener(liveReloadLocationAdapter);
+					specificPreferences.setEnableLiveReload(false);	
+				}
 			}
 		};
+	}
+	
+	private boolean isLivereloadAvailable() {
+		try {
+			HttpURLConnection.setFollowRedirects(false);
+			URL url = new URL("http://localhost:" + specificPreferences.getLiveReloadPort() + "/livereload.js"); //$NON-NLS-1$ //$NON-NLS-2$
+			HttpURLConnection con = (HttpURLConnection) url.openConnection();
+			con.setRequestMethod("HEAD"); //$NON-NLS-1$
+			return (con.getResponseCode() == HttpURLConnection.HTTP_OK);
+		} catch (Exception e) {
+			return false;
+		}
 	}
 	
 	private void initTouchEventsLocationAdapter() {
@@ -478,7 +505,6 @@ public class BrowserSim {
 		getBrowser().execute("window.onorientationchange = null;" + "window.orientation = " + orientation + ";"); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
 	}
 
-	@SuppressWarnings("nls")
 	private void setOrientation(int orientationAngle, Device device) {
 		Point size = BrowserSimUtil.getSizeInDesktopPixels(device);
 		Point browserSize;
@@ -490,7 +516,7 @@ public class BrowserSim {
 		}
 
 		skin.setOrientationAndLocationAndSize(orientationAngle, currentLocation, browserSize, resizableSkinSizeAdvisor);
-		getBrowser().execute("window.orientation = " + orientationAngle + ";" //$NON-NLS-1$
+		getBrowser().execute("window.orientation = " + orientationAngle + ";" //$NON-NLS-1$ //$NON-NLS-2$
 				+ "(function(){" //$NON-NLS-1$
 				+ 		"var event = document.createEvent('Event');" //$NON-NLS-1$
 				+ 		"event.initEvent('orientationchange', false, false);" // http://jsbin.com/azefow/6   https://developer.mozilla.org/en/DOM/document.createEvent //$NON-NLS-1$

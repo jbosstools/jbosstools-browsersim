@@ -35,6 +35,7 @@ public class Messages {
 	public static String BrowserSim_FILE;
 	public static String BrowserSim_FIREBUG_LITE;
 	public static String BrowserSim_HELP;
+	public static String BrowserSim_LIVERELOAD_WARNING;
 	public static String BrowserSim_OPEN_IN_DEFAULT_BROWSER;
 	public static String BrowserSim_PREFERENCES;
 	public static String BrowserSim_SKIN;
@@ -130,6 +131,7 @@ public class Messages {
 	public static String BrowserSimSourceViewer_EDIT;
 	public static String BrowserSimSourceViewer_SELECT_ALL;
 	public static String BrowserSimSourceViewer_COPY;
+	public static String WARNING;
 
 	static {
 		NLS.initializeMessages(BUNDLE_NAME, Messages.class);
