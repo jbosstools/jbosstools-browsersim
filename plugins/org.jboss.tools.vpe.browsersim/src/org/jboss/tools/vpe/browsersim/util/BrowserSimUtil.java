@@ -15,7 +15,6 @@ import java.lang.reflect.Method;
 import java.net.URL;
 import java.net.URLClassLoader;
 
-import org.jboss.tools.vpe.browsersim.browser.IBrowser;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.browser.Browser;
 import org.eclipse.swt.browser.LocationAdapter;
@@ -31,6 +30,7 @@ import org.eclipse.swt.widgets.Monitor;
 import org.eclipse.swt.widgets.Shell;
 import org.eclipse.swt.widgets.Widget;
 import org.jboss.tools.vpe.browsersim.BrowserSimLogger;
+import org.jboss.tools.vpe.browsersim.browser.IBrowser;
 import org.jboss.tools.vpe.browsersim.browser.PlatformUtil;
 import org.jboss.tools.vpe.browsersim.browser.javafx.JavaFXBrowser;
 import org.jboss.tools.vpe.browsersim.model.Device;
@@ -280,8 +280,8 @@ public class BrowserSimUtil {
 	 */
 	public static void loadEngines() {
 		Shell tempShell = new Shell(Display.getDefault());
-		Browser tempSWTBrowser = new Browser(tempShell, SWT.WEBKIT);
 		JavaFXBrowser tempJavaFXBrowser = new JavaFXBrowser(tempShell);	
+		Browser tempSWTBrowser = new Browser(tempShell, SWT.WEBKIT);
 		tempSWTBrowser.dispose();
 	}
 }
