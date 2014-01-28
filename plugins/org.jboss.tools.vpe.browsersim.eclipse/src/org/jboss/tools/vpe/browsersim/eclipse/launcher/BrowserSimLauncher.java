@@ -71,6 +71,7 @@ public class BrowserSimLauncher {
 		List<String> bundles = new ArrayList<String>();
 		bundles.add("org.jboss.tools.vpe.browsersim"); //$NON-NLS-1$
 		bundles.add("org.jboss.tools.vpe.browsersim.browser"); //$NON-NLS-1$
+		bundles.add("org.jboss.tools.vpe.browsersim.debugger");  //$NON-NLS-1$
 		
 		bundles.add("org.eclipse.jetty.server"); //$NON-NLS-1$
 		bundles.add("org.eclipse.jetty.servlet"); //$NON-NLS-1$

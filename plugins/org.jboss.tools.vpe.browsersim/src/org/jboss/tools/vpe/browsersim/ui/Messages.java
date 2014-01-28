@@ -26,6 +26,9 @@ public class Messages {
 	public static String BrowserSim_BROWSER_SIM;
 	public static String BrowserSim_COULD_NOT_OPEN_DEFAULT_BROWSER;
 	public static String BrowserSim_DEVICE;
+	public static String BrowserSim_DEV_TOOLS;
+	public static String BrowserSim_DEV_TOOLS_HEADER;
+	public static String BrowserSim_DEV_TOOLS_MESSAGE;
 	public static String BrowserSim_DEBUG;
 	public static String BrowserSim_ERROR;
 	public static String BrowserSim_ENABLE_LIVE_RELOAD;

@@ -130,6 +130,10 @@ public class BrowserSimUtil {
 		new MessageBoxWithLinks(shell, message, icon, Messages.BrowserSim_ABOUT_HEADER).open();
 	}
 	
+	public static void showDevToolsDialog(Shell shell, String message, Image icon) {
+		new MessageBoxWithLinks(shell, message, icon, Messages.BrowserSim_DEV_TOOLS_HEADER).open();
+	}
+	
 	public static void addDisposeListener(Widget widget, final Resource disposable) {
 		widget.addDisposeListener(new DisposeListener() {
 			@Override
