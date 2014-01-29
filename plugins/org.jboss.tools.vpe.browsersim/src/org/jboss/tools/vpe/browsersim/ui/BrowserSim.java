@@ -54,6 +54,8 @@ import org.jboss.tools.vpe.browsersim.browser.IDisposable;
 import org.jboss.tools.vpe.browsersim.browser.WebKitBrowserFactory;
 import org.jboss.tools.vpe.browsersim.browser.javafx.JavaFXBrowser;
 import org.jboss.tools.vpe.browsersim.devtools.DevToolsDebuggerServer;
+import org.jboss.tools.vpe.browsersim.js.log.JsLogFunction;
+import org.jboss.tools.vpe.browsersim.js.log.MessageType;
 import org.jboss.tools.vpe.browsersim.model.Device;
 import org.jboss.tools.vpe.browsersim.model.preferences.BrowserSimSpecificPreferencesStorage;
 import org.jboss.tools.vpe.browsersim.model.preferences.CommonPreferences;
@@ -363,8 +365,39 @@ public class BrowserSim {
 				skin.pageTitleChanged(event.title);
 			}
 		});
+		
+		if (!specificPreferences.isJavaFx()) {
+			overrideJsConsoleLog(browser); // JBIDE-15932
+		}
 	}
 	
+	// JBIDE-15932 need to display console logs especially during startup
+	private void overrideJsConsoleLog(final IBrowser browser) {	
+		browser.addLocationListener(new LocationAdapter() {  
+			@Override
+			@SuppressWarnings("nls")
+			public void changed(LocationEvent e) {
+				browser.execute("(function(){"
+										+ "if (window.console && console.log) {"
+										+	"window.console.log = browserSimConsoleLog;"
+										+	"window.console.info = browserSimConsoleInfo;"
+										+	"window.console.warn = browserSimConsoleWarn;" 
+										+	"window.console.error = browserSimConsoleError;"
+										+	"window.onerror = function(msg, url, lineNumber) {"
+										+		"console.log('ERROR: ' + msg + ' on line ' + lineNumber + ' for ' + url);"
+										+	"}"
+										+ "}"
+								+ "})()");
+			}
+		});
+		
+	private void createLogFunctions(IBrowser browser) {
+		browser.registerBrowserFunction("browserSimConsoleLog", new JsLogFunction(browser,  null)); //$NON-NLS-1$  
+		browser.registerBrowserFunction("browserSimConsoleInfo", new JsLogFunction(browser,  MessageType.INFO)); //$NON-NLS-1$  
+		browser.registerBrowserFunction("browserSimConsoleWarn", new JsLogFunction(browser,  MessageType.WARN)); //$NON-NLS-1$  
+		browser.registerBrowserFunction("browserSimConsoleError", new JsLogFunction(browser,  MessageType.ERROR)); //$NON-NLS-1$  
+	}
+
 	private void initObservers() {
 		commonPreferencesObserver = new Observer() {
 			@Override

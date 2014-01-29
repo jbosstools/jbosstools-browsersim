@@ -19,7 +19,10 @@ import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Status;
 import org.eclipse.jface.resource.ImageDescriptor;
+import org.eclipse.ui.console.MessageConsole;
+import org.eclipse.ui.console.MessageConsoleStream;
 import org.eclipse.ui.plugin.AbstractUIPlugin;
+import org.jboss.tools.vpe.browsersim.eclipse.util.ConsoleUtil;
 import org.osgi.framework.BundleContext;
 
 /**
@@ -75,6 +78,14 @@ public class Activator extends AbstractUIPlugin {
 	public static void logError(String message, Throwable throwable, String pluginId) {
 		getDefault().getLog().log(new Status(IStatus.ERROR, pluginId, message, throwable));
 	}
+	
+	public static void logMessage(String message, String consoleName) {
+		MessageConsole console = ConsoleUtil.findConsole(consoleName);
+		MessageConsoleStream out = console.newMessageStream();
+		ConsoleUtil.setConsoleColor(out, message);
+		out.println(message);
+		ConsoleUtil.show(console);
+	}
 
 	/**
 	 * Returns an image descriptor for the image file at the given
@@ -104,4 +115,5 @@ public class Activator extends AbstractUIPlugin {
 			return null;
 		}
 	}
+	
 }

@@ -34,7 +34,7 @@ import org.jboss.tools.vpe.browsersim.util.BrowserSimUtil;
  */
 
 public class BrowserSimRunner {
-	static final String PLUGIN_ID = "org.jboss.tools.vpe.browsersim"; //$NON-NLS-1$
+	public static final String PLUGIN_ID = "org.jboss.tools.vpe.browsersim"; //$NON-NLS-1$
 	private static final String[] BROWSERSIM_ICONS = {"icons/browsersim_16px.png", "icons/browsersim_32px.png", "icons/browsersim_64px.png", "icons/browsersim_128px.png", "icons/browsersim_256px.png", }; //$NON-NLS-1$//$NON-NLS-2$//$NON-NLS-3$//$NON-NLS-4$//$NON-NLS-5$
 	
 	public static final String NOT_STANDALONE = "-not-standalone"; //$NON-NLS-1$
