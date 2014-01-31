@@ -48,6 +48,7 @@ import org.jboss.tools.vpe.browsersim.BrowserSimLogger;
 import org.jboss.tools.vpe.browsersim.BrowserSimRunner;
 import org.jboss.tools.vpe.browsersim.browser.ExtendedOpenWindowListener;
 import org.jboss.tools.vpe.browsersim.browser.ExtendedWindowEvent;
+import org.jboss.tools.vpe.browsersim.browser.PlatformUtil;
 import org.jboss.tools.vpe.browsersim.browser.IBrowser;
 import org.jboss.tools.vpe.browsersim.browser.IBrowserFunction;
 import org.jboss.tools.vpe.browsersim.browser.IDisposable;
@@ -373,10 +374,14 @@ public class BrowserSim {
 	
 	// JBIDE-15932 need to display console logs especially during startup
 	private void overrideJsConsoleLog(final IBrowser browser) {	
+		createLogFunctions(browser);
 		browser.addLocationListener(new LocationAdapter() {  
 			@Override
 			@SuppressWarnings("nls")
 			public void changed(LocationEvent e) {
+				if (PlatformUtil.OS_LINUX.equals(PlatformUtil.getOs())) {
+					createLogFunctions(browser); // TODO need to do this better
+				}
 				browser.execute("(function(){"
 										+ "if (window.console && console.log) {"
 										+	"window.console.log = browserSimConsoleLog;"
@@ -390,7 +395,8 @@ public class BrowserSim {
 								+ "})()");
 			}
 		});
-		
+	}
+
 	private void createLogFunctions(IBrowser browser) {
 		browser.registerBrowserFunction("browserSimConsoleLog", new JsLogFunction(browser,  null)); //$NON-NLS-1$  
 		browser.registerBrowserFunction("browserSimConsoleInfo", new JsLogFunction(browser,  MessageType.INFO)); //$NON-NLS-1$  
