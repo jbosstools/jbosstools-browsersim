@@ -15,10 +15,12 @@ import java.net.URISyntaxException;
 
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.SWTError;
+import org.eclipse.swt.browser.Browser;
 import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Shell;
 import org.jboss.tools.vpe.browsersim.browser.PlatformUtil;
+import org.jboss.tools.vpe.browsersim.browser.javafx.JavaFXBrowser;
 import org.jboss.tools.vpe.browsersim.ui.BrowserSim;
 import org.jboss.tools.vpe.browsersim.ui.CocoaUIEnhancer;
 import org.jboss.tools.vpe.browsersim.ui.ExceptionNotifier;
@@ -37,6 +39,20 @@ public class BrowserSimRunner {
 	public static final String NOT_STANDALONE = "-not-standalone"; //$NON-NLS-1$
 	public static final String ABOUT_BLANK = "about:blank"; //"http://www.w3schools.com/js/tryit_view.asp?filename=try_nav_useragent"; //$NON-NLS-1$
 	
+	private static boolean isJavaFxAvailable;
+	static {
+		if (PlatformUtil.OS_LINUX.equals(PlatformUtil.getOs())) {
+			isJavaFxAvailable = false; // JavaFx web engine is not supported on Linux
+		} else {
+			isJavaFxAvailable = BrowserSimUtil.loadJavaFX();
+		}
+
+		Shell tempShell = new Shell();
+		Browser tempSWTBrowser = new Browser(tempShell, SWT.WEBKIT);
+		JavaFXBrowser tempJavaFXBrowser = new JavaFXBrowser(tempShell);
+		tempSWTBrowser.dispose();
+	}
+	
 	public static void main(String[] args) {
 		Display display = null;
 		try {
@@ -44,12 +60,7 @@ public class BrowserSimRunner {
 				CocoaUIEnhancer.initializeMacOSMenuBar(Messages.BrowserSim_BROWSER_SIM);
 			}
 			
-			boolean isJavaFxAvailable;
-			if (PlatformUtil.OS_LINUX.equals(PlatformUtil.getOs())) {
-				isJavaFxAvailable = false; // JavaFx web engine is not supported on Linux
-			} else {
-				isJavaFxAvailable = BrowserSimUtil.loadJavaFX();
-			}
+			
 			
 			BrowserSimArgs browserSimArgs = BrowserSimArgs.parseArgs(args);
 			
@@ -73,11 +84,7 @@ public class BrowserSimRunner {
 				setShellAttributes(parent);
 				parent.open();
 			}
-			
-			if (isJavaFxAvailable) {
-				BrowserSimUtil.loadEngines();
-			}
-			
+
 			BrowserSim browserSim = new BrowserSim(url, parent);
 			browserSim.open(isJavaFxAvailable);
 

@@ -15,8 +15,6 @@ import java.lang.reflect.Method;
 import java.net.URL;
 import java.net.URLClassLoader;
 
-import org.eclipse.swt.SWT;
-import org.eclipse.swt.browser.Browser;
 import org.eclipse.swt.browser.LocationAdapter;
 import org.eclipse.swt.browser.LocationEvent;
 import org.eclipse.swt.events.DisposeEvent;
@@ -273,15 +271,5 @@ public class BrowserSimUtil {
 		} catch (Throwable t) {
 			BrowserSimLogger.logError("Unable to add " + file.getName() + " to classpath.", t); //$NON-NLS-1$ //$NON-NLS-2$
 		}
-	}
-
-	/**
-	 * Load SWT.WEBKIT and JavaFX WebKit - TODO need to do this better
-	 */
-	public static void loadEngines() {
-		Shell tempShell = new Shell(Display.getDefault());
-		JavaFXBrowser tempJavaFXBrowser = new JavaFXBrowser(tempShell);	
-		Browser tempSWTBrowser = new Browser(tempShell, SWT.WEBKIT);
-		tempSWTBrowser.dispose();
 	}
 }
