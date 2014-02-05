@@ -34,6 +34,7 @@ import org.eclipse.swt.widgets.MenuItem;
 import org.eclipse.swt.widgets.ProgressBar;
 import org.eclipse.swt.widgets.Shell;
 import org.eclipse.swt.widgets.Text;
+import org.jboss.tools.vpe.browsersim.BrowserSimArgs;
 import org.jboss.tools.vpe.browsersim.browser.IBrowser;
 import org.jboss.tools.vpe.browsersim.browser.WebKitBrowserFactory;
 import org.jboss.tools.vpe.browsersim.model.Device;
@@ -142,7 +143,7 @@ public class ToolsMenuCreator {
 		devToolsMenuItem.addSelectionListener(new SelectionAdapter() {
 			public void widgetSelected(SelectionEvent e) {
 				String message = "";
-				message = MessageFormat.format(Messages.BrowserSim_DEV_TOOLS_MESSAGE, "http://localhost:8087/inspector.html?host=localhost:8087&page=dtdb");
+				message = MessageFormat.format(Messages.BrowserSim_DEV_TOOLS_MESSAGE, "http://localhost:" + BrowserSimArgs.debuggerPort +"/inspector.html?host=localhost:" + BrowserSimArgs.debuggerPort +"&page=dtdb");
 				Shell parentShell = skin.getShell();
 				BrowserSimImageList imageList = new BrowserSimImageList(parentShell);
 				BrowserSimUtil.showDevToolsDialog(parentShell, message, imageList.getImage(DEV_TOOLS_ICON));

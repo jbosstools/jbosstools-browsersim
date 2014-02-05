@@ -56,7 +56,6 @@ public class BrowserSimRunner {
 	
 	public static void main(String[] args) {
 		Display display = null;
-		boolean debuggerStarted = false;
 		try {
 			if (PlatformUtil.OS_MACOSX.equals(PlatformUtil.getOs())) {
 				CocoaUIEnhancer.initializeMacOSMenuBar(Messages.BrowserSim_BROWSER_SIM);
@@ -90,7 +89,6 @@ public class BrowserSimRunner {
 			
             if (browserSim.getBrowser() instanceof JavaFXBrowser) {
                 DevToolsDebuggerServer.startDebugServer(((JavaFXBrowser)browserSim.getBrowser()).getDebugger());
-                debuggerStarted = true;
             }
 
 			display = Display.getDefault();
@@ -106,13 +104,6 @@ public class BrowserSimRunner {
 		} finally {
 			if (display != null) {
 				display.dispose();
-			}
-			if (debuggerStarted) {
-				try {
-					DevToolsDebuggerServer.stopDebugServer();
-				} catch (Exception e) {
-					BrowserSimLogger.logError(e.getMessage(), e);
-				}
 			}
 		}
 	}

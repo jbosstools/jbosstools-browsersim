@@ -10,6 +10,8 @@
  ******************************************************************************/
 package org.jboss.tools.vpe.browsersim;
 
+import java.io.IOException;
+import java.net.ServerSocket;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -21,6 +23,7 @@ public class BrowserSimArgs {
 	public static final String NOT_STANDALONE = "-not-standalone"; //$NON-NLS-1$
 	private String path;
 	public static boolean standalone;
+	public static int debuggerPort;
 	
 	private BrowserSimArgs(String path, boolean isStandalone) {
 		this.path = path;
@@ -40,6 +43,15 @@ public class BrowserSimArgs {
 		} else {
 			path = null;
 		}
+		
+		try {
+			ServerSocket socket = new ServerSocket(0);
+			debuggerPort = socket.getLocalPort();
+			socket.close();
+		} catch (IOException e) {
+			BrowserSimLogger.logError(e.getMessage(), e);
+		}
+		
 		
 		return new BrowserSimArgs(path, !notStandalone);
 	}

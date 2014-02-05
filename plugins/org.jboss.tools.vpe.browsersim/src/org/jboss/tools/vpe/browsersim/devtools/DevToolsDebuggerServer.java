@@ -20,6 +20,7 @@ import org.eclipse.jetty.server.Server;
 import org.eclipse.jetty.server.handler.HandlerList;
 import org.eclipse.jetty.server.handler.ResourceHandler;
 import org.eclipse.jetty.servlet.ServletContextHandler;
+import org.jboss.tools.vpe.browsersim.BrowserSimArgs;
 
 import com.sun.javafx.scene.web.Debugger;
 
@@ -32,7 +33,8 @@ public class DevToolsDebuggerServer {
 	private static Server server;
 	
 	public static void startDebugServer(Debugger debugger) throws Exception {
-		server = new Server(8087);
+		server = new Server(BrowserSimArgs.debuggerPort);
+		
 		debugger.setEnabled(true);
     	
     	final ServletContextHandler servletHandler = new ServletContextHandler(ServletContextHandler.SESSIONS);
@@ -79,5 +81,9 @@ public class DevToolsDebuggerServer {
 	            	debugger.sendMessage(data);
 	            }
 		 });
+	}
+	
+	public static String getServerState() {
+		return server == null ? null : server.getState();
 	}
 }

@@ -20,6 +20,7 @@ import java.util.Observer;
 
 import javafx.application.Platform;
 
+import org.eclipse.jetty.server.Server;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.browser.LocationAdapter;
 import org.eclipse.swt.browser.LocationEvent;
@@ -32,6 +33,8 @@ import org.eclipse.swt.browser.TitleEvent;
 import org.eclipse.swt.browser.TitleListener;
 import org.eclipse.swt.events.ControlAdapter;
 import org.eclipse.swt.events.ControlEvent;
+import org.eclipse.swt.events.DisposeEvent;
+import org.eclipse.swt.events.DisposeListener;
 import org.eclipse.swt.events.ShellEvent;
 import org.eclipse.swt.events.ShellListener;
 import org.eclipse.swt.graphics.Point;
@@ -50,6 +53,7 @@ import org.jboss.tools.vpe.browsersim.browser.IBrowserFunction;
 import org.jboss.tools.vpe.browsersim.browser.IDisposable;
 import org.jboss.tools.vpe.browsersim.browser.WebKitBrowserFactory;
 import org.jboss.tools.vpe.browsersim.browser.javafx.JavaFXBrowser;
+import org.jboss.tools.vpe.browsersim.devtools.DevToolsDebuggerServer;
 import org.jboss.tools.vpe.browsersim.model.Device;
 import org.jboss.tools.vpe.browsersim.model.preferences.BrowserSimSpecificPreferencesStorage;
 import org.jboss.tools.vpe.browsersim.model.preferences.CommonPreferences;
@@ -185,6 +189,17 @@ public class BrowserSim {
 					CommonPreferencesStorage.INSTANCE.save(commonPreferences);
 				}
 				commonPreferences.deleteObserver(commonPreferencesObserver);
+			}
+		});
+		
+		shell.addDisposeListener(new DisposeListener() {
+			@Override
+			public void widgetDisposed(DisposeEvent arg0) {
+				try {
+					DevToolsDebuggerServer.stopDebugServer();
+				} catch (Exception e) {
+					BrowserSimLogger.logError(e.getMessage(), e);
+				}
 			}
 		});
 		
@@ -428,6 +443,14 @@ public class BrowserSim {
 	private void changeSkinOrEngine(Class<? extends BrowserSimSkin> newSkinClass, Device device,  Point currentLocation, String oldSkinUrl) {
 		initSkin(newSkinClass, currentLocation, parentShell);
 		fireSkinChangeEvent();
+		
+		if (skin.getBrowser() instanceof JavaFXBrowser && !Server.STARTED.equals(DevToolsDebuggerServer.getServerState())) {
+            try {
+				DevToolsDebuggerServer.startDebugServer(((JavaFXBrowser)skin.getBrowser()).getDebugger());
+			} catch (Exception e) {
+				BrowserSimLogger.logError(e.getMessage(), e);
+			}
+        }
 		
 		setOrientation(specificPreferences.getOrientationAngle(), device);
 		skin.getBrowser().setUserAgent(device.getUserAgent());
