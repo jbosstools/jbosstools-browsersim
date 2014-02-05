@@ -487,31 +487,27 @@ public class BrowserSim {
 	private void initLiveReloadLocationAdapter() {
 		liveReloadLocationAdapter = new LocationAdapter() {
 			@Override
-			public void changed(LocationEvent event) {
+			public void changed(final LocationEvent event) {
 				if (isLivereloadAvailable()) {
-					IBrowser browser = (IBrowser) event.widget;
-					browser.execute("if (!window.LiveReload) {" + //$NON-NLS-1$
-										"window.addEventListener('load', function(){" + //$NON-NLS-1$
-											"var e = document.createElement('script');" + //$NON-NLS-1$
-											"e.type = 'text/javascript';" + //$NON-NLS-1$
-											"e.async = 'true';" + //$NON-NLS-1$
-											"e.src = 'http://localhost:" + specificPreferences.getLiveReloadPort() + "/livereload.js';" + //$NON-NLS-1$ //$NON-NLS-2$
-											"document.head.appendChild(e);" + //$NON-NLS-1$
-										"});" + //$NON-NLS-1$
-									"}"); //$NON-NLS-1$
+					Platform.runLater(new Runnable() {
+						@Override
+						public void run() {
+							processLiveReloadEvent(event);
+						}
+					});
 				} else {
 					MessageBox warning = new MessageBox(parentShell, SWT.ICON_WARNING);
 					warning.setText(Messages.WARNING);
 					warning.setMessage(Messages.BrowserSim_LIVERELOAD_WARNING);
 					warning.open();
-					
+
 					skin.getBrowser().removeLocationListener(liveReloadLocationAdapter);
 					specificPreferences.setEnableLiveReload(false);	
 				}
 			}
 		};
 	}
-	
+
 	private boolean isLivereloadAvailable() {
 		try {
 			HttpURLConnection.setFollowRedirects(false);
@@ -523,12 +519,31 @@ public class BrowserSim {
 			return false;
 		}
 	}
+
+	private void processLiveReloadEvent(final LocationEvent event) {
+		IBrowser browser = (IBrowser) event.widget;
+		browser.execute("if (!window.LiveReload) {" + //$NON-NLS-1$
+				"window.addEventListener('load', function(){" + //$NON-NLS-1$
+					"var e = document.createElement('script');" + //$NON-NLS-1$
+					"e.type = 'text/javascript';" + //$NON-NLS-1$
+					"e.async = 'true';" + //$NON-NLS-1$
+					"e.src = 'http://localhost:" + specificPreferences.getLiveReloadPort() + "/livereload.js';" + //$NON-NLS-1$ //$NON-NLS-2$
+					"document.head.appendChild(e);" + //$NON-NLS-1$
+				"});" + //$NON-NLS-1$
+			"}"); //$NON-NLS-1$
+	}
 	
 	private void initTouchEventsLocationAdapter() {
 		touchEventsLocationAdapter = new LocationAdapter() {
 			@Override
-			public void changed(LocationEvent event) {
-				TouchSupportLoader.initTouchEvents((IBrowser) event.widget);
+			public void changed(final LocationEvent event) {
+				Platform.runLater(new Runnable() {
+
+					@Override
+					public void run() {
+						TouchSupportLoader.initTouchEvents((IBrowser) event.widget);						
+					}
+				});
 			}
 		};
 	}
