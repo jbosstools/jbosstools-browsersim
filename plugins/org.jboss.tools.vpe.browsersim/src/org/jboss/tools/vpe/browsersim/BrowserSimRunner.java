@@ -41,6 +41,11 @@ public class BrowserSimRunner {
 	public static final String ABOUT_BLANK = "about:blank"; //"http://www.w3schools.com/js/tryit_view.asp?filename=try_nav_useragent"; //$NON-NLS-1$
 	
 	private static boolean isJavaFxAvailable;
+	static {
+		if (PlatformUtil.OS_MACOSX.equals(PlatformUtil.getOs())) {
+			CocoaUIEnhancer.initializeMacOSMenuBar(Messages.BrowserSim_BROWSER_SIM);
+		}
+	}
 	static { // TODO need to do this better
 		if (PlatformUtil.OS_LINUX.equals(PlatformUtil.getOs())) {
 			isJavaFxAvailable = false; // JavaFx web engine is not supported on Linux
@@ -57,10 +62,6 @@ public class BrowserSimRunner {
 	public static void main(String[] args) {
 		Display display = null;
 		try {
-			if (PlatformUtil.OS_MACOSX.equals(PlatformUtil.getOs())) {
-				CocoaUIEnhancer.initializeMacOSMenuBar(Messages.BrowserSim_BROWSER_SIM);
-			}
-			
 			BrowserSimArgs browserSimArgs = BrowserSimArgs.parseArgs(args);
 			
 			String path = browserSimArgs.getPath();
