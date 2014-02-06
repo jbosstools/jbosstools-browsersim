@@ -15,6 +15,8 @@ import java.lang.reflect.Method;
 import java.net.URL;
 import java.net.URLClassLoader;
 
+import org.eclipse.swt.SWT;
+import org.eclipse.swt.browser.Browser;
 import org.eclipse.swt.browser.LocationAdapter;
 import org.eclipse.swt.browser.LocationEvent;
 import org.eclipse.swt.events.DisposeEvent;
@@ -42,6 +44,12 @@ import org.jboss.tools.vpe.browsersim.ui.skin.BrowserSimSkin;
  * @author Konstantin Marmalyukov (kmarmaliykov)
  */
 public class BrowserSimUtil {
+	/**
+	 * After Java7u51 loading SWT.WEBKIT before JavaFX webkit causes an error 
+	 * @see https://javafx-jira.kenai.com/browse/RT-35480
+	 */
+	private static final String java7u51 = "1.7.0_51"; //$NON-NLS-1$
+	
 	private static void fixShellLocation(Shell shell) {
 		Rectangle allClientArea = shell.getMonitor().getClientArea();
 		
@@ -274,6 +282,31 @@ public class BrowserSimUtil {
 			method.invoke(sysloader, new Object[] { u });
 		} catch (Throwable t) {
 			BrowserSimLogger.logError("Unable to add " + file.getName() + " to classpath.", t); //$NON-NLS-1$ //$NON-NLS-2$
+		}
+	}
+	
+	/**
+	 * We need to do this to make switcher work properly.
+	 * We need to load both SWT.WEBKIT and JavaFx WebKit to make switcher working properly.
+	 * 
+	 * After Java7u51 loading SWT.WEBKIT before JavaFX webkit causes an error.
+	 * For Java7u45 and earlier loading JavaFX Webkit before SWT Webkit causes a SWT Error.
+	 * 
+	 * @see JBIDE-16405
+	 * @see https://javafx-jira.kenai.com/browse/RT-35480
+	 */
+	@SuppressWarnings("unused")
+	public static void loadWebkitLibraries() {
+		Shell tempShell = new Shell();
+		String javaVersion = System.getProperty("java.version"); //$NON-NLS-1$
+		if (java7u51.compareTo(javaVersion) > 0) {
+			Browser tempSWTBrowser = new Browser(tempShell, SWT.WEBKIT);
+			JavaFXBrowser tempJavaFXBrowser = new JavaFXBrowser(tempShell);
+			tempSWTBrowser.dispose();
+		} else {
+			JavaFXBrowser tempJavaFXBrowser = new JavaFXBrowser(tempShell);
+			Browser tempSWTBrowser = new Browser(tempShell, SWT.WEBKIT);
+			tempSWTBrowser.dispose();
 		}
 	}
 }

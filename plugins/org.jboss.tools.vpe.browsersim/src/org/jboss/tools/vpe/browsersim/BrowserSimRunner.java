@@ -15,7 +15,6 @@ import java.net.URISyntaxException;
 
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.SWTError;
-import org.eclipse.swt.browser.Browser;
 import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Shell;
@@ -51,12 +50,10 @@ public class BrowserSimRunner {
 			isJavaFxAvailable = false; // JavaFx web engine is not supported on Linux
 		} else {
 			isJavaFxAvailable = BrowserSimUtil.loadJavaFX();
+			if (isJavaFxAvailable) {
+				BrowserSimUtil.loadWebkitLibraries();
+			}
 		}
-
-		Shell tempShell = new Shell();
-		Browser tempSWTBrowser = new Browser(tempShell, SWT.WEBKIT);
-		JavaFXBrowser tempJavaFXBrowser = new JavaFXBrowser(tempShell);
-		tempSWTBrowser.dispose();
 	}
 	
 	public static void main(String[] args) {
