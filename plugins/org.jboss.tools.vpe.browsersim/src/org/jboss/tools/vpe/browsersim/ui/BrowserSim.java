@@ -558,7 +558,7 @@ public class BrowserSim {
 						}
 					});
 				} else {
-					MessageBox warning = new MessageBox(parentShell, SWT.ICON_WARNING);
+					MessageBox warning = new MessageBox(skin.getShell(), SWT.ICON_WARNING);
 					warning.setText(Messages.WARNING);
 					warning.setMessage(Messages.BrowserSim_LIVERELOAD_WARNING);
 					warning.open();
