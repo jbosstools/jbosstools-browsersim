@@ -242,7 +242,11 @@ public class BrowserSimMenuCreator {
 		about.setText(Messages.BrowserSim_ABOUT);
 		about.addSelectionListener(new SelectionAdapter() {
 			public void widgetSelected(SelectionEvent e) {
-				showAboutDialog(e.display.getActiveShell());
+				Shell parentShell = e.display.getActiveShell();
+				if (parentShell == null) {
+					parentShell = e.display.getShells()[0]; // Hot fix for gtk3
+				}				
+				showAboutDialog(parentShell);
 			}
 		});
 	}

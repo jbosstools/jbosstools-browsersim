@@ -137,7 +137,11 @@ public class FileMenuCreator {
 		preferences.setText(Messages.BrowserSim_PREFERENCES);
 		preferences.addSelectionListener(new SelectionAdapter() {
 			public void widgetSelected(SelectionEvent e) {
-				PreferencesWrapper pw = new ManageDevicesDialog(Display.getDefault().getActiveShell(), SWT.APPLICATION_MODAL
+				Shell parentShell = Display.getDefault().getActiveShell();
+				if (parentShell == null) {
+					parentShell = Display.getDefault().getShells()[0]; // Hot fix for gtk3
+				}
+				PreferencesWrapper pw = new ManageDevicesDialog(parentShell, SWT.APPLICATION_MODAL
 						| SWT.SHELL_TRIM, commonPreferences, specificPreferences).open();
 				if (pw != null) {
 					commonPreferences.copyProperties(pw.getCommonPreferences());

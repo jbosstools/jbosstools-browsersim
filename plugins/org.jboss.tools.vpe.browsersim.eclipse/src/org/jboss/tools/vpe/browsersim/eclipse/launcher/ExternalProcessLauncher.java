@@ -113,6 +113,9 @@ public class ExternalProcessLauncher {
 					@Override
 					public void run() {
 						Shell shell = Display.getDefault().getActiveShell();
+						if (shell == null) {
+							shell = Display.getDefault().getShells()[0]; // Hot fix for gtk3 
+						}
 						BrowserSimErrorDialog e = new BrowserSimErrorDialog(shell, Messages.ExternalProcessLauncher_ERROR, shell.getDisplay().getSystemImage(SWT.ICON_ERROR),
 								programName, MessageDialog.ERROR, new String[] {IDialogConstants.OK_LABEL}, 0); 
 						e.open();
