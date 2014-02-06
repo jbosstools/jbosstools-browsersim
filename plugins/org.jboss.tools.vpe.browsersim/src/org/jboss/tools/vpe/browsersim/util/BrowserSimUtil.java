@@ -49,6 +49,7 @@ public class BrowserSimUtil {
 	 * @see https://javafx-jira.kenai.com/browse/RT-35480
 	 */
 	private static final String java7u51 = "1.7.0_51"; //$NON-NLS-1$
+	private static final String[] BROWSERSIM_ICONS = {"icons/browsersim_16px.png", "icons/browsersim_32px.png", "icons/browsersim_64px.png", "icons/browsersim_128px.png", "icons/browsersim_256px.png", }; //$NON-NLS-1$//$NON-NLS-2$//$NON-NLS-3$//$NON-NLS-4$//$NON-NLS-5$
 	
 	private static void fixShellLocation(Shell shell) {
 		Rectangle allClientArea = shell.getMonitor().getClientArea();
@@ -308,5 +309,22 @@ public class BrowserSimUtil {
 			Browser tempSWTBrowser = new Browser(tempShell, SWT.WEBKIT);
 			tempSWTBrowser.dispose();
 		}
+	}
+	
+	
+	private static Image[] initImages(Shell shell) {
+		BrowserSimImageList imageList = new BrowserSimImageList(shell);
+		Image[] icons = new Image[BROWSERSIM_ICONS.length];
+		for (int i = 0; i < BROWSERSIM_ICONS.length; i++) {
+			icons[i] = imageList.getImage(BROWSERSIM_ICONS[i]);
+		}
+		
+		return icons;
+	}
+
+	public static void setShellAttributes(Shell shell) {
+		Image[] icons = initImages(shell);
+		shell.setImages(icons);
+		shell.setText(Messages.BrowserSim_BROWSER_SIM);
 	}
 }

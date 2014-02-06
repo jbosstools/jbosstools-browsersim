@@ -45,13 +45,12 @@ import org.eclipse.swt.widgets.Menu;
 import org.eclipse.swt.widgets.MessageBox;
 import org.eclipse.swt.widgets.Shell;
 import org.jboss.tools.vpe.browsersim.BrowserSimLogger;
-import org.jboss.tools.vpe.browsersim.BrowserSimRunner;
 import org.jboss.tools.vpe.browsersim.browser.ExtendedOpenWindowListener;
 import org.jboss.tools.vpe.browsersim.browser.ExtendedWindowEvent;
-import org.jboss.tools.vpe.browsersim.browser.PlatformUtil;
 import org.jboss.tools.vpe.browsersim.browser.IBrowser;
 import org.jboss.tools.vpe.browsersim.browser.IBrowserFunction;
 import org.jboss.tools.vpe.browsersim.browser.IDisposable;
+import org.jboss.tools.vpe.browsersim.browser.PlatformUtil;
 import org.jboss.tools.vpe.browsersim.browser.WebKitBrowserFactory;
 import org.jboss.tools.vpe.browsersim.browser.javafx.JavaFXBrowser;
 import org.jboss.tools.vpe.browsersim.devtools.DevToolsDebuggerServer;
@@ -243,7 +242,7 @@ public class BrowserSim {
 			}
 		});
 		menuCreator.addMenuBar();
-		BrowserSimRunner.setShellAttributes(shell);
+		BrowserSimUtil.setShellAttributes(shell);
 		
 		skin.setControlHandler(controlHandler);
 		
