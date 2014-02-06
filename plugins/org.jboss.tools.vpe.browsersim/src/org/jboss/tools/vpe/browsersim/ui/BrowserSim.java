@@ -551,12 +551,16 @@ public class BrowserSim {
 			@Override
 			public void changed(final LocationEvent event) {
 				if (isLivereloadAvailable()) {
-					Platform.runLater(new Runnable() {
-						@Override
-						public void run() {
-							processLiveReloadEvent(event);
-						}
-					});
+					if (specificPreferences.isJavaFx()) {
+						Platform.runLater(new Runnable() {
+							@Override
+							public void run() {
+								processLiveReloadEvent(event);
+							}
+						});
+					} else {
+						processLiveReloadEvent(event);
+					}
 				} else {
 					MessageBox warning = new MessageBox(skin.getShell(), SWT.ICON_WARNING);
 					warning.setText(Messages.WARNING);
@@ -599,13 +603,16 @@ public class BrowserSim {
 		touchEventsLocationAdapter = new LocationAdapter() {
 			@Override
 			public void changed(final LocationEvent event) {
-				Platform.runLater(new Runnable() {
-
-					@Override
-					public void run() {
-						TouchSupportLoader.initTouchEvents((IBrowser) event.widget);						
-					}
-				});
+				if (specificPreferences.isJavaFx()) {
+					Platform.runLater(new Runnable() {
+						@Override
+						public void run() {
+							TouchSupportLoader.initTouchEvents((IBrowser) event.widget);
+						}
+					});
+				} else {
+					TouchSupportLoader.initTouchEvents((IBrowser) event.widget);
+				}
 			}
 		};
 	}
