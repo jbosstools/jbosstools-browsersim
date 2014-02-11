@@ -35,6 +35,7 @@ import org.eclipse.swt.widgets.Event;
 import org.eclipse.swt.widgets.Group;
 import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Listener;
+import org.eclipse.swt.widgets.MessageBox;
 import org.eclipse.swt.widgets.Shell;
 import org.eclipse.swt.widgets.TabFolder;
 import org.eclipse.swt.widgets.TabItem;
@@ -57,7 +58,10 @@ import org.jboss.tools.vpe.browsersim.util.BrowserSimUtil;
  * @author Yahor Radtsevich (yradtsevich)
  */
 public class ManageDevicesDialog extends Dialog {
-
+	/** @see org.jboss.tools.vpe.browsersim.eclipse.callbacks.RestartCallback */
+	private static final String BROWSERSIM_RESTART_COMMAND = "org.jboss.tools.vpe.browsersim.command.restart:"; //$NON-NLS-1$
+	
+	private String currentUrl;
 	protected CommonPreferences oldCommonPreferences;
 	protected SpecificPreferences oldSpecificPreferences;
 	protected Map<String, Device> devices;
@@ -83,6 +87,9 @@ public class ManageDevicesDialog extends Dialog {
 	protected Button touchEventsCheckBox;
 	protected Label liveReloadPortLabel;
 	protected Text liveReloadPortText;
+	protected Text screenshotsPath;
+	protected Text weinreScriptUrlText;
+	protected Text weinreClientUrlText;	
 
 	protected Button buttonEdit;
 	protected Button buttonRemove;
@@ -93,7 +100,7 @@ public class ManageDevicesDialog extends Dialog {
 	 * @param style
 	 * @param oldDevicesList 
 	 */
-	public ManageDevicesDialog(Shell parent, int style, CommonPreferences oldCommonPreferences, SpecificPreferences oldSpecificPreferences) {
+	public ManageDevicesDialog(Shell parent, int style, CommonPreferences oldCommonPreferences, SpecificPreferences oldSpecificPreferences, String currentUrl) {
 		super(parent, style);
 		setText(Messages.ManageDevicesDialog_PREFERENCES);
 		this.oldCommonPreferences = oldCommonPreferences;
@@ -108,6 +115,7 @@ public class ManageDevicesDialog extends Dialog {
 		this.enableTouchEvents = oldSpecificPreferences.isEnableTouchEvents();
 		this.truncateWindow = oldCommonPreferences.getTruncateWindow();
 		this.isJavaFx = oldSpecificPreferences.isJavaFx();
+		this.currentUrl = currentUrl;
 	} 
 	
 	/**
@@ -405,7 +413,7 @@ public class ManageDevicesDialog extends Dialog {
 		
 		Label screenshotsLabel = new Label(screnshotGroup, SWT.NONE);
 		screenshotsLabel.setText(Messages.ManageDevicesDialog_LOCATION);		
-		final Text screenshotsPath = new Text(screnshotGroup, SWT.BORDER);
+		screenshotsPath = new Text(screnshotGroup, SWT.BORDER);
 		screenshotsPath.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, true, true));
 		screenshotsPath.setText(oldCommonPreferences.getScreenshotsFolder());
 		
@@ -432,13 +440,13 @@ public class ManageDevicesDialog extends Dialog {
 		
 		Label weinreScriptUrlLabel = new Label(weinreGroup, SWT.NONE);
 		weinreScriptUrlLabel.setText(Messages.ManageDevicesDialog_WEINRE_SCRIPT_URL);
-		final Text weinreScriptUrlText = new Text(weinreGroup, SWT.BORDER);
+		weinreScriptUrlText = new Text(weinreGroup, SWT.BORDER);
 		weinreScriptUrlText.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, true, true));
 		weinreScriptUrlText.setText(oldCommonPreferences.getWeinreScriptUrl());
 		
 		Label weinreClientUrlLabel = new Label(weinreGroup, SWT.NONE);
 		weinreClientUrlLabel.setText(Messages.ManageDevicesDialog_WEINRE_CLIENT_URL);
-		final Text weinreClientUrlText = new Text(weinreGroup, SWT.BORDER);
+		weinreClientUrlText = new Text(weinreGroup, SWT.BORDER);
 		weinreClientUrlText.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, true, true));
 		weinreClientUrlText.setText(oldCommonPreferences.getWeinreClientUrl());
 		
@@ -480,10 +488,17 @@ public class ManageDevicesDialog extends Dialog {
 		shell.setDefaultButton(buttonOk);
 		buttonOk.addSelectionListener(new SelectionAdapter() {
 			public void widgetSelected(SelectionEvent e) {
-				newCommonPreferences = new CommonPreferences(devices, truncateWindow, screenshotsPath.getText(),
-						weinreScriptUrlText.getText(), weinreClientUrlText.getText());
-				newSpecificPreferences = create(selectedDeviceId, useSkins, enableLiveReload, getLiveReloadPort(), touchEventsCheckBox.getSelection(), isJavaFx);
-				shell.close();
+				if (isJavaFx != oldSpecificPreferences.isJavaFx() && !PlatformUtil.OS_MACOSX.equals(PlatformUtil.getOs())) {
+					int result = showEngineSwitchConfirmationDialog();
+					if (result == SWT.OK) {
+						restart();
+					}
+				} else {
+					newCommonPreferences = new CommonPreferences(devices, truncateWindow, screenshotsPath.getText(),
+							weinreScriptUrlText.getText(), weinreClientUrlText.getText());
+					newSpecificPreferences = create(selectedDeviceId, useSkins, enableLiveReload, getLiveReloadPort(), touchEventsCheckBox.getSelection(), isJavaFx);
+					shell.close();
+				}
 			}
 		});
 		
@@ -501,8 +516,18 @@ public class ManageDevicesDialog extends Dialog {
 		updateDevices();
 	}
 	
+	private void restart() {
+		newCommonPreferences = new CommonPreferences(devices, truncateWindow, screenshotsPath.getText(),
+				weinreScriptUrlText.getText(), weinreClientUrlText.getText());
+		newSpecificPreferences = create(selectedDeviceId, useSkins, enableLiveReload, getLiveReloadPort(), touchEventsCheckBox.getSelection(), isJavaFx);
+		getSpecificPreferencesStorage().save(newSpecificPreferences);
+		CommonPreferencesStorage.INSTANCE.save(newCommonPreferences);
+		Display.getDefault().dispose();						
+		sendRestartCommand();
+	}
+	
 	private void disableWebEngineSwitcherIfJavaFxNotAvailable(Button javaFXBrowserRadio, Group browserTypeGroup) {
-		String message = "";
+		String message = ""; //$NON-NLS-1$
 		// JavaFx is compiled against gtk 2, which makes it unusable on Linux - https://bugs.eclipse.org/bugs/show_bug.cgi?id=420182
 		if (PlatformUtil.OS_LINUX.equals(PlatformUtil.getOs())) {
 			message = Messages.ManageDevicesDialog_BROWSER_ENGINE_WARNING_ON_LINUX;
@@ -573,6 +598,13 @@ public class ManageDevicesDialog extends Dialog {
 		return port.isEmpty() ? SpecificPreferencesStorage.DEFAULT_LIVE_RELOAD_PORT : Integer.parseInt(port);
 	}
 	
+	private int showEngineSwitchConfirmationDialog() {
+		MessageBox dialog = new MessageBox(shell, SWT.ICON_QUESTION	| SWT.OK | SWT.CANCEL);
+		dialog.setText("BrowserSim"); //$NON-NLS-1$
+		dialog.setMessage("Changing browser engine requires restart. Do you want to restart BrowserSim now?"); //$NON-NLS-1$
+		return dialog.open();
+	}
+	
 	/**
 	 * {@link SpecificPreferencesStorage} factory method.
 	 * 
@@ -584,6 +616,10 @@ public class ManageDevicesDialog extends Dialog {
 	
 	protected SpecificPreferences create(String selectedDeviceId, boolean useSkins, boolean enableLiveReload, int liveReloadPort, boolean enableTouchEvents, boolean isJavaFx) {
 		return new BrowserSimSpecificPreferences(selectedDeviceId, useSkins, enableLiveReload, liveReloadPort, enableTouchEvents,
-				oldSpecificPreferences.getOrientationAngle(), oldSpecificPreferences.getLocation(), isJavaFx);
+				oldSpecificPreferences.getOrientationAngle(), getParent().getLocation(), isJavaFx);
+	}
+
+	protected void sendRestartCommand() {
+		System.out.println(BROWSERSIM_RESTART_COMMAND + currentUrl);
 	}
 }

@@ -309,7 +309,7 @@ public class BrowserSimMenuCreator {
 				public void run() {
 					Shell shell = getParentShell();
 					PreferencesWrapper pw = new ManageDevicesDialog(shell, SWT.APPLICATION_MODAL | SWT.SHELL_TRIM,
-							commonPreferences, specificPreferences).open();
+							commonPreferences, specificPreferences, skin.getBrowser().getUrl()).open();
 					if (pw != null) {
 						commonPreferences.copyProperties(pw.getCommonPreferences());
 						specificPreferences.copyProperties(pw.getSpecificPreferences());
@@ -336,7 +336,7 @@ public class BrowserSimMenuCreator {
 	}
 	
 	private void showAboutDialog(Shell shell) {
-		String message = "";
+		String message = ""; //$NON-NLS-1$
 		String version = ManifestUtil.getManifestVersion();
 		if (version != null) {
 			message = MessageFormat.format(Messages.BrowserSim_ABOUT_BROWSERSIM_MESSAGE, ManifestUtil.getManifestVersion());

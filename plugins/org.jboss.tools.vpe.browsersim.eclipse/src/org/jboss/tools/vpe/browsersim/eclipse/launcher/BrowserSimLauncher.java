@@ -20,6 +20,7 @@ import org.eclipse.jface.preference.IPreferenceStore;
 import org.jboss.tools.vpe.browsersim.browser.PlatformUtil;
 import org.jboss.tools.vpe.browsersim.eclipse.callbacks.JsLogCallback;
 import org.jboss.tools.vpe.browsersim.eclipse.callbacks.LogCallback;
+import org.jboss.tools.vpe.browsersim.eclipse.callbacks.RestartCallback;
 import org.jboss.tools.vpe.browsersim.eclipse.Activator;
 import org.jboss.tools.vpe.browsersim.eclipse.Messages;
 import org.jboss.tools.vpe.browsersim.eclipse.callbacks.OpenFileCallback;
@@ -37,7 +38,8 @@ public class BrowserSimLauncher {
 		new ViewSourceCallback(),
 		new OpenFileCallback(),
 		new LogCallback(),
-		new JsLogCallback()
+		new JsLogCallback(),
+		new RestartCallback()
 	);
 	public static final List<String> BUNDLES = getBundles();
 	public static final List<String> RESOURCES_BUNDLES = Arrays.asList(

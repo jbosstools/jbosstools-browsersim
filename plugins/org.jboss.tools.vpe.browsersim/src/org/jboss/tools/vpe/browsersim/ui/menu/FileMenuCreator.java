@@ -59,7 +59,7 @@ public class FileMenuCreator {
 
 		// If Platform is Mac OS X, application will have no duplicated menu items (Preferences)
 		if (!PlatformUtil.OS_MACOSX.equals(PlatformUtil.getOs())) {
-			addPreferencesItem(menu, commonPreferences, specificPreferences);
+			addPreferencesItem(menu, commonPreferences, specificPreferences, skin.getBrowser().getUrl());
 		}
 	}
 	
@@ -132,7 +132,8 @@ public class FileMenuCreator {
 		System.out.println(base64Source);
 	}
 	
-	private void addPreferencesItem(Menu menu, final CommonPreferences commonPreferences, final SpecificPreferences specificPreferences) {
+	private void addPreferencesItem(Menu menu, final CommonPreferences commonPreferences,
+			final SpecificPreferences specificPreferences, final String currentUrl) {
 		MenuItem preferences = new MenuItem(menu, SWT.PUSH);
 		preferences.setText(Messages.BrowserSim_PREFERENCES);
 		preferences.addSelectionListener(new SelectionAdapter() {
@@ -141,8 +142,7 @@ public class FileMenuCreator {
 				if (parentShell == null) {
 					parentShell = Display.getDefault().getShells()[0]; // Hot fix for gtk3
 				}
-				PreferencesWrapper pw = new ManageDevicesDialog(parentShell, SWT.APPLICATION_MODAL
-						| SWT.SHELL_TRIM, commonPreferences, specificPreferences).open();
+				PreferencesWrapper pw = openDialog(parentShell, commonPreferences, specificPreferences, currentUrl);
 				if (pw != null) {
 					commonPreferences.copyProperties(pw.getCommonPreferences());
 					specificPreferences.copyProperties(pw.getSpecificPreferences());
@@ -151,5 +151,11 @@ public class FileMenuCreator {
 				}
 			}
 		});
+	}
+	
+	protected PreferencesWrapper openDialog(Shell parentShell, CommonPreferences commonPreferences,
+			SpecificPreferences specificPreferences, String currentUrl) {
+		return new ManageDevicesDialog(parentShell, SWT.APPLICATION_MODAL
+				| SWT.SHELL_TRIM, commonPreferences, specificPreferences, currentUrl).open();
 	}
 }
