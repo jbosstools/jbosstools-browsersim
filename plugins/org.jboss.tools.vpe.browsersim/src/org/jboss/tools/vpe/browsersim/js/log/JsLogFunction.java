@@ -21,7 +21,7 @@ import org.jboss.tools.vpe.browsersim.browser.IBrowserFunction;
  * @author Ilya Buziuk (ibuziuk)
  */
 public class JsLogFunction implements IBrowserFunction {
-	private MessageType type; 
+	private MessageType type;
 
 	public JsLogFunction(IBrowser browser, MessageType type) {
 		this.type = type;
@@ -44,7 +44,7 @@ public class JsLogFunction implements IBrowserFunction {
 	public void addTypeInfo(Object[] arguments, MessageType type) {
 		if (type != null && arguments != null && arguments.length >= 1) {
 			arguments[0] = type.toString() + ": " + arguments[0]; //$NON-NLS-1$
-		}
+		} 
 	}
 	
 }

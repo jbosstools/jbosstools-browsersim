@@ -50,10 +50,10 @@ import org.jboss.tools.vpe.browsersim.browser.ExtendedWindowEvent;
 import org.jboss.tools.vpe.browsersim.browser.IBrowser;
 import org.jboss.tools.vpe.browsersim.browser.IBrowserFunction;
 import org.jboss.tools.vpe.browsersim.browser.IDisposable;
-import org.jboss.tools.vpe.browsersim.browser.PlatformUtil;
 import org.jboss.tools.vpe.browsersim.browser.WebKitBrowserFactory;
 import org.jboss.tools.vpe.browsersim.browser.javafx.JavaFXBrowser;
 import org.jboss.tools.vpe.browsersim.devtools.DevToolsDebuggerServer;
+import org.jboss.tools.vpe.browsersim.js.log.ConsoleLogConstants;
 import org.jboss.tools.vpe.browsersim.js.log.JsLogFunction;
 import org.jboss.tools.vpe.browsersim.js.log.MessageType;
 import org.jboss.tools.vpe.browsersim.model.Device;
@@ -366,41 +366,54 @@ public class BrowserSim {
 			}
 		});
 		
-		if (!specificPreferences.isJavaFx()) {
-			overrideJsConsoleLog(browser); // JBIDE-15932
-		}
+		overrideJsConsoleLog(browser); // JBIDE-15932		
 	}
 	
 	// JBIDE-15932 need to display console logs especially during startup
 	private void overrideJsConsoleLog(final IBrowser browser) {	
-		createLogFunctions(browser);
 		browser.addLocationListener(new LocationAdapter() {  
 			@Override
 			@SuppressWarnings("nls")
 			public void changed(LocationEvent e) {
-				if (PlatformUtil.OS_LINUX.equals(PlatformUtil.getOs())) {
-					createLogFunctions(browser); // TODO need to do this better
-				}
-				browser.execute("(function(){"
-										+ "if (window.console && console.log) {"
-										+	"window.console.log = browserSimConsoleLog;"
-										+	"window.console.info = browserSimConsoleInfo;"
-										+	"window.console.warn = browserSimConsoleWarn;" 
-										+	"window.console.error = browserSimConsoleError;"
+				createLogFunctions(browser); 
+				browser.execute("(function() {"
+										+ "if (window.console) {"
+										//  Adding BrowserFunction to the process of logging
+										+ 	"var originalConsole = window.console;"
+										+ 	"console = {"
+										+		"log: function(message) {"
+										+			"originalConsole.log(message);"
+										+			ConsoleLogConstants.BROSERSIM_CONSOLE_LOG + "(message);"
+										+		"},"
+										+		"info: function(message) {"
+										+			"originalConsole.info(message);"
+										+			ConsoleLogConstants.BROSERSIM_CONSOLE_INFO + "(message);"
+										+		"}," 
+										+		"warn: function(message) {"
+										+			"originalConsole.warn(message);"
+										+			ConsoleLogConstants.BROSERSIM_CONSOLE_WARN + "(message);"
+										+		"},"  
+										+		"error: function(message) {"
+										+			"originalConsole.error(message);"
+										+			ConsoleLogConstants.BROSERSIM_CONSOLE_ERROR + "(message);"
+										+		"}"  
+										+ 	"};"
+
+										// Overriding window.onerror 
 										+	"window.onerror = function(msg, url, lineNumber) {"
-										+		"console.log('ERROR: ' + msg + ' on line ' + lineNumber + ' for ' + url);"
+										+		"console.error(msg + ' on line ' + lineNumber + ' for ' + url);" 
 										+	"}"
 										+ "}"
-								+ "})()");
+								+ "})();");
 			}
 		});
 	}
 
 	private void createLogFunctions(IBrowser browser) {
-		browser.registerBrowserFunction("browserSimConsoleLog", new JsLogFunction(browser,  null)); //$NON-NLS-1$  
-		browser.registerBrowserFunction("browserSimConsoleInfo", new JsLogFunction(browser,  MessageType.INFO)); //$NON-NLS-1$  
-		browser.registerBrowserFunction("browserSimConsoleWarn", new JsLogFunction(browser,  MessageType.WARN)); //$NON-NLS-1$  
-		browser.registerBrowserFunction("browserSimConsoleError", new JsLogFunction(browser,  MessageType.ERROR)); //$NON-NLS-1$  
+		browser.registerBrowserFunction(ConsoleLogConstants.BROSERSIM_CONSOLE_LOG, new JsLogFunction(browser,  MessageType.LOG)); 
+		browser.registerBrowserFunction(ConsoleLogConstants.BROSERSIM_CONSOLE_INFO, new JsLogFunction(browser,  MessageType.INFO));  
+		browser.registerBrowserFunction(ConsoleLogConstants.BROSERSIM_CONSOLE_WARN, new JsLogFunction(browser,  MessageType.WARN));  
+		browser.registerBrowserFunction(ConsoleLogConstants.BROSERSIM_CONSOLE_ERROR, new JsLogFunction(browser,  MessageType.ERROR));  
 	}
 
 	private void initObservers() {

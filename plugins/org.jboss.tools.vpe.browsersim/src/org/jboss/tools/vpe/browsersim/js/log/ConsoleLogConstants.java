@@ -13,22 +13,13 @@ package org.jboss.tools.vpe.browsersim.js.log;
 /**
  * @author Ilya Buziuk (ibuziuk)
  */
-public enum MessageType {
-	ERROR("ERROR"), WARN("WARN"), INFO("INFO"), LOG("LOG");//$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$
-
-	private String type;
-
-	private MessageType(String type) {
-		this.type = type;
+public final class ConsoleLogConstants {
+	private ConsoleLogConstants() {
 	}
 
-	@Override
-	public String toString() {
-		return type;
-	}
-
-	public String getType() {
-		return type;
-	}
-	
+	// Browser Functions names
+	public static final String BROSERSIM_CONSOLE_LOG = "browserSimConsoleLog"; //$NON-NLS-1$
+	public static final String BROSERSIM_CONSOLE_INFO = "browserSimConsoleInfo"; //$NON-NLS-1$
+	public static final String BROSERSIM_CONSOLE_WARN = "browserSimConsoleWarn"; //$NON-NLS-1$
+	public static final String BROSERSIM_CONSOLE_ERROR = "browserSimConsoleError"; //$NON-NLS-1$
 }
