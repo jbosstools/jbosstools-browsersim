@@ -57,16 +57,19 @@ public class BrowserSimLauncher {
 		}
 		
 		IVMInstall jvm = getSelectedVM();
-		
-		String jvmPath = jvm.getInstallLocation().getAbsolutePath();
-		String jrePath = jvm.getInstallLocation().getAbsolutePath() + File.separator + "jre";
-		if (PlatformUtil.OS_LINUX.equals(PlatformUtil.getOs()) 
-				|| (!BrowserSimUtil.isJavaFxAvailable(jvmPath) && !BrowserSimUtil.isJavaFxAvailable(jrePath))) {
-			BUNDLES.add("org.jboss.tools.vpe.browsersim.javafx.mock"); //$NON-NLS-1$
+		if (jvm == null) {// no suitable vm
+			ExternalProcessLauncher.showErrorDialog(Messages.BrowserSim);
+		} else {
+			String jvmPath = jvm.getInstallLocation().getAbsolutePath();
+			String jrePath = jvm.getInstallLocation().getAbsolutePath() + File.separator + "jre";
+			if (PlatformUtil.OS_LINUX.equals(PlatformUtil.getOs()) 
+					|| (!BrowserSimUtil.isJavaFxAvailable(jvmPath) && !BrowserSimUtil.isJavaFxAvailable(jrePath))) {
+				BUNDLES.add("org.jboss.tools.vpe.browsersim.javafx.mock"); //$NON-NLS-1$
+			}
+			
+			ExternalProcessLauncher.launchAsExternalProcess(BUNDLES, RESOURCES_BUNDLES,
+					BROWSERSIM_CALLBACKS, BROWSERSIM_CLASS_NAME, parameters, Messages.BrowserSim, jvm);
 		}
-		
-		ExternalProcessLauncher.launchAsExternalProcess(BUNDLES, RESOURCES_BUNDLES,
-				BROWSERSIM_CALLBACKS, BROWSERSIM_CLASS_NAME, parameters, Messages.BrowserSim, jvm);
 	}
 	
 	private static List<String> getBundles() {

@@ -108,24 +108,27 @@ public class ExternalProcessLauncher {
 					};
 				}.start();
 			} else {
-				Display.getDefault().asyncExec(new Runnable() {
-					
-					@Override
-					public void run() {
-						Shell shell = Display.getDefault().getActiveShell();
-						if (shell == null) {
-							shell = Display.getDefault().getShells()[0]; // Hot fix for gtk3 
-						}
-						BrowserSimErrorDialog e = new BrowserSimErrorDialog(shell, Messages.ExternalProcessLauncher_ERROR, shell.getDisplay().getSystemImage(SWT.ICON_ERROR),
-								programName, MessageDialog.ERROR, new String[] {IDialogConstants.OK_LABEL}, 0); 
-						e.open();
-					}
-				});
-				
+				showErrorDialog(programName);
 			}
 		} catch (IOException e) {
 			Activator.logError(e.getMessage(), e);
 		}		
+	}
+	
+	public static void showErrorDialog(final String programName) {
+		Display.getDefault().asyncExec(new Runnable() {
+			
+			@Override
+			public void run() {
+				Shell shell = Display.getDefault().getActiveShell();
+				if (shell == null) {
+					shell = Display.getDefault().getShells()[0]; // Hot fix for gtk3 
+				}
+				BrowserSimErrorDialog e = new BrowserSimErrorDialog(shell, Messages.ExternalProcessLauncher_ERROR, shell.getDisplay().getSystemImage(SWT.ICON_ERROR),
+						programName, MessageDialog.ERROR, new String[] {IDialogConstants.OK_LABEL}, 0); 
+				e.open();
+			}
+		});
 	}
 	
 	private static String getClassPathString(List<String> bundles, List<String> resourcesBundles) throws IOException {
