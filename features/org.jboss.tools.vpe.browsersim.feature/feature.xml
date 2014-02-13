@@ -15,6 +15,7 @@
 
    <plugin id="org.jboss.tools.vpe.browsersim" download-size="0" install-size="0" version="0.0.0" unpack="false" />
    <plugin id="org.jboss.tools.vpe.browsersim.browser" download-size="0" install-size="0" version="0.0.0" unpack="false" />
+   <plugin id="org.jboss.tools.vpe.browsersim.javafx.mock" download-size="0" install-size="0" version="0.0.0" unpack="false" />
    <plugin id="org.jboss.tools.vpe.browsersim.eclipse" download-size="0" install-size="0" version="0.0.0" unpack="false"/>
    <plugin id="org.jboss.tools.vpe.browsersim.debugger" download-size="0" install-size="0" version="0.0.0" unpack="false"/>
    <plugin id="org.jboss.tools.vpe.browsersim.win32.win32.x86_64" os="win32" ws="win32" arch="x86_64" download-size="0" install-size="0" version="0.0.0" unpack="false"/>
