@@ -176,7 +176,7 @@ public class ScreenshotMenuCreator {
 	private static String saveAs(Shell parent) {
 		FileDialog fd = new FileDialog(parent, SWT.SAVE);
 		fd.setText(Messages.Screenshots_SaveAsDialog);
-		String[] filterExt = {EXTENSION};
+		String[] filterExt = {"*" + EXTENSION}; //$NON-NLS-1$
 		fd.setFilterExtensions(filterExt);
 		fd.setFileName(getDefaultFilename());
 		return fd.open();
