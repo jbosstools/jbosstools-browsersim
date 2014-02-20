@@ -15,6 +15,7 @@ import org.eclipse.swt.SWT;
 import org.eclipse.swt.internal.C;
 import org.eclipse.swt.internal.Callback;
 import org.eclipse.swt.widgets.Display;
+import org.eclipse.swt.widgets.Event;
 import org.eclipse.swt.widgets.Listener;
 
 /**
@@ -48,7 +49,7 @@ public class CocoaUIEnhancer {
 
     static Callback proc3Args;
 
-    private Listener quitListener;
+    private Runnable quitAction;
     private Runnable aboutAction;
     private Runnable preferencesAction;
 	private static CocoaUIEnhancer instance;
@@ -89,7 +90,7 @@ public class CocoaUIEnhancer {
      * @param preferencesAction
      *            The action to run when the Preferences menu is invoked.
      */
-    public void hookApplicationMenu( Display display) {
+    private void hookApplicationMenu( Display display) {
         // This is our callbackObject whose 'actionProc' method will be called when the About or
         // Preferences menuItem is invoked.
         //
@@ -129,7 +130,16 @@ public class CocoaUIEnhancer {
 
         // Connect the quit/exit menu.
         if ( !display.isDisposed() ) {
-//            display.addListener( SWT.Close, quitListener );
+            display.addListener( SWT.Close, new Listener() {
+
+				@Override
+				public void handleEvent(Event arg0) {
+					if (quitAction != null) {
+						quitAction.run();
+					}
+				}
+            	
+            } );
         }
 
         // Schedule disposal of callback object
@@ -317,8 +327,8 @@ public class CocoaUIEnhancer {
         }
     }
 
-	public void setQuitListener(Listener quitListener) {
-		this.quitListener = quitListener;
+	public void setQuitAction(Runnable quitAction) {
+		this.quitAction = quitAction;
 	}
 
 	public void setAboutAction(Runnable aboutAction) {

@@ -20,8 +20,6 @@ import org.eclipse.swt.events.MenuEvent;
 import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.widgets.Display;
-import org.eclipse.swt.widgets.Event;
-import org.eclipse.swt.widgets.Listener;
 import org.eclipse.swt.widgets.Menu;
 import org.eclipse.swt.widgets.MenuItem;
 import org.eclipse.swt.widgets.Shell;
@@ -79,7 +77,6 @@ public class BrowserSimMenuCreator {
 		CocoaUIEnhancer cocoaUIEnhancer = CocoaUIEnhancer.getInstance();
 		if (cocoaUIEnhancer != null) {
 			addMacOsMenuApplicationHandler(cocoaUIEnhancer);
-			cocoaUIEnhancer.hookApplicationMenu(skin.getShell().getDisplay());
 		}
 	}
 
@@ -289,11 +286,11 @@ public class BrowserSimMenuCreator {
 
 	private void addMacOsMenuApplicationHandler(CocoaUIEnhancer cocoaUIEnhancer) {
 		if (cocoaUIEnhancer != null) {
-			cocoaUIEnhancer.setQuitListener(new Listener() {
+			cocoaUIEnhancer.setQuitAction(new Runnable() {
 				@Override
-				public void handleEvent(Event event) {
-					// Quit Listener has no implementation, cause quit event is handled by controlHandler,
-					// but it must be in CocoaUIEnchancer released by EPL
+				public void run() {
+					//skin's shell has close listener which saves preferences
+					skin.getShell().close();
 				}
 			});
 
