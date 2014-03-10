@@ -45,10 +45,14 @@ import org.jboss.tools.vpe.browsersim.eclipse.Messages;
 public class BrowserSimPreferencesPage extends PreferencePage implements IWorkbenchPreferencePage{
 	public static final String BROWSERSIM_JVM_ID = "org.jboss.tools.vpe.browsersim.jvm"; //$NON-NLS-1$
 	public static final String BROWSERSIM_JVM_AUTOMATICALLY = "org.jboss.tools.vpe.browsersim.jvm.automatically"; //$NON-NLS-1$
+	public static final String BROWSERSIM_GTK_2 = "org.jboss.tools.vpe.browsersim.gtk2"; //$NON-NLS-1$
+	
 	
 	private Combo combo;
 	private Button automatically;
 	private Button select;
+	private Button gtk2;
+	private Button gtk3;
 	
 	private List<IVMInstall> jvms;
 	
@@ -118,10 +122,40 @@ public class BrowserSimPreferencesPage extends PreferencePage implements IWorkbe
 		
 		fillValues();
 		
+		if (PlatformUtil.OS_LINUX.equals(PlatformUtil.getOs())) {
+			addGtkGroup(result);
+		}
+		
 		Dialog.applyDialogFont(result);
 		return result;
 	}
 	
+	private void addGtkGroup(Composite result) {
+		Group gtkGroup = new Group(result, SWT.NONE);
+
+		GridLayout gtkGroupLayout = new GridLayout();
+		gtkGroupLayout.numColumns = 2;
+		gtkGroup.setLayout(gtkGroupLayout);
+
+		GridData gtkGridData = new GridData(GridData.FILL_HORIZONTAL);
+		gtkGroup.setLayoutData(gtkGridData);
+
+		gtkGroup.setText(Messages.BrowserSimPreferencesPage_SELECT_GTK);
+
+		gtk2 = addRadioButton(gtkGroup, Messages.BrowserSimPreferencesPage_GTK_2, BROWSERSIM_GTK_2, IPreferenceStore.TRUE, 0);
+		gtk3 = addRadioButton(gtkGroup, Messages.BrowserSimPreferencesPage_GTK_3, BROWSERSIM_GTK_2, IPreferenceStore.FALSE, 0);		
+		
+		setGtkValues();
+	}
+
+	private void setGtkValues() {
+		if (IPreferenceStore.TRUE.equals(getPreferenceStore().getString(BROWSERSIM_GTK_2))) {
+			gtk2.setSelection(true);
+		} else {
+			gtk3.setSelection(true);
+		}
+	}
+
 	private Button addRadioButton(Composite parent, String label, String key, String value, int indent) {
 		GridData gd= new GridData();
 		gd.horizontalSpan= 2;
@@ -187,10 +221,19 @@ public class BrowserSimPreferencesPage extends PreferencePage implements IWorkbe
 			combo.setEnabled(false);
 		}
 	}
-	
+		
 	@Override
 	public boolean performOk() {
 		IPreferenceStore store = getPreferenceStore();
+		
+		if (PlatformUtil.OS_LINUX.equals(PlatformUtil.getOs())) {
+			if (gtk2.getSelection()) {
+				store.setValue(BROWSERSIM_GTK_2, IPreferenceStore.TRUE);
+			} else {
+				store.setValue(BROWSERSIM_GTK_2, IPreferenceStore.FALSE);
+			}
+		}
+		
 		if (automatically.getSelection()) {
 			store.setValue(BROWSERSIM_JVM_AUTOMATICALLY, IPreferenceStore.TRUE);
 		} else {
@@ -220,6 +263,12 @@ public class BrowserSimPreferencesPage extends PreferencePage implements IWorkbe
 	protected void performDefaults() {
 		automatically.setSelection(true);
 		select.setSelection(false);
+		
+		if (PlatformUtil.OS_LINUX.equals(PlatformUtil.getOs())) { 
+			gtk2.setSelection(true);
+			gtk3.setSelection(false);
+		}
+		
 		controlChanged(automatically);
 		super.performDefaults();
 	}

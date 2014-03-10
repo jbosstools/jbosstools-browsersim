@@ -64,8 +64,7 @@ public class BrowserSimLauncher {
 		} else {
 			String jvmPath = jvm.getInstallLocation().getAbsolutePath();
 			String jrePath = jvm.getInstallLocation().getAbsolutePath() + File.separator + "jre";
-			if (PlatformUtil.OS_LINUX.equals(PlatformUtil.getOs()) 
-					|| (!BrowserSimUtil.isJavaFxAvailable(jvmPath) && !BrowserSimUtil.isJavaFxAvailable(jrePath))) {
+			if (!BrowserSimUtil.isJavaFxAvailable(jvmPath) && !BrowserSimUtil.isJavaFxAvailable(jrePath)) {
 				BUNDLES.add("org.jboss.tools.vpe.browsersim.javafx.mock"); //$NON-NLS-1$
 			}
 			

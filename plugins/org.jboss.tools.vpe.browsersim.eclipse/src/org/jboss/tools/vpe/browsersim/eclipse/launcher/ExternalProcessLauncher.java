@@ -16,6 +16,7 @@ import java.io.InputStreamReader;
 import java.io.Reader;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
 import org.eclipse.core.runtime.FileLocator;
 import org.eclipse.core.runtime.Platform;
@@ -23,15 +24,18 @@ import org.eclipse.core.runtime.preferences.ConfigurationScope;
 import org.eclipse.jdt.launching.IVMInstall;
 import org.eclipse.jface.dialogs.IDialogConstants;
 import org.eclipse.jface.dialogs.MessageDialog;
+import org.eclipse.jface.preference.IPreferenceStore;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Shell;
 import org.eclipse.ui.IWorkbenchListener;
 import org.eclipse.ui.PlatformUI;
+import org.jboss.tools.vpe.browsersim.browser.PlatformUtil;
 import org.jboss.tools.vpe.browsersim.eclipse.Activator;
 import org.jboss.tools.vpe.browsersim.eclipse.Messages;
 import org.jboss.tools.vpe.browsersim.eclipse.dialog.BrowserSimErrorDialog;
 import org.jboss.tools.vpe.browsersim.eclipse.launcher.internal.ExternalProcessPostShutdownDestroyer;
+import org.jboss.tools.vpe.browsersim.eclipse.preferences.BrowserSimPreferencesPage;
 import org.jboss.tools.vpe.browsersim.eclipse.preferences.PreferencesUtil;
 import org.osgi.framework.Bundle;
 
@@ -40,6 +44,8 @@ import org.osgi.framework.Bundle;
  */
 public class ExternalProcessLauncher {
 	private static String PATH_SEPARATOR = System.getProperty("path.separator"); //$NON-NLS-1$
+	private static final String SWT_GTK3 = "SWT_GTK3"; //$NON-NLS-1$
+	private static final String OFF = "0"; //$NON-NLS-1$
 	
 	public static void launchAsExternalProcess(List<String> bundles, List<String> resourcesBundles,
 			final List<ExternalProcessCallback> callbacks, String className, List<String> parameters, final String programName, IVMInstall jvm) {
@@ -69,6 +75,10 @@ public class ExternalProcessLauncher {
 				
 				ProcessBuilder processBuilder = new ProcessBuilder(commandElements);
 				processBuilder.directory(ConfigurationScope.INSTANCE.getLocation().toFile());
+				
+				if (PlatformUtil.OS_LINUX.equals(PlatformUtil.getOs())) {
+					setUpGtkEnvironmentalVariable(processBuilder);
+				}
 				
 				Process browserSimProcess = processBuilder.start();
 				final IWorkbenchListener browserSimPostShutDownDestroyer = new ExternalProcessPostShutdownDestroyer(browserSimProcess);
@@ -115,6 +125,14 @@ public class ExternalProcessLauncher {
 		}		
 	}
 	
+	private static void setUpGtkEnvironmentalVariable(ProcessBuilder processBuilder) {
+		IPreferenceStore store = Activator.getDefault().getPreferenceStore();
+		if (IPreferenceStore.TRUE.equals(store.getString(BrowserSimPreferencesPage.BROWSERSIM_GTK_2))) {
+			Map<String, String> env = processBuilder.environment(); 
+			env.put(SWT_GTK3, OFF);
+		}
+	}
+
 	public static void showErrorDialog(final String programName) {
 		Display.getDefault().asyncExec(new Runnable() {
 			
