@@ -14,6 +14,7 @@ import java.io.File;
 import java.lang.reflect.Method;
 import java.net.URL;
 import java.net.URLClassLoader;
+import java.util.Map;
 
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.browser.Browser;
@@ -50,7 +51,9 @@ public class BrowserSimUtil {
 	 */
 	private static final String java7u51 = "1.7.0_51"; //$NON-NLS-1$
 	private static final String[] BROWSERSIM_ICONS = {"icons/browsersim_16px.png", "icons/browsersim_32px.png", "icons/browsersim_64px.png", "icons/browsersim_128px.png", "icons/browsersim_256px.png", }; //$NON-NLS-1$//$NON-NLS-2$//$NON-NLS-3$//$NON-NLS-4$//$NON-NLS-5$
-	
+	private static final String SWT_GTK3 = "SWT_GTK3"; //$NON-NLS-1$
+	private static final String DISABLED = "0"; //$NON-NLS-1$
+
 	private static void fixShellLocation(Shell shell) {
 		Rectangle allClientArea = shell.getMonitor().getClientArea();
 		
@@ -311,6 +314,20 @@ public class BrowserSimUtil {
 		}
 	}
 	
+	/**
+	 * Setting SWT_GTK3 option is relevant only on Linux
+	 * @return <code>true</code> if running against GTK 2 libs
+	 * @see JBIDE-16732
+	 */
+	public static boolean isRunningAgainstGTK2() { 
+		Map<String, String> env = System.getenv();
+		String gtk3 = env.get(SWT_GTK3);
+		if (gtk3 != null && gtk3.equals(DISABLED)) {
+			return true;
+		}
+
+		return false;
+	}
 	
 	private static Image[] initImages(Shell shell) {
 		BrowserSimImageList imageList = new BrowserSimImageList(shell);

@@ -25,8 +25,10 @@ Require-Bundle: org.eclipse.ui,
 Bundle-ActivationPolicy: lazy
 Bundle-RequiredExecutionEnvironment: JavaSE-1.6
 Bundle-Vendor: JBoss by Red Hat
-Export-Package: org.jboss.tools.vpe.browsersim.eclipse.callbacks,
- org.jboss.tools.vpe.browsersim.eclipse.launcher
+Export-Package: org.jboss.tools.vpe.browsersim.eclipse,
+ org.jboss.tools.vpe.browsersim.eclipse.callbacks,
+ org.jboss.tools.vpe.browsersim.eclipse.launcher,
+ org.jboss.tools.vpe.browsersim.eclipse.preferences
 Import-Package: org.eclipse.debug.core,
  org.eclipse.debug.core.model,
  org.eclipse.jdt.internal.launching,

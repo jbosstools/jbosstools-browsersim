@@ -46,6 +46,7 @@ public class ExternalProcessLauncher {
 	private static String PATH_SEPARATOR = System.getProperty("path.separator"); //$NON-NLS-1$
 	private static final String SWT_GTK3 = "SWT_GTK3"; //$NON-NLS-1$
 	private static final String OFF = "0"; //$NON-NLS-1$
+	private static final String ON = "1"; //$NON-NLS-1$
 	
 	public static void launchAsExternalProcess(List<String> bundles, List<String> resourcesBundles,
 			final List<ExternalProcessCallback> callbacks, String className, List<String> parameters, final String programName, IVMInstall jvm) {
@@ -127,9 +128,11 @@ public class ExternalProcessLauncher {
 	
 	private static void setUpGtkEnvironmentalVariable(ProcessBuilder processBuilder) {
 		IPreferenceStore store = Activator.getDefault().getPreferenceStore();
+		Map<String, String> env = processBuilder.environment(); 
 		if (IPreferenceStore.TRUE.equals(store.getString(BrowserSimPreferencesPage.BROWSERSIM_GTK_2))) {
-			Map<String, String> env = processBuilder.environment(); 
 			env.put(SWT_GTK3, OFF);
+		} else {
+			env.put(SWT_GTK3, ON);
 		}
 	}
 

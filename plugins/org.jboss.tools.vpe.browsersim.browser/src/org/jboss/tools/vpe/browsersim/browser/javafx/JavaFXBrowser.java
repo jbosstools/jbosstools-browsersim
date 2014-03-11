@@ -18,7 +18,6 @@ import netscape.javascript.JSException;
 import netscape.javascript.JSObject;
 
 import org.eclipse.swt.SWT;
-import org.eclipse.swt.browser.CloseWindowListener;
 import org.eclipse.swt.browser.LocationEvent;
 import org.eclipse.swt.browser.LocationListener;
 import org.eclipse.swt.browser.ProgressEvent;

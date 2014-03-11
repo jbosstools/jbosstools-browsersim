@@ -528,8 +528,8 @@ public class ManageDevicesDialog extends Dialog {
 	
 	private void disableWebEngineSwitcherIfJavaFxNotAvailable(Button javaFXBrowserRadio, Group browserTypeGroup) {
 		String message = ""; //$NON-NLS-1$
-		// JavaFx is compiled against gtk 2, which makes it unusable on Linux - https://bugs.eclipse.org/bugs/show_bug.cgi?id=420182
-		if (PlatformUtil.OS_LINUX.equals(PlatformUtil.getOs())) {
+		// For now JavaFx is compiled against gtk 2 only, no support for gtk 3 on Linux - https://bugs.eclipse.org/bugs/show_bug.cgi?id=420182
+		if (PlatformUtil.OS_LINUX.equals(PlatformUtil.getOs()) && !BrowserSimUtil.isRunningAgainstGTK2()) {
 			message = Messages.ManageDevicesDialog_BROWSER_ENGINE_WARNING_ON_LINUX;
 		} else if (!BrowserSimUtil.isJavaFxAvailable()) {
 			message = Messages.ManageDevicesDialog_BROWSER_ENGINE_WARNING;
@@ -600,7 +600,7 @@ public class ManageDevicesDialog extends Dialog {
 	
 	private int showEngineSwitchConfirmationDialog() {
 		MessageBox dialog = new MessageBox(shell, SWT.ICON_QUESTION	| SWT.OK | SWT.CANCEL);
-		dialog.setText("BrowserSim"); //$NON-NLS-1$
+		dialog.setText("Change web engine"); //$NON-NLS-1$
 		dialog.setMessage("Changing browser engine requires restart. Do you want to restart BrowserSim now?"); //$NON-NLS-1$
 		return dialog.open();
 	}
