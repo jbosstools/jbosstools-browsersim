@@ -18,12 +18,12 @@ import java.util.List;
 import org.eclipse.jdt.launching.IVMInstall;
 import org.eclipse.jface.preference.IPreferenceStore;
 import org.jboss.tools.vpe.browsersim.browser.PlatformUtil;
-import org.jboss.tools.vpe.browsersim.eclipse.callbacks.JsLogCallback;
-import org.jboss.tools.vpe.browsersim.eclipse.callbacks.LogCallback;
-import org.jboss.tools.vpe.browsersim.eclipse.callbacks.RestartCallback;
 import org.jboss.tools.vpe.browsersim.eclipse.Activator;
 import org.jboss.tools.vpe.browsersim.eclipse.Messages;
+import org.jboss.tools.vpe.browsersim.eclipse.callbacks.JsLogCallback;
+import org.jboss.tools.vpe.browsersim.eclipse.callbacks.LogCallback;
 import org.jboss.tools.vpe.browsersim.eclipse.callbacks.OpenFileCallback;
+import org.jboss.tools.vpe.browsersim.eclipse.callbacks.RestartCallback;
 import org.jboss.tools.vpe.browsersim.eclipse.callbacks.ViewSourceCallback;
 import org.jboss.tools.vpe.browsersim.eclipse.preferences.BrowserSimPreferencesPage;
 import org.jboss.tools.vpe.browsersim.eclipse.preferences.PreferencesUtil;
@@ -41,7 +41,7 @@ public class BrowserSimLauncher {
 		new JsLogCallback(),
 		new RestartCallback()
 	);
-	public static final List<String> BUNDLES = getBundles();
+	
 	public static final List<String> RESOURCES_BUNDLES = Arrays.asList(
 		"org.jboss.tools.vpe.browsersim.win32.win32.x86_64" //$NON-NLS-1$
 	);
@@ -66,18 +66,19 @@ public class BrowserSimLauncher {
 			String jrePath = jvm.getInstallLocation().getAbsolutePath() + File.separator + "jre";
 			
 			IPreferenceStore store = Activator.getDefault().getPreferenceStore();
+			List<String> bundles = getBundles();
 			
 			if (IPreferenceStore.FALSE.equals(store.getString(BrowserSimPreferencesPage.BROWSERSIM_GTK_2))
 					|| (!BrowserSimUtil.isJavaFxAvailable(jvmPath) && !BrowserSimUtil.isJavaFxAvailable(jrePath))) {
-				BUNDLES.add("org.jboss.tools.vpe.browsersim.javafx.mock"); //$NON-NLS-1$
+				bundles.add("org.jboss.tools.vpe.browsersim.javafx.mock"); //$NON-NLS-1$
 			}
 			
-			ExternalProcessLauncher.launchAsExternalProcess(BUNDLES, RESOURCES_BUNDLES,
+			ExternalProcessLauncher.launchAsExternalProcess(bundles, RESOURCES_BUNDLES,
 					BROWSERSIM_CALLBACKS, BROWSERSIM_CLASS_NAME, parameters, Messages.BrowserSim, jvm);
 		}
 	}
 	
-	private static List<String> getBundles() {
+	public static List<String> getBundles() {
 		List<String> bundles = new ArrayList<String>();
 		bundles.add("org.jboss.tools.vpe.browsersim"); //$NON-NLS-1$
 		bundles.add("org.jboss.tools.vpe.browsersim.browser"); //$NON-NLS-1$
