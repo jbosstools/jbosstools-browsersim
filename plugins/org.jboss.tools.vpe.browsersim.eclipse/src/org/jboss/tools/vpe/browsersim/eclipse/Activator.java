@@ -22,7 +22,8 @@ import org.eclipse.jface.resource.ImageDescriptor;
 import org.eclipse.ui.console.MessageConsole;
 import org.eclipse.ui.console.MessageConsoleStream;
 import org.eclipse.ui.plugin.AbstractUIPlugin;
-import org.jboss.tools.vpe.browsersim.eclipse.util.ConsoleUtil;
+import org.jboss.tools.vpe.browsersim.eclipse.console.ConsoleUtil;
+import org.jboss.tools.vpe.browsersim.js.log.MessageType;
 import org.osgi.framework.BundleContext;
 
 /**
@@ -76,15 +77,22 @@ public class Activator extends AbstractUIPlugin {
 	}
 	
 	public static void logError(String message, Throwable throwable, String pluginId) {
-		getDefault().getLog().log(new Status(IStatus.ERROR, pluginId, message, throwable));
+		getDefault().getLog().log(new Status(IStatus.ERROR, pluginId, message, throwable)); // Logging to the 'Error Log'
+
+		MessageConsole console = ConsoleUtil.getConsole(); // Logging to the "BrowserSim / CordovaSim console"
+		MessageConsoleStream messageStream = console.newMessageStream();
+		messageStream.print("!ERROR " + pluginId + " " + message); //$NON-NLS-1$ //$NON-NLS-2$
+		if (throwable != null) {
+			ConsoleUtil.logException(throwable);
+		}
 	}
 	
-	public static void logMessage(String message, String consoleName) {
-		MessageConsole console = ConsoleUtil.findConsole(consoleName);
-		MessageConsoleStream out = console.newMessageStream();
-		ConsoleUtil.setConsoleColor(out, message);
-		out.println(message);
-		ConsoleUtil.show(console);
+	public static void logJsMessage(String message) {
+		MessageType messageType = ConsoleUtil.getMessageType(message);
+		MessageConsole console = ConsoleUtil.getConsole();
+		MessageConsoleStream messageStream = console.newMessageStream();
+		ConsoleUtil.setColor(messageType, messageStream);
+		messageStream.println(ConsoleUtil.addJsLogPrefix(message));
 	}
 
 	/**

@@ -20,7 +20,6 @@ import org.jboss.tools.vpe.browsersim.eclipse.launcher.TransparentReader;
  * @author Ilya Buziuk (ibuziuk)
  */
 public class JsLogCallback implements ExternalProcessCallback {
-	private static final String CONSOLE_NAME = "BrowserSim / CordovaSim console log"; //$NON-NLS-1$
 	private static final String JS_CONSOLE_COMMAND = "org.jboss.tools.vpe.browsersim.command.console.log:"; //$NON-NLS-1$
 	private static final String JS_CONSOLE_END_SRING = "org.jboss.tools.vpe.browsersim.command.console.log.end"; //$NON-NLS-1$
 
@@ -38,7 +37,7 @@ public class JsLogCallback implements ExternalProcessCallback {
 			logMessage.append(' ');
 		}
 
-		Activator.logMessage(logMessage.toString(), CONSOLE_NAME);
+		Activator.logJsMessage(logMessage.toString());
 	}
 
 }
