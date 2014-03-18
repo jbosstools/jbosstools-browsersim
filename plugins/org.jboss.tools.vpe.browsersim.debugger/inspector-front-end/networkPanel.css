@@ -37,32 +37,22 @@
 
 #network-close-button {
     position: absolute;
-    width: 14px;
-    height: 14px;
-    background-image: url(Images/closeButtons.png);
-    background-position: 0 0;
-    background-color: transparent;
-    border: 0 none transparent;
     top: 8px;
     left: 5px;
     z-index: 10;
     display: none;
 }
 
-#network-views.small #network-close-button  {
+#network-views.small #network-close-button {
     top: 4px;
-}
-
-#network-close-button:hover {
-    background-position: 14px 0;
-}
-
-#network-close-button:active {
-    background-position: 28px 0;
 }
 
 .network.panel.viewing-resource #network-close-button  {
     display: block;
+}
+
+#network-container {
+    border-top: 1px solid rgb(179, 179, 179);
 }
 
 .network.panel .sidebar {
@@ -80,45 +70,34 @@
     display: none;
 }
 
-.network.panel .scope-bar {
-    height: 23px;
-    padding-top: 5px;
-}
-
-.network.panel .data-grid th.sort-descending, .network.panel .data-grid th.sort-ascending {
-    background: -webkit-gradient(linear, left top, left bottom, from(rgb(236, 236, 236)), to(rgb(217, 217, 217)));
+.network.panel .data-grid th.sort-descending,
+.network.panel .data-grid th.sort-ascending {
+    background: white;
 }
 
 #network-views .network-item-view .tabbed-pane-header {
-    height: 31px;
+    flex: 0 0 31px;
     padding-top: 8px;
-    padding-left: 25px;
+    padding-left: 13px;
     white-space: nowrap;
 }
 
 #network-views.small .network-item-view .tabbed-pane-header {
-    height: 23px;
+    flex-basis: 23px;
     padding-top: 0;
 }
 
 .network-item-view {
     display: none;
-    position: absolute;
     background: white;
-    top: 0;
-    left: 0;
-    right: 0;
-    bottom: 0;
+}
+
+.network-item-view.visible {
+    display: -webkit-flex;
 }
 
 .network-item-view .tabbed-pane-header {
-    background: -webkit-gradient(linear, 0% 0%, 0% 100%, from(rgb(236, 236, 236)), to(rgb(217, 217, 217)));
-    border-bottom: 1px solid rgb(163, 163, 163);
-}
-
-.network-item-view .scope-bar li {
-    border-bottom-left-radius: 0;
-    border-bottom-right-radius: 0;
+    border-bottom: 1px solid rgb(205, 205, 205);
 }
 
 .resource-headers-view {
@@ -142,8 +121,20 @@
     font-weight: bold;
 }
 
+.resource-headers-view .outline-disclosure .parent .section * {
+    font-weight: normal;
+}
+
 .resource-headers-view .outline-disclosure .children li {
     white-space: nowrap;
+}
+
+.resource-headers-view .outline-disclosure li.expanded .caution {
+    color: rgb(255, 128, 0);
+}
+
+.resource-headers-view .outline-disclosure li:not(.expanded) .caution {
+    display: none;
 }
 
 .resource-headers-view .outline-disclosure li.expanded .header-count {
@@ -187,10 +178,6 @@
     margin-top: 1px;
 }
 
-.resource-headers-view .outline-disclosure .raw-form-data {
-    white-space: pre-wrap;
-}
-
 .resource-cookies-view {
     display: none;
     position: absolute;
@@ -204,10 +191,11 @@
 }
 
 .resource-cookies-view.visible {
-    display: block;
+    display: flex;
 }
 
 .resource-cookies-view .data-grid {
+    flex: auto;
     height: 100%;
 }
 
@@ -237,41 +225,108 @@
     opacity: 1;
 }
 
+.resource-timing-view .network-timing-bar.blocking,
 .resource-timing-view .network-timing-bar.proxy {
-    background-image: -webkit-gradient(linear, left top, left bottom, from(rgb(239, 228, 176)), to(rgb(139, 128, 76)));
-    border-left: 1px solid rgb(139, 128, 76);
+    background-image: linear-gradient(to bottom, rgb(242, 242, 194), rgb(204, 204, 102));
+    border-left: 1px solid rgb(204, 204, 102);
 }
 
 .resource-timing-view .network-timing-bar.dns {
-    background-image: -webkit-gradient(linear, left top, left bottom, from(rgb(153, 208, 216)), to(rgb(81, 174, 189)));
-    border-left: 1px solid rgb(81, 174, 189);
+    background-image: linear-gradient(to bottom, rgb(194, 242, 194), rgb(102, 204, 102));
+    border-left: 1px solid rgb(102, 204, 102);
 }
 
-.resource-timing-view .network-timing-bar.connecting {
-    background-image: -webkit-gradient(linear, left top, left bottom, from(rgb(203, 232, 145)), to(rgb(160, 214, 56)));
-    border-left: 1px solid rgb(160, 214, 56);
-}
-
+.resource-timing-view .network-timing-bar.connecting,
 .resource-timing-view .network-timing-bar.ssl {
-    background-image: -webkit-gradient(linear, left top, left bottom, from(rgb(21, 232, 145)), to(rgb(216, 149, 132)));
-    border-left: 1px solid rgb(216, 149, 132);
+    background-image: linear-gradient(to bottom, rgb(194, 242, 242), rgb(102, 204, 204));
+    border-left: 1px solid rgb(102, 204, 204);
 }
 
 .resource-timing-view .network-timing-bar.sending {
-    background-image: -webkit-gradient(linear, left top, left bottom, from(rgb(232, 192, 182)), to(rgb(216, 147, 130)));
-    border-left: 1px solid rgb(216, 147, 130);
+    background-image: linear-gradient(to bottom, rgb(194, 194, 242), rgb(102, 102, 204));
+    border-left: 1px solid rgb(102, 102, 204);
 }
 
 .resource-timing-view .network-timing-bar.waiting {
-    background-image: -webkit-gradient(linear, left top, left bottom, from(rgb(188, 179, 208)), to(rgb(141, 125, 175)));
-    border-left: 1px solid rgb(141, 125, 175);
+    background-image: linear-gradient(to bottom, rgb(242, 194, 242), rgb(204, 102, 204));
+    border-left: 1px solid rgb(204, 102, 204);
 }
 
 .resource-timing-view .network-timing-bar.receiving {
-    background-image: -webkit-gradient(linear, left top, left bottom, from(rgb(214, 214, 214)), to(rgb(182, 182, 182)));
-    border-left: 1px solid rgb(182, 182, 182);
+    background-image: linear-gradient(to bottom, rgb(242, 194, 194), rgb(204, 102, 102));
+    border-left: 1px solid rgb(204, 102, 102);
 }
 
 .resource-timing-view.visible {
     display: block;
+}
+
+.resource-websocket {
+    -webkit-user-select: text;
+}
+
+.resource-websocket,
+.resource-websocket .data-grid {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    border: none;
+}
+
+.resource-websocket .data-grid .data {
+    background-image: none;
+}
+
+.resource-websocket td {
+    padding-top: 3px;
+    padding-bottom: 3px;
+    border-top: 1px solid rgb(240, 240, 240);
+}
+
+.resource-websocket .data-column div {
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.resource-websocket-row-outcoming {
+    background-color: rgb(226, 247, 218);
+}
+
+.resource-websocket-row-outcoming:not(.selected) td {
+    border-left-color: rgb(177, 209, 165);
+}
+
+.resource-websocket-row-outcoming:not(.selected) td, .resource-websocket-row-outcoming:not(.selected) + tr td {
+    border-top-color: rgb(199, 236, 185);
+}
+
+.resource-websocket-row-opcode {
+    background-color: rgb(255, 255, 232);
+    color: rgb(170, 111, 71);
+}
+
+.resource-websocket-row-opcode td {
+    border-color: rgb(211, 187, 171);
+}
+
+.resource-websocket-row-opcode td, .resource-websocket-row-opcode + tr td {
+    border-top-color: rgb(248, 240, 210);
+}
+
+.resource-websocket-row-error {
+    background-color: rgb(255, 237, 237);
+    color: rgb(182, 0, 0);
+}
+
+.panel.network .split-view {
+    flex: auto;
+    position: relative;
+}
+
+.network-filters-header {
+    flex: 0 0 23px;
+    padding-right: 4px;
 }

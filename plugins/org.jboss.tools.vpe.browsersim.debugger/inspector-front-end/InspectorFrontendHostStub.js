@@ -32,13 +32,33 @@ if (!window.InspectorFrontendHost) {
 
 /**
  * @constructor
+ * @implements {InspectorFrontendHostAPI}
  */
 WebInspector.InspectorFrontendHostStub = function()
 {
-    this._attachedWindowHeight = 0;
+    this.isStub = true;
 }
 
 WebInspector.InspectorFrontendHostStub.prototype = {
+    /**
+     * @return {string}
+     */
+    getSelectionBackgroundColor: function()
+    {
+        return "#6e86ff";
+    },
+
+    /**
+     * @return {string}
+     */
+    getSelectionForegroundColor: function()
+    {
+        return "#ffffff";
+    },
+
+    /**
+     * @return {string}
+     */
     platform: function()
     {
         var match = navigator.userAgent.match(/Windows NT/);
@@ -50,6 +70,9 @@ WebInspector.InspectorFrontendHostStub.prototype = {
         return "linux";
     },
 
+    /**
+     * @return {string}
+     */
     port: function()
     {
         return "unknown";
@@ -65,19 +88,21 @@ WebInspector.InspectorFrontendHostStub.prototype = {
         this._windowVisible = false;
     },
 
-    attach: function()
+    setIsDocked: function(isDocked)
     {
     },
 
-    detach: function()
+    /**
+     * Requests inspected page to be placed atop of the inspector frontend
+     * with passed insets from the frontend sides, respecting minimum size passed.
+     * @param {{top: number, left: number, right: number, bottom: number}} insets
+     * @param {{width: number, height: number}} minSize
+     */
+    setContentsResizingStrategy: function(insets, minSize)
     {
     },
 
-    search: function(sourceRow, query)
-    {
-    },
-
-    setAttachedWindowHeight: function(height)
+    inspectElementCompleted: function()
     {
     },
 
@@ -89,54 +114,37 @@ WebInspector.InspectorFrontendHostStub.prototype = {
     {
     },
 
-    loaded: function()
-    {
-    },
-
-    localizedStringsURL: function()
-    {
-        return undefined;
-    },
-
-    hiddenPanels: function()
-    {
-        return "";
-    },
-
     inspectedURLChanged: function(url)
     {
         document.title = WebInspector.UIString(Preferences.applicationTitle, url);
     },
 
-    copyText: function()
+    copyText: function(text)
     {
+        WebInspector.log("Clipboard is not enabled in hosted mode. Please inspect using chrome://inspect", WebInspector.ConsoleMessage.MessageLevel.Error, true);
     },
 
-    canSaveAs: function(fileName, content)
+    openInNewTab: function(url)
     {
-        return true;
+        window.open(url, "_blank");
     },
 
-    saveAs: function(fileName, content)
+    save: function(url, content, forceSaveAs)
     {
-        var builder = new WebKitBlobBuilder();
-        builder.append(content);
-        var blob = builder.getBlob("application/octet-stream");
-
-        var fr = new FileReader();
-        fr.onload = function(e) {
-            // Force download
-            window.location = this.result;
-        }
-        fr.readAsDataURL(blob);
+        WebInspector.log("Saving files is not enabled in hosted mode. Please inspect using chrome://inspect", WebInspector.ConsoleMessage.MessageLevel.Error, true);
+        WebInspector.fileManager.canceledSaveURL(url);
     },
 
-    canAttachWindow: function()
+    append: function(url, content)
     {
-        return false;
+        WebInspector.log("Saving files is not enabled in hosted mode. Please inspect using chrome://inspect", WebInspector.ConsoleMessage.MessageLevel.Error, true);
     },
 
     sendMessageToBackend: function(message)
+    {
+    },
+
+    sendMessageToEmbedder: function(message)
     {
     },
 
@@ -148,17 +156,77 @@ WebInspector.InspectorFrontendHostStub.prototype = {
     {
     },
 
-    recordSettingChanged: function(settingCode)
+    requestFileSystems: function()
     {
     },
 
-    loadResourceSynchronously: function(url)
+    addFileSystem: function()
     {
-        return "";
+    },
+
+    removeFileSystem: function(fileSystemPath)
+    {
+    },
+
+    /**
+     * @param {string} fileSystemId
+     * @param {string} registeredName
+     * @return {?WebInspector.IsolatedFileSystem}
+     */
+    isolatedFileSystem: function(fileSystemId, registeredName)
+    {
+        return null;
+    },
+
+    upgradeDraggedFileSystemPermissions: function(domFileSystem)
+    {
+    },
+
+    indexPath: function(requestId, fileSystemPath)
+    {
+    },
+
+    stopIndexing: function(requestId)
+    {
+    },
+
+    searchInPath: function(requestId, fileSystemPath, query)
+    {
+    },
+
+    setZoomFactor: function(zoom)
+    {
+    },
+
+    /**
+     * @return {number}
+     */
+    zoomFactor: function()
+    {
+        return 1;
+    },
+
+    zoomIn: function()
+    {
+    },
+
+    zoomOut: function()
+    {
+    },
+
+    resetZoom: function()
+    {
+    },
+
+    /**
+     * @return {boolean}
+     */
+    isUnderTest: function()
+    {
+        return false;
     }
 }
 
-var InspectorFrontendHost = new WebInspector.InspectorFrontendHostStub();
-Preferences.localizeUI = false;
+InspectorFrontendHost = new WebInspector.InspectorFrontendHostStub();
 
 }

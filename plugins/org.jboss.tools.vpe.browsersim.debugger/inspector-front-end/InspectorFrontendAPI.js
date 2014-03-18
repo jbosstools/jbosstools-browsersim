@@ -28,76 +28,240 @@
  * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-InspectorFrontendAPI = {
+var InspectorFrontendAPI = {
     _pendingCommands: [],
 
-    isDebuggingEnabled: function()
-    {
-        return WebInspector.panels.scripts.debuggingEnabled;
-    },
-
-    setDebuggingEnabled: function(enabled)
-    {
-        if (enabled) {
-            WebInspector.panels.scripts.enableDebugging();
-            WebInspector.inspectorView.setCurrentPanel(WebInspector.panels.scripts);
-        } else
-            WebInspector.panels.scripts.disableDebugging();
-    },
-
-    isTimelineProfilingEnabled: function()
-    {
-        return WebInspector.panels.timeline.timelineProfilingEnabled;
-    },
-
-    setTimelineProfilingEnabled: function(enabled)
-    {
-        WebInspector.panels.timeline.setTimelineProfilingEnabled(enabled);
-    },
-
-    isProfilingJavaScript: function()
-    {
-        return WebInspector.CPUProfileType.instance && WebInspector.CPUProfileType.instance.isRecordingProfile();
-    },
-
-    startProfilingJavaScript: function()
-    {
-        WebInspector.panels.profiles.enableProfiler();
-        WebInspector.inspectorView.setCurrentPanel(WebInspector.panels.profiles);
-        if (WebInspector.CPUProfileType.instance)
-            WebInspector.CPUProfileType.instance.startRecordingProfile();
-    },
-
-    stopProfilingJavaScript: function()
-    {
-        if (WebInspector.CPUProfileType.instance)
-            WebInspector.CPUProfileType.instance.stopRecordingProfile();
-        WebInspector.inspectorView.setCurrentPanel(WebInspector.panels.profiles);
-    },
-
-    setAttachedWindow: function(attached)
-    {
-        WebInspector.attached = attached;
-    },
+    // Methods called by the embedder on load, potentially before front-end is initialized.
+    //////////////////////////////////////////////////////////////////////////////////////////////////
 
     showConsole: function()
     {
-        WebInspector.inspectorView.setCurrentPanel(WebInspector.panels.console);
+        InspectorFrontendAPI._runOnceLoaded(function() {
+            WebInspector.showPanel("console");
+        });
     },
 
-    dispatch: function(signature)
+    enterInspectElementMode: function()
     {
-        if (WebInspector.panels) {
-            var methodName = signature.shift();
-            return InspectorFrontendAPI[methodName].apply(InspectorFrontendAPI, signature);
-        }
-        InspectorFrontendAPI._pendingCommands.push(signature);
+        InspectorFrontendAPI._runOnceLoaded(function() {
+            WebInspector.showPanel("elements");
+            if (WebInspector.inspectElementModeController)
+                WebInspector.inspectElementModeController.toggleSearch();
+        });
     },
+
+    /**
+     * Focus on a particular line in the specified resource.
+     * @param {string} url The url to the resource.
+     * @param {number} lineNumber The line number to focus on.
+     * @param {number} columnNumber The column number to focus on.
+     */
+    revealSourceLine: function(url, lineNumber, columnNumber)
+    {
+        InspectorFrontendAPI._runOnceLoaded(function() {
+            var uiSourceCode = WebInspector.workspace.uiSourceCodeForURL(url);
+            if (uiSourceCode) {
+                WebInspector.Revealer.reveal(new WebInspector.UILocation(uiSourceCode, lineNumber, columnNumber));
+                return;
+            }
+
+            /**
+             * @param {!WebInspector.Event} event
+             */
+            function listener(event)
+            {
+                var uiSourceCode = /** @type {!WebInspector.UISourceCode} */ (event.data);
+                if (uiSourceCode.url === url) {
+                    WebInspector.Revealer.reveal(new WebInspector.UILocation(uiSourceCode, lineNumber, columnNumber));
+                    WebInspector.workspace.removeEventListener(WebInspector.Workspace.Events.UISourceCodeAdded, listener);
+                }
+            }
+
+            WebInspector.workspace.addEventListener(WebInspector.Workspace.Events.UISourceCodeAdded, listener);
+        });
+    },
+
+    /**
+     * @param {string} backgroundColor
+     * @param {string} color
+     */
+    setToolbarColors: function(backgroundColor, color)
+    {
+        WebInspector.setToolbarColors(backgroundColor, color);
+    },
+
+    /**
+     * @param {string} url
+     */
+    loadTimelineFromURL: function(url)
+    {
+        InspectorFrontendAPI._runOnceLoaded(function() {
+            /** @type {!WebInspector.TimelinePanel} */ (WebInspector.showPanel("timeline")).loadFromURL(url);
+        });
+    },
+
+    /**
+     * @param {boolean} useSoftMenu
+     */
+    setUseSoftMenu: function(useSoftMenu)
+    {
+        WebInspector.ContextMenu.setUseSoftMenu(useSoftMenu);
+    },
+
+    dispatchMessage: function(messageObject)
+    {
+        InspectorBackend.connection().dispatch(messageObject);
+    },
+
+    // Callbacks to the methods called from within initialized front-end.
+    //////////////////////////////////////////////////////////////////////////////////////////////////
+
+    contextMenuItemSelected: function(id)
+    {
+        WebInspector.contextMenuItemSelected(id);
+    },
+
+    contextMenuCleared: function()
+    {
+        WebInspector.contextMenuCleared();
+    },
+
+    fileSystemsLoaded: function(fileSystems)
+    {
+        WebInspector.isolatedFileSystemDispatcher.fileSystemsLoaded(fileSystems);
+    },
+
+    fileSystemRemoved: function(fileSystemPath)
+    {
+        WebInspector.isolatedFileSystemDispatcher.fileSystemRemoved(fileSystemPath);
+    },
+
+    fileSystemAdded: function(errorMessage, fileSystem)
+    {
+        WebInspector.isolatedFileSystemDispatcher.fileSystemAdded(errorMessage, fileSystem);
+    },
+
+    indexingTotalWorkCalculated: function(requestId, fileSystemPath, totalWork)
+    {
+        var projectDelegate = WebInspector.fileSystemWorkspaceProvider.delegate(fileSystemPath);
+        projectDelegate.indexingTotalWorkCalculated(requestId, totalWork);
+    },
+
+    indexingWorked: function(requestId, fileSystemPath, worked)
+    {
+        var projectDelegate = WebInspector.fileSystemWorkspaceProvider.delegate(fileSystemPath);
+        projectDelegate.indexingWorked(requestId, worked);
+    },
+
+    indexingDone: function(requestId, fileSystemPath)
+    {
+        var projectDelegate = WebInspector.fileSystemWorkspaceProvider.delegate(fileSystemPath);
+        projectDelegate.indexingDone(requestId);
+    },
+
+    searchCompleted: function(requestId, fileSystemPath, files)
+    {
+        var projectDelegate = WebInspector.fileSystemWorkspaceProvider.delegate(fileSystemPath);
+        projectDelegate.searchCompleted(requestId, files);
+    },
+
+    /**
+     * @param {string} url
+     */
+    savedURL: function(url)
+    {
+        WebInspector.fileManager.savedURL(url);
+    },
+
+    /**
+     * @param {string} url
+     */
+    canceledSaveURL: function(url)
+    {
+        WebInspector.fileManager.canceledSaveURL(url);
+    },
+
+    /**
+     * @param {string} url
+     */
+    appendedToURL: function(url)
+    {
+        WebInspector.fileManager.appendedToURL(url);
+    },
+
+    /**
+     * @param {number} id
+     * @param {?string} error
+     */
+    embedderMessageAck: function(id, error)
+    {
+        InspectorFrontendHost.embedderMessageAck(id, error);
+    },
+
+    // Called from within front-end
+    ///////////////////////////////
 
     loadCompleted: function()
     {
+        InspectorFrontendAPI._isLoaded = true;
         for (var i = 0; i < InspectorFrontendAPI._pendingCommands.length; ++i)
-            InspectorFrontendAPI.dispatch(InspectorFrontendAPI._pendingCommands[i]);
+            InspectorFrontendAPI._pendingCommands[i]();
         InspectorFrontendAPI._pendingCommands = [];
+        if (window.opener)
+            window.opener.postMessage(["loadCompleted"], "*");
+    },
+
+    /**
+     * @param {!Object} queryParamsObject
+     */
+    dispatchQueryParameters: function(queryParamsObject)
+    {
+        if ("dispatch" in queryParamsObject)
+            InspectorFrontendAPI._dispatch(JSON.parse(window.decodeURI(queryParamsObject["dispatch"])));
+    },
+
+    // Testing harness support
+    //////////////////////////
+
+    evaluateForTest: function(callId, script)
+    {
+        WebInspector.evaluateForTestInFrontend(callId, script);
+    },
+
+    dispatchMessageAsync: function(messageObject)
+    {
+        WebInspector.dispatch(messageObject);
+    },
+
+    // Implementation details
+    /////////////////////////
+
+    _dispatch: function(signature)
+    {
+        InspectorFrontendAPI._runOnceLoaded(function() {
+            var methodName = signature.shift();
+            return InspectorFrontendAPI[methodName].apply(InspectorFrontendAPI, signature);
+        });
+    },
+
+    /**
+     * @param {function()} command
+     */
+    _runOnceLoaded: function(command)
+    {
+        if (InspectorFrontendAPI._isLoaded) {
+            command();
+            return;
+        }
+        InspectorFrontendAPI._pendingCommands.push(command);
     }
 }
+
+function onMessageFromOpener(event)
+{
+    if (event.source === window.opener)
+        InspectorFrontendAPI._dispatch(event.data);
+}
+
+if (window.opener && window.dispatchStandaloneTestRunnerMessages)
+    window.addEventListener("message", onMessageFromOpener, true);

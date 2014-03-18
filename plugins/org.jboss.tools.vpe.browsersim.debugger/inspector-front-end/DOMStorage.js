@@ -1,5 +1,6 @@
 /*
  * Copyright (C) 2008 Nokia Inc.  All rights reserved.
+ * Copyright (C) 2013 Samsung Electronics. All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions
@@ -28,66 +29,283 @@
 
 /**
  * @constructor
+ * @extends {WebInspector.Object}
+ * @param {string} securityOrigin
+ * @param {boolean} isLocalStorage
  */
-WebInspector.DOMStorage = function(id, domain, isLocalStorage)
+WebInspector.DOMStorage = function(securityOrigin, isLocalStorage)
 {
-    this._id = id;
-    this._domain = domain;
+    this._securityOrigin = securityOrigin;
     this._isLocalStorage = isLocalStorage;
 }
 
+/**
+ * @param {string} securityOrigin
+ * @param {boolean} isLocalStorage
+ * @return {!DOMStorageAgent.StorageId}
+ */
+WebInspector.DOMStorage.storageId = function(securityOrigin, isLocalStorage)
+{
+    return { securityOrigin: securityOrigin, isLocalStorage: isLocalStorage };
+}
+
+WebInspector.DOMStorage.Events = {
+    DOMStorageItemsCleared: "DOMStorageItemsCleared",
+    DOMStorageItemRemoved: "DOMStorageItemRemoved",
+    DOMStorageItemAdded: "DOMStorageItemAdded",
+    DOMStorageItemUpdated: "DOMStorageItemUpdated"
+}
+
 WebInspector.DOMStorage.prototype = {
+
+    /** @return {!DOMStorageAgent.StorageId} */
     get id()
     {
-        return this._id;
+        return WebInspector.DOMStorage.storageId(this._securityOrigin, this._isLocalStorage);
     },
 
-    get domain()
+    /** @return {string} */
+    get securityOrigin()
     {
-        return this._domain;
+        return this._securityOrigin;
     },
 
+    /** @return {boolean} */
     get isLocalStorage()
     {
         return this._isLocalStorage;
     },
 
-    getEntries: function(callback)
+    /**
+     * @param {function(?Protocol.Error, !Array.<!DOMStorageAgent.Item>):void=} callback
+     */
+    getItems: function(callback)
     {
-        DOMStorageAgent.getDOMStorageEntries(this._id, callback);
+        DOMStorageAgent.getDOMStorageItems(this.id, callback);
     },
 
-    setItem: function(key, value, callback)
+    /**
+     * @param {string} key
+     * @param {string} value
+     */
+    setItem: function(key, value)
     {
-        DOMStorageAgent.setDOMStorageItem(this._id, key, value, callback);
+        DOMStorageAgent.setDOMStorageItem(this.id, key, value);
     },
 
-    removeItem: function(key, callback)
+    /**
+     * @param {string} key
+     */
+    removeItem: function(key)
     {
-        DOMStorageAgent.removeDOMStorageItem(this._id, key, callback);
-    }
+        DOMStorageAgent.removeDOMStorageItem(this.id, key);
+    },
+
+    __proto__: WebInspector.Object.prototype
+}
+
+/**
+ * @constructor
+ * @extends {WebInspector.Object}
+ */
+WebInspector.DOMStorageModel = function()
+{
+    /** @type {!Object.<string, !WebInspector.DOMStorage>} */
+    this._storages = {};
+    InspectorBackend.registerDOMStorageDispatcher(new WebInspector.DOMStorageDispatcher(this));
+    DOMStorageAgent.enable();
+    WebInspector.resourceTreeModel.addEventListener(WebInspector.ResourceTreeModel.EventTypes.SecurityOriginAdded, this._securityOriginAdded, this);
+    WebInspector.resourceTreeModel.addEventListener(WebInspector.ResourceTreeModel.EventTypes.SecurityOriginRemoved, this._securityOriginRemoved, this);
+}
+
+WebInspector.DOMStorageModel.Events = {
+    DOMStorageAdded: "DOMStorageAdded",
+    DOMStorageRemoved: "DOMStorageRemoved"
+}
+
+WebInspector.DOMStorageModel.prototype = {
+
+    /**
+     * @param {!WebInspector.Event} event
+     */
+    _securityOriginAdded: function(event)
+    {
+        var securityOrigin = /** @type {string} */ (event.data);
+        var localStorageKey = this._storageKey(securityOrigin, true);
+        console.assert(!this._storages[localStorageKey]);
+        var localStorage = new WebInspector.DOMStorage(securityOrigin, true);
+        this._storages[localStorageKey] = localStorage;
+        this.dispatchEventToListeners(WebInspector.DOMStorageModel.Events.DOMStorageAdded, localStorage);
+
+        var sessionStorageKey = this._storageKey(securityOrigin, false);
+        console.assert(!this._storages[sessionStorageKey]);
+        var sessionStorage = new WebInspector.DOMStorage(securityOrigin, false);
+        this._storages[sessionStorageKey] = sessionStorage;
+        this.dispatchEventToListeners(WebInspector.DOMStorageModel.Events.DOMStorageAdded, sessionStorage);
+    },
+
+    /**
+     * @param {!WebInspector.Event} event
+     */
+    _securityOriginRemoved: function(event)
+    {
+        var securityOrigin = /** @type {string} */ (event.data);
+        var localStorageKey = this._storageKey(securityOrigin, true);
+        var localStorage = this._storages[localStorageKey];
+        console.assert(localStorage);
+        delete this._storages[localStorageKey];
+        this.dispatchEventToListeners(WebInspector.DOMStorageModel.Events.DOMStorageRemoved, localStorage);
+
+        var sessionStorageKey = this._storageKey(securityOrigin, false);
+        var sessionStorage = this._storages[sessionStorageKey];
+        console.assert(sessionStorage);
+        delete this._storages[sessionStorageKey];
+        this.dispatchEventToListeners(WebInspector.DOMStorageModel.Events.DOMStorageRemoved, sessionStorage);
+    },
+
+    /**
+     * @param {string} securityOrigin
+     * @param {boolean} isLocalStorage
+     * @return {string}
+     */
+    _storageKey: function(securityOrigin, isLocalStorage)
+    {
+        return JSON.stringify(WebInspector.DOMStorage.storageId(securityOrigin, isLocalStorage));
+    },
+
+    /**
+     * @param {!DOMStorageAgent.StorageId} storageId
+     */
+    _domStorageItemsCleared: function(storageId)
+    {
+        var domStorage = this.storageForId(storageId);
+        if (!domStorage)
+            return;
+
+        var eventData = {};
+        domStorage.dispatchEventToListeners(WebInspector.DOMStorage.Events.DOMStorageItemsCleared, eventData);
+    },
+
+    /**
+     * @param {!DOMStorageAgent.StorageId} storageId
+     * @param {string} key
+     */
+    _domStorageItemRemoved: function(storageId, key)
+    {
+        var domStorage = this.storageForId(storageId);
+        if (!domStorage)
+            return;
+
+        var eventData = { key: key };
+        domStorage.dispatchEventToListeners(WebInspector.DOMStorage.Events.DOMStorageItemRemoved, eventData);
+    },
+
+    /**
+     * @param {!DOMStorageAgent.StorageId} storageId
+     * @param {string} key
+     * @param {string} value
+     */
+    _domStorageItemAdded: function(storageId, key, value)
+    {
+        var domStorage = this.storageForId(storageId);
+        if (!domStorage)
+            return;
+
+        var eventData = { key: key, value: value };
+        domStorage.dispatchEventToListeners(WebInspector.DOMStorage.Events.DOMStorageItemAdded, eventData);
+    },
+
+    /**
+     * @param {!DOMStorageAgent.StorageId} storageId
+     * @param {string} key
+     * @param {string} oldValue
+     * @param {string} value
+     */
+    _domStorageItemUpdated: function(storageId, key, oldValue, value)
+    {
+        var domStorage = this.storageForId(storageId);
+        if (!domStorage)
+            return;
+
+        var eventData = { key: key, oldValue: oldValue, value: value };
+        domStorage.dispatchEventToListeners(WebInspector.DOMStorage.Events.DOMStorageItemUpdated, eventData);
+    },
+
+    /**
+     * @param {!DOMStorageAgent.StorageId} storageId
+     * @return {!WebInspector.DOMStorage}
+     */
+    storageForId: function(storageId)
+    {
+        return this._storages[JSON.stringify(storageId)];
+    },
+
+    /**
+     * @return {!Array.<!WebInspector.DOMStorage>}
+     */
+    storages: function()
+    {
+        var result = [];
+        for (var id in this._storages)
+            result.push(this._storages[id]);
+        return result;
+    },
+
+    __proto__: WebInspector.Object.prototype
 }
 
 /**
  * @constructor
  * @implements {DOMStorageAgent.Dispatcher}
+ * @param {!WebInspector.DOMStorageModel} model
  */
-WebInspector.DOMStorageDispatcher = function()
+WebInspector.DOMStorageDispatcher = function(model)
 {
+    this._model = model;
 }
 
 WebInspector.DOMStorageDispatcher.prototype = {
-    addDOMStorage: function(payload)
+
+    /**
+     * @param {!DOMStorageAgent.StorageId} storageId
+     */
+    domStorageItemsCleared: function(storageId)
     {
-        var domStorage = new WebInspector.DOMStorage(
-            payload.id,
-            payload.host,
-            payload.isLocalStorage);
-        WebInspector.panels.resources.addDOMStorage(domStorage);
+        this._model._domStorageItemsCleared(storageId);
     },
 
-    updateDOMStorage: function(storageId)
+    /**
+     * @param {!DOMStorageAgent.StorageId} storageId
+     * @param {string} key
+     */
+    domStorageItemRemoved: function(storageId, key)
     {
-        WebInspector.panels.resources.updateDOMStorage(storageId);
-    }
+        this._model._domStorageItemRemoved(storageId, key);
+    },
+
+    /**
+     * @param {!DOMStorageAgent.StorageId} storageId
+     * @param {string} key
+     * @param {string} value
+     */
+    domStorageItemAdded: function(storageId, key, value)
+    {
+        this._model._domStorageItemAdded(storageId, key, value);
+    },
+
+    /**
+     * @param {!DOMStorageAgent.StorageId} storageId
+     * @param {string} key
+     * @param {string} oldValue
+     * @param {string} value
+     */
+    domStorageItemUpdated: function(storageId, key, oldValue, value)
+    {
+        this._model._domStorageItemUpdated(storageId, key, oldValue, value);
+    },
 }
+
+/**
+ * @type {!WebInspector.DOMStorageModel}
+ */
+WebInspector.domStorageModel;

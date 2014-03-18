@@ -38,11 +38,12 @@ WebInspector.MetricsSidebarPane = function()
     WebInspector.cssModel.addEventListener(WebInspector.CSSStyleModel.Events.MediaQueryResultChanged, this._styleSheetOrMediaQueryResultChanged, this);
     WebInspector.domAgent.addEventListener(WebInspector.DOMAgent.Events.AttrModified, this._attributesUpdated, this);
     WebInspector.domAgent.addEventListener(WebInspector.DOMAgent.Events.AttrRemoved, this._attributesUpdated, this);
+    WebInspector.resourceTreeModel.addEventListener(WebInspector.ResourceTreeModel.EventTypes.FrameResized, this._frameResized, this);
 }
 
 WebInspector.MetricsSidebarPane.prototype = {
     /**
-     * @param {WebInspector.DOMNode=} node
+     * @param {?WebInspector.DOMNode=} node
      */
     update: function(node)
     {
@@ -66,14 +67,22 @@ WebInspector.MetricsSidebarPane.prototype = {
             return;
         }
 
+        /**
+         * @param {?WebInspector.CSSStyleDeclaration} style
+         * @this {WebInspector.MetricsSidebarPane}
+         */
         function callback(style)
         {
             if (!style || this.node !== node)
                 return;
             this._updateMetrics(style);
         }
-        WebInspector.cssModel.getComputedStyleAsync(node.id, WebInspector.panels.elements.sidebarPanes.styles.forcedPseudoClasses, callback.bind(this));
+        WebInspector.cssModel.getComputedStyleAsync(node.id, callback.bind(this));
 
+        /**
+         * @param {?WebInspector.CSSStyleDeclaration} style
+         * @this {WebInspector.MetricsSidebarPane}
+         */
         function inlineStyleCallback(style)
         {
             if (!style || this.node !== node)
@@ -86,6 +95,23 @@ WebInspector.MetricsSidebarPane.prototype = {
     _styleSheetOrMediaQueryResultChanged: function()
     {
         this._innerUpdate();
+    },
+
+    _frameResized: function()
+    {
+        /**
+         * @this {WebInspector.MetricsSidebarPane}
+         */
+        function refreshContents()
+        {
+            this._innerUpdate();
+            delete this._activeTimer;
+        }
+
+        if (this._activeTimer)
+            clearTimeout(this._activeTimer);
+
+        this._activeTimer = setTimeout(refreshContents.bind(this), 100);
     },
 
     _attributesUpdated: function(event)
@@ -113,7 +139,7 @@ WebInspector.MetricsSidebarPane.prototype = {
 
     _highlightDOMNode: function(showHighlight, mode, event)
     {
-        event.stopPropagation();
+        event.consume();
         var nodeId = showHighlight && this.node ? this.node.id : 0;
         if (nodeId) {
             if (this._highlightMode === mode)
@@ -134,6 +160,9 @@ WebInspector.MetricsSidebarPane.prototype = {
         }
     },
 
+    /**
+     * @param {!WebInspector.CSSStyleDeclaration} style
+     */
     _updateMetrics: function(style)
     {
         // Updating with computed style.
@@ -141,6 +170,13 @@ WebInspector.MetricsSidebarPane.prototype = {
         metricsElement.className = "metrics";
         var self = this;
 
+        /**
+         * @param {!WebInspector.CSSStyleDeclaration} style
+         * @param {string} name
+         * @param {string} side
+         * @param {string} suffix
+         * @this {WebInspector.MetricsSidebarPane}
+         */
         function createBoxPartElement(style, name, side, suffix)
         {
             var propertyName = (name !== "position" ? name + "-" : "") + side + suffix;
@@ -150,6 +186,7 @@ WebInspector.MetricsSidebarPane.prototype = {
             else if (name === "position" && value === "auto")
                 value = "\u2012";
             value = value.replace(/px$/, "");
+            value = Number.toFixedIfFloating(value);
 
             var element = document.createElement("div");
             element.className = side;
@@ -161,27 +198,27 @@ WebInspector.MetricsSidebarPane.prototype = {
         function getContentAreaWidthPx(style)
         {
             var width = style.getPropertyValue("width").replace(/px$/, "");
-            if (style.getPropertyValue("box-sizing") === "border-box") {
+            if (!isNaN(width) && style.getPropertyValue("box-sizing") === "border-box") {
                 var borderBox = self._getBox(style, "border");
                 var paddingBox = self._getBox(style, "padding");
 
                 width = width - borderBox.left - borderBox.right - paddingBox.left - paddingBox.right;
             }
 
-            return width;
+            return Number.toFixedIfFloating(width);
         }
 
         function getContentAreaHeightPx(style)
         {
             var height = style.getPropertyValue("height").replace(/px$/, "");
-            if (style.getPropertyValue("box-sizing") === "border-box") {
+            if (!isNaN(height) && style.getPropertyValue("box-sizing") === "border-box") {
                 var borderBox = self._getBox(style, "border");
                 var paddingBox = self._getBox(style, "padding");
 
                 height = height - borderBox.top - borderBox.bottom - paddingBox.top - paddingBox.bottom;
             }
 
-            return height;
+            return Number.toFixedIfFloating(height);
         }
 
         // Display types for which margin is ignored.
@@ -216,7 +253,7 @@ WebInspector.MetricsSidebarPane.prototype = {
             WebInspector.Color.PageHighlight.Padding,
             WebInspector.Color.PageHighlight.Border,
             WebInspector.Color.PageHighlight.Margin,
-            WebInspector.Color.fromRGBA(0, 0, 0, 0)
+            WebInspector.Color.fromRGBA([0, 0, 0, 0])
         ];
         var boxLabels = [WebInspector.UIString("content"), WebInspector.UIString("padding"), WebInspector.UIString("border"), WebInspector.UIString("margin"), WebInspector.UIString("position")];
         var previousBox = null;
@@ -233,7 +270,7 @@ WebInspector.MetricsSidebarPane.prototype = {
 
             var boxElement = document.createElement("div");
             boxElement.className = name;
-            boxElement._backgroundColor = boxColors[i].toString("original");
+            boxElement._backgroundColor = boxColors[i].toString(WebInspector.Color.Format.RGBA);
             boxElement._name = name;
             boxElement.style.backgroundColor = boxElement._backgroundColor;
             boxElement.addEventListener("mouseover", this._highlightDOMNode.bind(this, true, name === "position" ? "all" : name), false);
@@ -292,64 +329,34 @@ WebInspector.MetricsSidebarPane.prototype = {
 
         this._isEditingMetrics = true;
 
-        var config = new WebInspector.EditingConfig(this.editingCommitted.bind(this), this.editingCancelled.bind(this), context);
-        WebInspector.startEditing(targetElement, config);
+        var config = new WebInspector.InplaceEditor.Config(this.editingCommitted.bind(this), this.editingCancelled.bind(this), context);
+        WebInspector.InplaceEditor.startEditing(targetElement, config);
 
         window.getSelection().setBaseAndExtent(targetElement, 0, targetElement, 1);
     },
 
     _handleKeyDown: function(context, styleProperty, event)
     {
-        if (!/^(?:Page)?(?:Up|Down)$/.test(event.keyIdentifier))
-            return;
         var element = event.currentTarget;
 
-        var selection = window.getSelection();
-        if (!selection.rangeCount)
-            return;
+        /**
+         * @param {string} originalValue
+         * @param {string} replacementString
+         * @this {WebInspector.MetricsSidebarPane}
+         */
+        function finishHandler(originalValue, replacementString)
+        {
+            this._applyUserInput(element, replacementString, originalValue, context, false);
+        }
 
-        var selectionRange = selection.getRangeAt(0);
-        if (selectionRange.commonAncestorContainer !== element && !selectionRange.commonAncestorContainer.isDescendant(element))
-            return;
-
-        var originalValue = element.textContent;
-        var wordRange = selectionRange.startContainer.rangeOfWord(selectionRange.startOffset, WebInspector.StylesSidebarPane.StyleValueDelimiters, element);
-        var wordString = wordRange.toString();
-
-        var matches = /(.*?)(-?(?:\d+(?:\.\d+)?|\.\d+))(.*)/.exec(wordString);
-        var replacementString;
-        if (matches && matches.length) {
-            var prefix = matches[1];
-            var suffix = matches[3];
-            var number = WebInspector.StylesSidebarPane.alteredFloatNumber(parseFloat(matches[2]), event);
-            if (number === null) {
-                // Need to check for null explicitly.
-                return;
-            }
-
+        function customNumberHandler(number)
+        {
             if (styleProperty !== "margin" && number < 0)
                 number = 0;
-
-            replacementString = prefix + number + suffix;
+            return number;
         }
-        if (!replacementString)
-            return;
 
-        var replacementTextNode = document.createTextNode(replacementString);
-
-        wordRange.deleteContents();
-        wordRange.insertNode(replacementTextNode);
-
-        var finalSelectionRange = document.createRange();
-        finalSelectionRange.setStart(replacementTextNode, 0);
-        finalSelectionRange.setEnd(replacementTextNode, replacementString.length);
-
-        selection.removeAllRanges();
-        selection.addRange(finalSelectionRange);
-
-        event.handled = true;
-        event.preventDefault();
-        this._applyUserInput(element, replacementString, originalValue, context, false);
+        WebInspector.handleElementValueModifications(event, element, finishHandler.bind(this), undefined, customNumberHandler);
     },
 
     editingEnded: function(element, context)
@@ -443,7 +450,7 @@ WebInspector.MetricsSidebarPane.prototype = {
                 continue;
 
             this.previousPropertyDataCandidate = property;
-            property.setValue(userInput, commitEditor, callback);
+            property.setValue(userInput, commitEditor, true, callback);
             return;
         }
 
@@ -454,7 +461,7 @@ WebInspector.MetricsSidebarPane.prototype = {
     {
         this.editingEnded(element, context);
         this._applyUserInput(element, userInput, previousContent, context, true);
-    }
-}
+    },
 
-WebInspector.MetricsSidebarPane.prototype.__proto__ = WebInspector.SidebarPane.prototype;
+    __proto__: WebInspector.SidebarPane.prototype
+}

@@ -33,186 +33,231 @@
 WebInspector.Panel = function(name)
 {
     WebInspector.View.call(this);
+    WebInspector.panels[name] = this;
 
-    this.element.addStyleClass("panel");
-    this.element.addStyleClass(name);
+    this.element.classList.add("panel");
+    this.element.classList.add(name);
     this._panelName = name;
 
-    this._shortcuts = {};
-
-    WebInspector.settings[this._sidebarWidthSettingName()] = WebInspector.settings.createSetting(this._sidebarWidthSettingName(), undefined);
+    this._shortcuts = /** !Object.<number, function(Event=):boolean> */ ({});
 }
 
 // Should by in sync with style declarations.
 WebInspector.Panel.counterRightMargin = 25;
 
 WebInspector.Panel.prototype = {
-    get toolbarItem()
-    {
-        if (this._toolbarItem)
-            return this._toolbarItem;
-
-        this._toolbarItem = WebInspector.Toolbar.createPanelToolbarItem(this);
-        return this._toolbarItem;
-    },
-
     get name()
     {
         return this._panelName;
     },
 
-    show: function()
-    {
-        WebInspector.View.prototype.show.call(this, WebInspector.inspectorView.element);
-    },
-
-    wasShown: function()
-    {
-        var statusBarItems = this.statusBarItems;
-        if (statusBarItems) {
-            this._statusBarItemContainer = document.createElement("div");
-            for (var i = 0; i < statusBarItems.length; ++i)
-                this._statusBarItemContainer.appendChild(statusBarItems[i]);
-            document.getElementById("main-status-bar").appendChild(this._statusBarItemContainer);
-        }
-
-        if ("_toolbarItem" in this)
-            this._toolbarItem.addStyleClass("toggled-on");
-
-        WebInspector.setCurrentFocusElement(this.defaultFocusedElement);
-    },
-
-    willHide: function()
-    {
-        if (this._statusBarItemContainer && this._statusBarItemContainer.parentNode)
-            this._statusBarItemContainer.parentNode.removeChild(this._statusBarItemContainer);
-        delete this._statusBarItemContainer;
-        if ("_toolbarItem" in this)
-            this._toolbarItem.removeStyleClass("toggled-on");
-    },
-
     reset: function()
     {
-        this.searchCanceled();
     },
 
-    get defaultFocusedElement()
+    /**
+     * @return {!Element}
+     */
+    defaultFocusedElement: function()
     {
-        return this.sidebarTreeElement || this.element;
+        return this.element;
     },
 
-    searchCanceled: function()
+    /**
+     * @return {?WebInspector.SearchableView}
+     */
+    searchableView: function()
     {
-        WebInspector.searchController.updateSearchMatchesCount(0, this);
+        return null;
     },
 
-    performSearch: function(query)
-    {
-        // Call searchCanceled since it will reset everything we need before doing a new search.
-        this.searchCanceled();
-    },
-
-    jumpToNextSearchResult: function()
-    {
-    },
-
-    jumpToPreviousSearchResult: function()
+    /**
+     * @param {string} text
+     */
+    replaceSelectionWith: function(text)
     {
     },
 
     /**
-     * @param {Element=} parentElement
-     * @param {string=} position
-     * @param {number=} defaultWidth
+     * @param {string} query
+     * @param {string} text
      */
-    createSplitView: function(parentElement, position, defaultWidth)
+    replaceAllWith: function(query, text)
     {
-        if (this.splitView)
-            return;
-
-        if (!parentElement)
-            parentElement = this.element;
-
-        this.splitView = new WebInspector.SplitView(position || WebInspector.SplitView.SidebarPosition.Left, this._sidebarWidthSettingName(), defaultWidth);
-        this.splitView.show(parentElement);
-        this.splitView.addEventListener(WebInspector.SplitView.EventTypes.Resized, this.sidebarResized.bind(this));
-
-        this.sidebarElement = this.splitView.sidebarElement;
-    },
-
-    /**
-     * @param {Element=} parentElement
-     * @param {string=} position
-     * @param {number=} defaultWidth
-     */
-    createSplitViewWithSidebarTree: function(parentElement, position, defaultWidth)
-    {
-        if (this.splitView)
-            return;
-
-        this.createSplitView(parentElement, position);
-
-        this.sidebarTreeElement = document.createElement("ol");
-        this.sidebarTreeElement.className = "sidebar-tree";
-        this.splitView.sidebarElement.appendChild(this.sidebarTreeElement);
-        this.splitView.sidebarElement.addStyleClass("sidebar");
-
-        this.sidebarTree = new TreeOutline(this.sidebarTreeElement);
-        this.sidebarTree.panel = this;
-    },
-
-    _sidebarWidthSettingName: function()
-    {
-        return this._panelName + "SidebarWidth";
     },
 
     // Should be implemented by ancestors.
-
-    get toolbarItemLabel()
-    {
-    },
-
     get statusBarItems()
     {
     },
 
-    sidebarResized: function(width)
-    {
-    },
-
-    statusBarResized: function()
-    {
-    },
-
-    canShowAnchorLocation: function(anchor)
-    {
-        return false;
-    },
-
-    showAnchorLocation: function(anchor)
-    {
-        return false;
-    },
-
+    /**
+     * @return {!Array.<!Element>}
+     */
     elementsToRestoreScrollPositionsFor: function()
     {
         return [];
     },
 
+    /**
+     * @param {!KeyboardEvent} event
+     */
     handleShortcut: function(event)
     {
         var shortcutKey = WebInspector.KeyboardShortcut.makeKeyFromEvent(event);
         var handler = this._shortcuts[shortcutKey];
-        if (handler) {
-            handler(event);
+        if (handler && handler(event)) {
             event.handled = true;
+            return;
         }
+
+        var searchableView = this.searchableView();
+        if (!searchableView)
+            return;
+
+        function handleSearchShortcuts(shortcuts, handler)
+        {
+            for (var i = 0; i < shortcuts.length; ++i) {
+                if (shortcuts[i].key !== shortcutKey)
+                    continue;
+                return handler.call(searchableView);
+            }
+            return false;
+        }
+
+        if (handleSearchShortcuts(WebInspector.SearchableView.findShortcuts(), searchableView.handleFindShortcut))
+            event.handled = true;
+        else if (handleSearchShortcuts(WebInspector.SearchableView.cancelSearchShortcuts(), searchableView.handleCancelSearchShortcut))
+            event.handled = true;
     },
 
-    registerShortcut: function(key, handler)
+    /**
+     * @param {!Array.<!WebInspector.KeyboardShortcut.Descriptor>} keys
+     * @param {function(?Event=):boolean} handler
+     */
+    registerShortcuts: function(keys, handler)
     {
-        this._shortcuts[key] = handler;
-    }
+        for (var i = 0; i < keys.length; ++i)
+            this._shortcuts[keys[i].key] = handler;
+    },
+
+    __proto__: WebInspector.View.prototype
 }
 
-WebInspector.Panel.prototype.__proto__ = WebInspector.View.prototype;
+/**
+ * @extends {WebInspector.Panel}
+ * @param {number=} defaultWidth
+ * @constructor
+ */
+WebInspector.PanelWithSidebarTree = function(name, defaultWidth)
+{
+    WebInspector.Panel.call(this, name);
+
+    this._panelSplitView = new WebInspector.SplitView(true, false, this._panelName + "PanelSplitViewState", defaultWidth || 200);
+    this._panelSplitView.setSidebarElementConstraints(Preferences.minSidebarWidth);
+    this._panelSplitView.show(this.element);
+
+    var sidebarElement = this._panelSplitView.sidebarElement();
+    sidebarElement.classList.add("sidebar");
+    var sidebarTreeElement = sidebarElement.createChild("ol", "sidebar-tree");
+    this.sidebarTree = new TreeOutline(sidebarTreeElement);
+}
+
+WebInspector.PanelWithSidebarTree.prototype = {
+    /**
+     * @return {!Element}
+     */
+    sidebarElement: function()
+    {
+        return this._panelSplitView.sidebarElement();
+    },
+
+    /**
+     * @return {!Element} element
+     */
+    mainElement: function()
+    {
+        return this._panelSplitView.mainElement();
+    },
+
+    /**
+     * @param {number=} minWidth
+     * @param {number=} minHeight
+     */
+    setMainElementConstraints: function(minWidth, minHeight)
+    {
+        this._panelSplitView.setMainElementConstraints(minWidth, minHeight);
+    },
+
+    /**
+     * @return {!Element}
+     */
+    defaultFocusedElement: function()
+    {
+        return this.sidebarTree.element || this.element;
+    },
+
+    __proto__: WebInspector.Panel.prototype
+}
+
+/**
+ * @interface
+ */
+WebInspector.PanelDescriptor = function()
+{
+}
+
+WebInspector.PanelDescriptor.prototype = {
+    /**
+     * @return {string}
+     */
+    name: function() {},
+
+    /**
+     * @return {string}
+     */
+    title: function() {},
+
+    /**
+     * @return {!WebInspector.Panel}
+     */
+    panel: function() {}
+}
+
+/**
+ * @constructor
+ * @param {!WebInspector.ModuleManager.Extension} extension
+ * @implements {WebInspector.PanelDescriptor}
+ */
+WebInspector.ModuleManagerExtensionPanelDescriptor = function(extension)
+{
+    this._name = extension.descriptor()["name"];
+    this._title = WebInspector.UIString(extension.descriptor()["title"]);
+    this._extension = extension;
+}
+
+WebInspector.ModuleManagerExtensionPanelDescriptor.prototype = {
+    /**
+     * @return {string}
+     */
+    name: function()
+    {
+        return this._name;
+    },
+
+    /**
+     * @return {string}
+     */
+    title: function()
+    {
+        return this._title;
+    },
+
+    /**
+     * @return {!WebInspector.Panel}
+     */
+    panel: function()
+    {
+        return /** @type {!WebInspector.Panel} */ (this._extension.instance());
+    }
+}

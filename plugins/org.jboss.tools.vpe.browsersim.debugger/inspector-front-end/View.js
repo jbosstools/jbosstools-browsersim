@@ -31,6 +31,7 @@
 WebInspector.View = function()
 {
     this.element = document.createElement("div");
+    this.element.className = "view";
     this.element.__view = this;
     this._visible = true;
     this._isRoot = false;
@@ -38,17 +39,55 @@ WebInspector.View = function()
     this._children = [];
     this._hideOnDetach = false;
     this._cssFiles = [];
+    this._notificationDepth = 0;
 }
 
 WebInspector.View._cssFileToVisibleViewCount = {};
 WebInspector.View._cssFileToStyleElement = {};
+WebInspector.View._cssUnloadTimeout = 2000;
+
+WebInspector.View._buildSourceURL = function(cssFile)
+{
+    return "\n/*# sourceURL=" + WebInspector.ParsedURL.completeURL(window.location.href, cssFile) + " */";
+}
+
+WebInspector.View.createStyleElement = function(cssFile)
+{
+    var styleElement;
+    var xhr = new XMLHttpRequest();
+    xhr.open("GET", cssFile, false);
+    xhr.send(null);
+
+    styleElement = document.createElement("style");
+    styleElement.type = "text/css";
+    styleElement.textContent = xhr.responseText + WebInspector.View._buildSourceURL(cssFile);
+    document.head.insertBefore(styleElement, document.head.firstChild);
+    return styleElement;
+}
 
 WebInspector.View.prototype = {
     markAsRoot: function()
     {
+        WebInspector.View._assert(!this.element.parentElement, "Attempt to mark as root attached node");
         this._isRoot = true;
     },
 
+    makeLayoutBoundary: function()
+    {
+        this._isLayoutBoundary = true;
+    },
+
+    /**
+     * @return {?WebInspector.View}
+     */
+    parentView: function()
+    {
+        return this._parentView;
+    },
+
+    /**
+     * @return {boolean}
+     */
     isShowing: function()
     {
         return this._isShowing;
@@ -59,42 +98,58 @@ WebInspector.View.prototype = {
         this._hideOnDetach = true;
     },
 
-    _parentIsShowing: function()
+    /**
+     * @return {boolean} 
+     */
+    _inNotification: function()
     {
-        return this._isRoot || (this._parentView && this._parentView.isShowing());
+        return !!this._notificationDepth || (this._parentView && this._parentView._inNotification());
     },
 
+    _parentIsShowing: function()
+    {
+        if (this._isRoot)
+            return true;
+        return this._parentView && this._parentView.isShowing();
+    },
+
+    /**
+     * @param {function(this:WebInspector.View)} method
+     */
     _callOnVisibleChildren: function(method)
     {
-        for (var i = 0; i < this._children.length; ++i)
-            if (this._children[i]._visible)
-                method.call(this._children[i]);
+        var copy = this._children.slice();
+        for (var i = 0; i < copy.length; ++i) {
+            if (copy[i]._parentView === this && copy[i]._visible)
+                method.call(copy[i]);
+        }
     },
 
     _processWillShow: function()
     {
         this._loadCSSIfNeeded();
         this._callOnVisibleChildren(this._processWillShow);
+        this._isShowing = true;
     },
 
     _processWasShown: function()
     {
-        this._isShowing = true;
+        if (this._inNotification())
+            return;
         this.restoreScrollPositions();
-
-        this.wasShown();
-        this.onResize();
-
+        this._notify(this.wasShown);
+        this._notify(this.onResize);
         this._callOnVisibleChildren(this._processWasShown);
     },
 
     _processWillHide: function()
     {
+        if (this._inNotification())
+            return;
         this.storeScrollPositions();
 
         this._callOnVisibleChildren(this._processWillHide);
-
-        this.willHide();
+        this._notify(this.willHide);
         this._isShowing = false;
     },
 
@@ -106,11 +161,60 @@ WebInspector.View.prototype = {
 
     _processOnResize: function()
     {
+        if (this._inNotification())
+            return;
         if (!this.isShowing())
             return;
-
-        this.onResize();
+        this._notify(this.onResize);
         this._callOnVisibleChildren(this._processOnResize);
+    },
+
+    _processDiscardCachedSize: function()
+    {
+        if (this._isLayoutBoundary) {
+            this.element.style.removeProperty("width");
+            this.element.style.removeProperty("height");
+        }
+        this._callOnVisibleChildren(this._processDiscardCachedSize);
+    },
+
+    _cacheSize: function()
+    {
+        this._prepareCacheSize();
+        this._applyCacheSize();
+    },
+
+    _prepareCacheSize: function()
+    {
+        if (this._isLayoutBoundary) {
+            this._cachedOffsetWidth = this.element.offsetWidth;
+            this._cachedOffsetHeight = this.element.offsetHeight;
+        }
+        this._callOnVisibleChildren(this._prepareCacheSize);
+    },
+
+    _applyCacheSize: function()
+    {
+        if (this._isLayoutBoundary) {
+            this.element.style.setProperty("width", this._cachedOffsetWidth + "px");
+            this.element.style.setProperty("height", this._cachedOffsetHeight + "px");
+            delete this._cachedOffsetWidth;
+            delete this._cachedOffsetHeight;
+        }
+        this._callOnVisibleChildren(this._applyCacheSize);
+    },
+
+    /**
+     * @param {function(this:WebInspector.View)} notification
+     */
+    _notify: function(notification)
+    {
+        ++this._notificationDepth;
+        try {
+            notification.call(this);
+        } finally {
+            --this._notificationDepth;
+        }
     },
 
     wasShown: function()
@@ -126,8 +230,8 @@ WebInspector.View.prototype = {
     },
 
     /**
-     * @param {Element} parentElement
-     * @param {Element=} insertBefore
+     * @param {?Element} parentElement
+     * @param {!Element=} insertBefore
      */
     show: function(parentElement, insertBefore)
     {
@@ -135,6 +239,9 @@ WebInspector.View.prototype = {
 
         // Update view hierarchy
         if (this.element.parentElement !== parentElement) {
+            if (this.element.parentElement)
+                this.detach();
+
             var currentParent = parentElement;
             while (currentParent && !currentParent.__view)
                 currentParent = currentParent.parentElement;
@@ -145,14 +252,16 @@ WebInspector.View.prototype = {
                 this._isRoot = false;
             } else
                 WebInspector.View._assert(this._isRoot, "Attempt to attach view to orphan node");
-        } else if (this._visible)
+        } else if (this._visible) {
             return;
+        }
 
         this._visible = true;
+
         if (this._parentIsShowing())
             this._processWillShow();
 
-        this.element.addStyleClass("visible");
+        this.element.classList.add("visible");
 
         // Reparent
         if (this.element.parentElement !== parentElement) {
@@ -163,8 +272,10 @@ WebInspector.View.prototype = {
                 WebInspector.View._originalAppendChild.call(parentElement, this.element);
         }
 
-        if (this._parentIsShowing())
+        if (this._parentIsShowing()) {
             this._processWasShown();
+            this._cacheSize();
+        }
     },
 
     /**
@@ -176,11 +287,13 @@ WebInspector.View.prototype = {
         if (!parentElement)
             return;
 
-        if (this._parentIsShowing())
+        if (this._parentIsShowing()) {
+            this._processDiscardCachedSize();
             this._processWillHide();
+        }
 
         if (this._hideOnDetach && !overrideHideOnDetach) {
-            this.element.removeStyleClass("visible");
+            this.element.classList.remove("visible");
             this._visible = false;
             if (this._parentIsShowing())
                 this._processWasHidden();
@@ -212,6 +325,9 @@ WebInspector.View.prototype = {
             children[i].detach();
     },
 
+    /**
+     * @return {!Array.<!Element>}
+     */
     elementsToRestoreScrollPositionsFor: function()
     {
         return [this.element];
@@ -239,22 +355,37 @@ WebInspector.View.prototype = {
         }
     },
 
-    canHighlightLine: function()
+    /**
+     * @return {boolean}
+     */
+    canHighlightPosition: function()
     {
         return false;
     },
 
-    highlightLine: function(line)
+    /**
+     * @param {number} line
+     * @param {number=} column
+     */
+    highlightPosition: function(line, column)
     {
     },
 
     doResize: function()
     {
-        this._processOnResize();
+        if (!this.isShowing())
+            return;
+        this._processDiscardCachedSize();
+        // No matter what notification we are in, dispatching onResize is not needed.
+        if (!this._inNotification())
+            this._callOnVisibleChildren(this._processOnResize);
+        this._cacheSize();
     },
 
     registerRequiredCSS: function(cssFile)
     {
+        if (window.flattenImports)
+            cssFile = cssFile.split("/").reverse()[0];
         this._cssFiles.push(cssFile);
     },
 
@@ -277,37 +408,38 @@ WebInspector.View.prototype = {
             styleElement.disabled = false;
             return;
         }
-
-        var xhr = new XMLHttpRequest();
-        xhr.open("GET", cssFile, false);
-        xhr.send(null);
-
-        styleElement = document.createElement("style");
-        styleElement.type = "text/css";
-        styleElement.textContent = xhr.responseText;
-        document.head.insertBefore(styleElement, document.head.firstChild);
-
+        styleElement = WebInspector.View.createStyleElement(cssFile);
         WebInspector.View._cssFileToStyleElement[cssFile] = styleElement;
     },
 
     _disableCSSIfNeeded: function()
     {
+        var scheduleUnload = !!WebInspector.View._cssUnloadTimer;
+
         for (var i = 0; i < this._cssFiles.length; ++i) {
             var cssFile = this._cssFiles[i];
 
-            var viewsWithCSSFile = WebInspector.View._cssFileToVisibleViewCount[cssFile];
-            viewsWithCSSFile--;
-            WebInspector.View._cssFileToVisibleViewCount[cssFile] = viewsWithCSSFile;
-
-            if (!viewsWithCSSFile)
-                this._doUnloadCSS(cssFile);
+            if (!--WebInspector.View._cssFileToVisibleViewCount[cssFile])
+                scheduleUnload = true;
         }
-    },
 
-    _doUnloadCSS: function(cssFile)
-    {
-        var styleElement = WebInspector.View._cssFileToStyleElement[cssFile];
-        styleElement.disabled = true;
+        function doUnloadCSS()
+        {
+            delete WebInspector.View._cssUnloadTimer;
+
+            for (cssFile in WebInspector.View._cssFileToVisibleViewCount) {
+                if (WebInspector.View._cssFileToVisibleViewCount.hasOwnProperty(cssFile)
+                    && !WebInspector.View._cssFileToVisibleViewCount[cssFile])
+                    WebInspector.View._cssFileToStyleElement[cssFile].disabled = true;
+            }
+        }
+
+        if (scheduleUnload) {
+            if (WebInspector.View._cssUnloadTimer)
+                clearTimeout(WebInspector.View._cssUnloadTimer);
+
+            WebInspector.View._cssUnloadTimer = setTimeout(doUnloadCSS, WebInspector.View._cssUnloadTimeout)
+        }
     },
 
     printViewHierarchy: function()
@@ -326,10 +458,50 @@ WebInspector.View.prototype = {
 
         if (this._children.length)
             lines.push(prefix + "}");
-    }
-}
+    },
 
-WebInspector.View.prototype.__proto__ = WebInspector.Object.prototype;
+    /**
+     * @return {!Element}
+     */
+    defaultFocusedElement: function()
+    {
+        return this._defaultFocusedElement || this.element;
+    },
+
+    /**
+     * @param {!Element} element
+     */
+    setDefaultFocusedElement: function(element)
+    {
+        this._defaultFocusedElement = element;
+    },
+
+    focus: function()
+    {
+        var element = this.defaultFocusedElement();
+        if (!element || element.isAncestor(document.activeElement))
+            return;
+
+        WebInspector.setCurrentFocusElement(element);
+    },
+
+    /**
+     * @return {!Size}
+     */
+    measurePreferredSize: function()
+    {
+        this._loadCSSIfNeeded();
+        WebInspector.View._originalAppendChild.call(document.body, this.element);
+        this.element.positionAt(0, 0);
+        var result = new Size(this.element.offsetWidth, this.element.offsetHeight);
+        this.element.positionAt(undefined, undefined);
+        WebInspector.View._originalRemoveChild.call(document.body, this.element);
+        this._disableCSSIfNeeded();
+        return result;
+    },
+
+    __proto__: WebInspector.Object.prototype
+}
 
 WebInspector.View._originalAppendChild = Element.prototype.appendChild;
 WebInspector.View._originalInsertBefore = Element.prototype.insertBefore;
@@ -368,15 +540,35 @@ WebInspector.View._assert = function(condition, message)
     }
 }
 
+/**
+ * @constructor
+ * @extends {WebInspector.View}
+ * @param {function()} resizeCallback
+ */
+WebInspector.ViewWithResizeCallback = function(resizeCallback)
+{
+    WebInspector.View.call(this);
+    this._resizeCallback = resizeCallback;
+}
+
+WebInspector.ViewWithResizeCallback.prototype = {
+    onResize: function()
+    {
+        this._resizeCallback();
+    },
+
+    __proto__: WebInspector.View.prototype
+}
+
 Element.prototype.appendChild = function(child)
 {
-    WebInspector.View._assert(!child.__view, "Attempt to add view via regular DOM operation.");
+    WebInspector.View._assert(!child.__view || child.parentElement === this, "Attempt to add view via regular DOM operation.");
     return WebInspector.View._originalAppendChild.call(this, child);
 }
 
 Element.prototype.insertBefore = function(child, anchor)
 {
-    WebInspector.View._assert(!child.__view, "Attempt to add view via regular DOM operation.");
+    WebInspector.View._assert(!child.__view || child.parentElement === this, "Attempt to add view via regular DOM operation.");
     return WebInspector.View._originalInsertBefore.call(this, child, anchor);
 }
 

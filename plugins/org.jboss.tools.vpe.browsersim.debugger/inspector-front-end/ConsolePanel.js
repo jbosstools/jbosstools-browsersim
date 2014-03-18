@@ -26,6 +26,9 @@
  * THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
+importScript("ConsoleViewMessage.js");
+importScript("ConsoleView.js");
+
 /**
  * @constructor
  * @extends {WebInspector.Panel}
@@ -33,124 +36,130 @@
 WebInspector.ConsolePanel = function()
 {
     WebInspector.Panel.call(this, "console");
+    this._view = WebInspector.ConsolePanel._view();
+}
 
-    WebInspector.consoleView.addEventListener(WebInspector.ConsoleView.Events.EntryAdded, this._consoleMessageAdded, this);
-    WebInspector.consoleView.addEventListener(WebInspector.ConsoleView.Events.ConsoleCleared, this._consoleCleared, this);
-    this._view = WebInspector.consoleView;
+/**
+ * @return {!WebInspector.ConsoleView}
+ */
+WebInspector.ConsolePanel._view = function()
+{
+    if (!WebInspector.ConsolePanel._consoleView) {
+        WebInspector.ConsolePanel._consoleView = new WebInspector.ConsoleView(WebInspector.isWorkerFrontend());
+        WebInspector.console.setUIDelegate(WebInspector.ConsolePanel._consoleView);
+    }
+    return WebInspector.ConsolePanel._consoleView;
 }
 
 WebInspector.ConsolePanel.prototype = {
-    get toolbarItemLabel()
+    /**
+     * @return {!Element}
+     */
+    defaultFocusedElement: function()
     {
-        return WebInspector.UIString("Console");
-    },
-
-    get statusBarItems()
-    {
-        return this._view.statusBarItems;
+        return this._view.defaultFocusedElement();
     },
 
     wasShown: function()
     {
         WebInspector.Panel.prototype.wasShown.call(this);
-        if (WebInspector.drawer.visible) {
-            WebInspector.drawer.hide(WebInspector.Drawer.AnimationType.Immediately);
-            this._drawerWasVisible = true;
-        }
         this._view.show(this.element);
     },
 
     willHide: function()
     {
-        if (this._drawerWasVisible) {
-            WebInspector.drawer.show(this._view, WebInspector.Drawer.AnimationType.Immediately);
-            delete this._drawerWasVisible;
-        }
         WebInspector.Panel.prototype.willHide.call(this);
+        if (WebInspector.ConsolePanel.WrapperView._instance)
+            WebInspector.ConsolePanel.WrapperView._instance._showViewInWrapper();
     },
 
-    searchCanceled: function()
-    {
-        this._clearCurrentSearchResultHighlight();
-        delete this._searchResults;
-        delete this._searchRegex;
-    },
+    __proto__: WebInspector.Panel.prototype
+}
 
-    performSearch: function(query)
-    {
-        WebInspector.searchController.updateSearchMatchesCount(0, this);
-        this.searchCanceled();
-        this._searchRegex = createPlainTextSearchRegex(query, "gi");
+/**
+ * @constructor
+ * @implements {WebInspector.Drawer.ViewFactory}
+ */
+WebInspector.ConsolePanel.ViewFactory = function()
+{
+}
 
-        this._searchResults = [];
-        var messages = WebInspector.consoleView.messages;
-        for (var i = 0; i < messages.length; i++) {
-            if (messages[i].matchesRegex(this._searchRegex)) {
-                this._searchResults.push(messages[i]);
-                this._searchRegex.lastIndex = 0;
-            }
-        }
-        WebInspector.searchController.updateSearchMatchesCount(this._searchResults.length, this);
-        this._currentSearchResultIndex = -1;
-        if (this._searchResults.length)
-            this._jumpToSearchResult(0);
-    },
-
-    jumpToNextSearchResult: function()
+WebInspector.ConsolePanel.ViewFactory.prototype = {
+    /**
+     * @return {!WebInspector.View}
+     */
+    createView: function()
     {
-        if (!this._searchResults || !this._searchResults.length)
-            return;
-        this._jumpToSearchResult((this._currentSearchResultIndex + 1) % this._searchResults.length);
-    },
-
-    jumpToPreviousSearchResult: function()
-    {
-        if (!this._searchResults || !this._searchResults.length)
-            return;
-        var index = this._currentSearchResultIndex - 1;
-        if (index === -1)
-            index = this._searchResults.length - 1;
-        this._jumpToSearchResult(index);
-    },
-
-    _clearCurrentSearchResultHighlight: function()
-    {
-        if (!this._searchResults)
-            return;
-        var highlightedMessage = this._searchResults[this._currentSearchResultIndex];
-        if (highlightedMessage)
-            highlightedMessage.clearHighlight();
-        this._currentSearchResultIndex = -1;
-    },
-
-    _jumpToSearchResult: function(index)
-    {
-        this._clearCurrentSearchResultHighlight();
-        this._currentSearchResultIndex = index;
-        this._searchResults[index].highlightSearchResults(this._searchRegex);
-    },
-
-    _consoleMessageAdded: function(event)
-    {
-        if (!this._searchRegex || !this.isShowing())
-            return;
-        var message = event.data;
-        this._searchRegex.lastIndex = 0;
-        if (message.matchesRegex(this._searchRegex)) {
-            this._searchResults.push(message);
-            WebInspector.searchController.updateSearchMatchesCount(this._searchResults.length, this);
-        }
-    },
-
-    _consoleCleared: function()
-    {
-        if (!this._searchResults)
-            return;
-        this._clearCurrentSearchResultHighlight();
-        this._searchResults.length = 0;
-        if (this.isShowing())
-            WebInspector.searchController.updateSearchMatchesCount(0, this);
+        if (!WebInspector.ConsolePanel.WrapperView._instance)
+            WebInspector.ConsolePanel.WrapperView._instance = new WebInspector.ConsolePanel.WrapperView();
+        return WebInspector.ConsolePanel.WrapperView._instance;
     }
 }
 
-WebInspector.ConsolePanel.prototype.__proto__ = WebInspector.Panel.prototype;
+/**
+ * @constructor
+ * @extends {WebInspector.View}
+ */
+WebInspector.ConsolePanel.WrapperView = function()
+{
+    WebInspector.View.call(this);
+    this.element.classList.add("console-view-wrapper");
+
+    this._view = WebInspector.ConsolePanel._view();
+    // FIXME: this won't be needed once drawer becomes a view.
+    this.wasShown();
+}
+
+WebInspector.ConsolePanel.WrapperView.prototype = {
+    wasShown: function()
+    {
+        if (!WebInspector.inspectorView.currentPanel() || WebInspector.inspectorView.currentPanel().name !== "console")
+            this._showViewInWrapper();
+    },
+
+    /**
+     * @return {!Element}
+     */
+    defaultFocusedElement: function()
+    {
+        return this._view.defaultFocusedElement();
+    },
+
+    focus: function()
+    {
+        this._view.focus();
+    },
+
+    _showViewInWrapper: function()
+    {
+        this._view.show(this.element);
+    },
+
+    __proto__: WebInspector.View.prototype
+}
+
+/**
+ * @constructor
+ * @implements {WebInspector.Revealer}
+ */
+WebInspector.ConsolePanel.ConsoleRevealer = function()
+{
+}
+
+WebInspector.ConsolePanel.ConsoleRevealer.prototype = {
+    /**
+     * @param {!Object} object
+     */
+    reveal: function(object)
+    {
+        if (!(object instanceof WebInspector.ConsoleModel))
+            return;
+
+        var consoleView = WebInspector.ConsolePanel._view();
+        if (consoleView.isShowing()) {
+            consoleView.focus();
+            return;
+        }
+        WebInspector.inspectorView.showViewInDrawer("console");
+    }
+}

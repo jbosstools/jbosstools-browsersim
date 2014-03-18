@@ -50,10 +50,17 @@ WebInspector.PropertiesSidebarPane.prototype = {
 
         WebInspector.RemoteObject.resolveNode(node, WebInspector.PropertiesSidebarPane._objectGroupName, nodeResolved.bind(this));
 
+        /**
+         * @this {WebInspector.PropertiesSidebarPane}
+         */
         function nodeResolved(object)
         {
             if (!object)
                 return;
+
+            /**
+             * @this {WebInspector.PropertiesSidebarPane}
+             */
             function protoList()
             {
                 var proto = this;
@@ -65,17 +72,23 @@ WebInspector.PropertiesSidebarPane.prototype = {
                 }
                 return result;
             }
-            object.callFunction(protoList, nodePrototypesReady.bind(this));
+            object.callFunction(protoList, undefined, nodePrototypesReady.bind(this));
             object.release();
         }
 
-        function nodePrototypesReady(object)
+        /**
+         * @this {WebInspector.PropertiesSidebarPane}
+         */
+        function nodePrototypesReady(object, wasThrown)
         {
-            if (!object)
+            if (!object || wasThrown)
                 return;
             object.getOwnProperties(fillSection.bind(this));
         }
 
+        /**
+         * @this {WebInspector.PropertiesSidebarPane}
+         */
         function fillSection(prototypes)
         {
             if (!prototypes)
@@ -99,7 +112,7 @@ WebInspector.PropertiesSidebarPane.prototype = {
                 body.appendChild(section.element);
             }
         }
-    }
-}
+    },
 
-WebInspector.PropertiesSidebarPane.prototype.__proto__ = WebInspector.SidebarPane.prototype;
+    __proto__: WebInspector.SidebarPane.prototype
+}

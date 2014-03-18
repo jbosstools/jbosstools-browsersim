@@ -30,13 +30,13 @@
 
 /**
  * @constructor
- * @extends {WebInspector.AuditCategory}
+ * @extends {WebInspector.AuditCategoryImpl}
  */
 WebInspector.AuditCategories.PagePerformance = function() {
-    WebInspector.AuditCategory.call(this, WebInspector.AuditCategories.PagePerformance.AuditCategoryName);
+    WebInspector.AuditCategoryImpl.call(this, WebInspector.AuditCategories.PagePerformance.AuditCategoryName);
 }
 
-WebInspector.AuditCategories.PagePerformance.AuditCategoryName = "Web Page Performance";
+WebInspector.AuditCategories.PagePerformance.AuditCategoryName = WebInspector.UIString("Web Page Performance");
 
 WebInspector.AuditCategories.PagePerformance.prototype = {
     initialize: function()
@@ -44,20 +44,21 @@ WebInspector.AuditCategories.PagePerformance.prototype = {
         this.addRule(new WebInspector.AuditRules.UnusedCssRule(), WebInspector.AuditRule.Severity.Warning);
         this.addRule(new WebInspector.AuditRules.CssInHeadRule(), WebInspector.AuditRule.Severity.Severe);
         this.addRule(new WebInspector.AuditRules.StylesScriptsOrderRule(), WebInspector.AuditRule.Severity.Severe);
-    }
-}
+        this.addRule(new WebInspector.AuditRules.VendorPrefixedCSSProperties(), WebInspector.AuditRule.Severity.Warning);
+    },
 
-WebInspector.AuditCategories.PagePerformance.prototype.__proto__ = WebInspector.AuditCategory.prototype;
+    __proto__: WebInspector.AuditCategoryImpl.prototype
+}
 
 /**
  * @constructor
- * @extends {WebInspector.AuditCategory}
+ * @extends {WebInspector.AuditCategoryImpl}
  */
 WebInspector.AuditCategories.NetworkUtilization = function() {
-    WebInspector.AuditCategory.call(this, WebInspector.AuditCategories.NetworkUtilization.AuditCategoryName);
+    WebInspector.AuditCategoryImpl.call(this, WebInspector.AuditCategories.NetworkUtilization.AuditCategoryName);
 }
 
-WebInspector.AuditCategories.NetworkUtilization.AuditCategoryName = "Network Utilization";
+WebInspector.AuditCategories.NetworkUtilization.AuditCategoryName = WebInspector.UIString("Network Utilization");
 
 WebInspector.AuditCategories.NetworkUtilization.prototype = {
     initialize: function()
@@ -72,7 +73,7 @@ WebInspector.AuditCategories.NetworkUtilization.prototype = {
         this.addRule(new WebInspector.AuditRules.ParallelizeDownloadRule(4, 10, 0.5), WebInspector.AuditRule.Severity.Warning);
         this.addRule(new WebInspector.AuditRules.BrowserCacheControlRule(), WebInspector.AuditRule.Severity.Severe);
         this.addRule(new WebInspector.AuditRules.ProxyCacheControlRule(), WebInspector.AuditRule.Severity.Warning);
-    }
-}
+    },
 
-WebInspector.AuditCategories.NetworkUtilization.prototype.__proto__ = WebInspector.AuditCategory.prototype;
+    __proto__: WebInspector.AuditCategoryImpl.prototype
+}

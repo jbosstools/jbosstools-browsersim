@@ -30,43 +30,36 @@
 
 /**
  * @constructor
- * @extends {WebInspector.View}
+ * @extends {WebInspector.SidebarPaneStack}
+ * @param {!Array.<!WebInspector.AuditCategoryResult>} categoryResults
  */
 WebInspector.AuditResultView = function(categoryResults)
 {
-    WebInspector.View.call(this);
-    this.element.className = "audit-result-view";
+    WebInspector.SidebarPaneStack.call(this);
+    this.element.classList.add("audit-result-view", "fill");
 
     function categorySorter(a, b) {
         return (a.title || "").localeCompare(b.title || "");
     }
     categoryResults.sort(categorySorter);
     for (var i = 0; i < categoryResults.length; ++i)
-        this.element.appendChild(new WebInspector.AuditCategoryResultPane(categoryResults[i]).element);
-
-    this.element.addEventListener("contextmenu", this._contextMenuEventFired.bind(this), true);
+        this.addPane(new WebInspector.AuditCategoryResultPane(categoryResults[i]));
 }
 
 WebInspector.AuditResultView.prototype = {
-    _contextMenuEventFired: function(event)
-    {
-        var contextMenu = new WebInspector.ContextMenu();
-        if (WebInspector.populateHrefContextMenu(contextMenu, null, event))
-            contextMenu.show(event);
-    }
+    __proto__: WebInspector.SidebarPaneStack.prototype
 }
-
-WebInspector.AuditResultView.prototype.__proto__ = WebInspector.View.prototype;
 
 /**
  * @constructor
  * @extends {WebInspector.SidebarPane}
+ * @param {!WebInspector.AuditCategoryResult} categoryResult
  */
 WebInspector.AuditCategoryResultPane = function(categoryResult)
 {
     WebInspector.SidebarPane.call(this, categoryResult.title);
     var treeOutlineElement = document.createElement("ol");
-    this.bodyElement.addStyleClass("audit-result-tree");
+    this.bodyElement.classList.add("audit-result-tree");
     this.bodyElement.appendChild(treeOutlineElement);
 
     this._treeOutline = new TreeOutline(treeOutlineElement);
@@ -84,20 +77,19 @@ WebInspector.AuditCategoryResultPane = function(categoryResult)
 
     for (var i = 0; i < categoryResult.ruleResults.length; ++i) {
         var ruleResult = categoryResult.ruleResults[i];
-        var treeElement = this._appendResult(this._treeOutline, ruleResult);
-        treeElement.listItemElement.addStyleClass("audit-result");
-
-        if (ruleResult.severity) {
-            var severityElement = document.createElement("img");
-            severityElement.className = "severity-" + ruleResult.severity;
-            treeElement.listItemElement.appendChild(severityElement);
-        }
+        var treeElement = this._appendResult(this._treeOutline, ruleResult, ruleResult.severity);
+        treeElement.listItemElement.classList.add("audit-result");
     }
     this.expand();
 }
 
 WebInspector.AuditCategoryResultPane.prototype = {
-    _appendResult: function(parentTreeElement, result)
+    /**
+     * @param {(!TreeOutline|!TreeElement)} parentTreeElement
+     * @param {!WebInspector.AuditRuleResult} result
+     * @param {?WebInspector.AuditRule.Severity=} severity
+     */
+    _appendResult: function(parentTreeElement, result, severity)
     {
         var title = "";
 
@@ -107,26 +99,33 @@ WebInspector.AuditCategoryResultPane.prototype = {
                 title = String.sprintf("%s (%d)", title, result.violationCount);
         }
 
-        var treeElement = new TreeElement(null, null, !!result.children);
-        treeElement.title = title;
+        var titleFragment = document.createDocumentFragment();
+        if (severity) {
+            var severityElement = document.createElement("div");
+            severityElement.className = "severity-" + severity;
+            titleFragment.appendChild(severityElement);
+        }
+        titleFragment.appendChild(document.createTextNode(title));
+
+        var treeElement = new TreeElement(titleFragment, null, !!result.children);
         parentTreeElement.appendChild(treeElement);
 
         if (result.className)
-            treeElement.listItemElement.addStyleClass(result.className);
+            treeElement.listItemElement.classList.add(result.className);
         if (typeof result.value !== "string")
-            treeElement.listItemElement.appendChild(WebInspector.applyFormatters(result.value));
+            treeElement.listItemElement.appendChild(WebInspector.auditFormatters.apply(result.value));
 
         if (result.children) {
             for (var i = 0; i < result.children.length; ++i)
                 this._appendResult(treeElement, result.children[i]);
         }
         if (result.expanded) {
-            treeElement.listItemElement.removeStyleClass("parent");
-            treeElement.listItemElement.addStyleClass("parent-expanded");
+            treeElement.listItemElement.classList.remove("parent");
+            treeElement.listItemElement.classList.add("parent-expanded");
             treeElement.expand();
         }
         return treeElement;
-    }
-}
+    },
 
-WebInspector.AuditCategoryResultPane.prototype.__proto__ = WebInspector.SidebarPane.prototype;
+    __proto__: WebInspector.SidebarPane.prototype
+}

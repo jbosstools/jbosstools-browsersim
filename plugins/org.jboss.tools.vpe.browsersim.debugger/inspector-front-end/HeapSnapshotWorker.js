@@ -29,25 +29,16 @@
  */
 
 WebInspector = {};
-WebInspector.UIString = function(s) { return s; };
 
-// Safari lacks 'bind'.
-if (!("bind" in Function.prototype)) {
-    Function.prototype.bind = function(thisObject)
-    {
-        var func = this;
-        var args = Array.prototype.slice.call(arguments, 1);
-        return function bound()
-        {
-            return func.apply(thisObject, args.concat(Array.prototype.slice.call(arguments, 0)));
-        };
-    };
-}
-
-importScripts("BinarySearch.js");
+importScripts("AllocationProfile.js");
 importScripts("HeapSnapshot.js");
+importScripts("HeapSnapshotCommon.js");
+importScripts("HeapSnapshotLoader.js");
 importScripts("HeapSnapshotWorkerDispatcher.js");
-importScripts("PartialQuickSort.js");
+importScripts("JSHeapSnapshot.js");
+importScripts("TextUtils.js");
+importScripts("UIString.js");
+importScripts("utilities.js");
 
 function postMessageWrapper(message)
 {

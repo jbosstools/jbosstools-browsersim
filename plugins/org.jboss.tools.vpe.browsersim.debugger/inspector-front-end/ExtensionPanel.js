@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2011 Google Inc. All rights reserved.
+ * Copyright (C) 2012 Google Inc. All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions are
@@ -30,153 +30,79 @@
 
 /**
  * @constructor
- * @extends {WebInspector.View}
- * @param {string} id
- * @param {Element} parent
- * @param {string} src
- * @param {string} className
- */
-WebInspector.ExtensionView = function(id, parent, src, className)
-{
-    WebInspector.View.call(this);
-
-    this._id = id;
-    this._iframe = document.createElement("iframe");
-    this._iframe.addEventListener("load", this._onLoad.bind(this), false);
-    this._iframe.src = src;
-    this._iframe.className = className;
-
-    this.element.appendChild(this._iframe);
-    this.show(parent);
-}
-
-WebInspector.ExtensionView.prototype = {
-    wasShown: function()
-    {
-        if (typeof this._frameIndex === "number")
-            WebInspector.extensionServer.notifyViewShown(this._id, this._frameIndex);
-    },
-
-    willHide: function()
-    {
-        if (typeof this._frameIndex === "number")
-            WebInspector.extensionServer.notifyViewHidden(this._id);
-    },
-
-    _onLoad: function()
-    {
-        this._frameIndex = Array.prototype.indexOf.call(window.frames, this._iframe.contentWindow);
-        if (this.isShowing())
-            WebInspector.extensionServer.notifyViewShown(this._id, this._frameIndex);
-    }
-}
-
-WebInspector.ExtensionView.prototype.__proto__ = WebInspector.View.prototype;
-
-/**
- * @constructor
- * @extends {WebInspector.View}
- * @param {string} id
- */
-WebInspector.ExtensionNotifierView = function(id)
-{
-    WebInspector.View.call(this);
-
-    this._id = id;
-}
-
-WebInspector.ExtensionNotifierView.prototype = {
-    wasShown: function()
-    {
-        WebInspector.extensionServer.notifyViewShown(this._id);
-    },
-
-    willHide: function()
-    {
-        WebInspector.extensionServer.notifyViewHidden(this._id);
-    }
-}
-
-WebInspector.ExtensionNotifierView.prototype.__proto__ = WebInspector.View.prototype;
-
-/**
- * @constructor
+ * @implements {WebInspector.Searchable}
  * @extends {WebInspector.Panel}
  * @param {string} id
- * @param {string} label
- * @param {string} iconURL
+ * @param {string} pageURL
  */
-WebInspector.ExtensionPanel = function(id, label, pageURL, iconURL)
+WebInspector.ExtensionPanel = function(id, pageURL)
 {
     WebInspector.Panel.call(this, id);
     this.setHideOnDetach();
-    this._toolbarItemLabel = label;
-    this._statusBarItems = [];
+    this.element.classList.add("extension-panel");
+    this._panelStatusBarElement = this.element.createChild("div", "panel-status-bar hidden");
 
-    if (iconURL) {
-        this._addStyleRule(".toolbar-item." + id + " .toolbar-icon", "background-image: url(" + iconURL + ");");
-        this._addStyleRule(".toolbar-small .toolbar-item." + id + " .toolbar-icon", "background-position-x: -32px;");
-    }
-    new WebInspector.ExtensionView(id, this.element, pageURL, "extension panel");
+    this._searchableView = new WebInspector.SearchableView(this);
+    this._searchableView.show(this.element);
+
+    var extensionView = new WebInspector.ExtensionView(id, pageURL, "extension panel");
+    extensionView.show(this._searchableView.element);
+    this.setDefaultFocusedElement(extensionView.defaultFocusedElement());
 }
 
 WebInspector.ExtensionPanel.prototype = {
-    get toolbarItemLabel()
+    /**
+     * @return {!Element}
+     */
+    defaultFocusedElement: function()
     {
-        return this._toolbarItemLabel;
-    },
-
-    get defaultFocusedElement()
-    {
-        return this.sidebarTreeElement || this.element;
-    },
-
-    get statusBarItems()
-    {
-        return this._statusBarItems;
+        return WebInspector.View.prototype.defaultFocusedElement.call(this);
     },
 
     /**
-     * @param {Element} element
+     * @param {!Element} element
      */
     addStatusBarItem: function(element)
     {
-        this._statusBarItems.push(element);
+        this._panelStatusBarElement.classList.remove("hidden");
+        this._panelStatusBarElement.appendChild(element);
     },
 
-    searchCanceled: function(startingNewSearch)
+    searchCanceled: function()
     {
-        WebInspector.extensionServer.notifySearchAction(this._id, "cancelSearch");
-        WebInspector.Panel.prototype.searchCanceled.apply(this, arguments);
+        WebInspector.extensionServer.notifySearchAction(this.name, WebInspector.extensionAPI.panels.SearchAction.CancelSearch);
+        this._searchableView.updateSearchMatchesCount(0);
     },
 
-    performSearch: function(query)
+    /**
+     * @return {!WebInspector.SearchableView}
+     */
+    searchableView: function()
     {
-        WebInspector.extensionServer.notifySearchAction(this._id, "performSearch", query);
-        WebInspector.Panel.prototype.performSearch.apply(this, arguments);
+        return this._searchableView;
+    },
+
+    /**
+     * @param {string} query
+     * @param {boolean} shouldJump
+     */
+    performSearch: function(query, shouldJump)
+    {
+        WebInspector.extensionServer.notifySearchAction(this.name, WebInspector.extensionAPI.panels.SearchAction.PerformSearch, query);
     },
 
     jumpToNextSearchResult: function()
     {
-        WebInspector.extensionServer.notifySearchAction(this._id, "nextSearchResult");
-        WebInspector.Panel.prototype.jumpToNextSearchResult.call(this);
+        WebInspector.extensionServer.notifySearchAction(this.name, WebInspector.extensionAPI.panels.SearchAction.NextSearchResult);
     },
 
     jumpToPreviousSearchResult: function()
     {
-        WebInspector.extensionServer.notifySearchAction(this._id, "previousSearchResult");
-        WebInspector.Panel.prototype.jumpToPreviousSearchResult.call(this);
+        WebInspector.extensionServer.notifySearchAction(this.name, WebInspector.extensionAPI.panels.SearchAction.PreviousSearchResult);
     },
 
-    _addStyleRule: function(selector, body)
-    {
-        var style = document.createElement("style");
-        style.textContent = selector + " { " + body + " }";
-        document.head.appendChild(style);
-    }
+    __proto__: WebInspector.Panel.prototype
 }
-
-WebInspector.ExtensionPanel.prototype.__proto__ = WebInspector.Panel.prototype;
 
 /**
  * @constructor
@@ -225,12 +151,13 @@ WebInspector.ExtensionButton.prototype = {
 WebInspector.ExtensionSidebarPane = function(title, id)
 {
     WebInspector.SidebarPane.call(this, title);
+    this.setHideOnDetach();
     this._id = id;
 }
 
 WebInspector.ExtensionSidebarPane.prototype = {
     /**
-     * @param {Object} object
+     * @param {!Object} object
      * @param {string} title
      * @param {function(?string=)} callback
      */
@@ -245,10 +172,10 @@ WebInspector.ExtensionSidebarPane.prototype = {
      * @param {string} title
      * @param {function(?string=)} callback
      */
-    setExpression: function(expression, title, callback)
+    setExpression: function(expression, title, evaluateOptions, securityOrigin, callback)
     {
         this._createObjectPropertiesView();
-        RuntimeAgent.evaluate(expression, "extension-watch", true, undefined, undefined, undefined, this._onEvaluate.bind(this, title, callback));
+        WebInspector.extensionServer.evaluate(expression, true, false, evaluateOptions, securityOrigin, this._onEvaluate.bind(this, title, callback));
     },
 
     /**
@@ -263,7 +190,11 @@ WebInspector.ExtensionSidebarPane.prototype = {
         if (this._extensionView)
             this._extensionView.detach(true);
 
-        this._extensionView = new WebInspector.ExtensionView(this._id, this.bodyElement, url, "extension");
+        this._extensionView = new WebInspector.ExtensionView(this._id, url, "extension fill");
+        this._extensionView.show(this.bodyElement);
+
+        if (!this.bodyElement.style.height)
+            this.setHeight("150px");
     },
 
     /**
@@ -277,9 +208,9 @@ WebInspector.ExtensionSidebarPane.prototype = {
     /**
      * @param {string} title
      * @param {function(?string=)} callback
-     * @param {Protocol.Error} error
-     * @param {Object} result
-     * @param {boolean} wasThrown
+     * @param {?Protocol.Error} error
+     * @param {!RuntimeAgent.RemoteObject} result
+     * @param {boolean=} wasThrown
      */
     _onEvaluate: function(title, callback, error, result, wasThrown)
     {
@@ -302,7 +233,7 @@ WebInspector.ExtensionSidebarPane.prototype = {
     },
 
     /**
-     * @param {Object} object
+     * @param {!WebInspector.RemoteObject} object
      * @param {string} title
      * @param {function(?string=)} callback
      */
@@ -316,12 +247,12 @@ WebInspector.ExtensionSidebarPane.prototype = {
         this._objectPropertiesView.element.removeChildren();
         var section = new WebInspector.ObjectPropertiesSection(object, title);
         if (!title)
-            section.headerElement.addStyleClass("hidden");
+            section.headerElement.classList.add("hidden");
         section.expanded = true;
         section.editable = false;
         this._objectPropertiesView.element.appendChild(section.element);
         callback();
-    }
-}
+    },
 
-WebInspector.ExtensionSidebarPane.prototype.__proto__ = WebInspector.SidebarPane.prototype;
+    __proto__: WebInspector.SidebarPane.prototype
+}

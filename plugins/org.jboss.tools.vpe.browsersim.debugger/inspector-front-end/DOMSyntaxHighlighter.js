@@ -33,16 +33,21 @@
  */
 WebInspector.DOMSyntaxHighlighter = function(mimeType, stripExtraWhitespace)
 {
-    this._tokenizer = WebInspector.SourceTokenizer.Registry.getInstance().getTokenizer(mimeType);
+    this._mimeType = mimeType;
     this._stripExtraWhitespace = stripExtraWhitespace;
 }
 
 WebInspector.DOMSyntaxHighlighter.prototype = {
+    /**
+     * @param {string} content
+     * @param {string} className
+     * @return {!Element}
+     */
     createSpan: function(content, className)
     {
         var span = document.createElement("span");
-        span.className = "webkit-" + className;
-        if (this._stripExtraWhitespace)
+        span.className = "cm-" + className;
+        if (this._stripExtraWhitespace && className !== "whitespace")
             content = content.replace(/^[\n\r]*/, "").replace(/\s*$/, "");
         span.appendChild(document.createTextNode(content));
         return span;
@@ -50,36 +55,40 @@ WebInspector.DOMSyntaxHighlighter.prototype = {
 
     syntaxHighlightNode: function(node)
     {
-        this._tokenizer.condition = this._tokenizer.createInitialCondition();
         var lines = node.textContent.split("\n");
         node.removeChildren();
 
+        /**
+         * @param {string} token
+         * @param {?string} tokenType
+         * @param {number} column
+         * @param {number} newColumn
+         * @this {WebInspector.DOMSyntaxHighlighter}
+         */
+        function processToken(token, tokenType, column, newColumn)
+        {
+            if (!tokenType)
+                return;
+
+            if (column > plainTextStart) {
+                var plainText = line.substring(plainTextStart, column);
+                node.appendChild(document.createTextNode(plainText));
+            }
+            node.appendChild(this.createSpan(token, tokenType));
+            plainTextStart = newColumn;
+        }
+
+        var tokenize = WebInspector.moduleManager.instance(WebInspector.TokenizerFactory).createTokenizer(this._mimeType);
         for (var i = lines[0].length ? 0 : 1; i < lines.length; ++i) {
             var line = lines[i];
             var plainTextStart = 0;
-            this._tokenizer.line = line;
-            var column = 0;
-            do {
-                var newColumn = this._tokenizer.nextToken(column);
-                var tokenType = this._tokenizer.tokenType;
-                if (tokenType) {
-                    if (column > plainTextStart) {
-                        var plainText = line.substring(plainTextStart, column);
-                        node.appendChild(document.createTextNode(plainText));
-                    }
-                    var token = line.substring(column, newColumn);
-                    node.appendChild(this.createSpan(token, tokenType));
-                    plainTextStart = newColumn;
-                }
-                column = newColumn;
-           } while (column < line.length)
-
-           if (plainTextStart < line.length) {
-               var plainText = line.substring(plainTextStart, line.length);
-               node.appendChild(document.createTextNode(plainText));
-           }
-           if (i < lines.length - 1)
-               node.appendChild(document.createElement("br"));
+            tokenize(line, processToken.bind(this));
+            if (plainTextStart < line.length) {
+                var plainText = line.substring(plainTextStart, line.length);
+                node.appendChild(document.createTextNode(plainText));
+            }
+            if (i < lines.length - 1)
+                node.appendChild(document.createElement("br"));
         }
     }
 }

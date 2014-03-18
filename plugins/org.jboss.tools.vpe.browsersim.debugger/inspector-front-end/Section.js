@@ -29,6 +29,7 @@
 
 /**
  * @constructor
+ * @param {string|!Element} title
  * @param {string=} subtitle
  */
 WebInspector.Section = function(title, subtitle)
@@ -190,7 +191,7 @@ WebInspector.Section.prototype = {
         if (this._expanded)
             return;
         this._expanded = true;
-        this.element.addStyleClass("expanded");
+        this.element.classList.add("expanded");
 
         if (!this._populated) {
             this.onpopulate();
@@ -203,7 +204,7 @@ WebInspector.Section.prototype = {
         if (!this._expanded)
             return;
         this._expanded = false;
-        this.element.removeStyleClass("expanded");
+        this.element.classList.remove("expanded");
     },
 
     toggleExpanded: function()
@@ -211,9 +212,9 @@ WebInspector.Section.prototype = {
         this.expanded = !this.expanded;
     },
 
-    handleClick: function(e)
+    handleClick: function(event)
     {
         this.toggleExpanded();
-        e.stopPropagation();
+        event.consume();
     }
 }

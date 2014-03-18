@@ -29,259 +29,356 @@
 
 /**
  * @constructor
+ * @extends {WebInspector.View}
+ * @param {!WebInspector.SplitView} splitView
  */
-WebInspector.Drawer = function()
+WebInspector.Drawer = function(splitView)
 {
-    this.element = document.getElementById("drawer");
-    this._savedHeight = 200; // Default.
-    this._mainElement = document.getElementById("main");
-    this._toolbarElement = document.getElementById("toolbar");
-    this._mainStatusBar = document.getElementById("main-status-bar");
-    this._mainStatusBar.addEventListener("mousedown", this._startStatusBarDragging.bind(this), true);
-    this._counters = document.getElementById("counters");
+    WebInspector.View.call(this);
+    this.element.id = "drawer-contents";
 
-    this._drawerContentsElement = document.createElement("div");
-    this._drawerContentsElement.id = "drawer-contents";
-    this._drawerContentsElement.className = "drawer-contents";
-    this.element.appendChild(this._drawerContentsElement);
-    
-    this._drawerStatusBar = document.createElement("div");
-    this._drawerStatusBar.id = "drawer-status-bar";
-    this._drawerStatusBar.className = "status-bar";
-    this.element.appendChild(this._drawerStatusBar);
+    this._splitView = splitView;
+    splitView.hideDefaultResizer();
+    this.show(splitView.sidebarElement());
 
-    this._viewStatusBar = document.createElement("div");
-    this._drawerStatusBar.appendChild(this._viewStatusBar);
-}
+    this._drawerEditorSplitView = new WebInspector.SplitView(true, true, "editorInDrawerSplitViewState", 0.5, 0.5);
+    this._drawerEditorSplitView.hideSidebar();
+    this._drawerEditorSplitView.addEventListener(WebInspector.SplitView.Events.ShowModeChanged, this._drawerEditorSplitViewShowModeChanged, this);
+    this._drawerEditorShownSetting = WebInspector.settings.createSetting("drawerEditorShown", true);
+    this._drawerEditorSplitView.show(this.element);
 
-WebInspector.Drawer.AnimationType = {
-        Immediately: 0,
-        Normal: 1,
-        Slow: 2
+    this._toggleDrawerButton = new WebInspector.StatusBarButton(WebInspector.UIString("Show drawer."), "console-status-bar-item");
+    this._toggleDrawerButton.addEventListener("click", this.toggle, this);
+
+    this._tabbedPane = new WebInspector.TabbedPane();
+    this._tabbedPane.element.id = "drawer-tabbed-pane";
+    this._tabbedPane.closeableTabs = false;
+    this._tabbedPane.setRetainTabOrder(true, WebInspector.moduleManager.orderComparator(WebInspector.Drawer.ViewFactory, "name", "order"));
+
+    this._toggleDrawerEditorButton = this._drawerEditorSplitView.createShowHideSidebarButton("editor in drawer", "drawer-editor-show-hide-button");
+    this._tabbedPane.element.appendChild(this._toggleDrawerEditorButton.element);
+    if (!WebInspector.experimentsSettings.showEditorInDrawer.isEnabled())
+        this.setDrawerEditorAvailable(false);
+
+    this._tabbedPane.addEventListener(WebInspector.TabbedPane.EventTypes.TabSelected, this._tabSelected, this);
+    splitView.installResizer(this._tabbedPane.headerElement());
+    this._lastSelectedViewSetting = WebInspector.settings.createSetting("WebInspector.Drawer.lastSelectedView", "console");
+    this._initializeViewFactories();
 }
 
 WebInspector.Drawer.prototype = {
-    get visible()
+    _initializeViewFactories: function()
     {
-        return !!this._view;
-    },
+        this._viewFactories = {};
+        var extensions = WebInspector.moduleManager.extensions(WebInspector.Drawer.ViewFactory);
 
-    _constrainHeight: function(height)
-    {
-        return Number.constrain(height, Preferences.minConsoleHeight, window.innerHeight - this._mainElement.totalOffsetTop() - Preferences.minConsoleHeight);
-    },
+        for (var i = 0; i < extensions.length; ++i) {
+            var descriptor = extensions[i].descriptor();
+            var id = descriptor["name"];
+            var title = WebInspector.UIString(descriptor["title"]);
+            var settingName = descriptor["setting"];
+            var setting = settingName ? /** @type {!WebInspector.Setting|undefined} */ (WebInspector.settings[settingName]) : null;
 
-    show: function(view, animationType)
-    {
-        this.immediatelyFinishAnimation();
-        if (this._view && this._view.counterElement)
-            this._view.counterElement.parentNode.removeChild(this._view.counterElement);
+            this._viewFactories[id] = extensions[i];
 
-        var drawerWasVisible = this.visible;
-
-        if (this._view) {
-            this._view.detach();
-            this._drawerContentsElement.removeChildren();
-        }
-
-        this._view = view;
-
-        var statusBarItems = this._view.statusBarItems || [];
-        this._viewStatusBar.removeChildren();
-        for (var i = 0; i < statusBarItems.length; ++i)
-            this._viewStatusBar.appendChild(statusBarItems[i]);
-
-        if (this._view.counterElement)
-            this._counters.insertBefore(this._view.counterElement, this._counters.firstChild);
-
-        document.body.addStyleClass("drawer-visible");
-        this._view.markAsRoot();
-        this._view.show(this._drawerContentsElement);
-
-        if (drawerWasVisible)
-            return;
-        
-        var anchoredItems = document.getElementById("anchored-status-bar-items");
-        var height = this._constrainHeight(this._savedHeight || this.element.offsetHeight);
-        var animations = [
-            {element: this.element, end: {height: height}},
-            {element: this._mainElement, end: {bottom: height}},
-            {element: this._mainStatusBar, start: {"padding-left": anchoredItems.offsetWidth - 1}, end: {"padding-left": 0}},
-            {element: this._viewStatusBar, start: {opacity: 0}, end: {opacity: 1}}
-        ];
-
-        this._drawerStatusBar.insertBefore(anchoredItems, this._drawerStatusBar.firstChild);
-
-        if (this._currentPanelCounters) {
-            var oldRight = this._drawerStatusBar.clientWidth - (this._counters.offsetLeft + this._currentPanelCounters.offsetWidth);
-            var newRight = WebInspector.Panel.counterRightMargin;
-            var rightPadding = (oldRight - newRight);
-            animations.push({element: this._currentPanelCounters, start: {"padding-right": rightPadding}, end: {"padding-right": 0}});
-            this._currentPanelCounters.parentNode.removeChild(this._currentPanelCounters);
-            this._mainStatusBar.appendChild(this._currentPanelCounters);
-        }
-        
-        function animationFinished()
-        {
-            WebInspector.inspectorView.currentPanel().statusBarResized();
-            if (this._view && this._view.afterShow)
-                this._view.afterShow();
-            delete this._currentAnimation;
-            if (this._currentPanelCounters)
-                this._currentPanelCounters.removeAttribute("style");
-        }
-
-        this._currentAnimation = WebInspector.animateStyle(animations, this._animationDuration(animationType), animationFinished.bind(this));
-        if (animationType === WebInspector.Drawer.AnimationType.Immediately)
-            this._currentAnimation.forceComplete();
-    },
-
-    hide: function(animationType)
-    {
-        this.immediatelyFinishAnimation();
-        if (!this.visible)
-            return;
-
-        this._savedHeight = this.element.offsetHeight;
-
-        if (this.element === WebInspector.currentFocusElement() || this.element.isAncestor(WebInspector.currentFocusElement()))
-            WebInspector.setCurrentFocusElement(WebInspector.previousFocusElement());
-
-        var anchoredItems = document.getElementById("anchored-status-bar-items");
-
-        // Temporarily set properties and classes to mimic the post-animation values so panels
-        // like Elements in their updateStatusBarItems call will size things to fit the final location.
-        this._mainStatusBar.style.setProperty("padding-left", (anchoredItems.offsetWidth - 1) + "px");
-        document.body.removeStyleClass("drawer-visible");
-        WebInspector.inspectorView.currentPanel().statusBarResized();
-        document.body.addStyleClass("drawer-visible");
-
-        var animations = [
-            {element: this._mainElement, end: {bottom: 0}},
-            {element: this._mainStatusBar, start: {"padding-left": 0}, end: {"padding-left": anchoredItems.offsetWidth - 1}},
-            {element: this._viewStatusBar, start: {opacity: 1}, end: {opacity: 0}}
-        ];
-
-        if (this._currentPanelCounters) {
-            var newRight = this._drawerStatusBar.clientWidth - this._counters.offsetLeft;
-            var oldRight = this._mainStatusBar.clientWidth - (this._currentPanelCounters.offsetLeft + this._currentPanelCounters.offsetWidth);
-            var rightPadding = (newRight - oldRight);
-            animations.push({element: this._currentPanelCounters, start: {"padding-right": 0}, end: {"padding-right": rightPadding}});
-        }
-
-        function animationFinished()
-        {
-            WebInspector.inspectorView.currentPanel().doResize();
-            this._mainStatusBar.insertBefore(anchoredItems, this._mainStatusBar.firstChild);
-            this._mainStatusBar.style.removeProperty("padding-left");
-
-            if (this._view.counterElement)
-                this._view.counterElement.parentNode.removeChild(this._view.counterElement);
-
-            if (this._currentPanelCounters) {
-                this._currentPanelCounters.setAttribute("style", null);
-                this._currentPanelCounters.parentNode.removeChild(this._currentPanelCounters);
-                this._counters.insertBefore(this._currentPanelCounters, this._counters.firstChild);
+            if (setting) {
+                setting.addChangeListener(this._toggleSettingBasedView.bind(this, id, title, setting));
+                if (setting.get())
+                    this._tabbedPane.appendTab(id, title, new WebInspector.View());
+            } else {
+                this._tabbedPane.appendTab(id, title, new WebInspector.View());
             }
-
-            this._view.detach();
-            delete this._view;
-            this._drawerContentsElement.removeChildren();
-            document.body.removeStyleClass("drawer-visible");
-            delete this._currentAnimation;
         }
-
-        this._currentAnimation = WebInspector.animateStyle(animations, this._animationDuration(animationType), animationFinished.bind(this));
-        if (animationType === WebInspector.Drawer.AnimationType.Immediately)
-            this._currentAnimation.forceComplete();
+        this._tabbedPane.show(this._drawerEditorSplitView.mainElement());
     },
 
-    resize: function()
+    /**
+     * @param {string} id
+     * @param {string} title
+     * @param {!WebInspector.Setting} setting
+     */
+    _toggleSettingBasedView: function(id, title, setting)
     {
-        if (!this.visible)
+        this._tabbedPane.closeTab(id);
+        if (setting.get())
+            this._tabbedPane.appendTab(id, title, new WebInspector.View());
+    },
+
+    /**
+     * @return {!Element}
+     */
+    toggleButtonElement: function()
+    {
+        return this._toggleDrawerButton.element;
+    },
+
+    /**
+     * @param {string} id
+     */
+    closeView: function(id)
+    {
+        this._tabbedPane.closeTab(id);
+    },
+
+    /**
+     * @param {string} id
+     * @param {boolean=} immediate
+     */
+    showView: function(id, immediate)
+    {
+        if (!this._tabbedPane.hasTab(id)) {
+            // Hidden tab.
+            this._innerShow(immediate);
+            return;
+        }
+        var viewFactory = this._viewFactory(id);
+        if (viewFactory)
+            this._tabbedPane.changeTabView(id, viewFactory.createView());
+        this._innerShow(immediate);
+        this._tabbedPane.selectTab(id, true);
+        // In case this id is already selected, anyways persist it as the last saved value.
+        this._lastSelectedViewSetting.set(id);
+    },
+
+    /**
+     * @param {string} id
+     * @param {string} title
+     * @param {!WebInspector.View} view
+     */
+    showCloseableView: function(id, title, view)
+    {
+        if (!this._tabbedPane.hasTab(id)) {
+            this._tabbedPane.appendTab(id, title, view, undefined, false, true);
+        } else {
+            this._tabbedPane.changeTabView(id, view);
+            this._tabbedPane.changeTabTitle(id, title);
+        }
+        this._innerShow();
+        this._tabbedPane.selectTab(id, true);
+    },
+
+    showDrawer: function()
+    {
+        this.showView(this._lastSelectedViewSetting.get());
+    },
+
+    wasShown: function()
+    {
+        this.showView(this._lastSelectedViewSetting.get());
+        this._toggleDrawerButton.toggled = true;
+        this._toggleDrawerButton.title = WebInspector.UIString("Hide drawer.");
+        this._ensureDrawerEditorExistsIfNeeded();
+    },
+
+    willHide: function()
+    {
+        this._toggleDrawerButton.toggled = false;
+        this._toggleDrawerButton.title = WebInspector.UIString("Show drawer.");
+    },
+
+    /**
+     * @param {boolean=} immediate
+     */
+    _innerShow: function(immediate)
+    {
+        if (this.isShowing())
             return;
 
-        this._view.storeScrollPositions();
-        var height = this._constrainHeight(parseInt(this.element.style.height, 10));
-        this._mainElement.style.bottom = height + "px";
-        this.element.style.height = height + "px";
-        this._view.doResize();
+        this._splitView.showBoth(!immediate);
+
+        if (this._visibleView())
+            this._visibleView().focus();
     },
 
-    immediatelyFinishAnimation: function()
+    closeDrawer: function()
     {
-        if (this._currentAnimation)
-            this._currentAnimation.forceComplete();
-    },
-
-    set currentPanelCounters(x)
-    {
-        if (!x) {
-            if (this._currentPanelCounters)
-                this._currentPanelCounters.parentElement.removeChild(this._currentPanelCounters);
-            delete this._currentPanelCounters;
+        if (!this.isShowing())
             return;
-        }
 
-        this._currentPanelCounters = x;
-        if (this.visible)
-            this._mainStatusBar.appendChild(x);
+        WebInspector.restoreFocusFromElement(this.element);
+        this._splitView.hideSidebar(true);
+    },
+
+    /**
+     * @return {!WebInspector.View} view
+     */
+    _visibleView: function()
+    {
+        return this._tabbedPane.visibleView;
+    },
+
+    /**
+     * @param {!WebInspector.Event} event
+     */
+    _tabSelected: function(event)
+    {
+        var tabId = this._tabbedPane.selectedTabId;
+        if (event.data["isUserGesture"] && !this._tabbedPane.isTabCloseable(tabId))
+            this._lastSelectedViewSetting.set(tabId);
+        var viewFactory = this._viewFactory(tabId);
+        if (viewFactory)
+            this._tabbedPane.changeTabView(tabId, viewFactory.createView());
+    },
+
+    toggle: function()
+    {
+        if (this._toggleDrawerButton.toggled)
+            this.closeDrawer();
         else
-            this._counters.insertBefore(x, this._counters.firstChild);
+            this.showDrawer();
     },
 
-    _animationDuration: function(animationType)
+    /**
+     * @return {boolean}
+     */
+    visible: function()
     {
-        switch (animationType) {
-        case WebInspector.Drawer.AnimationType.Slow:
-            return 2000;
-        case WebInspector.Drawer.AnimationType.Normal:
-            return 250;
-        default:
-            return 0;
-        }        
+        return this._toggleDrawerButton.toggled;
     },
 
-    _startStatusBarDragging: function(event)
+    /**
+     * @return {string}
+     */
+    selectedViewId: function()
     {
-        if (!this.visible || event.target !== this._mainStatusBar)
+        return this._tabbedPane.selectedTabId;
+    },
+
+    /**
+     * @return {?WebInspector.Drawer.ViewFactory}
+     */
+    _viewFactory: function(id)
+    {
+        return this._viewFactories[id] ? /** @type {!WebInspector.Drawer.ViewFactory} */ (this._viewFactories[id].instance()) : null;
+    },
+
+    /**
+     * @param {!WebInspector.Event} event
+     */
+    _drawerEditorSplitViewShowModeChanged: function(event)
+    {
+        var mode = /** @type {string} */ (event.data);
+        var shown = mode === WebInspector.SplitView.ShowMode.Both;
+
+        if (this._isHidingDrawerEditor)
             return;
 
-        this._view.storeScrollPositions();
-        WebInspector.elementDragStart(this._mainStatusBar, this._statusBarDragging.bind(this), this._endStatusBarDragging.bind(this), event, "row-resize");
+        this._drawerEditorShownSetting.set(shown);
 
-        this._statusBarDragOffset = event.pageY - this.element.totalOffsetTop();
+        if (!shown)
+            return;
 
-        event.stopPropagation();
+        this._ensureDrawerEditor();
+        this._drawerEditor.view().show(this._drawerEditorSplitView.sidebarElement());
     },
 
-    _statusBarDragging: function(event)
+    initialPanelShown: function()
     {
-        var height = window.innerHeight - event.pageY + this._statusBarDragOffset;
-        height = Number.constrain(height, Preferences.minConsoleHeight, window.innerHeight - this._mainElement.totalOffsetTop() - Preferences.minConsoleHeight);
-
-        this._mainElement.style.bottom = height + "px";
-        this.element.style.height = height + "px";
-        if (WebInspector.inspectorView.currentPanel())
-            WebInspector.inspectorView.currentPanel().doResize();
-        this._view.doResize();
-
-        event.preventDefault();
-        event.stopPropagation();
+        this._initialPanelWasShown = true;
+        this._ensureDrawerEditorExistsIfNeeded();
     },
 
-    _endStatusBarDragging: function(event)
+    _ensureDrawerEditorExistsIfNeeded: function()
     {
-        WebInspector.elementDragEnd(event);
+        if (!this._initialPanelWasShown || !this.isShowing() || !this._drawerEditorShownSetting.get() || !WebInspector.experimentsSettings.showEditorInDrawer.isEnabled())
+            return;
+        this._ensureDrawerEditor();
+    },
 
-        this._savedHeight = this.element.offsetHeight;
-        delete this._statusBarDragOffset;
+    _ensureDrawerEditor: function()
+    {
+        if (this._drawerEditor)
+            return;
+        this._drawerEditor = WebInspector.moduleManager.instance(WebInspector.DrawerEditor);
+        this._drawerEditor.installedIntoDrawer();
+    },
 
-        event.stopPropagation();
+    /**
+     * @param {boolean} available
+     */
+    setDrawerEditorAvailable: function(available)
+    {
+        if (!WebInspector.experimentsSettings.showEditorInDrawer.isEnabled())
+            available = false;
+        this._toggleDrawerEditorButton.element.classList.toggle("hidden", !available);
+    },
+
+    showDrawerEditor: function()
+    {
+        if (!WebInspector.experimentsSettings.showEditorInDrawer.isEnabled())
+            return;
+
+        this._splitView.showBoth();
+        this._drawerEditorSplitView.showBoth();
+    },
+
+    hideDrawerEditor: function()
+    {
+        this._isHidingDrawerEditor = true;
+        this._drawerEditorSplitView.hideSidebar();
+        this._isHidingDrawerEditor = false;
+    },
+
+    /**
+     * @return {boolean}
+     */
+    isDrawerEditorShown: function()
+    {
+        return this._drawerEditorShownSetting.get();
+    },
+
+    __proto__: WebInspector.View.prototype
+}
+
+/**
+ * @interface
+ */
+WebInspector.Drawer.ViewFactory = function()
+{
+}
+
+WebInspector.Drawer.ViewFactory.prototype = {
+    /**
+     * @return {!WebInspector.View}
+     */
+    createView: function() {}
+}
+
+/**
+ * @constructor
+ * @implements {WebInspector.Drawer.ViewFactory}
+ * @param {function(new:T)} constructor
+ * @template T
+ */
+WebInspector.Drawer.SingletonViewFactory = function(constructor)
+{
+    this._constructor = constructor;
+}
+
+WebInspector.Drawer.SingletonViewFactory.prototype = {
+    /**
+     * @return {!WebInspector.View}
+     */
+    createView: function()
+    {
+        if (!this._instance)
+            this._instance = /** @type {!WebInspector.View} */(new this._constructor());
+        return this._instance;
     }
 }
 
 /**
- * @type {WebInspector.Drawer}
+ * @interface
  */
-WebInspector.drawer = null;
+WebInspector.DrawerEditor = function()
+{
+}
+
+WebInspector.DrawerEditor.prototype = {
+    /**
+     * @return {!WebInspector.View}
+     */
+    view: function() { },
+
+    installedIntoDrawer: function() { },
+}

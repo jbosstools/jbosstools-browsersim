@@ -38,7 +38,7 @@ WebInspector.resourceForURL = function(url)
 }
 
 /**
- * @param {function(WebInspector.Resource)} callback
+ * @param {function(!WebInspector.Resource)} callback
  */
 WebInspector.forAllResources = function(callback)
 {
@@ -58,30 +58,38 @@ WebInspector.displayNameForURL = function(url)
     if (resource)
         return resource.displayName;
 
+    var uiSourceCode = WebInspector.workspace.uiSourceCodeForURL(url);
+    if (uiSourceCode)
+        return uiSourceCode.displayName();
+
     if (!WebInspector.inspectedPageURL)
         return url.trimURL("");
 
     var parsedURL = WebInspector.inspectedPageURL.asParsedURL();
-    var lastPathComponent = parsedURL.lastPathComponent;
+    var lastPathComponent = parsedURL ? parsedURL.lastPathComponent : parsedURL;
     var index = WebInspector.inspectedPageURL.indexOf(lastPathComponent);
     if (index !== -1 && index + lastPathComponent.length === WebInspector.inspectedPageURL.length) {
         var baseURL = WebInspector.inspectedPageURL.substring(0, index);
-        if (url.indexOf(baseURL) === 0)
+        if (url.startsWith(baseURL))
             return url.substring(index);
     }
 
-    return url.trimURL(parsedURL.host);
+    if (!parsedURL)
+        return url;
+
+    var displayName = url.trimURL(parsedURL.host);
+    return displayName === "/" ? parsedURL.host + "/" : displayName;
 }
 
 /**
  * @param {string} string
- * @param {function(string,string,string=):Node} linkifier
- * @return {DocumentFragment}
+ * @param {function(string,string,number=,number=):!Node} linkifier
+ * @return {!DocumentFragment}
  */
 WebInspector.linkifyStringAsFragmentWithCustomLinkifier = function(string, linkifier)
 {
     var container = document.createDocumentFragment();
-    var linkStringRegEx = /(?:[a-zA-Z][a-zA-Z0-9+.-]{2,}:\/\/|www\.)[\w$\-_+*'=\|\/\\(){}[\]%@&#~,:;.!?]{2,}[\w$\-_+*=\|\/\\({%@&#~]/;
+    var linkStringRegEx = /(?:[a-zA-Z][a-zA-Z0-9+.-]{2,}:\/\/|data:|www\.)[\w$\-_+*'=\|\/\\(){}[\]^%@&#~,:;.!?]{2,}[\w$\-_+*=\|\/\\({^%@&#~]/;
     var lineColumnRegEx = /:(\d+)(:(\d+))?$/;
 
     while (string) {
@@ -95,12 +103,22 @@ WebInspector.linkifyStringAsFragmentWithCustomLinkifier = function(string, linki
         container.appendChild(document.createTextNode(nonLink));
 
         var title = linkString;
-        var realURL = (linkString.indexOf("www.") === 0 ? "http://" + linkString : linkString);
+        var realURL = (linkString.startsWith("www.") ? "http://" + linkString : linkString);
         var lineColumnMatch = lineColumnRegEx.exec(realURL);
-        if (lineColumnMatch)
+        var lineNumber;
+        var columnNumber;
+        if (lineColumnMatch) {
             realURL = realURL.substring(0, realURL.length - lineColumnMatch[0].length);
+            lineNumber = parseInt(lineColumnMatch[1], 10);
+            // Immediately convert line and column to 0-based numbers.
+            lineNumber = isNaN(lineNumber) ? undefined : lineNumber - 1;
+            if (typeof(lineColumnMatch[3]) === "string") {
+                columnNumber = parseInt(lineColumnMatch[3], 10);
+                columnNumber = isNaN(columnNumber) ? undefined : columnNumber - 1;
+            }
+        }
 
-        var linkNode = linkifier(title, realURL, lineColumnMatch ? lineColumnMatch[1] : undefined);
+        var linkNode = linkifier(title, realURL, lineNumber, columnNumber);
         container.appendChild(linkNode);
         string = string.substring(linkIndex + linkString.length, string.length);
     }
@@ -111,32 +129,27 @@ WebInspector.linkifyStringAsFragmentWithCustomLinkifier = function(string, linki
     return container;
 }
 
-WebInspector._linkifierPlugins = [];
-
-/**
- * @param {function(string):string} plugin
- */
-WebInspector.registerLinkifierPlugin = function(plugin)
-{
-    WebInspector._linkifierPlugins.push(plugin);
-}
-
 /**
  * @param {string} string
- * @return {DocumentFragment}
+ * @return {!DocumentFragment}
  */
 WebInspector.linkifyStringAsFragment = function(string)
 {
-    function linkifier(title, url, lineNumber)
+    /**
+     * @param {string} title
+     * @param {string} url
+     * @param {number=} lineNumber
+     * @param {number=} columnNumber
+     * @return {!Node}
+     */
+    function linkifier(title, url, lineNumber, columnNumber)
     {
-        for (var i = 0; i < WebInspector._linkifierPlugins.length; ++i)
-            title = WebInspector._linkifierPlugins[i](title);
-
-        var isExternal = !WebInspector.resourceForURL(url);
+        var isExternal = !WebInspector.resourceForURL(url) && !WebInspector.workspace.uiSourceCodeForURL(url);
         var urlNode = WebInspector.linkifyURLAsNode(url, title, undefined, isExternal);
-        if (typeof(lineNumber) !== "undefined") {
+        if (typeof lineNumber !== "undefined") {
             urlNode.lineNumber = lineNumber;
-            urlNode.preferredPanel = "scripts";
+            if (typeof columnNumber !== "undefined")
+                urlNode.columnNumber = columnNumber;
         }
         
         return urlNode; 
@@ -151,7 +164,7 @@ WebInspector.linkifyStringAsFragment = function(string)
  * @param {string=} classes
  * @param {boolean=} isExternal
  * @param {string=} tooltipText
- * @return {Element}
+ * @return {!Element}
  */
 WebInspector.linkifyURLAsNode = function(url, linkText, classes, isExternal, tooltipText)
 {
@@ -161,14 +174,15 @@ WebInspector.linkifyURLAsNode = function(url, linkText, classes, isExternal, too
     classes += isExternal ? "webkit-html-external-link" : "webkit-html-resource-link";
 
     var a = document.createElement("a");
-    a.href = url;
+    var href = sanitizeHref(url);
+    if (href !== null)
+        a.href = href;
     a.className = classes;
     if (typeof tooltipText === "undefined")
         a.title = url;
     else if (typeof tooltipText !== "string" || tooltipText.length)
         a.title = tooltipText;
-    a.textContent = linkText;
-    a.style.maxWidth = "100%";
+    a.textContent = linkText.trimMiddle(WebInspector.Linkifier.MaxLengthForDisplayedURLs);
     if (isExternal)
         a.setAttribute("target", "_blank");
 
@@ -182,7 +196,7 @@ WebInspector.linkifyURLAsNode = function(url, linkText, classes, isExternal, too
  */
 WebInspector.formatLinkText = function(url, lineNumber)
 {
-    var text = WebInspector.displayNameForURL(url);
+    var text = url ? WebInspector.displayNameForURL(url) : WebInspector.UIString("(program)");
     if (typeof lineNumber === "number")
         text += ":" + (lineNumber + 1);
     return text;
@@ -190,130 +204,41 @@ WebInspector.formatLinkText = function(url, lineNumber)
 
 /**
  * @param {string} url
- * @param {number} lineNumber
+ * @param {number=} lineNumber
  * @param {string=} classes
  * @param {string=} tooltipText
- * @return {Element}
+ * @return {!Element}
  */
 WebInspector.linkifyResourceAsNode = function(url, lineNumber, classes, tooltipText)
 {
     var linkText = WebInspector.formatLinkText(url, lineNumber);
     var anchor = WebInspector.linkifyURLAsNode(url, linkText, classes, false, tooltipText);
-    anchor.preferredPanel = "resources";
     anchor.lineNumber = lineNumber;
     return anchor;
 }
 
 /**
- * @param {WebInspector.Resource} request
- * @param {string=} classes
+ * @param {!WebInspector.NetworkRequest} request
+ * @return {!Element}
  */
-WebInspector.linkifyRequestAsNode = function(request, classes)
+WebInspector.linkifyRequestAsNode = function(request)
 {
     var anchor = WebInspector.linkifyURLAsNode(request.url);
-    anchor.preferredPanel = "network";
-    anchor.requestId  = request.requestId;
+    anchor.requestId = request.requestId;
     return anchor;
 }
 
 /**
- * @return {?string} null if the specified resource MUST NOT have a URL (e.g. "javascript:...")
- */
-WebInspector.resourceURLForRelatedNode = function(node, url)
-{
-    if (!url || url.indexOf("://") > 0)
-        return url;
-
-    if (url.trim().indexOf("javascript:") === 0)
-        return null; // Do not provide a resource URL for security.
-
-    for (var frameOwnerCandidate = node; frameOwnerCandidate; frameOwnerCandidate = frameOwnerCandidate.parentNode) {
-        if (frameOwnerCandidate.documentURL) {
-            var result = WebInspector.completeURL(frameOwnerCandidate.documentURL, url);
-            if (result)
-                return result;
-            break;
-        }
-    }
-
-    // documentURL not found or has bad value
-    var resourceURL = url;
-    function callback(resource)
-    {
-        if (resource.path === url) {
-            resourceURL = resource.url;
-            return true;
-        }
-    }
-    WebInspector.forAllResources(callback);
-    return resourceURL;
-}
-
-/**
- * @param {WebInspector.ContextMenu} contextMenu
- * @param {Node} contextNode
- * @param {Event} event
- */
-WebInspector.populateHrefContextMenu = function(contextMenu, contextNode, event)
-{
-    var anchorElement = event.target.enclosingNodeOrSelfWithClass("webkit-html-resource-link") || event.target.enclosingNodeOrSelfWithClass("webkit-html-external-link");
-    if (!anchorElement)
-        return false;
-
-    var resourceURL = WebInspector.resourceURLForRelatedNode(contextNode, anchorElement.href);
-    if (!resourceURL)
-        return false;
-
-    // Add resource-related actions.
-    contextMenu.appendItem(WebInspector.openLinkExternallyLabel(), WebInspector.openResource.bind(WebInspector, resourceURL, false));
-    if (WebInspector.resourceForURL(resourceURL))
-        contextMenu.appendItem(WebInspector.UIString(WebInspector.useLowerCaseMenuTitles() ? "Open link in Resources panel" : "Open Link in Resources Panel"), WebInspector.openResource.bind(null, resourceURL, true));
-    contextMenu.appendItem(WebInspector.copyLinkAddressLabel(), InspectorFrontendHost.copyText.bind(InspectorFrontendHost, resourceURL));
-    return true;
-}
-
-/**
- * @param {string} baseURL
- * @param {string} href
+ * @param {?string} content
+ * @param {string} mimeType
+ * @param {boolean} contentEncoded
  * @return {?string}
  */
-WebInspector.completeURL = function(baseURL, href)
+WebInspector.contentAsDataURL = function(content, mimeType, contentEncoded)
 {
-    if (href) {
-        // Return absolute URLs as-is.
-        var parsedHref = href.asParsedURL();
-        if (parsedHref && parsedHref.scheme)
-            return href;
+    const maxDataUrlSize = 1024 * 1024;
+    if (content === null || content.length > maxDataUrlSize)
+        return null;
 
-        // Return special URLs as-is.
-        var trimmedHref = href.trim();
-        if (trimmedHref.indexOf("data:") === 0 || trimmedHref.indexOf("javascript:") === 0)
-            return href;
-    }
-
-    var parsedURL = baseURL.asParsedURL();
-    if (parsedURL) {
-        var path = href;
-        if (path.charAt(0) !== "/") {
-            var basePath = parsedURL.path;
-            // A href of "?foo=bar" implies "basePath?foo=bar".
-            // With "basePath?a=b" and "?foo=bar" we should get "basePath?foo=bar".
-            var prefix;
-            if (path.charAt(0) === "?") {
-                var basePathCutIndex = basePath.indexOf("?");
-                if (basePathCutIndex !== -1)
-                    prefix = basePath.substring(0, basePathCutIndex);
-                else
-                    prefix = basePath;
-            } else
-                prefix = basePath.substring(0, basePath.lastIndexOf("/")) + "/";
-
-            path = prefix + path;
-        } else if (path.length > 1 && path.charAt(1) === "/") {
-            // href starts with "//" which is a full URL with the protocol dropped (use the baseURL protocol).
-            return parsedURL.scheme + ":" + path;
-        }
-        return parsedURL.scheme + "://" + parsedURL.host + (parsedURL.port ? (":" + parsedURL.port) : "") + path;
-    }
-    return null;
+    return "data:" + mimeType + (contentEncoded ? ";base64," : ",") + content;
 }

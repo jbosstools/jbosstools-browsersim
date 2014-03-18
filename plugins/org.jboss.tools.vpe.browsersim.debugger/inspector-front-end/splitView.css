@@ -27,43 +27,56 @@
  */
 
 .split-view {
-    position: absolute;
-    top: 0;
-    bottom: 0;
-    left: 0;
-    right: 0;
     overflow: hidden;
 }
 
 .split-view-contents {
-    position: absolute;
-    top: 0;
-    bottom: 0;
     overflow: auto;
-    cursor: default;
+    display: flex;
+    position: relative;
+    flex-direction: column;
 }
 
-.split-view-sidebar-left {
+.split-view-sidebar {
+    flex: none;
+}
+
+.split-view-main, .split-view-sidebar.maximized {
+    flex: auto;
+}
+
+.split-view.hbox > .split-view-sidebar.split-view-contents-first:not(.maximized) {
     border-right: 1px solid rgb(64%, 64%, 64%);
 }
 
-.split-view-sidebar-left.maximized {
-    border-right: none;
-}
-
-.split-view-sidebar-right {
+.split-view.hbox > .split-view-sidebar.split-view-contents-second:not(.maximized) {
     border-left: 1px solid rgb(64%, 64%, 64%);
 }
 
-.split-view-sidebar-right.maximized {
-    border-right: none;
+.split-view.vbox > .split-view-sidebar.split-view-contents-first:not(.maximized) {
+    border-bottom: 1px solid rgb(64%, 64%, 64%);
 }
 
-.split-view-resizer {
+.split-view.vbox > .split-view-sidebar.split-view-contents-second:not(.maximized) {
+    border-top: 1px solid rgb(64%, 64%, 64%);
+}
+
+.split-view.hbox > .split-view-resizer {
     position: absolute;
     top: 0;
     bottom: 0;
     width: 5px;
     z-index: 500;
-    cursor: ew-resize;
+}
+
+.split-view.vbox > .split-view-resizer {
+    position: absolute;
+    left: 0;
+    right: 0;
+    height: 5px;
+    z-index: 500;
+}
+
+.split-view.split-view-no-resizer > .split-view-resizer {
+    display: none;
 }

@@ -31,18 +31,74 @@
 /**
  * @constructor
  * @extends {WebInspector.PopoverHelper}
+ * @param {!Element} panelElement
+ * @param {function(!Element, !Event):!Element|undefined} getAnchor
+ * @param {function(!Element, function(!WebInspector.RemoteObject, boolean, !Element=):undefined, string):undefined} queryObject
+ * @param {function()=} onHide
+ * @param {boolean=} disableOnClick
  */
 WebInspector.ObjectPopoverHelper = function(panelElement, getAnchor, queryObject, onHide, disableOnClick)
 {
-    WebInspector.PopoverHelper.call(this, panelElement, getAnchor, this._showObjectPopover.bind(this), onHide, disableOnClick);
+    WebInspector.PopoverHelper.call(this, panelElement, getAnchor, this._showObjectPopover.bind(this), this._onHideObjectPopover.bind(this), disableOnClick);
     this._queryObject = queryObject;
+    this._onHideCallback = onHide;
+    this._popoverObjectGroup = "popover";
     panelElement.addEventListener("scroll", this.hidePopover.bind(this), true);
 };
 
 WebInspector.ObjectPopoverHelper.prototype = {
+    /**
+     * @param {function(!WebInspector.RemoteObject):string} formatter
+     */
+    setRemoteObjectFormatter: function(formatter)
+    {
+        this._remoteObjectFormatter = formatter;
+    },
+
+    /**
+     * @param {!Element} element
+     * @param {!WebInspector.Popover} popover
+     */
     _showObjectPopover: function(element, popover)
     {
-        function showObjectPopover(result, wasThrown)
+        /**
+         * @param {!Element} anchorElement
+         * @param {!Element} popoverContentElement
+         * @param {?Protocol.Error} error
+         * @param {!DebuggerAgent.FunctionDetails} response
+         * @this {WebInspector.ObjectPopoverHelper}
+         */
+        function didGetDetails(anchorElement, popoverContentElement, error, response)
+        {
+            if (error) {
+                console.error(error);
+                return;
+            }
+            var container = document.createElement("div");
+            container.className = "inline-block";
+
+            var title = container.createChild("div", "function-popover-title source-code");
+            var functionName = title.createChild("span", "function-name");
+            functionName.textContent = response.functionName || WebInspector.UIString("(anonymous function)");
+
+            this._linkifier = new WebInspector.Linkifier();
+            var rawLocation = /** @type {!WebInspector.DebuggerModel.Location} */ (response.location);
+            var link = this._linkifier.linkifyRawLocation(rawLocation, "function-location-link");
+            if (link)
+                title.appendChild(link);
+
+            container.appendChild(popoverContentElement);
+
+            popover.show(container, anchorElement);
+        }
+
+        /**
+         * @param {!WebInspector.RemoteObject} result
+         * @param {boolean} wasThrown
+         * @param {!Element=} anchorOverride
+         * @this {WebInspector.ObjectPopoverHelper}
+         */
+        function showObjectPopover(result, wasThrown, anchorOverride)
         {
             if (popover.disposed)
                 return;
@@ -50,40 +106,61 @@ WebInspector.ObjectPopoverHelper.prototype = {
                 this.hidePopover();
                 return;
             }
+
+            var anchorElement = anchorOverride || element;
+            var description = (this._remoteObjectFormatter && this._remoteObjectFormatter(result)) || result.description;
+
             var popoverContentElement = null;
             if (result.type !== "object") {
                 popoverContentElement = document.createElement("span");
                 popoverContentElement.className = "monospace console-formatted-" + result.type;
                 popoverContentElement.style.whiteSpace = "pre";
-                popoverContentElement.textContent = result.description;
+                popoverContentElement.textContent = description;
+                if (result.type === "function") {
+                    DebuggerAgent.getFunctionDetails(result.objectId, didGetDetails.bind(this, anchorElement, popoverContentElement));
+                    return;
+                }
                 if (result.type === "string")
                     popoverContentElement.textContent = "\"" + popoverContentElement.textContent + "\"";
-                popover.show(popoverContentElement, element);
+                popover.show(popoverContentElement, anchorElement);
             } else {
+                if (result.subtype === "node")
+                    result.highlightAsDOMNode();
                 popoverContentElement = document.createElement("div");
-
                 this._titleElement = document.createElement("div");
                 this._titleElement.className = "source-frame-popover-title monospace";
-                this._titleElement.textContent = result.description;
+                this._titleElement.textContent = description;
                 popoverContentElement.appendChild(this._titleElement);
 
                 var section = new WebInspector.ObjectPropertiesSection(result);
                 // For HTML DOM wrappers, append "#id" to title, if not empty.
-                if (result.description.substr(0, 4) === "HTML") {
+                if (description.substr(0, 4) === "HTML") {
                     this._sectionUpdateProperties = section.updateProperties.bind(section);
                     section.updateProperties = this._updateHTMLId.bind(this);
                 }
                 section.expanded = true;
-                section.element.addStyleClass("source-frame-popover-tree");
-                section.headerElement.addStyleClass("hidden");
+                section.element.classList.add("source-frame-popover-tree");
+                section.headerElement.classList.add("hidden");
                 popoverContentElement.appendChild(section.element);
 
                 const popoverWidth = 300;
                 const popoverHeight = 250;
-                popover.show(popoverContentElement, element, popoverWidth, popoverHeight);
+                popover.show(popoverContentElement, anchorElement, popoverWidth, popoverHeight);
             }
         }
-        this._queryObject(element, showObjectPopover.bind(this));
+        this._queryObject(element, showObjectPopover.bind(this), this._popoverObjectGroup);
+    },
+
+    _onHideObjectPopover: function()
+    {
+        WebInspector.domAgent.hideDOMNodeHighlight();
+        if (this._linkifier) {
+            this._linkifier.reset();
+            delete this._linkifier;
+        }
+        if (this._onHideCallback)
+            this._onHideCallback();
+        RuntimeAgent.releaseObjectGroup(this._popoverObjectGroup);
     },
 
     _updateHTMLId: function(properties, rootTreeElementConstructor, rootPropertyComparer)
@@ -96,7 +173,7 @@ WebInspector.ObjectPopoverHelper.prototype = {
             }
         }
         this._sectionUpdateProperties(properties, rootTreeElementConstructor, rootPropertyComparer);
-    }
-}
+    },
 
-WebInspector.ObjectPopoverHelper.prototype.__proto__ = WebInspector.PopoverHelper.prototype;
+    __proto__: WebInspector.PopoverHelper.prototype
+}

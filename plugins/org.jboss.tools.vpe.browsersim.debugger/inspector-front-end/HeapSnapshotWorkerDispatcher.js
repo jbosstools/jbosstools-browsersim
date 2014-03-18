@@ -28,6 +28,9 @@
  * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
+/**
+ * @constructor
+ */
 WebInspector.HeapSnapshotWorkerDispatcher = function(globalObject, postMessage)
 {
     this._objects = [];
@@ -45,41 +48,64 @@ WebInspector.HeapSnapshotWorkerDispatcher.prototype = {
         return result;
     },
 
+    /**
+     * @param {string} name
+     * @param {*} data
+     */
+    sendEvent: function(name, data)
+    {
+        this._postMessage({eventName: name, data: data});
+    },
+
     dispatchMessage: function(event)
     {
-        var data = event.data;
-        switch (data.disposition) {
-            case "create": {
-                var constructorFunction = this._findFunction(data.methodName);
-                this._objects[data.objectId] = new constructorFunction();
-                this._postMessage({callId: data.callId});
-                break;
+        var data = /** @type {!WebInspector.HeapSnapshotCommon.WorkerCommand } */(event.data);
+        var response = {callId: data.callId};
+        try {
+            switch (data.disposition) {
+                case "create": {
+                    var constructorFunction = this._findFunction(data.methodName);
+                    this._objects[data.objectId] = new constructorFunction(this);
+                    break;
+                }
+                case "dispose": {
+                    delete this._objects[data.objectId];
+                    break;
+                }
+                case "getter": {
+                    var object = this._objects[data.objectId];
+                    var result = object[data.methodName];
+                    response.result = result;
+                    break;
+                }
+                case "factory": {
+                    var object = this._objects[data.objectId];
+                    var result = object[data.methodName].apply(object, data.methodArguments);
+                    if (result)
+                        this._objects[data.newObjectId] = result;
+                    response.result = !!result;
+                    break;
+                }
+                case "method": {
+                    var object = this._objects[data.objectId];
+                    response.result = object[data.methodName].apply(object, data.methodArguments);
+                    break;
+                }
+                case "evaluateForTest": {
+                    try {
+                        response.result = eval(data.source)
+                    } catch (e) {
+                        response.result = e.toString();
+                    }
+                    break;
+                }
             }
-            case "dispose": {
-                delete this._objects[data.objectId];
-                this._postMessage({callId: data.callId});
-                break;
-            }
-            case "getter": {
-                var object = this._objects[data.objectId];
-                var result = object[data.methodName];
-                this._postMessage({callId: data.callId, result: result});
-                break;
-            }
-            case "factory": {
-                var object = this._objects[data.objectId];
-                var result = object[data.methodName].apply(object, data.methodArguments);
-                if (result)
-                    this._objects[data.newObjectId] = result;
-                this._postMessage({callId: data.callId, result: !!result});
-                break;
-            }
-            case "method": {
-                var object = this._objects[data.objectId];
-                var result = object[data.methodName].apply(object, data.methodArguments);
-                this._postMessage({callId: data.callId, result: result});
-                break;
-            }
+        } catch (e) {
+            response.error = e.toString();
+            response.errorCallStack = e.stack;
+            if (data.methodName)
+                response.errorMethodName = data.methodName;
         }
+        this._postMessage(response);
     }
 };

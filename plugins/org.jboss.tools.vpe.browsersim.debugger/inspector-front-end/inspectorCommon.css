@@ -11,14 +11,29 @@ body {
     right: 0;
     overflow: hidden;
     font-family: Lucida Grande, sans-serif;
-    font-size: 10px;
+    font-size: 12px;
     margin: 0;
-    -webkit-text-size-adjust: none;
+    tab-size: 4;
     -webkit-user-select: none;
+    color: #222;
 }
 
-* {
-    -webkit-box-sizing: border-box;
+body.platform-linux {
+  color: rgb(48, 57, 66);
+  font-family: Ubuntu, Arial, sans-serif;
+}
+
+body.platform-mac {
+  color: rgb(48, 57, 66);
+  font-family: 'Lucida Grande', sans-serif;
+}
+
+body.platform-windows {
+  font-family: 'Segoe UI', Tahoma, sans-serif;
+}
+
+*, *::before, *::after {
+    box-sizing: border-box;
 }
 
 :focus {
@@ -29,7 +44,8 @@ img {
     -webkit-user-drag: none;
 }
 
-iframe, a img {
+iframe,
+a img {
     border: none;
 }
 
@@ -56,35 +72,32 @@ iframe.view {
     position: absolute;
     left: 0;
     right: 0;
-    height: 100%;
     top: 0;
     z-index: -100;
+    bottom: 0;
 }
 
 .resources-event-dividers {
     position: absolute;
     left: 0;
-    right: 5px;
+    right: 0;
     height: 100%;
     top: 0;
     z-index: 300;
     pointer-events: none;
 }
 
-.timeline .resources-event-dividers {
-    height: 19px;
-}
-
 .resources-dividers-label-bar {
     position: absolute;
     top: 0;
-    left: 0px;
+    left: 0;
     right: 0;
-    background-color: rgba(255, 255, 255, 0.8);
-    background-clip: padding;
-    border-bottom: 1px solid rgba(0, 0, 0, 0.3);
+    background-color: rgba(255, 255, 255, 0.85);
+    background-clip: padding-box;
     height: 20px;
     z-index: 200;
+    pointer-events: none;
+    overflow: hidden;
 }
 
 .resources-divider {
@@ -111,33 +124,83 @@ iframe.view {
     z-index: 300;
 }
 
-.resources-red-divider {
-    background-color: rgba(255, 0, 0, 0.5);
-}
-
-.resources-blue-divider {
-    background-color: rgba(0, 0, 255, 0.5);
-}
-
-.resources-orange-divider {
-    background-color: rgba(255, 178, 23, 0.5);
-}
-
-.resources-divider.last {
-    background-color: transparent;
-}
-
 .resources-divider-label {
     position: absolute;
     top: 4px;
     right: 3px;
-    font-size: 9px;
-    color: rgb(50%, 50%, 50%);
+    font-size: 80%;
     white-space: nowrap;
+    pointer-events: none;
 }
 
+.overview-grid-window-selector {
+    position: absolute;
+    top: 0;
+    bottom: 0;
+    background-color: rgba(125, 173, 217, 0.5);
+    z-index: 250;
+    pointer-events: none;
+}
+
+.overview-grid-window {
+    background-color: white;
+    position: absolute;
+    left: 0;
+    right: 0;
+    top: 0;
+    height: 20px;
+    z-index: 150;
+}
+
+.overview-grid-dividers-background {
+    left: 0%;
+    right: 0%;
+    top: 0;
+    height: 20px;
+    background-color: black;
+    position: absolute;
+}
+
+.overview-grid-window-rulers {
+    top: 0;
+    bottom: 0;
+    position: absolute;
+    opacity: 0.2;
+    border-right: 1px solid black;
+    border-left: 1px solid black;
+    z-index: 250;
+    pointer-events: none;
+}
+
+.overview-grid-window-resizer {
+    position: absolute;
+    top: 0;
+    height: 20px;
+    width: 5px;
+    margin-left: -2px;
+    margin-right: -3px;
+    background-color: rgb(153, 153, 153);
+    z-index: 500;
+    border-radius: 2px;
+    box-shadow: white 1px 0 0, white -1px 0 0, white 0 1px 0, white 0 -1px 0;
+}
+
+.overview-grid-window-resizer-right {
+    margin-left: -3px;
+    margin-right: -2px;
+}
 
 /* Network timing is shared between popover and network item view pane */
+
+.network-timing-table td {
+    padding: 0;
+}
+
+.network-timing-table td.caution {
+    font-weight: bold;
+    color: rgb(255, 128, 0);
+    padding: 2px 0;
+}
 
 .network-timing-row {
     position: relative;
@@ -155,34 +218,68 @@ iframe.view {
 
 .network-timing-bar-title {
     position: absolute;
-    color: black;
+    color: #222;
     top: 1px;
 }
 
-.webkit-search-result {
-    -webkit-border-radius: 4px;
-    padding: 2px 2px 2px 3px;
-    margin: -2px -2px -2px -3px;
-    opacity: 0.8;
-    -webkit-box-shadow: rgba(0, 0, 0, .5) 3px 3px 4px;
-    background-color: rgb(241, 234, 0);
-    color: black;
+.highlighted-search-result {
+    border-radius: 1px;
+    padding: 1px;
+    margin: -1px;
+    background-color: rgba(255, 255, 0, 0.8);
 }
 
 .sidebar-separator {
-    background-image: -webkit-gradient(linear, left top, left bottom, from(rgb(243, 243, 243)), color-stop(0.05, rgb(243, 243, 243)), color-stop(0.05, rgb(230, 230, 230)), to(rgb(209, 209, 209)));
+    background-color: rgb(230, 230, 230);
     padding: 0 5px;
     border-top: 1px solid rgb(189, 189, 189);
     border-bottom: 1px solid rgb(189, 189, 189);
-    color: rgb(110, 110, 110);
-    text-shadow: white 0 1px 0;
+    color: rgb(50, 50, 50);
     white-space: nowrap;
     text-overflow: ellipsis;
     overflow: hidden;
-    font-size: 11px;
+    line-height: 16px;
 }
 
 .sidebar-label {
     font-size: 11px;
 }
 
+.pie-chart {
+    width: 100px;
+    height: 110px;
+}
+
+.pie-chart-background {
+    position: absolute;
+    width: 100px;
+    height: 100px;
+    border-radius: 50px;
+    background-color: rgb(248, 248, 248);
+    box-shadow: 0 1px 2px;
+}
+
+.pie-chart-foreground {
+    position: absolute;
+    width: 100px;
+    height: 100px;
+    text-align: center;
+    line-height: 100px;
+    z-index: 10;
+}
+
+.pie-chart-slice {
+    position: absolute;
+    width: 100px;
+    height: 100px;
+    border-radius: 50px;
+    clip: rect(0px, 100px, 100px, 50px);
+}
+
+.pie-chart-slice-inner {
+    position: absolute;
+    width: 100px;
+    height: 100px;
+    border-radius: 50px;
+    clip: rect(0px, 50px, 100px, 0px);
+}

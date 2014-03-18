@@ -33,17 +33,15 @@ WebInspector.ApplicationCacheItemsView = function(model, frameId)
     
     this._model = model;
 
-    this.element.addStyleClass("storage-view");
-    this.element.addStyleClass("table");
+    this.element.classList.add("storage-view");
+    this.element.classList.add("table");
 
     // FIXME: Needs better tooltip. (Localized)
     this.deleteButton = new WebInspector.StatusBarButton(WebInspector.UIString("Delete"), "delete-storage-status-bar-item");
     this.deleteButton.visible = false;
     this.deleteButton.addEventListener("click", this._deleteButtonClicked, this);
 
-    this.connectivityIcon = document.createElement("img");
-    this.connectivityIcon.className = "storage-application-cache-connectivity-icon";
-    this.connectivityIcon.src = "";
+    this.connectivityIcon = document.createElement("div");
     this.connectivityMessage = document.createElement("span");
     this.connectivityMessage.className = "storage-application-cache-connectivity";
     this.connectivityMessage.textContent = "";
@@ -51,9 +49,7 @@ WebInspector.ApplicationCacheItemsView = function(model, frameId)
     this.divider = document.createElement("span");
     this.divider.className = "status-bar-item status-bar-divider";
 
-    this.statusIcon = document.createElement("img");
-    this.statusIcon.className = "storage-application-cache-status-icon";
-    this.statusIcon.src = "";
+    this.statusIcon = document.createElement("div");
     this.statusMessage = document.createElement("span");
     this.statusMessage.className = "storage-application-cache-status";
     this.statusMessage.textContent = "";
@@ -119,18 +115,18 @@ WebInspector.ApplicationCacheItemsView.prototype = {
         
         var statusInformation = {};
         // We should never have UNCACHED status, since we remove frames with UNCACHED application cache status from the tree. 
-        statusInformation[applicationCache.UNCACHED]    = { src: "Images/errorRedDot.png", text: "UNCACHED" };
-        statusInformation[applicationCache.IDLE]        = { src: "Images/successGreenDot.png", text: "IDLE" };
-        statusInformation[applicationCache.CHECKING]    = { src: "Images/warningOrangeDot.png",  text: "CHECKING" };
-        statusInformation[applicationCache.DOWNLOADING] = { src: "Images/warningOrangeDot.png",  text: "DOWNLOADING" };
-        statusInformation[applicationCache.UPDATEREADY] = { src: "Images/successGreenDot.png",  text: "UPDATEREADY" };
-        statusInformation[applicationCache.OBSOLETE]    = { src: "Images/errorRedDot.png",      text: "OBSOLETE" };
+        statusInformation[applicationCache.UNCACHED]    = { className: "red-ball", text: "UNCACHED" };
+        statusInformation[applicationCache.IDLE]        = { className: "green-ball", text: "IDLE" };
+        statusInformation[applicationCache.CHECKING]    = { className: "orange-ball",  text: "CHECKING" };
+        statusInformation[applicationCache.DOWNLOADING] = { className: "orange-ball",  text: "DOWNLOADING" };
+        statusInformation[applicationCache.UPDATEREADY] = { className: "green-ball",  text: "UPDATEREADY" };
+        statusInformation[applicationCache.OBSOLETE]    = { className: "red-ball",      text: "OBSOLETE" };
 
         var info = statusInformation[status] || statusInformation[applicationCache.UNCACHED];
 
-        this.statusIcon.src = info.src;
+        this.statusIcon.className = "storage-application-cache-status-icon " + info.className;
         this.statusMessage.textContent = info.text;
-        
+
         if (this.isShowing() && this._status === applicationCache.IDLE && (oldStatus === applicationCache.UPDATEREADY || !this._resources))
             this._markDirty();
         this._maybeUpdate();
@@ -142,10 +138,10 @@ WebInspector.ApplicationCacheItemsView.prototype = {
     updateNetworkState: function(isNowOnline)
     {
         if (isNowOnline) {
-            this.connectivityIcon.src = "Images/successGreenDot.png";
+            this.connectivityIcon.className = "storage-application-cache-connectivity-icon green-ball";
             this.connectivityMessage.textContent = WebInspector.UIString("Online");
         } else {
-            this.connectivityIcon.src = "Images/errorRedDot.png";
+            this.connectivityIcon.className = "storage-application-cache-connectivity-icon red-ball";
             this.connectivityMessage.textContent = WebInspector.UIString("Offline");
         }
     },
@@ -156,7 +152,7 @@ WebInspector.ApplicationCacheItemsView.prototype = {
     },
 
     /**
-     * @param {Object} applicationCache
+     * @param {?ApplicationCacheAgent.ApplicationCache} applicationCache
      */
     _updateCallback: function(applicationCache)
     {
@@ -170,7 +166,7 @@ WebInspector.ApplicationCacheItemsView.prototype = {
             this._emptyView.show(this.element);
             this.deleteButton.visible = false;
             if (this._dataGrid)
-                this._dataGrid.element.addStyleClass("hidden");
+                this._dataGrid.element.classList.add("hidden");
             return;
         }
         // FIXME: are these variables needed anywhere else?
@@ -180,14 +176,12 @@ WebInspector.ApplicationCacheItemsView.prototype = {
         this._size = applicationCache.size;
         this._resources = applicationCache.resources;
 
-        var lastPathComponent = applicationCache.lastPathComponent;
-
         if (!this._dataGrid)
             this._createDataGrid();
 
         this._populateDataGrid();
         this._dataGrid.autoSizeColumns(20, 80);
-        this._dataGrid.element.removeStyleClass("hidden");
+        this._dataGrid.element.classList.remove("hidden");
         this._emptyView.detach();
         this.deleteButton.visible = true;
 
@@ -198,24 +192,20 @@ WebInspector.ApplicationCacheItemsView.prototype = {
 
     _createDataGrid: function()
     {
-        var columns = { 0: {}, 1: {}, 2: {} };
-        columns[0].title = WebInspector.UIString("Resource");
-        columns[0].sort = "ascending";
-        columns[0].sortable = true;
-        columns[1].title = WebInspector.UIString("Type");
-        columns[1].sortable = true;
-        columns[2].title = WebInspector.UIString("Size");
-        columns[2].aligned = "right";
-        columns[2].sortable = true;
+        var columns = [
+            {title: WebInspector.UIString("Resource"), sort: WebInspector.DataGrid.Order.Ascending, sortable: true},
+            {title: WebInspector.UIString("Type"), sortable: true},
+            {title: WebInspector.UIString("Size"), align: WebInspector.DataGrid.Align.Right, sortable: true}
+        ];
         this._dataGrid = new WebInspector.DataGrid(columns);
         this._dataGrid.show(this.element);
-        this._dataGrid.addEventListener("sorting changed", this._populateDataGrid, this);
+        this._dataGrid.addEventListener(WebInspector.DataGrid.Events.SortingChanged, this._populateDataGrid, this);
     },
 
     _populateDataGrid: function()
     {
         var selectedResource = this._dataGrid.selectedNode ? this._dataGrid.selectedNode.resource : null;
-        var sortDirection = this._dataGrid.sortOrder === "ascending" ? 1 : -1;
+        var sortDirection = this._dataGrid.isSortOrderAscending() ? 1 : -1;
 
         function numberCompare(field, resource1, resource2)
         {
@@ -227,7 +217,7 @@ WebInspector.ApplicationCacheItemsView.prototype = {
         }
 
         var comparator;
-        switch (parseInt(this._dataGrid.sortColumnIdentifier, 10)) {
+        switch (parseInt(this._dataGrid.sortColumnIdentifier(), 10)) {
             case 0: comparator = localeCompare.bind(this, "name"); break;
             case 1: comparator = localeCompare.bind(this, "type"); break;
             case 2: comparator = numberCompare.bind(this, "size"); break;
@@ -235,7 +225,7 @@ WebInspector.ApplicationCacheItemsView.prototype = {
         }
 
         this._resources.sort(comparator);
-        this._dataGrid.removeChildren();
+        this._dataGrid.rootNode().removeChildren();
 
         var nodeToSelect;
         for (var i = 0; i < this._resources.length; ++i) {
@@ -247,15 +237,15 @@ WebInspector.ApplicationCacheItemsView.prototype = {
             var node = new WebInspector.DataGridNode(data);
             node.resource = resource;
             node.selectable = true;
-            this._dataGrid.appendChild(node);
+            this._dataGrid.rootNode().appendChild(node);
             if (resource === selectedResource) {
                 nodeToSelect = node;
                 nodeToSelect.selected = true;
             }
         }
 
-        if (!nodeToSelect && this._dataGrid.children.length)
-            this._dataGrid.children[0].selected = true;
+        if (!nodeToSelect && this._dataGrid.rootNode().children.length)
+            this._dataGrid.rootNode().children[0].selected = true;
     },
 
     _deleteButtonClicked: function(event)
@@ -273,6 +263,7 @@ WebInspector.ApplicationCacheItemsView.prototype = {
         // InspectorBackend.deleteCachedResource(...)
         // this._update();
     },
+
+    __proto__: WebInspector.View.prototype
 }
 
-WebInspector.ApplicationCacheItemsView.prototype.__proto__ = WebInspector.View.prototype;

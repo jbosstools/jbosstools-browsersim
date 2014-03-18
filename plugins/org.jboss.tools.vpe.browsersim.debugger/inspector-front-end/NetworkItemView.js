@@ -29,41 +29,46 @@
  */
 
 /**
- * @extends {WebInspector.TabbedPane}
  * @constructor
+ * @extends {WebInspector.TabbedPane}
+ * @param {!WebInspector.NetworkRequest} request
  */
-WebInspector.NetworkItemView = function(resource)
+WebInspector.NetworkItemView = function(request)
 {
     WebInspector.TabbedPane.call(this);
+    this.element.classList.add("network-item-view");
 
-    this.element.addStyleClass("network-item-view");
-
-    var headersView = new WebInspector.ResourceHeadersView(resource);
+    var headersView = new WebInspector.RequestHeadersView(request);
     this.appendTab("headers", WebInspector.UIString("Headers"), headersView);
 
-    var responseView = new WebInspector.ResourceResponseView(resource);
-    var previewView = new WebInspector.ResourcePreviewView(resource, responseView);
+    this.addEventListener(WebInspector.TabbedPane.EventTypes.TabSelected, this._tabSelected, this);
 
-    this.appendTab("preview", WebInspector.UIString("Preview"), previewView);
-    this.appendTab("response", WebInspector.UIString("Response"), responseView);
+    if (request.type === WebInspector.resourceTypes.WebSocket) {
+        var frameView = new WebInspector.ResourceWebSocketFrameView(request);
+        this.appendTab("webSocketFrames", WebInspector.UIString("Frames"), frameView);
+    } else {
+        var responseView = new WebInspector.RequestResponseView(request);
+        var previewView = new WebInspector.RequestPreviewView(request, responseView);
+        this.appendTab("preview", WebInspector.UIString("Preview"), previewView);
+        this.appendTab("response", WebInspector.UIString("Response"), responseView);
+    }
 
-    if (resource.requestCookies || resource.responseCookies) {
-        this._cookiesView = new WebInspector.ResourceCookiesView(resource);
+    if (request.requestCookies || request.responseCookies) {
+        this._cookiesView = new WebInspector.RequestCookiesView(request);
         this.appendTab("cookies", WebInspector.UIString("Cookies"), this._cookiesView);
     }
 
-    if (resource.timing) {
-        var timingView = new WebInspector.ResourceTimingView(resource);
+    if (request.timing) {
+        var timingView = new WebInspector.RequestTimingView(request);
         this.appendTab("timing", WebInspector.UIString("Timing"), timingView);
     }
-
-    this.addEventListener("tab-selected", this._tabSelected, this);
+    this._request = request;
 }
 
 WebInspector.NetworkItemView.prototype = {
     wasShown: function()
     {
-        WebInspector.TabbedPane.prototype.wasShown.call();
+        WebInspector.TabbedPane.prototype.wasShown.call(this);
         this._selectTab();
     },
 
@@ -84,28 +89,51 @@ WebInspector.NetworkItemView.prototype = {
 
     _tabSelected: function(event)
     {
-        if (event.data.isUserGesture)
-            WebInspector.settings.resourceViewTab.set(event.data.tabId);
-    }
-}
+        if (!event.data.isUserGesture)
+            return;
 
-WebInspector.NetworkItemView.prototype.__proto__ = WebInspector.TabbedPane.prototype;
+        WebInspector.settings.resourceViewTab.set(event.data.tabId);
+
+        WebInspector.notifications.dispatchEventToListeners(WebInspector.UserMetrics.UserAction, {
+            action: WebInspector.UserMetrics.UserActionNames.NetworkRequestTabSelected,
+            tab: event.data.tabId,
+            url: this._request.url
+        });
+    },
+
+    /**
+      * @return {!WebInspector.NetworkRequest}
+      */
+    request: function()
+    {
+        return this._request;
+    },
+
+    __proto__: WebInspector.TabbedPane.prototype
+}
 
 /**
- * @extends {WebInspector.ResourceView}
  * @constructor
+ * @extends {WebInspector.RequestView}
+ * @param {!WebInspector.NetworkRequest} request
  */
-WebInspector.ResourceContentView = function(resource)
+WebInspector.RequestContentView = function(request)
 {
-    WebInspector.ResourceView.call(this, resource);
+    WebInspector.RequestView.call(this, request);
 }
 
-WebInspector.ResourceContentView.prototype = {
+WebInspector.RequestContentView.prototype = {
+    /**
+     * @return {boolean}
+     */
     hasContent: function()
     {
         return true;
     },
 
+    /**
+     * @return {!WebInspector.View}
+     */
     get innerView()
     {
         return this._innerView;
@@ -127,13 +155,17 @@ WebInspector.ResourceContentView.prototype = {
             return;
         this._innerViewShowRequested = true;
 
-        function callback()
+        /**
+         * @param {?string} content
+         * @this {WebInspector.RequestContentView}
+         */
+        function callback(content)
         {
             this._innerViewShowRequested = false;
             this.contentLoaded();
         }
 
-        this.resource.requestContent(callback.bind(this));
+        this.request.requestContent(callback.bind(this));
     },
 
     contentLoaded: function()
@@ -141,16 +173,23 @@ WebInspector.ResourceContentView.prototype = {
         // Should be implemented by subclasses.
     },
 
-    canHighlightLine: function()
+    /**
+     * @override
+     * @return {boolean}
+     */
+    canHighlightPosition: function()
     {
-        return this._innerView && this._innerView.canHighlightLine();
+        return this._innerView && this._innerView.canHighlightPosition();
     },
 
-    highlightLine: function(line)
+    /**
+     * @override
+     */
+    highlightPosition: function(line, column)
     {
-        if (this.canHighlightLine())
-            this._innerView.highlightLine(line);
-    }
-}
+        if (this.canHighlightPosition())
+            this._innerView.highlightPosition(line, column);
+    },
 
-WebInspector.ResourceContentView.prototype.__proto__ = WebInspector.ResourceView.prototype;
+    __proto__: WebInspector.RequestView.prototype
+}

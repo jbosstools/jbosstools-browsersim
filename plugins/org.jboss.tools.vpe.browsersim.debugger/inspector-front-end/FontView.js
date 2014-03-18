@@ -34,7 +34,7 @@ WebInspector.FontView = function(resource)
 {
     WebInspector.ResourceView.call(this, resource);
 
-    this.element.addStyleClass("font");
+    this.element.classList.add("font");
 }
 
 WebInspector.FontView._fontPreviewLines = [ "ABCDEFGHIJKLM", "NOPQRSTUVWXYZ", "abcdefghijklm", "nopqrstuvwxyz", "1234567890" ];
@@ -44,6 +44,9 @@ WebInspector.FontView._fontId = 0;
 WebInspector.FontView._measureFontSize = 50;
 
 WebInspector.FontView.prototype = {
+    /**
+     * @return {boolean}
+     */
     hasContent: function()
     {
         return true;
@@ -135,7 +138,7 @@ WebInspector.FontView.prototype = {
         var finalFontSize = Math.floor(WebInspector.FontView._measureFontSize * Math.min(widthRatio, heightRatio)) - 2;
 
         this.fontPreviewElement.style.setProperty("font-size", finalFontSize + "px", null);
-    }
-}
+    },
 
-WebInspector.FontView.prototype.__proto__ = WebInspector.ResourceView.prototype;
+    __proto__: WebInspector.ResourceView.prototype
+}

@@ -33,59 +33,586 @@
  */
 function InspectorBackendClass()
 {
-    this._lastCallbackId = 1;
-    this._pendingResponsesCount = 0;
-    this._callbacks = {};
-    this._domainDispatchers = {};
-    this._eventArgs = {};
-    this._replyArgs = {};
-
-    this.dumpInspectorTimeStats = false;
-    this.dumpInspectorProtocolMessages = false;
+    this._connection = null;
+    this._agentPrototypes = {};
+    this._dispatcherPrototypes = {};
     this._initialized = false;
+    this._enums = {};
+    this._initProtocolAgentsConstructor();
 }
 
 InspectorBackendClass.prototype = {
-    _wrap: function(callback, method)
+
+    _initProtocolAgentsConstructor: function()
     {
-        var callbackId = this._lastCallbackId++;
+        window.Protocol = {};
+
+        /**
+         * @constructor
+         * @param {!Object.<string, !Object>} agentsMap
+         */
+        window.Protocol.Agents = function(agentsMap) {
+            this._agentsMap = agentsMap;
+        };
+    },
+
+    /**
+     * @param {string} domain
+     */
+    _addAgentGetterMethodToProtocolAgentsPrototype: function(domain)
+    {
+        var upperCaseLength = 0;
+        while (upperCaseLength < domain.length && domain[upperCaseLength].toLowerCase() !== domain[upperCaseLength])
+            ++upperCaseLength;
+
+        var methodName = domain.substr(0, upperCaseLength).toLowerCase() + domain.slice(upperCaseLength) + "Agent";
+
+        /**
+         * @this {Protocol.Agents}
+         */
+        function agentGetter()
+        {
+            return this._agentsMap[domain];
+        }
+
+        window.Protocol.Agents.prototype[methodName] = agentGetter;
+    },
+
+    /**
+     * @return {!InspectorBackendClass.Connection}
+     */
+    connection: function()
+    {
+        if (!this._connection)
+            throw "Main connection was not initialized";
+        return this._connection;
+    },
+
+    /**
+     * @param {!InspectorBackendClass.MainConnection} connection
+     */
+    setConnection: function(connection)
+    {
+        this._connection = connection;
+        this._connection.initialize(this._agentPrototypes, this._dispatcherPrototypes);
+
+        this._connection.registerAgentsOn(window);
+        for (var type in this._enums) {
+            var domainAndMethod = type.split(".");
+            window[domainAndMethod[0] + "Agent"][domainAndMethod[1]] = this._enums[type];
+        }
+    },
+
+    /**
+     * @param {string} domain
+     * @return {!InspectorBackendClass.AgentPrototype}
+     */
+    _agentPrototype: function(domain)
+    {
+        if (!this._agentPrototypes[domain]) {
+            this._agentPrototypes[domain] = new InspectorBackendClass.AgentPrototype(domain);
+            this._addAgentGetterMethodToProtocolAgentsPrototype(domain);
+        }
+
+        return this._agentPrototypes[domain];
+    },
+
+    /**
+     * @param {string} domain
+     * @return {!InspectorBackendClass.DispatcherPrototype}
+     */
+    _dispatcherPrototype: function(domain)
+    {
+        if (!this._dispatcherPrototypes[domain])
+            this._dispatcherPrototypes[domain] = new InspectorBackendClass.DispatcherPrototype();
+        return this._dispatcherPrototypes[domain];
+    },
+
+    /**
+     * @param {string} method
+     * @param {!Array.<!Object>} signature
+     * @param {!Array.<string>} replyArgs
+     * @param {boolean} hasErrorData
+     */
+    registerCommand: function(method, signature, replyArgs, hasErrorData)
+    {
+        var domainAndMethod = method.split(".");
+        this._agentPrototype(domainAndMethod[0]).registerCommand(domainAndMethod[1], signature, replyArgs, hasErrorData);
+        this._initialized = true;
+    },
+
+    /**
+     * @param {string} type
+     * @param {!Object} values
+     */
+    registerEnum: function(type, values)
+    {
+        this._enums[type] = values;
+        this._initialized = true;
+    },
+
+    /**
+     * @param {string} eventName
+     * @param {!Object} params
+     */
+    registerEvent: function(eventName, params)
+    {
+        var domain = eventName.split(".")[0];
+        this._dispatcherPrototype(domain).registerEvent(eventName, params);
+        this._initialized = true;
+    },
+
+    /**
+     * @param {string} domain
+     * @param {!Object} dispatcher
+     */
+    registerDomainDispatcher: function(domain, dispatcher)
+    {
+        this._connection.registerDispatcher(domain, dispatcher);
+    },
+
+    /**
+     * @param {string} jsonUrl
+     */
+    loadFromJSONIfNeeded: function(jsonUrl)
+    {
+        if (this._initialized)
+            return;
+
+        var xhr = new XMLHttpRequest();
+        xhr.open("GET", jsonUrl, false);
+        xhr.send(null);
+
+        var schema = JSON.parse(xhr.responseText);
+        var code = InspectorBackendClass._generateCommands(schema);
+        eval(code);
+    },
+
+    /**
+     * @param {function(T)} clientCallback
+     * @param {string} errorPrefix
+     * @param {function(new:T,S)=} constructor
+     * @param {T=} defaultValue
+     * @return {function(?string, S)}
+     * @template T,S
+     */
+    wrapClientCallback: function(clientCallback, errorPrefix, constructor, defaultValue)
+    {
+        /**
+         * @param {?string} error
+         * @param {S} value
+         * @template S
+         */
+        function callbackWrapper(error, value)
+        {
+            if (error) {
+                console.error(errorPrefix + error);
+                clientCallback(defaultValue);
+                return;
+            }
+            if (constructor)
+                clientCallback(new constructor(value));
+            else
+                clientCallback(value);
+        }
+        return callbackWrapper;
+    }
+}
+
+/**
+ * @param {*} schema
+ * @return {string}
+ */
+InspectorBackendClass._generateCommands = function(schema) {
+    var jsTypes = { integer: "number", array: "object" };
+    var rawTypes = {};
+    var result = [];
+
+    var domains = schema["domains"] || [];
+    for (var i = 0; i < domains.length; ++i) {
+        var domain = domains[i];
+        for (var j = 0; domain.types && j < domain.types.length; ++j) {
+            var type = domain.types[j];
+            rawTypes[domain.domain + "." + type.id] = jsTypes[type.type] || type.type;
+        }
+    }
+
+    function toUpperCase(groupIndex, group0, group1)
+    {
+        return [group0, group1][groupIndex].toUpperCase();
+    }
+    function generateEnum(enumName, items)
+    {
+        var members = []
+        for (var m = 0; m < items.length; ++m) {
+            var value = items[m];
+            var name = value.replace(/-(\w)/g, toUpperCase.bind(null, 1)).toTitleCase();
+            name = name.replace(/HTML|XML|WML|API/ig, toUpperCase.bind(null, 0));
+            members.push(name + ": \"" + value +"\"");
+        }
+        return "InspectorBackend.registerEnum(\"" + enumName + "\", {" + members.join(", ") + "});";
+    }
+
+    for (var i = 0; i < domains.length; ++i) {
+        var domain = domains[i];
+
+        var types = domain["types"] || [];
+        for (var j = 0; j < types.length; ++j) {
+            var type = types[j];
+            if ((type["type"] === "string") && type["enum"])
+                result.push(generateEnum(domain.domain + "." + type.id, type["enum"]));
+            else if (type["type"] === "object") {
+                var properties = type["properties"] || [];
+                for (var k = 0; k < properties.length; ++k) {
+                    var property = properties[k];
+                    if ((property["type"] === "string") && property["enum"])
+                        result.push(generateEnum(domain.domain + "." + type.id + property["name"].toTitleCase(), property["enum"]));
+                }
+            }
+        }
+
+        var commands = domain["commands"] || [];
+        for (var j = 0; j < commands.length; ++j) {
+            var command = commands[j];
+            var parameters = command["parameters"];
+            var paramsText = [];
+            for (var k = 0; parameters && k < parameters.length; ++k) {
+                var parameter = parameters[k];
+
+                var type;
+                if (parameter.type)
+                    type = jsTypes[parameter.type] || parameter.type;
+                else {
+                    var ref = parameter["$ref"];
+                    if (ref.indexOf(".") !== -1)
+                        type = rawTypes[ref];
+                    else
+                        type = rawTypes[domain.domain + "." + ref];
+                }
+
+                var text = "{\"name\": \"" + parameter.name + "\", \"type\": \"" + type + "\", \"optional\": " + (parameter.optional ? "true" : "false") + "}";
+                paramsText.push(text);
+            }
+
+            var returnsText = [];
+            var returns = command["returns"] || [];
+            for (var k = 0; k < returns.length; ++k) {
+                var parameter = returns[k];
+                returnsText.push("\"" + parameter.name + "\"");
+            }
+            var hasErrorData = String(Boolean(command.error));
+            result.push("InspectorBackend.registerCommand(\"" + domain.domain + "." + command.name + "\", [" + paramsText.join(", ") + "], [" + returnsText.join(", ") + "], " + hasErrorData + ");");
+        }
+
+        for (var j = 0; domain.events && j < domain.events.length; ++j) {
+            var event = domain.events[j];
+            var paramsText = [];
+            for (var k = 0; event.parameters && k < event.parameters.length; ++k) {
+                var parameter = event.parameters[k];
+                paramsText.push("\"" + parameter.name + "\"");
+            }
+            result.push("InspectorBackend.registerEvent(\"" + domain.domain + "." + event.name + "\", [" + paramsText.join(", ") + "]);");
+        }
+
+        result.push("InspectorBackend.register" + domain.domain + "Dispatcher = InspectorBackend.registerDomainDispatcher.bind(InspectorBackend, \"" + domain.domain + "\");");
+    }
+    return result.join("\n");
+}
+
+/**
+ *  @constructor
+ */
+InspectorBackendClass.Connection = function()
+{
+    this._lastMessageId = 1;
+    this._pendingResponsesCount = 0;
+    this._agents = {};
+    this._dispatchers = {};
+    this._callbacks = {};
+}
+
+InspectorBackendClass.Connection.prototype = {
+
+    /**
+     * @param {!Object.<string, !InspectorBackendClass.AgentPrototype>} agentPrototypes
+     * @param {!Object.<string, !InspectorBackendClass.DispatcherPrototype>} dispatcherPrototypes
+     */
+    initialize: function(agentPrototypes, dispatcherPrototypes)
+    {
+        for (var domain in agentPrototypes) {
+            this._agents[domain] = Object.create(agentPrototypes[domain]);
+            this._agents[domain].setConnection(this);
+        }
+
+        for (var domain in dispatcherPrototypes)
+            this._dispatchers[domain] = Object.create(dispatcherPrototypes[domain])
+
+    },
+
+    /**
+     * @param {!Object} object
+     */
+    registerAgentsOn: function(object)
+    {
+        for (var domain in this._agents)
+            object[domain + "Agent"]  = this._agents[domain];
+    },
+
+    /**
+     * @return {number}
+     */
+    nextMessageId: function()
+    {
+        return this._lastMessageId++;
+    },
+
+    /**
+     * @param {string} domain
+     * @return {!InspectorBackendClass.AgentPrototype}
+     */
+    agent: function(domain)
+    {
+        return this._agents[domain];
+    },
+
+    /**
+     * @return {!Object.<string, !Object>}
+     */
+    agentsMap: function()
+    {
+        return this._agents;
+    },
+
+    /**
+     * @param {string} domain
+     * @param {string} method
+     * @param {?Object} params
+     * @param {?function(*)} callback
+     * @private
+     */
+    _wrapCallbackAndSendMessageObject: function(domain, method, params, callback)
+    {
+        var messageObject = {};
+        messageObject.method = method;
+        if (params)
+            messageObject.params = params;
+
+        var wrappedCallback = this._wrap(callback, domain, method);
+
+        var messageId = this.nextMessageId();
+        messageObject.id = messageId;
+
+        if (InspectorBackendClass.Options.dumpInspectorProtocolMessages)
+            console.log("frontend: " + JSON.stringify(messageObject));
+
+        this.sendMessage(messageObject);
+        ++this._pendingResponsesCount;
+        this._callbacks[messageId] = wrappedCallback;
+    },
+
+    /**
+     * @param {?function(*)} callback
+     * @param {string} method
+     * @param {string} domain
+     * @return {!function(*)}
+     */
+    _wrap: function(callback, domain, method)
+    {
         if (!callback)
             callback = function() {};
 
-        this._callbacks[callbackId] = callback;
         callback.methodName = method;
-        if (this.dumpInspectorTimeStats)
+        callback.domain = domain;
+        if (InspectorBackendClass.Options.dumpInspectorTimeStats)
             callback.sendRequestTime = Date.now();
-        
-        return callbackId;
+
+        return callback;
     },
 
-    registerCommand: function(method, signature, replyArgs)
+    /**
+     * @param {!Object} messageObject
+     */
+    sendMessage: function(messageObject)
     {
-        var domainAndMethod = method.split(".");
-        var agentName = domainAndMethod[0] + "Agent";
-        if (!window[agentName])
-            window[agentName] = {};
-
-        window[agentName][domainAndMethod[1]] = this._sendMessageToBackend.bind(this, method, signature);
-        window[agentName][domainAndMethod[1]]["invoke"] = this._invoke.bind(this, method, signature);
-        this._replyArgs[method] = replyArgs;
-
-        this._initialized = true;
+        throw "Not implemented";
     },
 
-    registerEvent: function(eventName, params)
+    /**
+     * @param {!Object} messageObject
+     */
+    reportProtocolError: function(messageObject)
     {
-        this._eventArgs[eventName] = params;
-
-        this._initialized = true;
+        console.error("Protocol Error: the message with wrong id. Message =  " + JSON.stringify(messageObject));
     },
 
-    _invoke: function(method, signature, args, callback)
+    /**
+     * @param {!Object|string} message
+     */
+    dispatch: function(message)
     {
-        this._wrapCallbackAndSendMessageObject(method, args, callback);
+        if (InspectorBackendClass.Options.dumpInspectorProtocolMessages)
+            console.log("backend: " + ((typeof message === "string") ? message : JSON.stringify(message)));
+
+        var messageObject = /** @type {!Object} */ ((typeof message === "string") ? JSON.parse(message) : message);
+
+        if ("id" in messageObject) { // just a response for some request
+
+            var callback = this._callbacks[messageObject.id];
+            if (!callback) {
+                this.reportProtocolError(messageObject);
+                return;
+            }
+
+            var processingStartTime;
+            if (InspectorBackendClass.Options.dumpInspectorTimeStats)
+                processingStartTime = Date.now();
+
+            this.agent(callback.domain).dispatchResponse(messageObject.id, messageObject, callback.methodName, callback);
+            --this._pendingResponsesCount;
+            delete this._callbacks[messageObject.id];
+
+            if (InspectorBackendClass.Options.dumpInspectorTimeStats)
+                console.log("time-stats: " + callback.methodName + " = " + (processingStartTime - callback.sendRequestTime) + " + " + (Date.now() - processingStartTime));
+
+            if (this._scripts && !this._pendingResponsesCount)
+                this.runAfterPendingDispatches();
+            return;
+        } else {
+            var method = messageObject.method.split(".");
+            var domainName = method[0];
+            if (!(domainName in this._dispatchers)) {
+                console.error("Protocol Error: the message " + messageObject.method + " is for non-existing domain '" + domainName + "'");
+                return;
+            }
+
+            this._dispatchers[domainName].dispatch(method[1], messageObject);
+
+        }
+
     },
 
+    /**
+     * @param {string} domain
+     * @param {!Object} dispatcher
+     */
+    registerDispatcher: function(domain, dispatcher)
+    {
+        if (!this._dispatchers[domain])
+            return;
+
+        this._dispatchers[domain].setDomainDispatcher(dispatcher);
+    },
+
+    /**
+     * @param {string=} script
+     */
+    runAfterPendingDispatches: function(script)
+    {
+        if (!this._scripts)
+            this._scripts = [];
+
+        if (script)
+            this._scripts.push(script);
+
+        if (!this._pendingResponsesCount) {
+            var scripts = this._scripts;
+            this._scripts = []
+            for (var id = 0; id < scripts.length; ++id)
+                scripts[id].call(this);
+        }
+    }
+
+}
+
+/**
+ * @constructor
+ * @extends {InspectorBackendClass.Connection}
+ */
+InspectorBackendClass.MainConnection = function()
+{
+    InspectorBackendClass.Connection.call(this);
+}
+
+InspectorBackendClass.MainConnection.prototype = {
+
+    /**
+     * @param {!Object} messageObject
+     */
+    sendMessage: function(messageObject)
+    {
+        var message = JSON.stringify(messageObject);
+        InspectorFrontendHost.sendMessageToBackend(message);
+    },
+
+    __proto__: InspectorBackendClass.Connection.prototype
+
+}
+
+/**
+ * @constructor
+ * @param {string} domain
+ */
+InspectorBackendClass.AgentPrototype = function(domain)
+{
+    this._replyArgs = {};
+    this._hasErrorData = {};
+    this._domain = domain;
+}
+
+InspectorBackendClass.AgentPrototype.prototype = {
+
+    /**
+     * @param {!InspectorBackendClass.Connection} connection
+     */
+    setConnection: function(connection)
+    {
+        this._connection = connection;
+    },
+
+    /**
+     * @param {string} methodName
+     * @param {!Array.<!Object>} signature
+     * @param {!Array.<string>} replyArgs
+     * @param {boolean} hasErrorData
+     */
+    registerCommand: function(methodName, signature, replyArgs, hasErrorData)
+    {
+        var domainAndMethod = this._domain + "." + methodName;
+
+        /**
+         * @this {InspectorBackendClass.AgentPrototype}
+         */
+        function sendMessage(vararg)
+        {
+            var params = [domainAndMethod, signature].concat(Array.prototype.slice.call(arguments));
+            InspectorBackendClass.AgentPrototype.prototype._sendMessageToBackend.apply(this, params);
+        }
+
+        this[methodName] = sendMessage;
+
+        /**
+         * @this {InspectorBackendClass.AgentPrototype}
+         */
+        function invoke(vararg)
+        {
+            var params = [domainAndMethod].concat(Array.prototype.slice.call(arguments));
+            InspectorBackendClass.AgentPrototype.prototype._invoke.apply(this, params);
+        }
+
+        this["invoke_" + methodName] = invoke;
+
+        this._replyArgs[domainAndMethod] = replyArgs;
+        if (hasErrorData)
+            this._hasErrorData[domainAndMethod] = true;
+
+    },
+
+    /**
+     * @param {string} method
+     * @param {!Array.<!Object>} signature
+     * @param {*} vararg
+     * @private
+     */
     _sendMessageToBackend: function(method, signature, vararg)
     {
         var args = Array.prototype.slice.call(arguments, 2);
@@ -118,241 +645,118 @@ InspectorBackendClass.prototype = {
             hasParams = true;
         }
 
-        if (args.length === 1 && !callback) {
-            if (typeof args[0] !== "undefined") {
-                console.error("Protocol Error: Optional callback argument for method '" + method + "' call must be a function but its type is '" + typeof args[0] + "'.");
-                return;
-            }
-        }
-
-        this._wrapCallbackAndSendMessageObject(method, hasParams ? params : null, callback);
-    },
-
-    _wrapCallbackAndSendMessageObject: function(method, params, callback)
-    {
-        var messageObject = {};
-        messageObject.method = method;
-        if (params)
-            messageObject.params = params;
-        messageObject.id = this._wrap(callback, method);
-
-        if (this.dumpInspectorProtocolMessages)
-            console.log("frontend: " + JSON.stringify(messageObject));
-
-        ++this._pendingResponsesCount;
-        this.sendMessageObjectToBackend(messageObject);
-    },
-
-    sendMessageObjectToBackend: function(messageObject)
-    {
-        var message = JSON.stringify(messageObject);
-        InspectorFrontendHost.sendMessageToBackend(message);
-    },
-
-    registerDomainDispatcher: function(domain, dispatcher)
-    {
-        this._domainDispatchers[domain] = dispatcher;
-    },
-
-    dispatch: function(message)
-    {
-        if (this.dumpInspectorProtocolMessages)
-            console.log("backend: " + ((typeof message === "string") ? message : JSON.stringify(message)));
-
-        var messageObject = (typeof message === "string") ? JSON.parse(message) : message;
-
-        if ("id" in messageObject) { // just a response for some request
-            if (messageObject.error) {
-                messageObject.error.__proto__ = {
-                    getDescription: function()
-                    {
-                        switch(this.code) {
-                            case -32700: return "Parse error";
-                            case -32600: return "Invalid Request";
-                            case -32601: return "Method not found";
-                            case -32602: return "Invalid params";
-                            case -32603: return "Internal error";;
-                            case -32000: return "Server error";
-                        }
-                    },
-
-                    toString: function()
-                    {
-                        var description ="Unknown error code";
-                        return this.getDescription() + "(" + this.code + "): " + this.message + "." + (this.data ? " " + this.data.join(" ") : "");
-                    },
-
-                    getMessage: function()
-                    {
-                        return this.message;
-                    }
-                }
-
-                if (messageObject.error.code !== -32000)
-                    this.reportProtocolError(messageObject);
-            }
-
-            var callback = this._callbacks[messageObject.id];
-            if (callback) {
-                var argumentsArray = [];
-                if (messageObject.result) {
-                    var paramNames = this._replyArgs[callback.methodName];
-                    if (paramNames) {
-                        for (var i = 0; i < paramNames.length; ++i)
-                            argumentsArray.push(messageObject.result[paramNames[i]]);
-                    }
-                }
-
-                var processingStartTime;
-                if (this.dumpInspectorTimeStats && callback.methodName)
-                    processingStartTime = Date.now();
-
-                argumentsArray.unshift(messageObject.error);
-                callback.apply(null, argumentsArray);
-                --this._pendingResponsesCount;
-                delete this._callbacks[messageObject.id];
-
-                if (this.dumpInspectorTimeStats && callback.methodName)
-                    console.log("time-stats: " + callback.methodName + " = " + (processingStartTime - callback.sendRequestTime) + " + " + (Date.now() - processingStartTime));
-            }
-
-            if (this._scripts && !this._pendingResponsesCount)
-                this.runAfterPendingDispatches();
-
+        if (args.length === 1 && !callback && (typeof args[0] !== "undefined")) {
+            console.error("Protocol Error: Optional callback argument for method '" + method + "' call must be a function but its type is '" + typeof args[0] + "'.");
             return;
-        } else {
-            var method = messageObject.method.split(".");
-            var domainName = method[0];
-            var functionName = method[1];
-            if (!(domainName in this._domainDispatchers)) {
-                console.error("Protocol Error: the message is for non-existing domain '" + domainName + "'");
-                return;
-            }
-            var dispatcher = this._domainDispatchers[domainName];
-            if (!(functionName in dispatcher)) {
-                console.error("Protocol Error: Attempted to dispatch an unimplemented method '" + messageObject.method + "'");
-                return;
-            }
-
-            if (!this._eventArgs[messageObject.method]) {
-                console.error("Protocol Error: Attempted to dispatch an unspecified method '" + messageObject.method + "'");
-                return;
-            }
-
-            var params = [];
-            if (messageObject.params) {
-                var paramNames = this._eventArgs[messageObject.method];
-                for (var i = 0; i < paramNames.length; ++i)
-                    params.push(messageObject.params[paramNames[i]]);
-            }
-
-            var processingStartTime;
-            if (this.dumpInspectorTimeStats)
-                processingStartTime = Date.now();
-
-            dispatcher[functionName].apply(dispatcher, params);
-
-            if (this.dumpInspectorTimeStats)
-                console.log("time-stats: " + messageObject.method + " = " + (Date.now() - processingStartTime));
         }
-    },
 
-    reportProtocolError: function(messageObject)
-    {
-        console.error("Request with id = " + messageObject.id + " failed. " + messageObject.error);
+        this._connection._wrapCallbackAndSendMessageObject(this._domain, method, hasParams ? params : null, callback);
     },
 
     /**
-     * @param {string=} script
+     * @param {string} method
+     * @param {?Object} args
+     * @param {?function(*)} callback
      */
-    runAfterPendingDispatches: function(script)
+    _invoke: function(method, args, callback)
     {
-        if (!this._scripts)
-            this._scripts = [];
-
-        if (script)
-            this._scripts.push(script);
-
-        if (!this._pendingResponsesCount) {
-            var scripts = this._scripts;
-            this._scripts = []
-            for (var id = 0; id < scripts.length; ++id)
-                 scripts[id].call(this);
-        }
+        this._connection._wrapCallbackAndSendMessageObject(this._domain, method, args, callback);
     },
 
-    loadFromJSONIfNeeded: function()
+    /**
+     * @param {number} messageId
+     * @param {!Object} messageObject
+     */
+    dispatchResponse: function(messageId, messageObject, methodName, callback)
     {
-        if (this._initialized)
+        if (messageObject.error && messageObject.error.code !== -32000)
+            console.error("Request with id = " + messageObject.id + " failed. " + JSON.stringify(messageObject.error));
+
+        var argumentsArray = [];
+        argumentsArray[0] = messageObject.error ? messageObject.error.message: null;
+
+        if (this._hasErrorData[methodName])
+            argumentsArray[1] = messageObject.error ? messageObject.error.data : null;
+
+        if (messageObject.result) {
+            var paramNames = this._replyArgs[methodName] || [];
+            for (var i = 0; i < paramNames.length; ++i)
+                argumentsArray.push(messageObject.result[paramNames[i]]);
+        }
+
+        callback.apply(null, argumentsArray);
+    }
+}
+
+/**
+ * @constructor
+ */
+InspectorBackendClass.DispatcherPrototype = function()
+{
+    this._eventArgs = {};
+    this._dispatcher = null;
+}
+
+InspectorBackendClass.DispatcherPrototype.prototype = {
+
+    /**
+     * @param {string} eventName
+     * @param {!Object} params
+     */
+    registerEvent: function(eventName, params)
+    {
+        this._eventArgs[eventName] = params
+    },
+
+    /**
+     * @param {!Object} dispatcher
+     */
+    setDomainDispatcher: function(dispatcher)
+    {
+        this._dispatcher = dispatcher;
+    },
+
+    /**
+     * @param {string} functionName
+     * @param {!Object} messageObject
+     */
+    dispatch: function(functionName, messageObject)
+    {
+        if (!this._dispatcher)
             return;
 
-        var xhr = new XMLHttpRequest();
-        xhr.open("GET", "../Inspector.json", false);
-        xhr.send(null);
-    
-        var schema = JSON.parse(xhr.responseText);
-        var jsTypes = { integer: "number", array: "object" };
-        var rawTypes = {};
-    
-        var domains = schema["domains"];
-        for (var i = 0; i < domains.length; ++i) {
-            var domain = domains[i];
-            for (var j = 0; domain.types && j < domain.types.length; ++j) {
-                var type = domain.types[j];
-                rawTypes[domain.domain + "." + type.id] = jsTypes[type.type] || type.type;
-            }
+        if (!(functionName in this._dispatcher)) {
+            console.error("Protocol Error: Attempted to dispatch an unimplemented method '" + messageObject.method + "'");
+            return;
         }
-    
-        var result = [];
-        for (var i = 0; i < domains.length; ++i) {
-            var domain = domains[i];
 
-            var commands = domain["commands"] || [];    
-            for (var j = 0; j < commands.length; ++j) {
-                var command = commands[j];
-                var parameters = command["parameters"];
-                var paramsText = [];
-                for (var k = 0; parameters && k < parameters.length; ++k) {
-                    var parameter = parameters[k];
-    
-                    var type;
-                    if (parameter.type)
-                        type = jsTypes[parameter.type] || parameter.type;
-                    else {
-                        var ref = parameter["$ref"];
-                        if (ref.indexOf(".") !== -1)
-                            type = rawTypes[ref];
-                        else
-                            type = rawTypes[domain.domain + "." + ref];
-                    }
-    
-                    var text = "{\"name\": \"" + parameter.name + "\", \"type\": \"" + type + "\", \"optional\": " + (parameter.optional ? "true" : "false") + "}";
-                    paramsText.push(text);
-                }
-    
-                var returnsText = [];
-                var returns = command["returns"] || [];
-                for (var k = 0; k < returns.length; ++k) {
-                    var parameter = returns[k];
-                    returnsText.push("\"" + parameter.name + "\"");
-                }
-                result.push("InspectorBackend.registerCommand(\"" + domain.domain + "." + command.name + "\", [" + paramsText.join(", ") + "], [" + returnsText.join(", ") + "]);");
-            }
-    
-            for (var j = 0; domain.events && j < domain.events.length; ++j) {
-                var event = domain.events[j];
-                var paramsText = [];
-                for (var k = 0; event.parameters && k < event.parameters.length; ++k) {
-                    var parameter = event.parameters[k];
-                    paramsText.push("\"" + parameter.name + "\"");
-                }
-                result.push("InspectorBackend.registerEvent(\"" + domain.domain + "." + event.name + "\", [" + paramsText.join(", ") + "]);");
-            }
-    
-            result.push("InspectorBackend.register" + domain.domain + "Dispatcher = InspectorBackend.registerDomainDispatcher.bind(InspectorBackend, \"" + domain.domain + "\");");
+        if (!this._eventArgs[messageObject.method]) {
+            console.error("Protocol Error: Attempted to dispatch an unspecified method '" + messageObject.method + "'");
+            return;
         }
-        eval(result.join("\n"));
+
+        var params = [];
+        if (messageObject.params) {
+            var paramNames = this._eventArgs[messageObject.method];
+            for (var i = 0; i < paramNames.length; ++i)
+                params.push(messageObject.params[paramNames[i]]);
+        }
+
+        var processingStartTime;
+        if (InspectorBackendClass.Options.dumpInspectorTimeStats)
+            processingStartTime = Date.now();
+
+        this._dispatcher[functionName].apply(this._dispatcher, params);
+
+        if (InspectorBackendClass.Options.dumpInspectorTimeStats)
+            console.log("time-stats: " + messageObject.method + " = " + (Date.now() - processingStartTime));
     }
+
+}
+
+InspectorBackendClass.Options = {
+    dumpInspectorTimeStats: false,
+    dumpInspectorProtocolMessages: false
 }
 
 InspectorBackend = new InspectorBackendClass();

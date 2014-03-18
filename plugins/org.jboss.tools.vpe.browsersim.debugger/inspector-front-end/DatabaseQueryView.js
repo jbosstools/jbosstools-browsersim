@@ -33,9 +33,9 @@ WebInspector.DatabaseQueryView = function(database)
 
     this.database = database;
 
-    this.element.addStyleClass("storage-view");
-    this.element.addStyleClass("query");
-    this.element.addStyleClass("monospace");
+    this.element.classList.add("storage-view");
+    this.element.classList.add("query");
+    this.element.classList.add("monospace");
     this.element.addEventListener("selectstart", this._selectStart.bind(this), false);
 
     this._promptElement = document.createElement("div");
@@ -46,7 +46,7 @@ WebInspector.DatabaseQueryView = function(database)
 
     this.prompt = new WebInspector.TextPromptWithHistory(this.completions.bind(this), " ");
     this.prompt.attach(this._promptElement);
-    
+
     this.element.addEventListener("click", this._messagesClicked.bind(this), true);
 }
 
@@ -61,12 +61,17 @@ WebInspector.DatabaseQueryView.prototype = {
             this.prompt.moveCaretToEndOfPrompt();
     },
     
-    completions: function(wordRange, force, completionsReadyCallback)
+    /**
+     * @param {!Element} proxyElement
+     * @param {!Range} wordRange
+     * @param {boolean} force
+     * @param {function(!Array.<string>, number=)} completionsReadyCallback
+     */
+    completions: function(proxyElement, wordRange, force, completionsReadyCallback)
     {
         var prefix = wordRange.toString().toLowerCase();
-        if (!prefix.length && !force)
+        if (!prefix)
             return;
-
         var results = [];
 
         function accumulateMatches(textArray)
@@ -75,7 +80,7 @@ WebInspector.DatabaseQueryView.prototype = {
                 var text = textArray[i].toLowerCase();
                 if (text.length < prefix.length)
                     continue;
-                if (text.indexOf(prefix) !== 0)
+                if (!text.startsWith(prefix))
                     continue;
                 results.push(textArray[i]);
             }
@@ -98,6 +103,9 @@ WebInspector.DatabaseQueryView.prototype = {
 
         this.prompt.clearAutoComplete();
 
+        /**
+         * @this {WebInspector.DatabaseQueryView}
+         */
         function moveBackIfOutside()
         {
             delete this._selectionTimeout;
@@ -119,8 +127,7 @@ WebInspector.DatabaseQueryView.prototype = {
 
     _enterKeyPressed: function(event)
     {
-        event.preventDefault();
-        event.stopPropagation();
+        event.consume(true);
 
         this.prompt.clearAutoComplete(true);
 
@@ -140,7 +147,7 @@ WebInspector.DatabaseQueryView.prototype = {
         var trimmedQuery = query.trim();
 
         if (dataGrid) {
-            dataGrid.element.addStyleClass("inline");
+            dataGrid.renderInline();
             this._appendViewQueryResult(trimmedQuery, dataGrid);
             dataGrid.autoSizeColumns(5);
         }
@@ -149,21 +156,14 @@ WebInspector.DatabaseQueryView.prototype = {
             this.dispatchEventToListeners(WebInspector.DatabaseQueryView.Events.SchemaUpdated, this.database);
     },
 
-    _queryError: function(query, error)
+    _queryError: function(query, errorMessage)
     {
-        if (error.message)
-            var message = error.message;
-        else if (error.code == 2)
-            var message = WebInspector.UIString("Database no longer has expected version.");
-        else
-            var message = WebInspector.UIString("An unexpected error %s occurred.", error.code);
-
-        this._appendErrorQueryResult(query, message);
+        this._appendErrorQueryResult(query, errorMessage);
     },
 
     /**
      * @param {string} query
-     * @param {WebInspector.View} view
+     * @param {!WebInspector.View} view
      */
     _appendViewQueryResult: function(query, view)
     {
@@ -180,7 +180,7 @@ WebInspector.DatabaseQueryView.prototype = {
     _appendErrorQueryResult: function(query, errorText)
     {
         var resultElement = this._appendQueryResult(query);
-        resultElement.addStyleClass("error")
+        resultElement.classList.add("error")
         resultElement.textContent = errorText;
 
         this._promptElement.scrollIntoView(false);
@@ -201,7 +201,7 @@ WebInspector.DatabaseQueryView.prototype = {
         resultElement.className = "database-query-result";
         element.appendChild(resultElement);
         return resultElement;
-    }
-}
+    },
 
-WebInspector.DatabaseQueryView.prototype.__proto__ = WebInspector.View.prototype;
+    __proto__: WebInspector.View.prototype
+}

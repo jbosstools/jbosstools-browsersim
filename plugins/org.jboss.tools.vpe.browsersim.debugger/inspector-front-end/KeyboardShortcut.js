@@ -51,22 +51,29 @@ WebInspector.KeyboardShortcut.Modifiers = {
     }
 };
 
+/** @typedef {!{code: number, name: (string|!Object.<string, string>)}} */
+WebInspector.KeyboardShortcut.Key;
+
+/** @type {!Object.<string, !WebInspector.KeyboardShortcut.Key>} */
 WebInspector.KeyboardShortcut.Keys = {
     Backspace: { code: 8, name: "\u21a4" },
-    Tab: { code: 9, name: { mac: "\u21e5", other: "<Tab>" } },
-    Enter: { code: 13, name: { mac: "\u21a9", other: "<Enter>" } },
-    Esc: { code: 27, name: { mac: "\u238b", other: "<Esc>" } },
-    Space: { code: 32, name: "<Space>" },
-    PageUp: { code: 33,  name: { mac: "\u21de", other: "<PageUp>" } },      // also NUM_NORTH_EAST
-    PageDown: { code: 34, name: { mac: "\u21df", other: "<PageDown>" } },   // also NUM_SOUTH_EAST
-    End: { code: 35, name: { mac: "\u2197", other: "<End>" } },             // also NUM_SOUTH_WEST
-    Home: { code: 36, name: { mac: "\u2196", other: "<Home>" } },           // also NUM_NORTH_WEST
+    Tab: { code: 9, name: { mac: "\u21e5", other: "Tab" } },
+    Enter: { code: 13, name: { mac: "\u21a9", other: "Enter" } },
+    Ctrl: { code: 17, name: "Ctrl" },
+    Esc: { code: 27, name: { mac: "\u238b", other: "Esc" } },
+    Space: { code: 32, name: "Space" },
+    PageUp: { code: 33,  name: { mac: "\u21de", other: "PageUp" } },      // also NUM_NORTH_EAST
+    PageDown: { code: 34, name: { mac: "\u21df", other: "PageDown" } },   // also NUM_SOUTH_EAST
+    End: { code: 35, name: { mac: "\u2197", other: "End" } },             // also NUM_SOUTH_WEST
+    Home: { code: 36, name: { mac: "\u2196", other: "Home" } },           // also NUM_NORTH_WEST
     Left: { code: 37, name: "\u2190" },           // also NUM_WEST
     Up: { code: 38, name: "\u2191" },             // also NUM_NORTH
     Right: { code: 39, name: "\u2192" },          // also NUM_EAST
     Down: { code: 40, name: "\u2193" },           // also NUM_SOUTH
-    Delete: { code: 46, name: "<Del>" },
+    Delete: { code: 46, name: "Del" },
     Zero: { code: 48, name: "0" },
+    H: { code: 72, name: "H" },
+    Meta: { code: 91, name: "Meta" },
     F1: { code: 112, name: "F1" },
     F2: { code: 113, name: "F2" },
     F3: { code: 114, name: "F3" },
@@ -85,15 +92,25 @@ WebInspector.KeyboardShortcut.Keys = {
     Minus: { code: 189, name: "-" },
     Period: { code: 190, name: "." },
     Slash: { code: 191, name: "/" },
+    QuestionMark: { code: 191, name: "?" },
     Apostrophe: { code: 192, name: "`" },
-    SingleQuote: { code: 222, name: "\'" }
+    Tilde: { code: 192, name: "Tilde" },
+    Backslash: { code: 220, name: "\\" },
+    SingleQuote: { code: 222, name: "\'" },
+    get CtrlOrMeta()
+    {
+        // "default" command/ctrl key for platform, Command on Mac, Ctrl on other platforms
+        return WebInspector.isMac() ? this.Meta : this.Ctrl;
+    },
 };
 
 /**
  * Creates a number encoding keyCode in the lower 8 bits and modifiers mask in the higher 8 bits.
  * It is useful for matching pressed keys.
- * keyCode is the Code of the key, or a character "a-z" which is converted to a keyCode value.
+ *
+ * @param {number|string} keyCode The code of the key, or a character "a-z" which is converted to a keyCode value.
  * @param {number=} modifiers Optional list of modifiers passed as additional paramerters.
+ * @return {number}
  */
 WebInspector.KeyboardShortcut.makeKey = function(keyCode, modifiers)
 {
@@ -103,6 +120,10 @@ WebInspector.KeyboardShortcut.makeKey = function(keyCode, modifiers)
     return WebInspector.KeyboardShortcut._makeKeyFromCodeAndModifiers(keyCode, modifiers);
 }
 
+/**
+ * @param {?KeyboardEvent} keyboardEvent
+ * @return {number}
+ */
 WebInspector.KeyboardShortcut.makeKeyFromEvent = function(keyboardEvent)
 {
     var modifiers = WebInspector.KeyboardShortcut.Modifiers.None;
@@ -117,13 +138,31 @@ WebInspector.KeyboardShortcut.makeKeyFromEvent = function(keyboardEvent)
     return WebInspector.KeyboardShortcut._makeKeyFromCodeAndModifiers(keyboardEvent.keyCode, modifiers);
 }
 
+/**
+ * @param {?KeyboardEvent} event
+ * @return {boolean}
+ */
 WebInspector.KeyboardShortcut.eventHasCtrlOrMeta = function(event)
 {
     return WebInspector.isMac() ? event.metaKey && !event.ctrlKey : event.ctrlKey && !event.metaKey;
 }
 
 /**
+ * @param {?Event} event
+ * @return {boolean}
+ */
+WebInspector.KeyboardShortcut.hasNoModifiers = function(event)
+{
+    return !event.ctrlKey && !event.shiftKey && !event.altKey && !event.metaKey;
+}
+
+/** @typedef {!{key: number, name: string}} */
+WebInspector.KeyboardShortcut.Descriptor;
+
+/**
+ * @param {string|!WebInspector.KeyboardShortcut.Key} key
  * @param {number=} modifiers
+ * @return {!WebInspector.KeyboardShortcut.Descriptor}
  */
 WebInspector.KeyboardShortcut.makeDescriptor = function(key, modifiers)
 {
@@ -134,27 +173,42 @@ WebInspector.KeyboardShortcut.makeDescriptor = function(key, modifiers)
 }
 
 /**
+ * @param {string|!WebInspector.KeyboardShortcut.Key} key
  * @param {number=} modifiers
+ * @return {string}
  */
 WebInspector.KeyboardShortcut.shortcutToString = function(key, modifiers)
 {
     return WebInspector.KeyboardShortcut._modifiersToString(modifiers) + WebInspector.KeyboardShortcut._keyName(key);
 }
 
+/**
+ * @param {string|!WebInspector.KeyboardShortcut.Key} key
+ * @return {string}
+ */
 WebInspector.KeyboardShortcut._keyName = function(key)
 {
     if (typeof key === "string")
         return key.toUpperCase();
     if (typeof key.name === "string")
         return key.name;
-    return key.name[WebInspector.platform()] || key.name.other;
+    return key.name[WebInspector.platform()] || key.name.other || '';
 }
 
+/**
+ * @param {number} keyCode
+ * @param {?number} modifiers
+ * @return {number}
+ */
 WebInspector.KeyboardShortcut._makeKeyFromCodeAndModifiers = function(keyCode, modifiers)
 {
     return (keyCode & 255) | (modifiers << 8);
 };
 
+/**
+ * @param {number|undefined} modifiers
+ * @return {string}
+ */
 WebInspector.KeyboardShortcut._modifiersToString = function(modifiers)
 {
     const cmdKey = "\u2318";
@@ -165,13 +219,15 @@ WebInspector.KeyboardShortcut._modifiersToString = function(modifiers)
     var isMac = WebInspector.isMac();
     var res = "";
     if (modifiers & WebInspector.KeyboardShortcut.Modifiers.Ctrl)
-        res += isMac ? ctrlKey : "<Ctrl> + ";
+        res += isMac ? ctrlKey : "Ctrl + ";
     if (modifiers & WebInspector.KeyboardShortcut.Modifiers.Alt)
-        res += isMac ? optKey : "<Alt> + ";
+        res += isMac ? optKey : "Alt + ";
     if (modifiers & WebInspector.KeyboardShortcut.Modifiers.Shift)
-        res += isMac ? shiftKey : "<Shift> + ";
+        res += isMac ? shiftKey : "Shift + ";
     if (modifiers & WebInspector.KeyboardShortcut.Modifiers.Meta)
-        res += isMac ? cmdKey : "<Win> + ";
+        res += isMac ? cmdKey : "Win + ";
 
     return res;
 };
+
+WebInspector.KeyboardShortcut.SelectAll = WebInspector.KeyboardShortcut.makeKey("a", WebInspector.KeyboardShortcut.Modifiers.CtrlOrMeta);

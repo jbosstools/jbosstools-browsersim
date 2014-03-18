@@ -34,32 +34,32 @@
 .resources.panel .sidebar {
     padding-left: 0;
     z-index: 10;
+    display: block;
 }
 
 .resources.panel .sidebar li {
-    height: 17px;
+    height: 18px;
     white-space: nowrap;
 }
 
 .resources.panel .sidebar li.selected {
     color: white;
-    text-shadow: rgba(0, 0, 0, 0.33) 0 1px 0;
-    font-weight: bold;
+    text-shadow: rgba(0, 0, 0, 0.33) 1px 1px 0;
 }
 
 .resources.panel .sidebar li.selected .selection {
-    background-image: -webkit-gradient(linear, left top, left bottom, from(rgb(162, 177, 207)), to(rgb(120, 138, 177)));
+    background-image: linear-gradient(to bottom, rgb(162, 177, 207), rgb(120, 138, 177));
     border-top: 1px solid #979797;
-    height: 17px;
+    height: 18px;
 }
 
 .resources.panel .sidebar :focus li.selected .selection {
-    background-image: -webkit-gradient(linear, left top, left bottom, from(rgb(92, 147, 213)), to(rgb(21, 83, 170)));
+    background-image: linear-gradient(to bottom, rgb(92, 147, 213), rgb(21, 83, 170));
     border-top: 1px solid rgb(68, 128, 200);
 }
 
 body.inactive .resources.panel .sidebar li.selected .selection {
-    background-image: -webkit-gradient(linear, left top, left bottom, from(rgb(180, 180, 180)), to(rgb(138, 138, 138)));
+    background-image: linear-gradient(to bottom, rgb(180, 180, 180), rgb(138, 138, 138));
     border-top: 1px solid rgb(151, 151, 151);
 }
 
@@ -75,6 +75,24 @@ body.inactive .resources.panel .sidebar li.selected .selection {
     text-overflow: ellipsis;
     padding-left: 2px;
     top: 1px;
+}
+
+.resources-main {
+    position: absolute;
+    top: 0;
+    bottom: 23px;
+    left: 0;
+    right: 0;
+    display: flex;
+}
+
+.resources-status-bar {
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    height: 23px;
+    background-color: rgb(236, 236, 236);
 }
 
 li.selected .base-storage-tree-element-subtitle {
@@ -111,16 +129,16 @@ li.selected .base-storage-tree-element-subtitle {
 }
 
 .storage-view.visible {
-    display: block;
+    display: flex;
 }
 
 .storage-view {
     overflow: hidden;
 }
 
-.storage-view .data-grid {
+.storage-view .data-grid:not(.inline) {
     border: none;
-    height: 100%;
+    flex: auto;
 }
 
 .storage-view .storage-table-error {
@@ -131,7 +149,6 @@ li.selected .base-storage-tree-element-subtitle {
     padding: 2px 0;
     overflow-y: overlay;
     overflow-x: hidden;
-    -webkit-text-size-adjust: auto;
 }
 
 .database-query-prompt {
@@ -143,7 +160,9 @@ li.selected .base-storage-tree-element-subtitle {
     -webkit-user-select: text;
 }
 
-.database-user-query::before, .database-query-prompt::before, .database-query-result::before {
+.database-user-query::before,
+.database-query-prompt::before,
+.database-query-result::before {
     position: absolute;
     display: block;
     content: "";
@@ -151,12 +170,22 @@ li.selected .base-storage-tree-element-subtitle {
     top: 0.8em;
     width: 10px;
     height: 10px;
-    margin-top: -5px;
+    margin-top: -7px;
     -webkit-user-select: none;
+    background-image: url(Images/statusbarButtonGlyphs.png);
+    background-size: 320px 144px;
 }
 
+@media (-webkit-min-device-pixel-ratio: 1.5) {
+.database-user-query::before,
+.database-query-prompt::before,
+.database-query-result::before {
+    background-image: url(Images/statusbarButtonGlyphs_2x.png);
+}
+} /* media */
+
 .database-query-prompt::before {
-    background-image: url(Images/userInputIcon.png);
+    background-position: -192px -96px;
 }
 
 .database-user-query {
@@ -167,7 +196,7 @@ li.selected .base-storage-tree-element-subtitle {
 }
 
 .database-user-query::before {
-    background-image: url(Images/userInputPreviousIcon.png);
+    background-position: -192px -107px;
 }
 
 .database-query-text {
@@ -189,7 +218,7 @@ li.selected .base-storage-tree-element-subtitle {
 }
 
 .database-query-result.error::before {
-    background-image: url(Images/errorIcon.png);
+    background-position: -213px -96px;
 }
 
 .resource-sidebar-tree-item .icon {
@@ -200,14 +229,14 @@ li.selected .base-storage-tree-element-subtitle {
     content: url(Images/resourcePlainIconSmall.png);
 }
 
-.resource-sidebar-tree-item.resources-category-images .icon {
+.resource-sidebar-tree-item.resources-type-image .icon {
     position: relative;
     background-image: url(Images/resourcePlainIcon.png);
     background-repeat: no-repeat;
     content: "";
 }
 
-.resources-category-images .image-resource-icon-preview {
+.resources-type-image .image-resource-icon-preview {
     position: absolute;
     margin: auto;
     top: 3px;
@@ -220,12 +249,12 @@ li.selected .base-storage-tree-element-subtitle {
     min-height: 1px;
 }
 
-.children.small .resource-sidebar-tree-item.resources-category-images .icon {
+.children.small .resource-sidebar-tree-item.resources-type-image .icon {
     background-image: url(Images/resourcePlainIconSmall.png);
     content: "";
 }
 
-.children.small .resources-category-images .image-resource-icon-preview {
+.children.small .resources-type-image .image-resource-icon-preview {
     top: 2px;
     bottom: 1px;
     left: 3px;
@@ -234,55 +263,55 @@ li.selected .base-storage-tree-element-subtitle {
     max-height: 11px;
 }
 
-.resource-sidebar-tree-item.resources-category-documents .icon {
+.resource-sidebar-tree-item.resources-type-document .icon {
     content: url(Images/resourceDocumentIcon.png);
 }
 
-.children.small .resource-sidebar-tree-item.resources-category-documents .icon {
+.children.small .resource-sidebar-tree-item.resources-type-document .icon {
     content: url(Images/resourceDocumentIconSmall.png);
 }
 
-.resource-sidebar-tree-item.resources-category-stylesheets .icon {
+.resource-sidebar-tree-item.resources-type-stylesheet .icon {
     content: url(Images/resourceCSSIcon.png);
 }
 
-.children.small .resource-sidebar-tree-item.resources-category-stylesheets .icon {
+.children.small .resource-sidebar-tree-item.resources-type-stylesheet .icon {
     content: url(Images/resourceDocumentIconSmall.png);
 }
 
-.resource-sidebar-tree-item.resources-category-images .icon {
+.resource-sidebar-tree-item.resources-type-image .icon {
     position: relative;
     background-image: url(Images/resourcePlainIcon.png);
     background-repeat: no-repeat;
     content: "";
 }
 
-.children.small .resource-sidebar-tree-item.resources-category-images .icon {
+.children.small .resource-sidebar-tree-item.resources-type-image .icon {
     background-image: url(Images/resourcePlainIconSmall.png);
     content: "";
 }
 
-.resource-sidebar-tree-item.resources-category-fonts .icon {
+.resource-sidebar-tree-item.resources-type-font .icon {
     content: url(Images/resourcePlainIcon.png);
 }
 
-.children.small .resource-sidebar-tree-item.resources-category-fonts .icon {
+.children.small .resource-sidebar-tree-item.resources-type-font .icon {
     content: url(Images/resourcePlainIconSmall.png);
 }
 
-.resource-sidebar-tree-item.resources-category-scripts .icon {
+.resource-sidebar-tree-item.resources-type-script .icon {
     content: url(Images/resourceJSIcon.png);
 }
 
-.children.small .resource-sidebar-tree-item.resources-category-scripts .icon {
+.children.small .resource-sidebar-tree-item.resources-type-script .icon {
     content: url(Images/resourceDocumentIconSmall.png);
 }
 
-.resource-sidebar-tree-item.resources-category-xhr .icon {
+.resource-sidebar-tree-item.resources-type-xhr .icon {
     content: url(Images/resourcePlainIcon.png);
 }
 
-.children.small .resource-sidebar-tree-item.resources-category-xhr .icon {
+.children.small .resource-sidebar-tree-item.resources-type-xhr .icon {
     content: url(Images/resourceDocumentIconSmall.png);
 }
 
@@ -296,6 +325,18 @@ li.selected .base-storage-tree-element-subtitle {
 
 .database-table-storage-tree-item .icon {
     content: url(Images/databaseTable.png);
+}
+
+.indexed-db-storage-tree-item .icon {
+    content: url(Images/indexedDB.png);
+}
+
+.indexed-db-object-store-storage-tree-item .icon {
+    content: url(Images/indexedDBObjectStore.png);
+}
+
+.indexed-db-index-storage-tree-item .icon {
+    content: url(Images/indexedDBIndex.png);
 }
 
 .domstorage-storage-tree-item.local-storage .icon {
@@ -314,7 +355,6 @@ li.selected .base-storage-tree-element-subtitle {
     content: url(Images/applicationCache.png);
 }
 
-/* FIXME: Make separate png for file-system */
 .file-system-storage-tree-item .icon {
-    content: url(Images/applicationCache.png);
+    content: url(Images/fileSystem.png);
 }
