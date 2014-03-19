@@ -50,6 +50,13 @@ public class MessageBoxWithLinks extends CustomMessageBox {
 				Program.launch(event.text);
 			}
 		});
+		
+		addButtons();
+		getShell().setText(header);
+		getShell().pack();
+	}
+	
+	protected void addButtons() {
 		Button ok = new Button(getButtonsComposite(), SWT.PUSH);
 		ok.setText(Messages.ExceptionNotifier_OK);
 		ok.addSelectionListener(new SelectionAdapter() {
@@ -61,9 +68,7 @@ public class MessageBoxWithLinks extends CustomMessageBox {
 		GridData okLayoutData = new GridData(SWT.END, SWT.CENTER, true, true);
 		okLayoutData.widthHint = 88;
 		ok.setLayoutData(okLayoutData);
-		getShell().setText(header);
 		getShell().setDefaultButton(ok);
-		getShell().pack();
 	}
 
 	public void setMessage(String message) {

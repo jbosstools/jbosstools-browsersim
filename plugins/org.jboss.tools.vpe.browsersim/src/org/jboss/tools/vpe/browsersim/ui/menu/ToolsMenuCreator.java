@@ -142,11 +142,11 @@ public class ToolsMenuCreator {
 		devToolsMenuItem.setText(Messages.BrowserSim_DEV_TOOLS);
 		devToolsMenuItem.addSelectionListener(new SelectionAdapter() {
 			public void widgetSelected(SelectionEvent e) {
-				String message = "";
-				message = MessageFormat.format(Messages.BrowserSim_DEV_TOOLS_MESSAGE, "http://localhost:" + BrowserSimArgs.debuggerPort +"/inspector.html?host=localhost:" + BrowserSimArgs.debuggerPort +"&page=dtdb");
+				String url = "http://localhost:" + BrowserSimArgs.debuggerPort +"/inspector.html?host=localhost:" + BrowserSimArgs.debuggerPort +"&page=dtdb"; //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
+				String message = MessageFormat.format(Messages.BrowserSim_DEV_TOOLS_MESSAGE, url);
 				Shell parentShell = skin.getShell();
 				BrowserSimImageList imageList = new BrowserSimImageList(parentShell);
-				BrowserSimUtil.showDevToolsDialog(parentShell, message, imageList.getImage(DEV_TOOLS_ICON));
+				BrowserSimUtil.showDevToolsDialog(parentShell, message, url, imageList.getImage(DEV_TOOLS_ICON));
 			}
 		});
 	}

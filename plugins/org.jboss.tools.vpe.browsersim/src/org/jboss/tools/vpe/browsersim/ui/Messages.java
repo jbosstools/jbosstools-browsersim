@@ -79,6 +79,7 @@ public class Messages {
 	public static String ExceptionNotifier_BROWSERSIM_IS_FAILED_TO_START;
 	public static String ExceptionNotifier_BROWSERSIM_IS_FAILED_TO_START_ON_LINUX;
 	public static String ExceptionNotifier_JRE_1_7_IS_NOT_SUPPORTED_ON_WINDOWS;
+	public static String ExceptionNotifier_COPY_LINK;
 	public static String ExceptionNotifier_OK;
 	public static String ExceptionNotifier_ONLY_32_BIT_ECLIPSE_IS_SUPPORTED_ON_WINDOWS;
 	public static String ManageDevicesDialog_ADD;

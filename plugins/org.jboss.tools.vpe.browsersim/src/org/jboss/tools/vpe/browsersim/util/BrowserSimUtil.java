@@ -37,6 +37,7 @@ import org.jboss.tools.vpe.browsersim.browser.javafx.JavaFXBrowser;
 import org.jboss.tools.vpe.browsersim.model.Device;
 import org.jboss.tools.vpe.browsersim.model.SkinMap;
 import org.jboss.tools.vpe.browsersim.ui.MessageBoxWithLinks;
+import org.jboss.tools.vpe.browsersim.ui.MessageBoxWithLinksForDebugger;
 import org.jboss.tools.vpe.browsersim.ui.Messages;
 import org.jboss.tools.vpe.browsersim.ui.skin.BrowserSimSkin;
 
@@ -142,8 +143,8 @@ public class BrowserSimUtil {
 		new MessageBoxWithLinks(shell, message, icon, Messages.BrowserSim_ABOUT_HEADER).open();
 	}
 	
-	public static void showDevToolsDialog(Shell shell, String message, Image icon) {
-		new MessageBoxWithLinks(shell, message, icon, Messages.BrowserSim_DEV_TOOLS_HEADER).open();
+	public static void showDevToolsDialog(Shell shell, String message, String url, Image icon) {
+		new MessageBoxWithLinksForDebugger(shell, message, url, icon, Messages.BrowserSim_DEV_TOOLS_HEADER).open();
 	}
 	
 	public static void addDisposeListener(Widget widget, final Resource disposable) {
