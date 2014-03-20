@@ -488,7 +488,7 @@ public class ManageDevicesDialog extends Dialog {
 		shell.setDefaultButton(buttonOk);
 		buttonOk.addSelectionListener(new SelectionAdapter() {
 			public void widgetSelected(SelectionEvent e) {
-				if (isJavaFx != oldSpecificPreferences.isJavaFx() && !PlatformUtil.OS_MACOSX.equals(PlatformUtil.getOs())) {
+				if (isJavaFx != oldSpecificPreferences.isJavaFx()) {
 					int result = showEngineSwitchConfirmationDialog();
 					if (result == SWT.OK) {
 						restart();

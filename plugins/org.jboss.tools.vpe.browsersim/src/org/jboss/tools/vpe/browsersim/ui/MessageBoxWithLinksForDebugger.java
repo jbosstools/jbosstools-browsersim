@@ -50,11 +50,11 @@ public class MessageBoxWithLinksForDebugger extends MessageBoxWithLinks {
 		});
 
 		GridData copyLinkLayoutData = new GridData(SWT.END, SWT.CENTER, true, true);
-		copyLinkLayoutData.widthHint = 88;
+		copyLinkLayoutData.widthHint = 100;
 		copyLink.setLayoutData(copyLinkLayoutData);
 
 		GridData okLayoutData = new GridData(SWT.END, SWT.CENTER, true, true);
-		okLayoutData.widthHint = 88;
+		okLayoutData.widthHint = 100;
 		ok.setLayoutData(okLayoutData);
 
 		getShell().setDefaultButton(ok);

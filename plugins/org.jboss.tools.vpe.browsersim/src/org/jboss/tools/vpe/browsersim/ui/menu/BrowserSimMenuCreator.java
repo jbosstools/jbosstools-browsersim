@@ -305,8 +305,7 @@ public class BrowserSimMenuCreator {
 				@Override
 				public void run() {
 					Shell shell = getParentShell();
-					PreferencesWrapper pw = new ManageDevicesDialog(shell, SWT.APPLICATION_MODAL | SWT.SHELL_TRIM,
-							commonPreferences, specificPreferences, skin.getBrowser().getUrl()).open();
+					PreferencesWrapper pw = openDialog(shell, commonPreferences, specificPreferences, skin.getBrowser().getUrl());
 					if (pw != null) {
 						commonPreferences.copyProperties(pw.getCommonPreferences());
 						specificPreferences.copyProperties(pw.getSpecificPreferences());
@@ -342,5 +341,11 @@ public class BrowserSimMenuCreator {
 		}
 		BrowserSimImageList imageList = new BrowserSimImageList(shell);
 		BrowserSimUtil.showAboutDialog(shell, message, imageList.getImage(ABOUT_ICON));
+	}
+	
+	protected PreferencesWrapper openDialog(Shell parentShell, CommonPreferences commonPreferences,
+			SpecificPreferences specificPreferences, String currentUrl) {
+		return new ManageDevicesDialog(parentShell, SWT.APPLICATION_MODAL
+				| SWT.SHELL_TRIM, commonPreferences, specificPreferences, currentUrl).open();
 	}
 }
