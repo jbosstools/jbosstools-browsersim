@@ -3,24 +3,16 @@
 	<modelVersion>4.0.0</modelVersion>
 	<parent>
 		<groupId>org.jboss.tools</groupId>
-		<artifactId>vpe</artifactId>
+		<artifactId>browsersim</artifactId>
 		<version>3.5.100-SNAPSHOT</version>
 	</parent>
-	<groupId>org.jboss.tools.vpe</groupId>
+	<groupId>org.jboss.tools.browsersim</groupId>
 	<artifactId>tests</artifactId>
-	<name>vpe.tests</name>
+	<name>browsersim.tests</name>
 
 	<packaging>pom</packaging>
 
 	<modules>
-		<module>org.jboss.tools.vpe.base.test</module>
-		<module>org.jboss.tools.vpe.docbook.test</module>
-		<module>org.jboss.tools.vpe.ui.test</module>
-		<module>org.jboss.tools.vpe.html.test</module>
-		<module>org.jboss.tools.vpe.spring.test</module>
-		<module>org.jboss.tools.vpe.jsp.test</module>
-		<module>org.jboss.tools.vpe.test</module>
-		<module>org.jboss.tools.vpe.xulrunner.test</module>
 		<module>org.jboss.tools.vpe.browsersim.browser.test</module>
 		<module>org.jboss.tools.vpe.browsersim.eclipse.test</module>
 	</modules>

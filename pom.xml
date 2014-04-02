@@ -7,12 +7,12 @@
 		<version>4.2.0.Beta2-SNAPSHOT</version>
 	</parent>
 	<groupId>org.jboss.tools</groupId>
-	<artifactId>vpe</artifactId>
+	<artifactId>browsersim</artifactId>
 	<version>3.5.100-SNAPSHOT</version>
-	<name>vpe.all</name>
+	<name>browsersim.all</name>
 	<packaging>pom</packaging>
 	<properties>
-		<tycho.scmUrl>scm:git:https://github.com/jbosstools/jbosstools-vpe.git</tycho.scmUrl>
+		<tycho.scmUrl>scm:git:https://github.com/jbosstools/jbosstools-browsersim.git</tycho.scmUrl>
 	</properties>
 	<modules>
 		<module>win32_win32_x86</module>
@@ -23,32 +23,15 @@
 	</modules>
 	<repositories>
                 <repository>
-                        <id>jbosstools-aerogear</id>
-                        <layout>p2</layout>
-                        <url>${jbosstools-aerogear-site}</url>
-                </repository>
-                <repository>
                         <id>jbosstools-base</id>
                         <layout>p2</layout>
                         <url>${jbosstools-base-site}</url>
-                </repository>
-                <repository>
-                        <id>jbosstools-javaee</id>
-                        <layout>p2</layout>
-                        <url>${jbosstools-javaee-site}</url>
                 </repository>
                 <repository>
                         <id>jbosstools-jst</id>
                         <layout>p2</layout>
                         <url>${jbosstools-jst-site}</url>
                 </repository>
-                <repository>
-                        <id>jbosstools-xulrunner</id>
-                        <layout>p2</layout>
-                        <url>${jbosstools-xulrunner-site}</url>
-                </repository>
-
-
 		<!-- To resolve parent artifact -->
 		<repository>
 			<id>jboss-public-repository-group</id>

@@ -3,21 +3,16 @@
 	<modelVersion>4.0.0</modelVersion>
 	<parent>
 		<groupId>org.jboss.tools</groupId>
-		<artifactId>vpe</artifactId>
+		<artifactId>browsersim</artifactId>
 		<version>3.5.100-SNAPSHOT</version>
 	</parent>
-	<groupId>org.jboss.tools.vpe</groupId>
+	<groupId>org.jboss.tools.browsersim</groupId>
 	<artifactId>features</artifactId>
 	
-	<name>vpe.features</name>
+	<name>browsersim.features</name>
 	<packaging>pom</packaging>
 	<modules>
-		<module>org.jboss.tools.vpe.feature</module>
-		<module>org.jboss.tools.vpe.test.feature</module>
-		<module>org.jboss.tools.xulrunner.feature</module>
 		<module>org.jboss.tools.vpe.browsersim.feature</module>
-		<module>org.jboss.tools.vpe.cordovasim.feature</module>
-		<module>org.jboss.tools.vpe.vpv.feature</module>
 	</modules>
 	<build>
 		<plugins>
