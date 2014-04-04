@@ -1,12 +1,12 @@
-# The JBoss Tools Visual Page Editing project
+# The JBoss Tools Browser Simulator project
 
 ## Summary
 
-Visual Page Editing provides an editor that has a source and visual preview for XML based documents, it also contains the BrowserSimulator for editing/viewing your project webpages as mobile browsers would do it. 
+[BrowserSim](https://community.jboss.org/wiki/BrowserSimFAQ) is a browser simulator which primarily is intended for having a quick, easy and multi-platform way of testing if a webapp / website will be rendered correctly on a mobile device. Browsersim makes it easy to test basic layout issues without having to install a platform specific emulator or manually using a phone.  
 
 ## Install
 
-_JBoss Tools Visual Page Editing_ is part of [JBoss Tools](http://jboss.org/tools) from
+_JBoss Tools Browser Simulator_ is part of [JBoss Tools](http://jboss.org/tools) from
 which it can be [downloaded and installed](http://jboss.org/tools/download)
 on its own or together with the full JBoss Tools distribution.
 
@@ -15,9 +15,9 @@ on its own or together with the full JBoss Tools distribution.
 The easiest way to get started with the code is to [create your own fork](http://help.github.com/forking/), 
 and then clone your fork:
 
-    $ git clone git@github.com:<you>/jbosstools-vpe.git
-    $ cd jbosstools-vpe
-    $ git remote add upstream git://github.com/jbosstools/jbosstools-vpe.git
+    $ git clone git@github.com:<you>/jbosstools-browsersim.git
+    $ cd jbosstools-browsersim
+    $ git remote add upstream git://github.com/jbosstools/jbosstools-browsersim.git
 	
 At any time, you can pull changes from the upstream and merge them onto your master:
 
@@ -28,9 +28,9 @@ At any time, you can pull changes from the upstream and merge them onto your mas
 The general idea is to keep your 'master' branch in-sync with the
 'upstream/master'.
 
-## Building JBoss Tools Visual Page Editing
+## Building JBoss Tools Browser Simulator
 
-To build _JBoss Tools Visual Page Editing_ requires specific versions of Java (1.6+) and
+To build _JBoss Tools Browser Simulator_ requires specific versions of Java (1.6+) and
 +Maven (3.1+). See this [link](https://github.com/jbosstools/jbosstools-devdoc/blob/master/building/readme.md) for more information on how to setup, run and configure build.
 
 This command will run the build:
@@ -45,13 +45,13 @@ But *do not* push changes without having the new and existing unit tests pass!
  
 ## Contribute fixes and features
 
-_JBoss Tools Visual Page Editing_ is open source, and we welcome anybody that wants to
+_JBoss Tools Browser Simulator_ is open source, and we welcome anybody that wants to
 participate and contribute!
 
 If you want to fix a bug or make any changes, please log an issue in
 the [JBoss Tools JIRA](https://issues.jboss.org/browse/JBIDE)
 describing the bug or new feature and give it a component type of
-`Visual Page Editor Core & Templates`. Then we highly recommend making the changes on a
+`browsersim`. Then we highly recommend making the changes on a
 topic branch named with the JIRA issue number. For example, this
 command creates a branch for the JBIDE-1234 issue:
 
