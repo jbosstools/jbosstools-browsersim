@@ -39,6 +39,7 @@ import org.jboss.tools.vpe.browsersim.eclipse.launcher.ExternalProcessLauncher;
 
 /**
  * @author Konstantin Marmalyukov (kmarmaliykov)
+ * @author Ilya Buziuk (ibuziuk)
  */
 @SuppressWarnings("restriction")
 public class PreferencesUtil {
@@ -205,5 +206,13 @@ public class PreferencesUtil {
 			return PlatformUtil.parseArch(text);
 		} 
 		return null;
+	}
+	
+	public static String argumentsListToString(List<String> list) {
+		String str = ""; //$NON-NLS-1$
+		for (String s : list) {
+			str += s + " "; //$NON-NLS-1$
+ 		}
+		return str;
 	}
 }
