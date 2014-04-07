@@ -48,6 +48,15 @@
             name="BrowserSim">
       </editor>
    </extension>
+   <extension point="org.eclipse.ui.console.consolePageParticipants">
+		<consolePageParticipant 
+			class="org.jboss.tools.vpe.browsersim.eclipse.console.ConsolePageParticipant" 
+			id="org.jboss.tools.vpe.browsersim.eclipse.console.consolePageParticipant">
+		<enablement>
+			<instanceof value="org.eclipse.ui.console.IConsole" />
+		</enablement>
+	</consolePageParticipant>
+   </extension>
    <extension point="org.eclipse.ui.browser.browsers">
        <browser
              executable="."
