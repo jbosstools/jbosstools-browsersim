@@ -60,7 +60,7 @@ public class BrowserSimLauncher {
 			ExternalProcessLauncher.showErrorDialog(Messages.BrowserSim);
 		} else {
 			String jvmPath = jvm.getInstallLocation().getAbsolutePath();
-			String jrePath = jvm.getInstallLocation().getAbsolutePath() + File.separator + "jre";
+			String jrePath = jvm.getInstallLocation().getAbsolutePath() + File.separator + "jre"; //$NON-NLS-1$
 			
 			IPreferenceStore store = Activator.getDefault().getPreferenceStore();
 			List<String> bundles = getBundles();

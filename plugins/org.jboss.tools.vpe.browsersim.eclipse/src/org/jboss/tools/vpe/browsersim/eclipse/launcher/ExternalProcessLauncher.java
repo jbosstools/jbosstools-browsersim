@@ -74,8 +74,8 @@ public class ExternalProcessLauncher {
 					}
 				}
 				
-				launch(programName, classPath, className, parameters, jreContainerPath, commandElements);
-				ProcessCallBacks(callbacks);
+				ILaunch launch = launch(programName, classPath, className, parameters, jreContainerPath, commandElements);
+				ProcessCallBacks(launch, callbacks);
 			} else {
 				showErrorDialog(programName);
 			}
@@ -87,50 +87,30 @@ public class ExternalProcessLauncher {
 	}
 	
 	
-	private static void ProcessCallBacks(final List<ExternalProcessCallback> callbacks) {
-		IProcess browserSimProcess = getProcess();
-		IStreamMonitor outputStreamMonitor = browserSimProcess.getStreamsProxy().getOutputStreamMonitor();
-		outputStreamMonitor.addListener(new IStreamListener() {
+	private static void ProcessCallBacks(ILaunch launch, final List<ExternalProcessCallback> callbacks) {
+		IProcess[] processes = launch.getProcesses();
+		if (processes.length > 0) {
+			IProcess process = processes[0];
+			IStreamMonitor outputStreamMonitor = process.getStreamsProxy().getOutputStreamMonitor();
+			outputStreamMonitor.addListener(new IStreamListener() {
 
-			@Override
-			public void streamAppended(String message, IStreamMonitor monitor) {
-				for (ExternalProcessCallback callback : callbacks) {
-					if (message.startsWith(callback.getCallbackId())) {
-						try {
-							callback.call(message, null);
-						} catch (IOException e) {
-							BrowserSimLogger.logError(e.getMessage(), e);
+				@Override
+				public void streamAppended(String message, IStreamMonitor monitor) {
+					for (ExternalProcessCallback callback : callbacks) {
+						if (message.startsWith(callback.getCallbackId())) {
+							try {
+								callback.call(message, null);
+							} catch (IOException e) {
+								Activator.logError(e.getMessage(), e);
+							}
 						}
 					}
+
 				}
-
-			}
-		});
-	}
-
-
-	private static IProcess getProcess() {
-		IProcess process = null;
-		ILaunchManager manager = DebugPlugin.getDefault().getLaunchManager();
-		ILaunch[] launches = manager.getLaunches();
-		if (launches.length > 0) {
-			for (ILaunch launch : launches) {
-				ILaunchConfiguration conf = launch.getLaunchConfiguration();
-				try {
-					if (conf.getType().equals(
-							manager.getLaunchConfigurationType(IJavaLaunchConfigurationConstants.ID_JAVA_APPLICATION))) {
-						IProcess[] processes = launch.getProcesses();
-						if (processes != null && processes.length > 0) {
-							process = processes[0]; // XXX ?
-						}
-					}
-				} catch (CoreException e) {
-					BrowserSimLogger.logError(e.getMessage(), e);
-				}
-			}
+			});
+		} else {
+			Activator.logError("Unable to get launch process", new Throwable()); //$NON-NLS-1$
 		}
-
-		return process;
 	}
 
 
@@ -149,7 +129,7 @@ public class ExternalProcessLauncher {
 		} else {
 			environment.put(SWT_GTK3, ON);
 		}
-		workingCopy.setAttribute(ILaunchManager.ATTR_ENVIRONMENT_VARIABLES, environment);
+		workingCopy.setAttribute(ILaunchManager.ATTR_ENVIRONMENT_VARIABLES,environment);
 	}
 
 	public static void showErrorDialog(final String programName) {
@@ -243,15 +223,15 @@ public class ExternalProcessLauncher {
 		return result.toString();
 	}
 	
-	private static void launch(String programmName, String classPath, String className, List<String> parameters, String jvmPath, List<String> commandElements) throws CoreException {
+	private static ILaunch launch(String programmName, String classPath, String className, List<String> parameters, String jvmPath, List<String> commandElements) throws CoreException {
 		ILaunchManager manager = DebugPlugin.getDefault().getLaunchManager();
 		ILaunchConfigurationType type = manager.getLaunchConfigurationType(IJavaLaunchConfigurationConstants.ID_JAVA_APPLICATION);
 		ILaunchConfigurationWorkingCopy workingCopy = type.newInstance(null, programmName);
 		
 		setWorkingCopyAttributes(workingCopy, classPath, className, parameters, jvmPath, commandElements);
-		
 		ILaunchConfiguration config = workingCopy.doSave();
-		config.launch(ILaunchManager.RUN_MODE, null);
+		
+		return config.launch(ILaunchManager.RUN_MODE, null);
 	}
 
 

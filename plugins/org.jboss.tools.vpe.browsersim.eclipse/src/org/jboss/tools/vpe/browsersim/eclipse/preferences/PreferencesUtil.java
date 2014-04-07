@@ -211,8 +211,16 @@ public class PreferencesUtil {
 	public static String argumentsListToString(List<String> list) {
 		String str = ""; //$NON-NLS-1$
 		for (String s : list) {
+			s = surroundSpaces(s);
 			str += s + " "; //$NON-NLS-1$
  		}
+		return str;
+	}
+	
+	private static String surroundSpaces(String str) {
+		if (str.indexOf(' ') >= 0) {
+			return '\"' + str + '\"';
+		}
 		return str;
 	}
 }
