@@ -22,10 +22,14 @@ import org.eclipse.core.runtime.FileLocator;
 import org.eclipse.core.runtime.Path;
 import org.eclipse.core.runtime.Platform;
 import org.eclipse.debug.core.DebugPlugin;
+import org.eclipse.debug.core.ILaunch;
 import org.eclipse.debug.core.ILaunchConfiguration;
 import org.eclipse.debug.core.ILaunchConfigurationType;
 import org.eclipse.debug.core.ILaunchConfigurationWorkingCopy;
 import org.eclipse.debug.core.ILaunchManager;
+import org.eclipse.debug.core.IStreamListener;
+import org.eclipse.debug.core.model.IProcess;
+import org.eclipse.debug.core.model.IStreamMonitor;
 import org.eclipse.jdt.launching.IJavaLaunchConfigurationConstants;
 import org.eclipse.jdt.launching.IRuntimeClasspathEntry;
 import org.eclipse.jdt.launching.IVMInstall;
@@ -71,6 +75,7 @@ public class ExternalProcessLauncher {
 				}
 				
 				launch(programName, classPath, className, parameters, jreContainerPath, commandElements);
+				ProcessCallBacks(callbacks);
 			} else {
 				showErrorDialog(programName);
 			}
@@ -82,6 +87,53 @@ public class ExternalProcessLauncher {
 	}
 	
 	
+	private static void ProcessCallBacks(final List<ExternalProcessCallback> callbacks) {
+		IProcess browserSimProcess = getProcess();
+		IStreamMonitor outputStreamMonitor = browserSimProcess.getStreamsProxy().getOutputStreamMonitor();
+		outputStreamMonitor.addListener(new IStreamListener() {
+
+			@Override
+			public void streamAppended(String message, IStreamMonitor monitor) {
+				for (ExternalProcessCallback callback : callbacks) {
+					if (message.startsWith(callback.getCallbackId())) {
+						try {
+							callback.call(message, null);
+						} catch (IOException e) {
+							BrowserSimLogger.logError(e.getMessage(), e);
+						}
+					}
+				}
+
+			}
+		});
+	}
+
+
+	private static IProcess getProcess() {
+		IProcess process = null;
+		ILaunchManager manager = DebugPlugin.getDefault().getLaunchManager();
+		ILaunch[] launches = manager.getLaunches();
+		if (launches.length > 0) {
+			for (ILaunch launch : launches) {
+				ILaunchConfiguration conf = launch.getLaunchConfiguration();
+				try {
+					if (conf.getType().equals(
+							manager.getLaunchConfigurationType(IJavaLaunchConfigurationConstants.ID_JAVA_APPLICATION))) {
+						IProcess[] processes = launch.getProcesses();
+						if (processes != null && processes.length > 0) {
+							process = processes[0]; // XXX ?
+						}
+					}
+				} catch (CoreException e) {
+					BrowserSimLogger.logError(e.getMessage(), e);
+				}
+			}
+		}
+
+		return process;
+	}
+
+
 	private static boolean isGTK2() {
 		IPreferenceStore store = Activator.getDefault().getPreferenceStore();
 		if (IPreferenceStore.TRUE.equals(store.getString(BrowserSimPreferencesPage.BROWSERSIM_GTK_2))){

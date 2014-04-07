@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2007-2013 Red Hat, Inc.
+ * Copyright (c) 2007-2014 Red Hat, Inc.
  * Distributed under license by Red Hat, Inc. All rights reserved.
  * This program is made available under the terms of the
  * Eclipse Public License v1.0 which accompanies this distribution,
@@ -33,6 +33,7 @@ import org.jboss.tools.vpe.browsersim.eclipse.launcher.TransparentReader;
  * <pre>org.jboss.tools.vpe.browsersim.ui.BrowserSim.command.openFile:file:///path/to/file</code>
  * 
  * @author Yahor Radtsevich (yradtsevich)
+ * @author Ilya Buziuk (ibuziuk)
  */
 public class OpenFileCallback implements ExternalProcessCallback {
 	private static final String OPEN_FILE_COMMAND = "org.jboss.tools.vpe.browsersim.command.openFile:"; //$NON-NLS-1$
@@ -53,7 +54,10 @@ public class OpenFileCallback implements ExternalProcessCallback {
 		Display.getDefault().asyncExec(new Runnable() {
 			@Override
 			public void run() {
-				String fileNameToOpen = lastString.substring(OPEN_FILE_COMMAND.length());
+				String stringToParse = lastString;
+				stringToParse = stringToParse.replaceAll("\\r\\n", ""); //$NON-NLS-1$ //$NON-NLS-2$
+				
+				String fileNameToOpen = stringToParse.substring(OPEN_FILE_COMMAND.length());
 				File fileToOpen = new File(fileNameToOpen);
 
 				if (fileToOpen.exists() && fileToOpen.isFile()) {
