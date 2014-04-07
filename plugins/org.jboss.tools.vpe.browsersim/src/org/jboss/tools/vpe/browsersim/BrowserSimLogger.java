@@ -14,28 +14,22 @@ import java.io.PrintStream;
 
 /**
  * @author Yahor Radtsevich (yradtsevich)
+ * @author Ilya Buziuk (ibuziuk)
  */
 public class BrowserSimLogger {
-	private static final String LOG_COMMAND = "org.jboss.tools.vpe.browsersim.command.log:"; //$NON-NLS-1$
-	private static final String LOG_END_SRING = "org.jboss.tools.vpe.browsersim.command.log.end"; //$NON-NLS-1$
 	
-	public static void logError(String message, Throwable throwable) {
-		logError(message, throwable, BrowserSimRunner.PLUGIN_ID);
+	private BrowserSimLogger() {
 	}
-	
-	public static void logError(String message, Throwable throwable, String pluginId) {
+		
+	public static void logError(String message, Throwable throwable) {
 		if (BrowserSimArgs.standalone) {
-			logError(System.err, message, throwable, pluginId);
+			logError(System.err, message, throwable);
 		} else {
-			System.out.print(LOG_COMMAND);
-			logError(System.out, message, throwable, pluginId);
-			System.out.println(LOG_END_SRING);
+			logError(System.out, message, throwable);
 		}
 	}
 
-	private static void logError(PrintStream printStream, String message,
-			Throwable throwable, String pluginId) {
-		printStream.println(pluginId);
+	private static void logError(PrintStream printStream, String message, Throwable throwable) {
 		if (message != null) {
 			printStream.println(message);
 		}

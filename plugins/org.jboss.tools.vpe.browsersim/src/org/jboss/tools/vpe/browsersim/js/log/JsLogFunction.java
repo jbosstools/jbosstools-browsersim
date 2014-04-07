@@ -21,6 +21,7 @@ import org.jboss.tools.vpe.browsersim.browser.IBrowserFunction;
  * @author Ilya Buziuk (ibuziuk)
  */
 public class JsLogFunction implements IBrowserFunction {
+	private static final String JS_LOG_PREFIX = "!JavaScript"; //$NON-NLS-1$
 	private MessageType type;
 
 	public JsLogFunction(IBrowser browser, MessageType type) {
@@ -36,14 +37,14 @@ public class JsLogFunction implements IBrowserFunction {
 			for (Object argument : arguments) {
 				message.append(argument.toString() + " "); //$NON-NLS-1$
 			}
-			JsConsoleLogger.log(message.toString());
+			JsConsoleLogger.log(message.toString(), type);
 		}
 		return null;
 	}
 
 	public void addTypeInfo(Object[] arguments, MessageType type) {
 		if (type != null && arguments != null && arguments.length >= 1) {
-			arguments[0] = type.toString() + ": " + arguments[0]; //$NON-NLS-1$
+			arguments[0] = JS_LOG_PREFIX + " " + type.toString() + ": " + arguments[0]; //$NON-NLS-1$ //$NON-NLS-2$
 		} 
 	}
 	
