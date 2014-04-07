@@ -45,6 +45,7 @@ import org.jboss.tools.vpe.browsersim.util.BrowserSimUtil;
 /**
  * @author Yahor Radtsevich (yradtsevich)
  * @author Konstantin Marmalyukov (kmarmaliykov)
+ * @author Ilya Buziuk (ibuziuk)
  */
 
 public class FileMenuCreator {
@@ -52,6 +53,7 @@ public class FileMenuCreator {
 	protected static final String OPEN_FILE_COMMAND = "org.jboss.tools.vpe.browsersim.command.openFile:"; //$NON-NLS-1$
 	/** @see org.jboss.tools.vpe.browsersim.eclipse.callbacks.ViewSourceCallback */
 	private static final String VIEW_SOURCE_COMMAND = "org.jboss.tools.vpe.browsersim.command.viewSource:"; //$NON-NLS-1$
+	protected static final String BASE_64_DELIMITER = "_BASE_64_DELIMITER_"; //$NON-NLS-1$
 
 	public void addItems(final Menu menu, final BrowserSimSkin skin, final CommonPreferences commonPreferences, final SpecificPreferences specificPreferences) {
 		addOpenInDefaultBrowserItem(menu, skin);
@@ -126,10 +128,9 @@ public class FileMenuCreator {
 	}
 	
 	protected void viewServerSource(IBrowser browser) {
-		System.out.println(VIEW_SOURCE_COMMAND + browser.getUrl()); // send command to Eclipse
 		String source = browser.getText();
 		String base64Source = DatatypeConverter.printBase64Binary(source.getBytes());
-		System.out.println(base64Source);
+		System.out.println(VIEW_SOURCE_COMMAND + browser.getUrl() + BASE_64_DELIMITER + base64Source); // send command to Eclipse
 	}
 	
 	private void addPreferencesItem(Menu menu, final CommonPreferences commonPreferences,
