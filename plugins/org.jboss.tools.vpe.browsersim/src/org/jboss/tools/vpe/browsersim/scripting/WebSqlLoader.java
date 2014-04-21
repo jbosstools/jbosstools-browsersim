@@ -17,6 +17,7 @@ import org.jboss.tools.vpe.browsersim.util.BrowserSimResourcesUtil;
 
 /**
  * @author Yahor Radtsevich (yradtsevich)
+ * @author Ilya Buizuk (ibuizuk)
  */
 public class WebSqlLoader {
 	
@@ -28,7 +29,7 @@ public class WebSqlLoader {
 			loadPureJsWebSqlFunction.dispose();
 		}
 		
-		loadPureJsWebSqlFunction = browser.registerBrowserFunction("loadPureJsWebSql", new IBrowserFunction() {
+		loadPureJsWebSqlFunction = browser.registerBrowserFunction("loadPureJsWebSql", new IBrowserFunction() { //$NON-NLS-1$
 			@Override
 			public Object function(Object[] arguments) {
 				String purejswebsql = BrowserSimResourcesUtil.getResourceAsString("javascript/purejswebsql.js"); //$NON-NLS-1$
@@ -50,13 +51,9 @@ public class WebSqlLoader {
 							"window.openDatabase = origOpenDatabase;" + // always use origOpenDatabase //$NON-NLS-1$
 							"return result;" + //$NON-NLS-1$
 						"} catch (e) {" + //$NON-NLS-1$
-							"if (e.code === 18) {" + //$NON-NLS-1$
-								"loadPureJsWebSql();" + //$NON-NLS-1$
-								"window.openDatabase = purejsOpenDatabase;" + // always use purejsOpenDatabase //$NON-NLS-1$
-								"return window.openDatabase.apply(this, arguments);" + //$NON-NLS-1$
-							"} else {" + //$NON-NLS-1$
-								"throw e;" + //$NON-NLS-1$
-							"}" + //$NON-NLS-1$
+							"loadPureJsWebSql();" + //$NON-NLS-1$
+							"window.openDatabase = purejsOpenDatabase;" + // always use purejsOpenDatabase //$NON-NLS-1$
+							"return window.openDatabase.apply(this, arguments);" + //$NON-NLS-1$
 						"}" + //$NON-NLS-1$
 					"};" + //$NON-NLS-1$
 				"}" + //$NON-NLS-1$
