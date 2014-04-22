@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2007-2012 Red Hat, Inc.
+ * Copyright (c) 2007-2014 Red Hat, Inc.
  * Distributed under license by Red Hat, Inc. All rights reserved.
  * This program is made available under the terms of the
  * Eclipse Public License v1.0 which accompanies this distribution,
@@ -42,9 +42,11 @@ import org.jboss.tools.vpe.browsersim.eclipse.launcher.TransparentReader;
  * org.jboss.tools.vpe.browsersim.ui.BrowserSim.command.viewSource:http://example.com/index.html
  * Base64EncodedPageSource==</code>
  * @author Yahor Radtsevich (yradtsevich)
+ * @author Ilya Buziuk (ibuziuk)
  */
 public class ViewSourceCallback implements ExternalProcessCallback {
 	private static final String VIEW_SOURCE_COMMAND = "org.jboss.tools.vpe.browsersim.command.viewSource:"; //$NON-NLS-1$
+	private static final String BASE_64_DELIMITER = "_BASE_64_DELIMITER_"; //$NON-NLS-1$
 
 	/* (non-Javadoc)
 	 * @see org.jboss.tools.vpe.browsersim.eclipse.callbacks.BrowserSimCallback#getCallbackId()
@@ -59,16 +61,23 @@ public class ViewSourceCallback implements ExternalProcessCallback {
 	 */
 	@Override
 	public void call(final String lastString, TransparentReader reader) throws IOException {
-		final String address = lastString.substring(VIEW_SOURCE_COMMAND.length());
-		String encodedSource = reader.readLine(false);
-		final String source = new String(DatatypeConverter.parseBase64Binary(encodedSource));
-		
-		Display.getDefault().asyncExec(new Runnable() {
-			@Override
-			public void run() {
-				openInMemoryHtmlEditor(source, address, address);
-			}
-		});
+		if (lastString.contains(BASE_64_DELIMITER)) {
+			String[] commandURLandBase64CodeArray = lastString.split(BASE_64_DELIMITER);
+			String commandAndURL = commandURLandBase64CodeArray[0];
+			String base64code = commandURLandBase64CodeArray[1];
+			
+			final String address = commandAndURL.substring(VIEW_SOURCE_COMMAND.length());
+			final String source = new String(DatatypeConverter.parseBase64Binary(base64code));
+
+			Display.getDefault().asyncExec(new Runnable() {
+				@Override
+				public void run() {
+					openInMemoryHtmlEditor(source, address, address);
+				}
+			});
+		} else {
+			throw new IllegalArgumentException("String '" + lastString + "' does not contain " + BASE_64_DELIMITER); //$NON-NLS-1$ //$NON-NLS-2$
+		}
 	}
 	
 	private void openInMemoryHtmlEditor(String content, String name, String toolTip) {

@@ -20,8 +20,6 @@ import org.eclipse.jface.preference.IPreferenceStore;
 import org.jboss.tools.vpe.browsersim.browser.PlatformUtil;
 import org.jboss.tools.vpe.browsersim.eclipse.Activator;
 import org.jboss.tools.vpe.browsersim.eclipse.Messages;
-import org.jboss.tools.vpe.browsersim.eclipse.callbacks.JsLogCallback;
-import org.jboss.tools.vpe.browsersim.eclipse.callbacks.LogCallback;
 import org.jboss.tools.vpe.browsersim.eclipse.callbacks.OpenFileCallback;
 import org.jboss.tools.vpe.browsersim.eclipse.callbacks.RestartCallback;
 import org.jboss.tools.vpe.browsersim.eclipse.callbacks.ViewSourceCallback;
@@ -31,14 +29,13 @@ import org.jboss.tools.vpe.browsersim.util.BrowserSimUtil;
 
 /**
  * @author "Yahor Radtsevich (yradtsevich)"
+ * @author Ilya Buziuk (ibuziuk)
  */
 public class BrowserSimLauncher {
 	public static final String BROWSERSIM_CLASS_NAME = "org.jboss.tools.vpe.browsersim.BrowserSimRunner"; //$NON-NLS-1$
 	public static final List<ExternalProcessCallback> BROWSERSIM_CALLBACKS = Arrays.asList(
 		new ViewSourceCallback(),
 		new OpenFileCallback(),
-		new LogCallback(),
-		new JsLogCallback(),
 		new RestartCallback()
 	);
 	
@@ -63,7 +60,7 @@ public class BrowserSimLauncher {
 			ExternalProcessLauncher.showErrorDialog(Messages.BrowserSim);
 		} else {
 			String jvmPath = jvm.getInstallLocation().getAbsolutePath();
-			String jrePath = jvm.getInstallLocation().getAbsolutePath() + File.separator + "jre";
+			String jrePath = jvm.getInstallLocation().getAbsolutePath() + File.separator + "jre"; //$NON-NLS-1$
 			
 			IPreferenceStore store = Activator.getDefault().getPreferenceStore();
 			List<String> bundles = getBundles();

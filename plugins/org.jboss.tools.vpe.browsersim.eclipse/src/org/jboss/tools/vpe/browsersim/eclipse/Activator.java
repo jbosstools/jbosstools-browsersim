@@ -13,28 +13,33 @@ package org.jboss.tools.vpe.browsersim.eclipse;
 import java.io.File;
 import java.io.IOException;
 import java.net.URL;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Map;
+import java.util.Set;
 
 import org.eclipse.core.runtime.FileLocator;
 import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Status;
 import org.eclipse.jface.resource.ImageDescriptor;
-import org.eclipse.ui.console.MessageConsole;
-import org.eclipse.ui.console.MessageConsoleStream;
+import org.eclipse.swt.custom.StyledText;
+import org.eclipse.ui.console.IConsolePageParticipant;
 import org.eclipse.ui.plugin.AbstractUIPlugin;
-import org.jboss.tools.vpe.browsersim.eclipse.console.ConsoleUtil;
-import org.jboss.tools.vpe.browsersim.js.log.MessageType;
 import org.osgi.framework.BundleContext;
 
 /**
  * The activator class controls the plug-in life cycle
  * 
  * @author "Yahor Radtsevich (yradtsevich)"
+ * @author Ilya Buziuk (ibuziuk)
  */
 public class Activator extends AbstractUIPlugin {
-
+	
 	// The plug-in ID
 	public static final String PLUGIN_ID = "org.jboss.tools.vpe.browsersim.eclipse"; //$NON-NLS-1$
+
+	private Map<StyledText, IConsolePageParticipant> viewers = new HashMap<StyledText, IConsolePageParticipant>();
 
 	// The shared instance
 	private static Activator plugin;
@@ -77,24 +82,9 @@ public class Activator extends AbstractUIPlugin {
 	}
 	
 	public static void logError(String message, Throwable throwable, String pluginId) {
-		getDefault().getLog().log(new Status(IStatus.ERROR, pluginId, message, throwable)); // Logging to the 'Error Log'
-
-		MessageConsole console = ConsoleUtil.getConsole(); // Logging to the "BrowserSim / CordovaSim console"
-		MessageConsoleStream messageStream = console.newMessageStream();
-		messageStream.print("!ERROR " + pluginId + " " + message); //$NON-NLS-1$ //$NON-NLS-2$
-		if (throwable != null) {
-			ConsoleUtil.logException(throwable);
-		}
+		getDefault().getLog().log(new Status(IStatus.ERROR, pluginId, message, throwable));
 	}
 	
-	public static void logJsMessage(String message) {
-		MessageType messageType = ConsoleUtil.getMessageType(message);
-		MessageConsole console = ConsoleUtil.getConsole();
-		MessageConsoleStream messageStream = console.newMessageStream();
-		ConsoleUtil.setColor(messageType, messageStream);
-		messageStream.println(ConsoleUtil.addJsLogPrefix(message));
-	}
-
 	/**
 	 * Returns an image descriptor for the image file at the given
 	 * plug-in relative path
@@ -122,6 +112,22 @@ public class Activator extends AbstractUIPlugin {
 		} catch (IOException ioe) {
 			return null;
 		}
+	}
+	
+	public void addViewer(StyledText viewer, IConsolePageParticipant participant) {
+		viewers.put(viewer, participant);
+	}
+
+	public void removeViewerWithPageParticipant(IConsolePageParticipant participant) {
+		Set<StyledText> toRemove = new HashSet<StyledText>();
+
+		for (StyledText viewer : viewers.keySet()) {
+			if (viewers.get(viewer) == participant)
+				toRemove.add(viewer);
+		}
+
+		for (StyledText viewer : toRemove)
+			viewers.remove(viewer);
 	}
 	
 }
