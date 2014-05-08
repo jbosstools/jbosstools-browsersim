@@ -47,10 +47,6 @@ import org.jboss.tools.vpe.browsersim.ui.skin.BrowserSimSkin;
  * @author Konstantin Marmalyukov (kmarmaliykov)
  */
 public class BrowserSimUtil {
-	/**
-	 * After Java7u51 loading SWT.WEBKIT before JavaFX webkit causes an error 
-	 * @see https://javafx-jira.kenai.com/browse/RT-35480
-	 */
 	private static final String java7u51 = "1.7.0_51"; //$NON-NLS-1$
 	private static final String[] BROWSERSIM_ICONS = {"icons/browsersim_16px.png", "icons/browsersim_32px.png", "icons/browsersim_64px.png", "icons/browsersim_128px.png", "icons/browsersim_256px.png", }; //$NON-NLS-1$//$NON-NLS-2$//$NON-NLS-3$//$NON-NLS-4$//$NON-NLS-5$
 	private static final String SWT_GTK3 = "SWT_GTK3"; //$NON-NLS-1$
@@ -348,6 +344,14 @@ public class BrowserSimUtil {
 	}
 	
 	public static boolean isWindowsSwtWebkitInstalled() {
+		/**
+		 * Workaround for Java7u51 and higher. Loading SWT.WEBKIT libraries before JavaFX webkit causes an error. 
+		 * @see https://javafx-jira.kenai.com/browse/RT-35480
+		 */
+		if (java7u51.compareTo(System.getProperty("java.version")) <= 0) {
+			@SuppressWarnings("unused")
+			JavaFXBrowser tempJavaFXBrowser = new JavaFXBrowser(new Shell());
+		}
 		//due to last changes Safari is needed to run BrowerSim (against QuickTime)
 		//to avoid JVM crash we need to check Safari existnce before creating a browser.(JBIDE-13044).
 		//If an exception is thrown during org.eclipse.swt.browser.WebKit.readInstallDir() invocation,
