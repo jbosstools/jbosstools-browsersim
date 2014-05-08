@@ -10,10 +10,6 @@
  ******************************************************************************/
 package org.jboss.tools.vpe.browsersim.browser;
 
-import java.io.File;
-import java.lang.reflect.InvocationTargetException;
-import java.lang.reflect.Method;
-
 import org.eclipse.swt.SWTError;
 import org.eclipse.swt.widgets.Composite;
 import org.jboss.tools.vpe.browsersim.browser.internal.WebKitBrowser_gtk_linux_x86;
@@ -26,8 +22,6 @@ import org.jboss.tools.vpe.browsersim.browser.javafx.JavaFXBrowser;
  * @author "Yahor Radtsevich (yradtsevich)"
  */
 public class WebKitBrowserFactory implements IBrowserSimBrowserFactory {
-	public static final String NO_SAFARI = "Safari must be installed to use a SWT.WEBKIT-style Browser"; //$NON-NLS-1$
-	
 	@Override
 	public IBrowser createBrowser(Composite parent, int style, boolean isJavaFx) {
 		if (isJavaFx) {
@@ -40,39 +34,7 @@ public class WebKitBrowserFactory implements IBrowserSimBrowserFactory {
 		} else if (PlatformUtil.CURRENT_PLATFORM.startsWith("cocoa.macosx")) { //$NON-NLS-1$
 			return new WebKitBrowser_webkit_cocoa_macos(parent, style);
 		} else if (PlatformUtil.CURRENT_PLATFORM.equals("win32.win32.x86")) { //$NON-NLS-1$
-			//due to last changes Safari is needed to run BrowerSim (against QuickTime)
-			//to avoid JVM crash we need to check Safari existnce before creating a browser.(JBIDE-13044).
-			//If an exception is thrown during org.eclipse.swt.browser.WebKit.readInstallDir() invocation,
-			//this means that SWT internal API is changed and we just log it to the console.
-			try {
-				Method method = Class.forName("org.eclipse.swt.browser.WebKit").getDeclaredMethod("readInstallDir", String.class); //$NON-NLS-1$ //$NON-NLS-2$
-				method.setAccessible(true);
-				String AASDirectory = (String) method.invoke(null, "SOFTWARE\\Apple Computer, Inc.\\Safari");//$NON-NLS-1$
-				
-				if (AASDirectory != null) {
-					AASDirectory += "\\Apple Application Support"; //$NON-NLS-1$
-					if (!new File(AASDirectory).exists()) {
-						AASDirectory = null;
-					}
-				}
-				
-				if (AASDirectory == null) {
-					throw new SWTError(NO_SAFARI);
-				}
-			} catch(IllegalAccessException e) {
-				e.printStackTrace();
-			} catch (SecurityException e) {
-				e.printStackTrace();
-			} catch (NoSuchMethodException e) {
-				e.printStackTrace();
-			} catch (ClassNotFoundException e) {
-				e.printStackTrace();
-			} catch (IllegalArgumentException e) {
-				e.printStackTrace();
-			} catch (InvocationTargetException e) {
-				e.printStackTrace();
-			} 
-			
+			//will work fine because AAS existance checked before browser creation
 			return new WebKitBrowser_win32_win32_x86(parent, style);
 		}
 
