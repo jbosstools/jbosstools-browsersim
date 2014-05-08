@@ -405,6 +405,7 @@ public class ManageDevicesDialog extends Dialog {
 		swtBrowserRadio.addSelectionListener(browserTypeSelectionListener);
 		
 		disableWebEngineSwitcherIfJavaFxNotAvailable(javaFXBrowserRadio, browserTypeGroup); 
+		disableWebEngineSwitcherIfWebKitNotAvailable(swtBrowserRadio, browserTypeGroup);
 		
 		Group screnshotGroup = new Group(settingsComposite, SWT.NONE);
 		screnshotGroup.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, true, false, 1, 1));
@@ -540,6 +541,17 @@ public class ManageDevicesDialog extends Dialog {
 		}
 	}
 
+	private void disableWebEngineSwitcherIfWebKitNotAvailable(Button swtBrowserRadio, Group browserTypeGroup) {
+		String message = ""; //$NON-NLS-1$
+		// BrowserSim needs Safari installed on Windows
+		if (PlatformUtil.OS_WIN32.equals(PlatformUtil.getOs()) && !BrowserSimUtil.isWindowsSwtWebkitInstalled()) {
+			message = Messages.ManageDevicesDialog_BROWSER_ENGINE_WEBKIT_WARNING_ON_WINDOWS;
+		} 
+		if (!message.isEmpty()) {
+			disableSwitcher(swtBrowserRadio, browserTypeGroup, message);
+		}
+	}
+	
 	private void disableSwitcher(Button javaFXBrowserRadio, Group browserTypeGroup, String message) {
 		javaFXBrowserRadio.setEnabled(false);
 		Label label = new Label(browserTypeGroup, SWT.NONE);

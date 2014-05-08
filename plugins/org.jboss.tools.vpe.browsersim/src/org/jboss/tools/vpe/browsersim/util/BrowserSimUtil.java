@@ -11,6 +11,7 @@
 package org.jboss.tools.vpe.browsersim.util;
 
 import java.io.File;
+import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.net.URL;
 import java.net.URLClassLoader;
@@ -344,5 +345,38 @@ public class BrowserSimUtil {
 		Image[] icons = initImages(shell);
 		shell.setImages(icons);
 		shell.setText(Messages.BrowserSim_BROWSER_SIM);
+	}
+	
+	public static boolean isWindowsSwtWebkitInstalled() {
+		//due to last changes Safari is needed to run BrowerSim (against QuickTime)
+		//to avoid JVM crash we need to check Safari existnce before creating a browser.(JBIDE-13044).
+		//If an exception is thrown during org.eclipse.swt.browser.WebKit.readInstallDir() invocation,
+		//this means that SWT internal API is changed and we just log it to the console.
+		try {
+			Method method = Class.forName("org.eclipse.swt.browser.WebKit").getDeclaredMethod("readInstallDir", String.class); //$NON-NLS-1$ //$NON-NLS-2$
+			method.setAccessible(true);
+			String AASDirectory = (String) method.invoke(null, "SOFTWARE\\Apple Computer, Inc.\\Safari");//$NON-NLS-1$
+			
+			if (AASDirectory != null) {
+				AASDirectory += "\\Apple Application Support"; //$NON-NLS-1$
+				if (new File(AASDirectory).exists()) {
+					return true;
+				}
+			}
+		} catch(IllegalAccessException e) {
+			e.printStackTrace();
+		} catch (SecurityException e) {
+			e.printStackTrace();
+		} catch (NoSuchMethodException e) {
+			e.printStackTrace();
+		} catch (ClassNotFoundException e) {
+			e.printStackTrace();
+		} catch (IllegalArgumentException e) {
+			e.printStackTrace();
+		} catch (InvocationTargetException e) {
+			e.printStackTrace();
+		}
+		
+		return false;
 	}
 }

@@ -50,6 +50,7 @@ import org.jboss.tools.vpe.browsersim.browser.ExtendedWindowEvent;
 import org.jboss.tools.vpe.browsersim.browser.IBrowser;
 import org.jboss.tools.vpe.browsersim.browser.IBrowserFunction;
 import org.jboss.tools.vpe.browsersim.browser.IDisposable;
+import org.jboss.tools.vpe.browsersim.browser.PlatformUtil;
 import org.jboss.tools.vpe.browsersim.browser.WebKitBrowserFactory;
 import org.jboss.tools.vpe.browsersim.browser.javafx.JavaFXBrowser;
 import org.jboss.tools.vpe.browsersim.devtools.DevToolsDebuggerServer;
@@ -112,12 +113,17 @@ public class BrowserSim {
 		parentShell = parent;
 	}
 	
-	public void open(boolean isJavaFxAvailable) {
+	public void open(boolean isJavaFxAvailable, boolean isWebKitAvailable) {
 		SpecificPreferences sp = (SpecificPreferences) getSpecificPreferencesStorage().load();
 		if (sp == null) {
 			sp = (SpecificPreferences) getSpecificPreferencesStorage().loadDefault();
 		}
 		
+		if (PlatformUtil.OS_WIN32.equals(PlatformUtil.getOs()) && !BrowserSimUtil.isWindowsSwtWebkitInstalled()) {
+			if (isJavaFxAvailable) {
+				sp.setJavaFx(true);
+			}
+		}
 		if (!isJavaFxAvailable) {
 			sp.setJavaFx(false);
 		}
