@@ -368,6 +368,11 @@ public class BrowserSimUtil {
 			@SuppressWarnings("unused")
 			JavaFXBrowser tempJavaFXBrowser = new JavaFXBrowser(new Shell());
 		}
+		
+		if (PlatformUtil.ARCH_X64.equals(PlatformUtil.getArch())) {
+			//64Bit Safari does not exists
+			return false;
+		}
 		//due to last changes Safari is needed to run BrowerSim (against QuickTime)
 		//to avoid JVM crash we need to check Safari existnce before creating a browser.(JBIDE-13044).
 		//If an exception is thrown during org.eclipse.swt.browser.WebKit.readInstallDir() invocation,

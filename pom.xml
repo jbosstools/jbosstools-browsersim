@@ -15,7 +15,6 @@
 		<tycho.scmUrl>scm:git:https://github.com/jbosstools/jbosstools-browsersim.git</tycho.scmUrl>
 	</properties>
 	<modules>
-		<module>win32_win32_x86</module>
 		<module>plugins</module>
 		<module>tests</module>
 		<module>features</module>

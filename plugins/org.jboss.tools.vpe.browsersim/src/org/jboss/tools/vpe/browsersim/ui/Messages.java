@@ -89,6 +89,7 @@ public class Messages {
 	public static String ManageDevicesDialog_BROWSER_ENGINE;
 	public static String ManageDevicesDialog_BROWSER_ENGINE_WARNING;
 	public static String ManageDevicesDialog_BROWSER_ENGINE_WEBKIT_WARNING_ON_WINDOWS;
+	public static String ManageDevicesDialog_BROWSER_ENGINE_WEBKIT_WARNING_ON_WINDOWS64;
 	public static String ManageDevicesDialog_BROWSER_ENGINE_WARNING_ON_LINUX;
 	public static String ManageDevicesDialog_BROWSER_TYPE_SWT;
 	public static String ManageDevicesDialog_BROWSER_TYPE_JAVAFX;
