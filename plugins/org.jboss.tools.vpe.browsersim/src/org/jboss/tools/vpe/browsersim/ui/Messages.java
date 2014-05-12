@@ -98,6 +98,7 @@ public class Messages {
 	public static String ManageDevicesDialog_EDIT;
 	public static String ManageDevicesDialog_ENABLE_LIVE_RELOAD;
 	public static String ManageDevicesDialog_LIVE_RELOAD_PORT;
+	public static String ManageDevicesDialog_LIVE_RELOAD_UNAVAILABLE;
 	public static String ManageDevicesDialog_TOUCH_EVENTS_OPTIONS;
 	public static String ManageDevicesDialog_SIMULATE_TOUCH_EVENTS;
 	public static String ManageDevicesDialog_HEIGHT;

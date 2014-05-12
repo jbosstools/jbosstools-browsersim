@@ -542,10 +542,18 @@ public class BrowserSim {
 	
 	private void processLiveReload(boolean isLiveReloadEnabled) {
 		if (isLiveReloadEnabled) {
-			if (liveReloadLocationAdapter == null) {
-				initLiveReloadLocationAdapter();
+			if (specificPreferences.isJavaFx() && BrowserSimUtil.isJavaFx7Available()) {
+				showLivereloadError(Messages.ManageDevicesDialog_LIVE_RELOAD_UNAVAILABLE);
+				specificPreferences.setEnableLiveReload(false);
+			} else if (isLivereloadAvailable()) {
+				if (liveReloadLocationAdapter == null) {
+					initLiveReloadLocationAdapter();
+				}
+				skin.getBrowser().addLocationListener(liveReloadLocationAdapter);
+			} else {
+				showLivereloadError(Messages.BrowserSim_LIVERELOAD_WARNING);
+				specificPreferences.setEnableLiveReload(false);
 			}
-			skin.getBrowser().addLocationListener(liveReloadLocationAdapter);
 		} else {
 			if (liveReloadLocationAdapter != null) {
 				skin.getBrowser().removeLocationListener(liveReloadLocationAdapter);
@@ -580,13 +588,9 @@ public class BrowserSim {
 						processLiveReloadEvent(event);
 					}
 				} else {
-					MessageBox warning = new MessageBox(skin.getShell(), SWT.ICON_WARNING);
-					warning.setText(Messages.WARNING);
-					warning.setMessage(Messages.BrowserSim_LIVERELOAD_WARNING);
-					warning.open();
-
+					showLivereloadError(Messages.BrowserSim_LIVERELOAD_WARNING);
 					skin.getBrowser().removeLocationListener(liveReloadLocationAdapter);
-					specificPreferences.setEnableLiveReload(false);	
+					specificPreferences.setEnableLiveReload(false);
 				}
 			}
 		};
@@ -604,6 +608,13 @@ public class BrowserSim {
 		}
 	}
 
+	private void showLivereloadError(String message) {
+		MessageBox warning = new MessageBox(skin.getShell(), SWT.ICON_WARNING);
+		warning.setText(Messages.WARNING);
+		warning.setMessage(message);
+		warning.open();
+	}
+	
 	private void processLiveReloadEvent(final LocationEvent event) {
 		IBrowser browser = (IBrowser) event.widget;
 		browser.execute("if (!window.LiveReload) {" + //$NON-NLS-1$
