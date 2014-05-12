@@ -144,7 +144,7 @@ public class ManageDevicesDialog extends Dialog {
 	 */
 	private void createContents() {
 		shell = new Shell(getParent(), getStyle());
-		shell.setSize(780, 555);
+		shell.setSize(790, 555);
 		shell.setText(getText());
 		shell.setLayout(new GridLayout(1, false));
 		
@@ -337,7 +337,7 @@ public class ManageDevicesDialog extends Dialog {
 		Composite settingsComposite = new Composite(tabFolder, SWT.NONE);
 		settingsComposite.setLayout(new GridLayout());
 		
-		Group liveReloadGroup = new Group(settingsComposite, SWT.NONE);
+		final Group liveReloadGroup = new Group(settingsComposite, SWT.NONE);
 		liveReloadGroup.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, true, false, 1, 1));
 		liveReloadGroup.setLayout(new GridLayout(2, false));
 		liveReloadGroup.setText(Messages.ManageDevicesDialog_LIVE_RELOAD_OPTIONS);
@@ -375,6 +375,8 @@ public class ManageDevicesDialog extends Dialog {
 			}
 		});
 		
+		disableLivereloadForJavaFx7(liveReloadGroup);
+		
 		Group touchEventsGroup = new Group(settingsComposite, SWT.NONE);
 		touchEventsGroup.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, true, false, 1, 1));
 		touchEventsGroup.setText(Messages.ManageDevicesDialog_TOUCH_EVENTS_OPTIONS);
@@ -398,6 +400,7 @@ public class ManageDevicesDialog extends Dialog {
 			@Override
 			public void widgetSelected(SelectionEvent e) {
 				isJavaFx = javaFXBrowserRadio.equals((Button) e.widget);
+				disableLivereloadForJavaFx7(liveReloadGroup);
 			}
 		}; 
 		
@@ -497,7 +500,7 @@ public class ManageDevicesDialog extends Dialog {
 				} else {
 					newCommonPreferences = new CommonPreferences(devices, truncateWindow, screenshotsPath.getText(),
 							weinreScriptUrlText.getText(), weinreClientUrlText.getText());
-					newSpecificPreferences = create(selectedDeviceId, useSkins, enableLiveReload, getLiveReloadPort(), touchEventsCheckBox.getSelection(), isJavaFx);
+					newSpecificPreferences = create(checkedDeviceId, useSkins, enableLiveReload, getLiveReloadPort(), touchEventsCheckBox.getSelection(), isJavaFx);
 					shell.close();
 				}
 			}
@@ -540,7 +543,7 @@ public class ManageDevicesDialog extends Dialog {
 			disableSwitcher(javaFXBrowserRadio, browserTypeGroup, message);
 		}
 	}
-
+	
 	private void disableWebEngineSwitcherIfWebKitNotAvailable(Button swtBrowserRadio, Group browserTypeGroup) {
 		String message = ""; //$NON-NLS-1$
 		// BrowserSim needs Safari installed on Windows
@@ -557,6 +560,21 @@ public class ManageDevicesDialog extends Dialog {
 		Label label = new Label(browserTypeGroup, SWT.NONE);
 		label.setText(message);
 		label.setForeground(Display.getDefault().getSystemColor(SWT.COLOR_RED));
+	}
+	
+	private void disableLivereloadForJavaFx7(Composite parent) {
+		if (isJavaFx && BrowserSimUtil.isJavaFx7Available()) {
+			liveReloadCheckBox.setSelection(false);
+			liveReloadCheckBox.setEnabled(false);
+			GridData gd = new GridData(SWT.FILL, SWT.CENTER, true, false);
+			gd.horizontalSpan = 2;
+			Label label = new Label(parent, SWT.NONE);
+			label.setLayoutData(gd);
+			label.setText(Messages.ManageDevicesDialog_LIVE_RELOAD_UNAVAILABLE);
+			label.setForeground(Display.getDefault().getSystemColor(SWT.COLOR_RED));
+		} else {
+			liveReloadCheckBox.setEnabled(true);
+		}
 	}
 	
 	public void updateDevices() {
