@@ -47,8 +47,6 @@ public class BrowserSimErrorDialog extends MessageDialog {
 		IPreferenceNode jreNode = getPreferenceNode(BROWSERSIM_PREFERENCE_PAGE_ID);
 		if (Platform.OS_WIN32.equals(os)) {
 			message = MessageFormat.format(Messages.BrowserSimErrorDialog_ERROR_MESSAGE_WINDOWS, programName, jreNode.getLabelText());
-		} else if (Platform.OS_MACOSX.equals(os) && is32bitEclipse) {
-			message = MessageFormat.format(Messages.BrowserSimErrorDialog_ERROR_MESSAGE_MAC32, programName, jreNode.getLabelText());
 		} else {// Linux, 64-bit Mac
 			String bit = is32bitEclipse ? "32-bit" : "64-bit"; //$NON-NLS-1$ //$NON-NLS-2$
 			message = MessageFormat.format(Messages.BrowserSimErrorDialog_ERROR_MESSAGE_COMMON, programName, jreNode.getLabelText(), bit);

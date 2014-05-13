@@ -13,7 +13,6 @@ package org.jboss.tools.vpe.browsersim.eclipse.preferences;
 import java.text.MessageFormat;
 import java.util.List;
 
-import org.eclipse.core.runtime.Platform;
 import org.eclipse.jdt.launching.IVMInstall;
 import org.eclipse.jface.dialogs.Dialog;
 import org.eclipse.jface.dialogs.IDialogConstants;
@@ -176,15 +175,8 @@ public class BrowserSimPreferencesPage extends PreferencePage implements IWorkbe
 			 * @see https://issues.jboss.org/browse/JBIDE-13988
 			 */
 			String message;
-			String os = Platform.getOS();
 			boolean is32bitEclipse = PlatformUtil.ARCH_X86.equals(PlatformUtil.getArch());
-			if (Platform.OS_WIN32.equals(os)) {
-				message = Messages.BrowserSimPreferencesPage_REQUIREMENTS_WINDOWS;
-			} else if (PlatformUtil.OS_MACOSX.equals(os) && is32bitEclipse) {
-				message = Messages.BrowserSimPreferencesPage_REQUIREMENTS_MAC32;
-			} else {// Linux, 64-bit Mac
-				message = MessageFormat.format(Messages.BrowserSimPreferencesPage_REQUIREMENTS, is32bitEclipse ? "32-bit" : "64-bit"); //$NON-NLS-1$ //$NON-NLS-2$
-			}
+			message = MessageFormat.format(Messages.BrowserSimPreferencesPage_REQUIREMENTS, is32bitEclipse ? "32-bit" : "64-bit"); //$NON-NLS-1$ //$NON-NLS-2$
 			setMessage(message, IMessageProvider.ERROR);
 			automatically.setSelection(true);
 			select.setEnabled(false);

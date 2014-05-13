@@ -63,25 +63,14 @@ public class PreferencesUtil {
 				if (vm instanceof AbstractVMInstall) {
 					AbstractVMInstall abstractVm = (AbstractVMInstall) vm;
 					String javaVersion = abstractVm.getJavaVersion();
-					if (javaVersion != null && javaVersion.compareTo("1.6") >= 0) { //$NON-NLS-1$
+					if (javaVersion != null && javaVersion.compareTo("1.7") >= 0) { //$NON-NLS-1$
 						if (PlatformUtil.OS_WIN32.equals(eclipseOs)) {
 							String vmArch = getArchitecture(vm);
 							if (eclipseArch.equals(vmArch) && !conflictsWithWebKit(abstractVm, vmArch)) {
 								vms.add(abstractVm);
 							}
-						} else if (PlatformUtil.OS_MACOSX.equals(eclipseOs)) {
-							if (PlatformUtil.ARCH_X86.equals(eclipseArch)) {
-								// Only Java 6 supports 32-bit mode on Mac
-								if (javaVersion.startsWith("1.6")) { //$NON-NLS-1$
-									vms.add(abstractVm);
-								}
-							} else {
-								vms.add(abstractVm);
-							}
-						} else if (PlatformUtil.OS_LINUX.equals(eclipseOs)) {
-							if (eclipseArch.equals(getArchitecture(vm))) {
-								vms.add(abstractVm);
-							}
+						} else if (eclipseArch.equals(getArchitecture(vm))) {
+							vms.add(abstractVm);
 						}
 					}
 				}
