@@ -3,7 +3,6 @@ package org.jboss.tools.vpe.browsersim.eclipse.dialog;
 import java.text.MessageFormat;
 import java.util.Iterator;
 
-import org.eclipse.core.runtime.Platform;
 import org.eclipse.jface.dialogs.MessageDialog;
 import org.eclipse.jface.preference.IPreferenceNode;
 import org.eclipse.jface.preference.PreferenceManager;
@@ -41,16 +40,10 @@ public class BrowserSimErrorDialog extends MessageDialog {
         data.horizontalSpan = 2;
         link.setData(data);
 		
-		String message;
-		String os = Platform.getOS();
 		boolean is32bitEclipse = PlatformUtil.ARCH_X86.equals(PlatformUtil.getArch());
 		IPreferenceNode jreNode = getPreferenceNode(BROWSERSIM_PREFERENCE_PAGE_ID);
-		if (Platform.OS_WIN32.equals(os)) {
-			message = MessageFormat.format(Messages.BrowserSimErrorDialog_ERROR_MESSAGE_WINDOWS, programName, jreNode.getLabelText());
-		} else {// Linux, 64-bit Mac
-			String bit = is32bitEclipse ? "32-bit" : "64-bit"; //$NON-NLS-1$ //$NON-NLS-2$
-			message = MessageFormat.format(Messages.BrowserSimErrorDialog_ERROR_MESSAGE_COMMON, programName, jreNode.getLabelText(), bit);
-		}
+		String bit = is32bitEclipse ? "32-bit" : "64-bit"; //$NON-NLS-1$ //$NON-NLS-2$
+		String message = MessageFormat.format(Messages.BrowserSimErrorDialog_ERROR_MESSAGE_COMMON, programName, jreNode.getLabelText(), bit);
 
 	    link.setText(message);
 	    link.addSelectionListener(new SelectionAdapter(){

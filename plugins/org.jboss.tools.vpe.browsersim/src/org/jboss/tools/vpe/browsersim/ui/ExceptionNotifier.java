@@ -17,7 +17,6 @@ import org.eclipse.swt.SWTError;
 import org.eclipse.swt.widgets.MessageBox;
 import org.eclipse.swt.widgets.Shell;
 import org.jboss.tools.vpe.browsersim.BrowserSimLogger;
-import org.jboss.tools.vpe.browsersim.browser.PlatformUtil;
 
 /**
  * @author Yahor Radtsevich (yradtsevich)
@@ -27,18 +26,8 @@ public class ExceptionNotifier {
 	 * Should be used to notify user about WebKit-loading errors
 	 */
 	public static void showBrowserSimLoadError(Shell parentShell, SWTError error, String appName) {
-		String os = PlatformUtil.getOs();
-		String arch = PlatformUtil.getArch();
 		String message;
-		if (PlatformUtil.OS_WIN32.equals(os) && PlatformUtil.ARCH_X86.equals(arch) // Eclipse 32-bit on Windows and
-				&& error.getMessage() != null											  // Safari is not installed
-				&& error.getMessage().contains("Safari must be installed to use a SWT.WEBKIT-style Browser")) { //$NON-NLS-1$
-			message = MessageFormat.format(Messages.ExceptionNotifier_APPLE_APPLICATION_SUPPORT_IS_NOT_FOUND, appName);
-		} else if (PlatformUtil.OS_LINUX.equals(os) && error.getMessage() != null) {    // Linux - probably WebKitGTK is not installed
-			message = MessageFormat.format(Messages.ExceptionNotifier_BROWSERSIM_IS_FAILED_TO_START_ON_LINUX, error.getMessage());
-		} else {																	  // everything else
-			message = MessageFormat.format(Messages.ExceptionNotifier_BROWSERSIM_IS_FAILED_TO_START, error.getMessage());
-		}
+		message = MessageFormat.format(Messages.ExceptionNotifier_BROWSERSIM_IS_FAILED_TO_START, error.getMessage());
 		showErrorMessageWithLinks(parentShell, message, error);
 	}
 

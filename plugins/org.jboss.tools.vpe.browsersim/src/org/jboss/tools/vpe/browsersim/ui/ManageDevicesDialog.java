@@ -547,13 +547,18 @@ public class ManageDevicesDialog extends Dialog {
 	private void disableWebEngineSwitcherIfWebKitNotAvailable(Button swtBrowserRadio, Group browserTypeGroup) {
 		String message = ""; //$NON-NLS-1$
 		// BrowserSim needs Safari installed on Windows
-		if (PlatformUtil.OS_WIN32.equals(PlatformUtil.getOs()) && !BrowserSimUtil.isWindowsSwtWebkitInstalled()) {
-			if (PlatformUtil.ARCH_X64.equals(PlatformUtil.getArch())) {
-				message = Messages.ManageDevicesDialog_BROWSER_ENGINE_WEBKIT_WARNING_ON_WINDOWS64;
-			} else {
-				message = Messages.ManageDevicesDialog_BROWSER_ENGINE_WEBKIT_WARNING_ON_WINDOWS;
+		if (!BrowserSimUtil.isWebkitAvailable()) {
+			String os = PlatformUtil.getOs();
+			if (PlatformUtil.OS_WIN32.equals(os)) {
+				if (PlatformUtil.ARCH_X64.equals(PlatformUtil.getArch())) {
+					message = Messages.ManageDevicesDialog_BROWSER_ENGINE_WEBKIT_WARNING_ON_WINDOWS64;
+				} else {
+					message = Messages.ManageDevicesDialog_BROWSER_ENGINE_WEBKIT_WARNING_ON_WINDOWS;
+				}
+			} else if (PlatformUtil.OS_LINUX.equals(os)) {
+				message = Messages.ManageDevicesDialog_BROWSER_ENGINE_WEBKIT_WARNING_ON_LINUX;
 			}
-		} 
+		}
 		if (!message.isEmpty()) {
 			disableSwitcher(swtBrowserRadio, browserTypeGroup, message);
 		}

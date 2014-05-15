@@ -16,7 +16,6 @@ public class Messages extends NLS {
 	public static String ExternalProcessLauncher_NO_BUNDLE;
 	public static String BrowserSimErrorDialog_ERROR_MESSAGE_COMMON;
 	public static String BrowserSimErrorDialog_ERROR_MESSAGE_HEADER;
-	public static String BrowserSimErrorDialog_ERROR_MESSAGE_WINDOWS;
 	public static String BrowserSimPreferencesPage_DETECT_AUTOMATICALLY;
 	public static String BrowserSimPreferencesPage_GTK_2;
 	public static String BrowserSimPreferencesPage_GTK_3;
