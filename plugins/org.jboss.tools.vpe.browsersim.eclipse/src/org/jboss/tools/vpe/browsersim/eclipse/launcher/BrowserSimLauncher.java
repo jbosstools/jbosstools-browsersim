@@ -13,6 +13,7 @@ package org.jboss.tools.vpe.browsersim.eclipse.launcher;
 import java.io.File;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 
 import org.eclipse.jdt.launching.IVMInstall;
@@ -39,14 +40,10 @@ public class BrowserSimLauncher {
 		new RestartCallback()
 	);
 	
-	public static final List<String> RESOURCES_BUNDLES = Arrays.asList(
-		"org.jboss.tools.vpe.browsersim.win32.win32.x86_64" //$NON-NLS-1$
-	);
+	public static final List<String> RESOURCES_BUNDLES = Collections.<String>emptyList();
 	
-	//if you change this parameter, see also @org.jbosstools.browsersim.ui.BrowserSim
 	public static final String NOT_STANDALONE = "-not-standalone"; //$NON-NLS-1$
 	
-
 	public static void launchBrowserSim(String initialUrl) {
 		List<String> parameters = new ArrayList<String>();
 		
@@ -91,12 +88,9 @@ public class BrowserSimLauncher {
 		bundles.add("org.eclipse.jetty.security"); //$NON-NLS-1$
 		bundles.add("org.eclipse.jetty.continuation"); //$NON-NLS-1$
 		
-		// for Win64 we add swt from fragment which mached in resources
-		if (!(PlatformUtil.OS_WIN32.equals(PlatformUtil.getOs())
-				&& PlatformUtil.ARCH_X64.equals(PlatformUtil.getArch()))) {
-			bundles.add("org.eclipse.swt"); //$NON-NLS-1$
-			bundles.add("org.eclipse.swt."+ PlatformUtil.CURRENT_PLATFORM); //$NON-NLS-1$
-		}
+		bundles.add("org.eclipse.swt"); //$NON-NLS-1$
+		bundles.add("org.eclipse.swt."+ PlatformUtil.CURRENT_PLATFORM); //$NON-NLS-1$
+		
 		return bundles;
 	}
 	

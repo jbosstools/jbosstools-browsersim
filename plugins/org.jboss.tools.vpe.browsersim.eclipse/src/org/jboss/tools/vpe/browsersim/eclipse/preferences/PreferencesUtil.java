@@ -65,8 +65,8 @@ public class PreferencesUtil {
 					String javaVersion = abstractVm.getJavaVersion();
 					if (javaVersion != null && javaVersion.compareTo("1.6") >= 0) { //$NON-NLS-1$
 						if (PlatformUtil.OS_WIN32.equals(eclipseOs)) {
-							// can use only 32 bit jvm on windows
-							if (isX86(abstractVm) && !conflictsWithWebKit(abstractVm)) {
+							String vmArch = getArchitecture(vm);
+							if (eclipseArch.equals(vmArch) && !conflictsWithWebKit(abstractVm, vmArch)) {
 								vms.add(abstractVm);
 							}
 						} else if (PlatformUtil.OS_MACOSX.equals(eclipseOs)) {
@@ -79,7 +79,7 @@ public class PreferencesUtil {
 								vms.add(abstractVm);
 							}
 						} else if (PlatformUtil.OS_LINUX.equals(eclipseOs)) {
-							if (PlatformUtil.ARCH_X86.equals(eclipseArch) == isX86(abstractVm)) {
+							if (eclipseArch.equals(getArchitecture(vm))) {
 								vms.add(abstractVm);
 							}
 						}
@@ -122,11 +122,11 @@ public class PreferencesUtil {
 		return null;
 	}
 	
-	private static boolean isX86(IVMInstall vm) {
-		return PlatformUtil.ARCH_X86.equals(PreferencesUtil.getArchitecture(vm));
-	}
-	
-	private static boolean conflictsWithWebKit(IVMInstall vm) {
+	private static boolean conflictsWithWebKit(IVMInstall vm, String vmArch) {
+		if (PlatformUtil.ARCH_X64.equals(vmArch)) {
+			//no 64bit Webkit - no conflicts
+			return false;
+		}
 		File libxml2 = new File(vm.getInstallLocation().getAbsolutePath() + "/bin/libxml2.dll"); //$NON-NLS-1$
 		return libxml2.exists();
 	}
@@ -147,7 +147,6 @@ public class PreferencesUtil {
 	/**
 	 * @see org.eclipse.jdt.internal.launching.StandardVMType#generateLibraryInfo
 	 */
-	@SuppressWarnings({ "unchecked" })
 	public static String generateLibraryInfo(File javaHome, String javaCommand) throws IOException {
 		String arch = null;
 		String currentBundleLocation = ExternalProcessLauncher
