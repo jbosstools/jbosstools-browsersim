@@ -39,7 +39,8 @@ public class Messages {
 	public static String BrowserSim_FIREBUG_LITE;
 	public static String BrowserSim_HELP;
 	public static String BrowserSim_LIVERELOAD_WARNING;
-	public static String BrowserSim_NO_WEB_ENGINES;
+	public static String BrowserSim_NO_WEB_ENGINES_LINUX;
+	public static String BrowserSim_NO_WEB_ENGINES_WINDOWS;
 	public static String BrowserSim_OPEN_IN_DEFAULT_BROWSER;
 	public static String BrowserSim_PREFERENCES;
 	public static String BrowserSim_SKIN;
@@ -89,6 +90,8 @@ public class Messages {
 	public static String ManageDevicesDialog_BROWSER_ENGINE;
 	public static String ManageDevicesDialog_BROWSER_ENGINE_WARNING;
 	public static String ManageDevicesDialog_BROWSER_ENGINE_WEBKIT_WARNING_ON_WINDOWS;
+	public static String ManageDevicesDialog_BROWSER_ENGINE_WEBKIT_WARNING_ON_WINDOWS64;
+	public static String ManageDevicesDialog_BROWSER_ENGINE_WEBKIT_WARNING_ON_LINUX;
 	public static String ManageDevicesDialog_BROWSER_ENGINE_WARNING_ON_LINUX;
 	public static String ManageDevicesDialog_BROWSER_TYPE_SWT;
 	public static String ManageDevicesDialog_BROWSER_TYPE_JAVAFX;

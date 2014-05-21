@@ -16,14 +16,10 @@ public class Messages extends NLS {
 	public static String ExternalProcessLauncher_NO_BUNDLE;
 	public static String BrowserSimErrorDialog_ERROR_MESSAGE_COMMON;
 	public static String BrowserSimErrorDialog_ERROR_MESSAGE_HEADER;
-	public static String BrowserSimErrorDialog_ERROR_MESSAGE_MAC32;
-	public static String BrowserSimErrorDialog_ERROR_MESSAGE_WINDOWS;
 	public static String BrowserSimPreferencesPage_DETECT_AUTOMATICALLY;
 	public static String BrowserSimPreferencesPage_GTK_2;
 	public static String BrowserSimPreferencesPage_GTK_3;
 	public static String BrowserSimPreferencesPage_JRE_LINK;
-	public static String BrowserSimPreferencesPage_REQUIREMENTS_MAC32;
-	public static String BrowserSimPreferencesPage_REQUIREMENTS_WINDOWS;
 	public static String BrowserSimPreferencesPage_REQUIREMENTS;
 	public static String BrowserSimPreferencesPage_SELECT;
 	public static String BrowserSimPreferencesPage_SELECT_GTK;

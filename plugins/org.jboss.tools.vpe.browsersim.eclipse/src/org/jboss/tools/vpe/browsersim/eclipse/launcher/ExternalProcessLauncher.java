@@ -69,9 +69,6 @@ public class ExternalProcessLauncher {
 				
 				if (Platform.OS_MACOSX.equals(Platform.getOS())) {
 					commandElements.add("-XstartOnFirstThread"); //$NON-NLS-1$
-					if (Platform.ARCH_X86.equals(Platform.getOSArch())) {
-						commandElements.add("-d32"); //$NON-NLS-1$
-					}
 				}
 				
 				ILaunch launch = launch(programName, classPath, className, parameters, jreContainerPath, commandElements);

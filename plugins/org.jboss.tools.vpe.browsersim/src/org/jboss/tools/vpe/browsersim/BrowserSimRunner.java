@@ -12,6 +12,7 @@ package org.jboss.tools.vpe.browsersim;
 
 import java.net.URI;
 import java.net.URISyntaxException;
+import java.text.MessageFormat;
 
 import org.eclipse.jetty.server.Server;
 import org.eclipse.swt.SWT;
@@ -48,27 +49,34 @@ public class BrowserSimRunner {
 	static { 
 		String platform = PlatformUtil.getOs();
 		isJavaFxAvailable = false;
-		isWebKitAvailable = true;
+		
 		
 		boolean isLinux = PlatformUtil.OS_LINUX.equals(platform);
-		
+
 		// Trying to load javaFx libs except Linux GTK3 case
 		if (!(isLinux && !BrowserSimUtil.isRunningAgainstGTK2())) {
 			isJavaFxAvailable = BrowserSimUtil.loadJavaFX();
 		}
 		
-		//check if AAS is installed on Windows
-		boolean isWindows = PlatformUtil.OS_WIN32.equals(platform);
-		if (isWindows && !BrowserSimUtil.isWindowsSwtWebkitInstalled()) {
-			isWebKitAvailable = false;
-		}
+		isWebKitAvailable = BrowserSimUtil.isWebkitAvailable();
 	}
 	
 	public static void main(String[] args) {
 		Display display = null;
 		try {
-			if (!isWebKitAvailable && !isJavaFxAvailable) {
-				throw new SWTError(Messages.BrowserSim_NO_WEB_ENGINES);
+			if (!isJavaFxAvailable && !isWebKitAvailable) {
+				String errorMessage = "";
+				String os = PlatformUtil.getOs();
+				if (PlatformUtil.OS_LINUX.equals(os)) {
+					errorMessage = MessageFormat.format(
+							Messages.BrowserSim_NO_WEB_ENGINES_LINUX,
+							Messages.BrowserSim_BROWSER_SIM);
+				} else if(PlatformUtil.OS_WIN32.equals(os)) {
+					errorMessage = MessageFormat.format(
+							Messages.BrowserSim_NO_WEB_ENGINES_WINDOWS,
+							Messages.BrowserSim_BROWSER_SIM);
+				}
+				throw new SWTError(errorMessage);
 			}
 			
 			BrowserSimArgs browserSimArgs = BrowserSimArgs.parseArgs(args);

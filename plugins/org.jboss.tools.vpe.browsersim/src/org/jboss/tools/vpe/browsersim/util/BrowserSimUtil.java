@@ -27,6 +27,7 @@ import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.graphics.Point;
 import org.eclipse.swt.graphics.Rectangle;
 import org.eclipse.swt.graphics.Resource;
+import org.eclipse.swt.internal.Library;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Monitor;
 import org.eclipse.swt.widgets.Shell;
@@ -46,6 +47,7 @@ import org.jboss.tools.vpe.browsersim.ui.skin.BrowserSimSkin;
  * @author Yahor Radtsevich (yradtsevich)
  * @author Konstantin Marmalyukov (kmarmaliykov)
  */
+@SuppressWarnings("restriction")
 public class BrowserSimUtil {
 	private static final String java7u51 = "1.7.0_51"; //$NON-NLS-1$
 	private static final String java8 = "1.8.0"; //$NON-NLS-1$
@@ -356,7 +358,19 @@ public class BrowserSimUtil {
 		shell.setText(Messages.BrowserSim_BROWSER_SIM);
 	}
 	
-	public static boolean isWindowsSwtWebkitInstalled() {
+	public static boolean isWebkitAvailable() {
+		String os = PlatformUtil.getOs();
+		if (PlatformUtil.OS_WIN32.equals(os)) {
+			return isWindowsSwtWebkitInstalled();
+		} else if (PlatformUtil.OS_MACOSX.equals(os)){
+			return true;
+		} else if (PlatformUtil.OS_LINUX.equals(os)) {
+			return isLinuxWebkitInstalled();
+		}
+		return false;
+	}
+	
+	private static boolean isWindowsSwtWebkitInstalled() {
 		/**
 		 * Workaround for Java7u51 and higher. Loading SWT.WEBKIT libraries before JavaFX webkit causes an error. 
 		 * @see https://javafx-jira.kenai.com/browse/RT-35480
@@ -367,6 +381,11 @@ public class BrowserSimUtil {
 		if (0 >= java7u51.compareTo(javaVersion) && java8.compareTo(javaVersion) >0) {
 			@SuppressWarnings("unused")
 			JavaFXBrowser tempJavaFXBrowser = new JavaFXBrowser(new Shell());
+		}
+		
+		if (PlatformUtil.ARCH_X64.equals(PlatformUtil.getArch())) {
+			//64Bit Safari does not exists
+			return false;
 		}
 		//due to last changes Safari is needed to run BrowerSim (against QuickTime)
 		//to avoid JVM crash we need to check Safari existnce before creating a browser.(JBIDE-13044).
@@ -399,4 +418,41 @@ public class BrowserSimUtil {
 		
 		return false;
 	}
+	
+	public static boolean isLinuxWebkitInstalled() {
+		try {
+			Library.loadLibrary("swt-webkit"); // $NON-NLS-1$
+
+			String webkit2 = System.getenv("SWT_WEBKIT2"); // $NON-NLS-1$
+			final int GTK_VERSION = LinuxUtil.VERSION(LinuxUtil.gtk_major_version(), LinuxUtil.gtk_minor_version(), LinuxUtil.gtk_micro_version());
+
+			final boolean GTK3 = GTK_VERSION >= LinuxUtil.VERSION(3, 0, 0);
+			boolean WEBKIT2 = webkit2 != null && webkit2.equals("1") && GTK3; // $NON-NLS-1$
+			// TODO webkit_check_version() should take care of the following,
+			// but for some
+			// reason this symbol is missing from the latest build. If it is
+			// present in
+			// Linux distro-provided builds then replace the following with this
+			// call.
+			int major, minor, micro;
+			if (WEBKIT2) {
+				major = LinuxUtil.webkit_get_major_version();
+				minor = LinuxUtil.webkit_get_minor_version();
+				micro = LinuxUtil.webkit_get_micro_version();
+			} else {
+				major = LinuxUtil.webkit_major_version();
+				minor = LinuxUtil.webkit_minor_version();
+				micro = LinuxUtil.webkit_micro_version();
+			}
+			final int[] MIN_VERSION = {1, 2, 0};
+			
+			return major > MIN_VERSION[0] ||
+			(major == MIN_VERSION[0] && minor > MIN_VERSION[1]) ||
+			(major == MIN_VERSION[0] && minor == MIN_VERSION[1] && micro >= MIN_VERSION[2]);
+		} catch (Throwable e) {
+			
+		}
+		return false;
+	}
+	
 }
