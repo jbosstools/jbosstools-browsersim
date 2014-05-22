@@ -24,6 +24,7 @@ public class Messages extends NLS {
 	public static String BrowserSimPreferencesPage_SELECT;
 	public static String BrowserSimPreferencesPage_SELECT_GTK;
 	public static String BrowserSimPreferencesPage_SELECT_JRE;
+	public static String UsageEventTypeLaunchLabelDescription;
 	static {
 		// initialize resource bundle
 		NLS.initializeMessages(BUNDLE_NAME, Messages.class);

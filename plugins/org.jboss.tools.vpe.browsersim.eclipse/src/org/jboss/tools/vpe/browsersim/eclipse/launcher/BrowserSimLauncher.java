@@ -45,6 +45,7 @@ public class BrowserSimLauncher {
 	public static final String NOT_STANDALONE = "-not-standalone"; //$NON-NLS-1$
 	
 	public static void launchBrowserSim(String initialUrl) {
+		Activator.getDefault().countLaunchEvent();
 		List<String> parameters = new ArrayList<String>();
 		
 		parameters.add(NOT_STANDALONE);
