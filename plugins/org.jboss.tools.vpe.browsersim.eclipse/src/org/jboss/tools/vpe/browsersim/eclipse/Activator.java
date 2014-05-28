@@ -28,6 +28,9 @@ import org.eclipse.ui.console.IConsolePageParticipant;
 import org.eclipse.ui.plugin.AbstractUIPlugin;
 import org.jboss.tools.usage.event.UsageEventType;
 import org.jboss.tools.usage.event.UsageReporter;
+import org.jboss.tools.vpe.browsersim.model.preferences.BrowserSimSpecificPreferencesStorage;
+import org.jboss.tools.vpe.browsersim.model.preferences.SpecificPreferences;
+import org.jboss.tools.vpe.browsersim.model.preferences.SpecificPreferencesStorage;
 import org.osgi.framework.BundleContext;
 
 /**
@@ -42,6 +45,8 @@ public class Activator extends AbstractUIPlugin {
 	public static final String PLUGIN_ID = "org.jboss.tools.vpe.browsersim.eclipse"; //$NON-NLS-1$
 
 	private static final String BROWSERSIM_ACTION = "browsersim";
+	private static final String JAVA_FX_LABEL = "javafx";
+	private static final String WEBKIT_LABEL = "webkit";
 
 	private Map<StyledText, IConsolePageParticipant> viewers = new HashMap<StyledText, IConsolePageParticipant>();
 
@@ -68,7 +73,16 @@ public class Activator extends AbstractUIPlugin {
 	}
 
 	public void countLaunchEvent() {
-		UsageReporter.getInstance().countEvent(launchEventType.event(UsageEventType.OPEN_ACTION));
+		String label = getEngineName(BrowserSimSpecificPreferencesStorage.INSTANCE);
+		UsageReporter.getInstance().countEvent(launchEventType.event(label));
+	}
+
+	public static String getEngineName(SpecificPreferencesStorage storage) {
+		SpecificPreferences sp = (SpecificPreferences) storage.load();
+		if (sp == null) {
+			sp = (SpecificPreferences) storage.loadDefault();
+		}
+		return sp.isJavaFx()?JAVA_FX_LABEL:WEBKIT_LABEL;
 	}
 
 	/*
