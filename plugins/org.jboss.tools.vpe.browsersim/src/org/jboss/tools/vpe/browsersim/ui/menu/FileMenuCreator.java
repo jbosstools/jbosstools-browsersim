@@ -10,16 +10,16 @@
  ******************************************************************************/
 package org.jboss.tools.vpe.browsersim.ui.menu;
 
+import java.io.BufferedWriter;
 import java.io.File;
+import java.io.FileWriter;
+import java.io.IOException;
 import java.net.MalformedURLException;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.net.URL;
 
-import javax.xml.bind.DatatypeConverter;
-
 import org.eclipse.swt.SWT;
-import org.jboss.tools.vpe.browsersim.browser.IBrowser;
 import org.eclipse.swt.events.DisposeEvent;
 import org.eclipse.swt.events.DisposeListener;
 import org.eclipse.swt.events.SelectionAdapter;
@@ -31,6 +31,8 @@ import org.eclipse.swt.widgets.MenuItem;
 import org.eclipse.swt.widgets.Shell;
 import org.jboss.tools.vpe.browsersim.BrowserSimArgs;
 import org.jboss.tools.vpe.browsersim.BrowserSimLogger;
+import org.jboss.tools.vpe.browsersim.BrowserSimRunner;
+import org.jboss.tools.vpe.browsersim.browser.IBrowser;
 import org.jboss.tools.vpe.browsersim.browser.PlatformUtil;
 import org.jboss.tools.vpe.browsersim.model.preferences.CommonPreferences;
 import org.jboss.tools.vpe.browsersim.model.preferences.SpecificPreferences;
@@ -41,6 +43,7 @@ import org.jboss.tools.vpe.browsersim.ui.Messages;
 import org.jboss.tools.vpe.browsersim.ui.PreferencesWrapper;
 import org.jboss.tools.vpe.browsersim.ui.skin.BrowserSimSkin;
 import org.jboss.tools.vpe.browsersim.util.BrowserSimUtil;
+import org.jboss.tools.vpe.browsersim.util.PreferencesUtil;
 
 /**
  * @author Yahor Radtsevich (yradtsevich)
@@ -53,7 +56,6 @@ public class FileMenuCreator {
 	protected static final String OPEN_FILE_COMMAND = "org.jboss.tools.vpe.browsersim.command.openFile:"; //$NON-NLS-1$
 	/** @see org.jboss.tools.vpe.browsersim.eclipse.callbacks.ViewSourceCallback */
 	private static final String VIEW_SOURCE_COMMAND = "org.jboss.tools.vpe.browsersim.command.viewSource:"; //$NON-NLS-1$
-	protected static final String BASE_64_DELIMITER = "_BASE_64_DELIMITER_"; //$NON-NLS-1$
 
 	public void addItems(final Menu menu, final BrowserSimSkin skin, final CommonPreferences commonPreferences, final SpecificPreferences specificPreferences) {
 		addOpenInDefaultBrowserItem(menu, skin);
@@ -128,9 +130,25 @@ public class FileMenuCreator {
 	}
 	
 	protected void viewServerSource(IBrowser browser) {
-		String source = browser.getText();
-		String base64Source = DatatypeConverter.printBase64Binary(source.getBytes());
-		System.out.println(VIEW_SOURCE_COMMAND + browser.getUrl() + BASE_64_DELIMITER + base64Source); // send command to Eclipse
+		if (!BrowserSimRunner.ABOUT_BLANK.equals(browser.getUrl())) {
+			String source = browser.getText();
+	
+			try { 
+				File configFolder = new File(PreferencesUtil.getConfigFolderPath());
+				configFolder.mkdir();
+				File temp = new File(configFolder, "temp.html");
+	 
+				FileWriter fw = new FileWriter(temp.getAbsoluteFile());
+				BufferedWriter bw = new BufferedWriter(fw);
+				bw.write(source);
+				bw.flush();
+				bw.close();
+			} catch (IOException e) {
+				BrowserSimLogger.logError("Cannot create temp file", e);
+			}
+	
+			System.out.println(VIEW_SOURCE_COMMAND + browser.getUrl()); // send command to Eclipse
+		}
 	}
 	
 	private void addPreferencesItem(Menu menu, final CommonPreferences commonPreferences,

@@ -10,12 +10,13 @@
  ******************************************************************************/
 package org.jboss.tools.vpe.browsersim.eclipse.callbacks;
 
+import java.io.BufferedReader;
 import java.io.ByteArrayInputStream;
+import java.io.File;
+import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
-
-import javax.xml.bind.DatatypeConverter;
-
+import java.io.InputStreamReader;
 import org.eclipse.core.resources.IStorage;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IPath;
@@ -31,10 +32,12 @@ import org.eclipse.ui.IWorkbenchWindow;
 import org.eclipse.ui.PartInitException;
 import org.eclipse.ui.PlatformUI;
 import org.eclipse.ui.texteditor.ITextEditor;
+import org.jboss.tools.vpe.browsersim.BrowserSimLogger;
 import org.jboss.tools.vpe.browsersim.eclipse.Activator;
 import org.jboss.tools.vpe.browsersim.eclipse.Messages;
 import org.jboss.tools.vpe.browsersim.eclipse.launcher.ExternalProcessCallback;
 import org.jboss.tools.vpe.browsersim.eclipse.launcher.TransparentReader;
+import org.jboss.tools.vpe.browsersim.util.PreferencesUtil;
 
 /**
  * Handler for the BrowserSim commands printed to the console in the following form:
@@ -46,7 +49,6 @@ import org.jboss.tools.vpe.browsersim.eclipse.launcher.TransparentReader;
  */
 public class ViewSourceCallback implements ExternalProcessCallback {
 	private static final String VIEW_SOURCE_COMMAND = "org.jboss.tools.vpe.browsersim.command.viewSource:"; //$NON-NLS-1$
-	private static final String BASE_64_DELIMITER = "_BASE_64_DELIMITER_"; //$NON-NLS-1$
 
 	/* (non-Javadoc)
 	 * @see org.jboss.tools.vpe.browsersim.eclipse.callbacks.BrowserSimCallback#getCallbackId()
@@ -61,23 +63,37 @@ public class ViewSourceCallback implements ExternalProcessCallback {
 	 */
 	@Override
 	public void call(final String lastString, TransparentReader reader) throws IOException {
-		if (lastString.contains(BASE_64_DELIMITER)) {
-			String[] commandURLandBase64CodeArray = lastString.split(BASE_64_DELIMITER);
-			String commandAndURL = commandURLandBase64CodeArray[0];
-			String base64code = commandURLandBase64CodeArray[1];
-			
-			final String address = commandAndURL.substring(VIEW_SOURCE_COMMAND.length());
-			final String source = new String(DatatypeConverter.parseBase64Binary(base64code));
+		final String address = lastString.substring(VIEW_SOURCE_COMMAND.length());
+		
+		File tempFile = new File(PreferencesUtil.getConfigFolderPath(), "temp.html");
+		InputStream input = new FileInputStream(tempFile);
+		InputStreamReader reader1 = new InputStreamReader(input);
+		BufferedReader bufferedReader = new BufferedReader(reader1);
 
-			Display.getDefault().asyncExec(new Runnable() {
-				@Override
-				public void run() {
-					openInMemoryHtmlEditor(source, address, address);
+		StringBuilder stringBuilder = new StringBuilder();
+		String read;
+		try {
+			try {
+				while ((read = bufferedReader.readLine()) != null) {
+					stringBuilder.append(read);
+					stringBuilder.append('\n');
 				}
-			});
-		} else {
-			throw new IllegalArgumentException("String '" + lastString + "' does not contain " + BASE_64_DELIMITER); //$NON-NLS-1$ //$NON-NLS-2$
+			} finally {
+				bufferedReader.close();
+				tempFile.delete();
+			}
+		} catch (IOException e) {
+			BrowserSimLogger.logError(e.getMessage(), e);
 		}
+
+		final String source = stringBuilder.toString();
+		
+		Display.getDefault().asyncExec(new Runnable() {
+			@Override
+			public void run() {
+				openInMemoryHtmlEditor(source, address, address);
+			}
+		});
 	}
 	
 	private void openInMemoryHtmlEditor(String content, String name, String toolTip) {
