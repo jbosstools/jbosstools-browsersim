@@ -424,6 +424,7 @@ public class BrowserSimUtil {
 			Library.loadLibrary("swt-webkit"); // $NON-NLS-1$
 
 			String webkit2 = System.getenv("SWT_WEBKIT2"); // $NON-NLS-1$
+			
 			final int GTK_VERSION = LinuxUtil.VERSION(LinuxUtil.gtk_major_version(), LinuxUtil.gtk_minor_version(), LinuxUtil.gtk_micro_version());
 
 			final boolean GTK3 = GTK_VERSION >= LinuxUtil.VERSION(3, 0, 0);
@@ -450,9 +451,8 @@ public class BrowserSimUtil {
 			(major == MIN_VERSION[0] && minor > MIN_VERSION[1]) ||
 			(major == MIN_VERSION[0] && minor == MIN_VERSION[1] && micro >= MIN_VERSION[2]);
 		} catch (Throwable e) {
-			
+			BrowserSimLogger.logError(e.getMessage(), e);
+			return false;
 		}
-		return false;
 	}
-	
 }

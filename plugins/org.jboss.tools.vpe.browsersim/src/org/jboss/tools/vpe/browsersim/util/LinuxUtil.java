@@ -11,122 +11,65 @@
  *
  * Contributors:
  *     IBM Corporation - initial API and implementation
+ *     Red Hat, Inc. - new implementation based on reflection
  *******************************************************************************/
 package org.jboss.tools.vpe.browsersim.util;
 
-import org.eclipse.swt.internal.Platform;
+import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Method;
 
-@SuppressWarnings("restriction")
+/**
+ * 
+ * @author Konstantin Marmalyukov (kmarmaliykov)
+ *
+ */
+
 public class LinuxUtil {
 	public static int VERSION(int major, int minor, int micro) {
 		return (major << 16) + (minor << 8) + micro;
 	}
 	
-	/** @method flags=const */
-	public static final native int _gtk_major_version();
-
-	public static final int gtk_major_version() {
-		Platform.lock.lock();
-		try {
-			return _gtk_major_version();
-		} finally {
-			Platform.lock.unlock();
-		}
+	public static final int gtk_major_version() throws Exception {
+		return (Integer)call("org.eclipse.swt.internal.gtk.OS", "gtk_major_version"); //$NON-NLS-1$ //$NON-NLS-2$
 	}
 
-	/** @method flags=const */
-	public static final native int _gtk_minor_version();
-
-	public static final int gtk_minor_version() {
-		Platform.lock.lock();
-		try {
-			return _gtk_minor_version();
-		} finally {
-			Platform.lock.unlock();
-		}
+	public static final int gtk_minor_version() throws Exception {
+		return (Integer)call("org.eclipse.swt.internal.gtk.OS", "gtk_minor_version"); //$NON-NLS-1$ //$NON-NLS-2$
 	}
 
-	/** @method flags=const */
-	public static final native int _gtk_micro_version();
-
-	public static final int gtk_micro_version() {
-		Platform.lock.lock();
-		try {
-			return _gtk_micro_version();
-		} finally {
-			Platform.lock.unlock();
-		}
+	public static final int gtk_micro_version() throws Exception {
+		return (Integer)call("org.eclipse.swt.internal.gtk.OS", "gtk_micro_version"); //$NON-NLS-1$ //$NON-NLS-2$
 	}
 	
-	/** @method flags=dynamic */
-	public static final native int _webkit_major_version();
-
-	public static final int webkit_major_version() {
-		Platform.lock.lock();
-		try {
-			return _webkit_major_version();
-		} finally {
-			Platform.lock.unlock();
-		}
+	public static final int webkit_major_version() throws Exception {
+		return (Integer)call("org.eclipse.swt.internal.webkit.WebKitGTK", "webkit_major_version"); //$NON-NLS-1$ //$NON-NLS-2$
 	}
 
-	/** @method flags=dynamic */
-	public static final native int _webkit_get_major_version();
-
-	public static final int webkit_get_major_version() {
-		Platform.lock.lock();
-		try {
-			return _webkit_get_major_version();
-		} finally {
-			Platform.lock.unlock();
-		}
+	public static final int webkit_get_major_version() throws Exception {
+		return (Integer)call("org.eclipse.swt.internal.webkit.WebKitGTK", "webkit_get_major_version"); //$NON-NLS-1$ //$NON-NLS-2$
 	}
 
-	/** @method flags=dynamic */
-	public static final native int _webkit_micro_version();
-
-	public static final int webkit_micro_version() {
-		Platform.lock.lock();
-		try {
-			return _webkit_micro_version();
-		} finally {
-			Platform.lock.unlock();
-		}
+	public static final int webkit_micro_version() throws Exception {
+		return (Integer)call("org.eclipse.swt.internal.webkit.WebKitGTK", "webkit_micro_version"); //$NON-NLS-1$ //$NON-NLS-2$
 	}
 
-	/** @method flags=dynamic */
-	public static final native int _webkit_get_micro_version();
-
-	public static final int webkit_get_micro_version() {
-		Platform.lock.lock();
-		try {
-			return _webkit_get_micro_version();
-		} finally {
-			Platform.lock.unlock();
-		}
+	public static final int webkit_get_micro_version() throws Exception {
+		return (Integer)call("org.eclipse.swt.internal.webkit.WebKitGTK", "webkit_get_micro_version"); //$NON-NLS-1$ //$NON-NLS-2$
 	}
 
-	/** @method flags=dynamic */
-	public static final native int _webkit_minor_version();
-
-	public static final int webkit_minor_version() {
-		Platform.lock.lock();
-		try {
-			return _webkit_minor_version();
-		} finally {
-			Platform.lock.unlock();
-		}
+	public static final int webkit_minor_version() throws Exception {
+		return (Integer)call("org.eclipse.swt.internal.webkit.WebKitGTK", "webkit_minor_version"); //$NON-NLS-1$ //$NON-NLS-2$
 	}
 
-	/** @method flags=dynamic */
-	public static final native int _webkit_get_minor_version();
-
-	public static final int webkit_get_minor_version() {
-		Platform.lock.lock();
-		try {
-			return _webkit_get_minor_version();
-		} finally {
-			Platform.lock.unlock();
-		}
+	public static final int webkit_get_minor_version() throws Exception {
+		return (Integer)call("org.eclipse.swt.internal.webkit.WebKitGTK", "webkit_get_minor_version"); //$NON-NLS-1$ //$NON-NLS-2$
+	}
+	
+	private static Object call(String className, String methodName) throws ClassNotFoundException, InstantiationException,
+		IllegalAccessException, NoSuchMethodException, SecurityException, IllegalArgumentException, InvocationTargetException {
+		Class<?> clazz = Class.forName(className);
+		Object o = clazz.newInstance();
+		Method method = clazz.getDeclaredMethod(methodName);
+		return method.invoke(o);
 	}
 }
