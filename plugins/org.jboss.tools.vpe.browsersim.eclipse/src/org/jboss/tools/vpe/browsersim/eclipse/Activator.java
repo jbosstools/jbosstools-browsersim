@@ -44,9 +44,9 @@ public class Activator extends AbstractUIPlugin {
 	// The plug-in ID
 	public static final String PLUGIN_ID = "org.jboss.tools.vpe.browsersim.eclipse"; //$NON-NLS-1$
 
-	private static final String BROWSERSIM_ACTION = "browsersim";
-	private static final String JAVA_FX_LABEL = "javafx";
-	private static final String WEBKIT_LABEL = "webkit";
+	private static final String BROWSERSIM_ACTION = "browsersim"; //$NON-NLS-1$
+	private static final String JAVA_FX_LABEL = "javafx"; //$NON-NLS-1$
+	private static final String WEBKIT_LABEL = "webkit"; //$NON-NLS-1$
 
 	private Map<StyledText, IConsolePageParticipant> viewers = new HashMap<StyledText, IConsolePageParticipant>();
 

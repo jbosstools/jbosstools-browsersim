@@ -65,7 +65,7 @@ public class ViewSourceCallback implements ExternalProcessCallback {
 	public void call(final String lastString, TransparentReader reader) throws IOException {
 		final String address = lastString.substring(VIEW_SOURCE_COMMAND.length());
 		
-		File tempFile = new File(PreferencesUtil.getConfigFolderPath(), "temp.html");
+		File tempFile = new File(PreferencesUtil.getConfigFolderPath(), "temp.html"); //$NON-NLS-1$
 		InputStream input = new FileInputStream(tempFile);
 		InputStreamReader reader1 = new InputStreamReader(input);
 		BufferedReader bufferedReader = new BufferedReader(reader1);
