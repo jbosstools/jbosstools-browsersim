@@ -94,6 +94,8 @@ public class ManageDevicesDialog extends Dialog {
 	protected Button buttonEdit;
 	protected Button buttonRemove;
 	
+	protected Composite settingsComposite;
+	
 	/**
 	 * Create the dialog.
 	 * @param parent
@@ -124,6 +126,7 @@ public class ManageDevicesDialog extends Dialog {
 	 */
 	public PreferencesWrapper open() {
 		createContents();
+		updateDevices();
 		shell.open();
 		shell.layout();
 		Display display = getParent().getDisplay();
@@ -142,7 +145,7 @@ public class ManageDevicesDialog extends Dialog {
 	/**
 	 * Create contents of the dialog.
 	 */
-	private void createContents() {
+	protected void createContents() {
 		shell = new Shell(getParent(), getStyle());
 		shell.setSize(790, 555);
 		shell.setText(getText());
@@ -334,7 +337,7 @@ public class ManageDevicesDialog extends Dialog {
 		TabItem settingsTab = new TabItem(tabFolder, SWT.NONE);
 		settingsTab.setText(Messages.ManageDevicesDialog_TABS_SETTINGS);
 		
-		Composite settingsComposite = new Composite(tabFolder, SWT.NONE);
+		settingsComposite = new Composite(tabFolder, SWT.NONE);
 		settingsComposite.setLayout(new GridLayout());
 		
 		final Group liveReloadGroup = new Group(settingsComposite, SWT.NONE);
@@ -467,21 +470,7 @@ public class ManageDevicesDialog extends Dialog {
 		buttonLoadDefaults.setText(Messages.ManageDevicesDialog_LOAD_DEFAULTS);
 		buttonLoadDefaults.addSelectionListener(new SelectionAdapter() {
 			public void widgetSelected(SelectionEvent e) {
-				CommonPreferences cp = CommonPreferencesStorage.INSTANCE.loadDefault();
-				SpecificPreferences sp = getSpecificPreferencesStorage().loadDefault();
-				devices = cp.getDevices();
-				checkedDeviceId = sp.getSelectedDeviceId();
-				selectedDeviceId = sp.getSelectedDeviceId();
-				useSkins = sp.getUseSkins();
-				enableLiveReload = sp.isEnableLiveReload();
-				liveReloadPortText.setText(Integer.toString(sp.getLiveReloadPort()));
-				enableTouchEvents = sp.isEnableTouchEvents();
-				truncateWindow = cp.getTruncateWindow();
-				isJavaFx = sp.isJavaFx();
-				screenshotsPath.setText(cp.getScreenshotsFolder());
-				weinreScriptUrlText.setText(cp.getWeinreScriptUrl());
-				weinreClientUrlText.setText(cp.getWeinreClientUrl());
-				updateDevices();
+				loadDefaultPreferences();
 			}
 		});
 		
@@ -492,17 +481,7 @@ public class ManageDevicesDialog extends Dialog {
 		shell.setDefaultButton(buttonOk);
 		buttonOk.addSelectionListener(new SelectionAdapter() {
 			public void widgetSelected(SelectionEvent e) {
-				if (isJavaFx != oldSpecificPreferences.isJavaFx()) {
-					int result = showEngineSwitchConfirmationDialog();
-					if (result == SWT.OK) {
-						restart();
-					}
-				} else {
-					newCommonPreferences = new CommonPreferences(devices, truncateWindow, screenshotsPath.getText(),
-							weinreScriptUrlText.getText(), weinreClientUrlText.getText());
-					newSpecificPreferences = create(checkedDeviceId, useSkins, enableLiveReload, getLiveReloadPort(), touchEventsCheckBox.getSelection(), isJavaFx);
-					shell.close();
-				}
+				performOK();
 			}
 		});
 		
@@ -511,18 +490,13 @@ public class ManageDevicesDialog extends Dialog {
 		buttonCancel.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, false, false));
 		buttonCancel.addSelectionListener(new SelectionAdapter() {
 			public void widgetSelected(SelectionEvent e) {
-				newCommonPreferences = null;
-				newSpecificPreferences = null;
-				shell.close();
+				performCancel();
 			}
 		});
-		
-		updateDevices();
 	}
 	
 	private void restart() {
-		newCommonPreferences = new CommonPreferences(devices, truncateWindow, screenshotsPath.getText(),
-				weinreScriptUrlText.getText(), weinreClientUrlText.getText());
+		newCommonPreferences = new CommonPreferences(devices, truncateWindow, screenshotsPath.getText(), weinreScriptUrlText.getText(), weinreClientUrlText.getText());
 		newSpecificPreferences = create(selectedDeviceId, useSkins, enableLiveReload, getLiveReloadPort(), touchEventsCheckBox.getSelection(), isJavaFx);
 		getSpecificPreferencesStorage().save(newSpecificPreferences);
 		CommonPreferencesStorage.INSTANCE.save(newCommonPreferences);
@@ -627,6 +601,43 @@ public class ManageDevicesDialog extends Dialog {
 		swtBrowserRadio.setSelection(!isJavaFx);
 	}
 	
+	private void performOK() {
+		if (isJavaFx != oldSpecificPreferences.isJavaFx()) {
+			int result = showEngineSwitchConfirmationDialog();
+			if (result == SWT.OK) {
+				restart();
+			}
+		} else {
+			newCommonPreferences = new CommonPreferences(devices, truncateWindow, screenshotsPath.getText(), weinreScriptUrlText.getText(), weinreClientUrlText.getText());
+			newSpecificPreferences = create(checkedDeviceId, useSkins, enableLiveReload, getLiveReloadPort(), touchEventsCheckBox.getSelection(), isJavaFx);
+			shell.close();
+		}
+	}
+	
+	private void performCancel() {
+		newCommonPreferences = null;
+		newSpecificPreferences = null;
+		shell.close();
+	}
+	
+	protected void loadDefaultPreferences() {
+		CommonPreferences cp = CommonPreferencesStorage.INSTANCE.loadDefault();
+		SpecificPreferences sp = getSpecificPreferencesStorage().loadDefault();
+		devices = cp.getDevices();
+		checkedDeviceId = sp.getSelectedDeviceId();
+		selectedDeviceId = sp.getSelectedDeviceId();
+		useSkins = sp.getUseSkins();
+		enableLiveReload = sp.isEnableLiveReload();
+		liveReloadPortText.setText(Integer.toString(sp.getLiveReloadPort()));
+		enableTouchEvents = sp.isEnableTouchEvents();
+		truncateWindow = cp.getTruncateWindow();
+		isJavaFx = sp.isJavaFx();
+		screenshotsPath.setText(cp.getScreenshotsFolder());
+		weinreScriptUrlText.setText(cp.getWeinreScriptUrl());
+		weinreClientUrlText.setText(cp.getWeinreClientUrl());
+		updateDevices();
+	}
+		
 	private void enableLiveReloadPort(boolean enableLiveReload) {
 		liveReloadPortLabel.setEnabled(enableLiveReload);
 		liveReloadPortText.setEnabled(enableLiveReload);
