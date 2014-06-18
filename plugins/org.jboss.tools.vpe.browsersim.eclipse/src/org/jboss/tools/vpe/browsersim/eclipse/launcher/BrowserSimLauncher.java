@@ -60,10 +60,9 @@ public class BrowserSimLauncher {
 			String jvmPath = jvm.getInstallLocation().getAbsolutePath();
 			String jrePath = jvm.getInstallLocation().getAbsolutePath() + File.separator + "jre"; //$NON-NLS-1$
 			
-			IPreferenceStore store = Activator.getDefault().getPreferenceStore();
 			List<String> bundles = getBundles();
 			
-			if (IPreferenceStore.FALSE.equals(store.getString(BrowserSimPreferencesPage.BROWSERSIM_GTK_2))
+			if (!ExternalProcessLauncher.isGTK2()
 					|| (!BrowserSimUtil.isJavaFxAvailable(jvmPath) && !BrowserSimUtil.isJavaFxAvailable(jrePath))) {
 				bundles.add("org.jboss.tools.vpe.browsersim.javafx.mock"); //$NON-NLS-1$
 			}

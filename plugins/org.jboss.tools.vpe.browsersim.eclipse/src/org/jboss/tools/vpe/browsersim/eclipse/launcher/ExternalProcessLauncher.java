@@ -111,7 +111,7 @@ public class ExternalProcessLauncher {
 	}
 
 
-	private static boolean isGTK2() {
+	public static boolean isGTK2() {
 		IPreferenceStore store = Activator.getDefault().getPreferenceStore();
 		if (IPreferenceStore.TRUE.equals(store.getString(BrowserSimPreferencesPage.BROWSERSIM_GTK_2))){
 			return true;
