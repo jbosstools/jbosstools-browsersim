@@ -147,7 +147,7 @@ public class ManageDevicesDialog extends Dialog {
 	 */
 	protected void createContents() {
 		shell = new Shell(getParent(), getStyle());
-		shell.setSize(790, 555);
+		shell.setSize(800, 555);
 		shell.setText(getText());
 		shell.setLayout(new GridLayout(1, false));
 		
