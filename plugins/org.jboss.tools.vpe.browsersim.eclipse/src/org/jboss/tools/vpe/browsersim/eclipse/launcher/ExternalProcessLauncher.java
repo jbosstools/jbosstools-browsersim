@@ -23,7 +23,6 @@ import org.eclipse.core.runtime.Path;
 import org.eclipse.core.runtime.Platform;
 import org.eclipse.debug.core.DebugPlugin;
 import org.eclipse.debug.core.ILaunch;
-import org.eclipse.debug.core.ILaunchConfiguration;
 import org.eclipse.debug.core.ILaunchConfigurationType;
 import org.eclipse.debug.core.ILaunchConfigurationWorkingCopy;
 import org.eclipse.debug.core.ILaunchManager;
@@ -223,12 +222,9 @@ public class ExternalProcessLauncher {
 	private static ILaunch launch(String programmName, String classPath, String className, List<String> parameters, String jvmPath, List<String> commandElements) throws CoreException {
 		ILaunchManager manager = DebugPlugin.getDefault().getLaunchManager();
 		ILaunchConfigurationType type = manager.getLaunchConfigurationType(IJavaLaunchConfigurationConstants.ID_JAVA_APPLICATION);
-		ILaunchConfigurationWorkingCopy workingCopy = type.newInstance(null, programmName);
-		
-		setWorkingCopyAttributes(workingCopy, classPath, className, parameters, jvmPath, commandElements);
-		ILaunchConfiguration config = workingCopy.doSave();
-		
-		return config.launch(ILaunchManager.RUN_MODE, null);
+		ILaunchConfigurationWorkingCopy workingCopy = type.newInstance(null, programmName);		
+		setWorkingCopyAttributes(workingCopy, classPath, className, parameters, jvmPath, commandElements);				
+		return workingCopy.launch(ILaunchManager.RUN_MODE, null);
 	}
 
 
