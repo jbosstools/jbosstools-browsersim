@@ -371,45 +371,26 @@ public class BrowserSim {
 			}
 		});
 		
-		overrideJsConsoleLog(browser); // JBIDE-15932		
+		overrideJsConsole(browser); // JBIDE-15932		
 	}
 	
 	// JBIDE-15932 need to display console logs especially during startup
-	private void overrideJsConsoleLog(final IBrowser browser) {	
+	private void overrideJsConsole(final IBrowser browser) {	
 		browser.addLocationListener(new LocationAdapter() {  
 			@Override
-			@SuppressWarnings("nls")
 			public void changed(LocationEvent e) {
-				createLogFunctions(browser); 
-				browser.execute("(function() {"
-										+ "if (window.console) {"
-										//  Adding BrowserFunction to the process of logging
-										+ 	"var originalConsole = window.console;"
-										+ 	"console = {"
-										+		"log: function(message) {"
-										+			"originalConsole.log(message);"
-										+			ConsoleLogConstants.BROSERSIM_CONSOLE_LOG + "(message);"
-										+		"},"
-										+		"info: function(message) {"
-										+			"originalConsole.info(message);"
-										+			ConsoleLogConstants.BROSERSIM_CONSOLE_INFO + "(message);"
-										+		"}," 
-										+		"warn: function(message) {"
-										+			"originalConsole.warn(message);"
-										+			ConsoleLogConstants.BROSERSIM_CONSOLE_WARN + "(message);"
-										+		"},"  
-										+		"error: function(message) {"
-										+			"originalConsole.error(message);"
-										+			ConsoleLogConstants.BROSERSIM_CONSOLE_ERROR + "(message);"
-										+		"}"  
-										+ 	"};"
-
-										// Overriding window.onerror 
-										+	"window.onerror = function(msg, url, lineNumber) {"
-										+		"console.error(msg + ' on line ' + lineNumber + ' for ' + url);" 
-										+	"}"
-										+ "}"
-								+ "})();");
+				if (browser instanceof JavaFXBrowser && BrowserSimUtil.isJavaFx8Available()) {
+					 Platform.runLater(new Runnable() {
+						@Override
+						public void run() {
+							createLogFunctions(browser); 
+							overrideJsLogFunctions(browser);
+						}
+					});
+				} else {
+					createLogFunctions(browser); 
+					overrideJsLogFunctions(browser);
+				}
 			}
 		});
 	}
@@ -419,6 +400,38 @@ public class BrowserSim {
 		browser.registerBrowserFunction(ConsoleLogConstants.BROSERSIM_CONSOLE_INFO, new JsLogFunction(browser,  MessageType.INFO));  
 		browser.registerBrowserFunction(ConsoleLogConstants.BROSERSIM_CONSOLE_WARN, new JsLogFunction(browser,  MessageType.WARN));  
 		browser.registerBrowserFunction(ConsoleLogConstants.BROSERSIM_CONSOLE_ERROR, new JsLogFunction(browser,  MessageType.ERROR));  
+	}
+	
+	private void overrideJsLogFunctions(IBrowser browser) {
+		browser.execute("(function() {" //$NON-NLS-1$
+				+ "if (window.console) {" //$NON-NLS-1$
+				//  Adding BrowserFunction to the process of logging
+				+ 	"var originalConsole = window.console;" //$NON-NLS-1$
+				+ 	"console = {" //$NON-NLS-1$
+				+		"log: function(message) {" //$NON-NLS-1$
+				+			"originalConsole.log(message);" //$NON-NLS-1$
+				+			ConsoleLogConstants.BROSERSIM_CONSOLE_LOG + "(message);" //$NON-NLS-1$
+				+		"}," //$NON-NLS-1$
+				+		"info: function(message) {" //$NON-NLS-1$
+				+			"originalConsole.info(message);" //$NON-NLS-1$
+				+			ConsoleLogConstants.BROSERSIM_CONSOLE_INFO + "(message);" //$NON-NLS-1$
+				+		"},"  //$NON-NLS-1$
+				+		"warn: function(message) {" //$NON-NLS-1$
+				+			"originalConsole.warn(message);" //$NON-NLS-1$
+				+			ConsoleLogConstants.BROSERSIM_CONSOLE_WARN + "(message);" //$NON-NLS-1$
+				+		"},"   //$NON-NLS-1$
+				+		"error: function(message) {" //$NON-NLS-1$
+				+			"originalConsole.error(message);" //$NON-NLS-1$
+				+			ConsoleLogConstants.BROSERSIM_CONSOLE_ERROR + "(message);" //$NON-NLS-1$
+				+		"}"   //$NON-NLS-1$
+				+ 	"};" //$NON-NLS-1$
+
+				// Overriding window.onerror 
+				+	"window.onerror = function(msg, url, lineNumber) {" //$NON-NLS-1$
+				+		"console.error(msg + ' on line ' + lineNumber + ' for ' + url);"  //$NON-NLS-1$
+				+	"}" //$NON-NLS-1$
+				+ "}" //$NON-NLS-1$
+		+ "})();");	 //$NON-NLS-1$
 	}
 
 	private void initObservers() {
