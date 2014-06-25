@@ -7,4 +7,5 @@
 	</location>
 	<orientationAngle>0</orientationAngle>
 	<useSkins>true</useSkins>
+	<javafx>true</javafx>
 </browserSim>
