@@ -7,4 +7,8 @@
 	</location>
 	<orientationAngle>0</orientationAngle>
 	<useSkins>true</useSkins>
+	<enableLiveReload>false</enableLiveReload>
+	<liveReloadPort>35729</liveReloadPort>
+	<enableTouchEvents>false</enableTouchEvents>
+	<javafx>true</javafx>
 </browserSim>

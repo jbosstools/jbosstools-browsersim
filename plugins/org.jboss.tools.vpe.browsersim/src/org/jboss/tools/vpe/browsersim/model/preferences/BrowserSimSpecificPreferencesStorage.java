@@ -52,7 +52,7 @@ public class BrowserSimSpecificPreferencesStorage extends SpecificPreferencesSto
 		boolean enableLiveReload = false;
 		int liveReloadPort = DEFAULT_LIVE_RELOAD_PORT;
 		boolean enableTouchEvents = false;
-		boolean isJavaFx = false;
+		boolean isJavaFx = true;
 
 		try {
 			DocumentBuilderFactory dbFactory = DocumentBuilderFactory.newInstance();
