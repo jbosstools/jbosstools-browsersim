@@ -57,7 +57,7 @@ public class FileMenuCreator {
 	/** @see org.jboss.tools.vpe.browsersim.eclipse.callbacks.ViewSourceCallback */
 	private static final String VIEW_SOURCE_COMMAND = "org.jboss.tools.vpe.browsersim.command.viewSource:"; //$NON-NLS-1$
 
-	public void addItems(final Menu menu, final BrowserSimSkin skin, final CommonPreferences commonPreferences, final SpecificPreferences specificPreferences) {
+	public void addItemsToMenuBar(final Menu menu, final BrowserSimSkin skin, final CommonPreferences commonPreferences, final SpecificPreferences specificPreferences) {
 		addOpenInDefaultBrowserItem(menu, skin);
 		addViewSourceItem(menu, skin);
 
@@ -65,6 +65,12 @@ public class FileMenuCreator {
 		if (!PlatformUtil.OS_MACOSX.equals(PlatformUtil.getOs())) {
 			addPreferencesItem(menu, commonPreferences, specificPreferences, skin.getBrowser().getUrl());
 		}
+	}
+	
+	public void addItemsToContextMenu(final Menu menu, final BrowserSimSkin skin, final CommonPreferences commonPreferences, final SpecificPreferences specificPreferences) {
+		addOpenInDefaultBrowserItem(menu, skin);
+		addViewSourceItem(menu, skin);
+		addPreferencesItem(menu, commonPreferences, specificPreferences, skin.getBrowser().getUrl());
 	}
 	
 	private void addOpenInDefaultBrowserItem(final Menu menu, final BrowserSimSkin skin) {

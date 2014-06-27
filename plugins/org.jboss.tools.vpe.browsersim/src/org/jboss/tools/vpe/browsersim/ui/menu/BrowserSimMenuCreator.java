@@ -98,10 +98,13 @@ public class BrowserSimMenuCreator {
 				addToolsItems(contextMenu, skin, commonPreferences, specificPreferences, homeUrl);
 
 				new MenuItem(contextMenu, SWT.BAR);
-				addFileItems(contextMenu, skin, commonPreferences, specificPreferences);
-
-				new MenuItem(contextMenu, SWT.BAR);
-				addAboutItem(contextMenu);
+				addFileItemsToContextMenu(contextMenu, skin, commonPreferences, specificPreferences);
+				
+				// JBIDE-16581 Need to remove 'About' from the context menu
+				if (!PlatformUtil.OS_MACOSX.equals(PlatformUtil.getOs())) {
+					new MenuItem(contextMenu, SWT.BAR);
+					addAboutItem(contextMenu);
+				}
 
 				new MenuItem(contextMenu, SWT.BAR);
 				addExitItem(contextMenu, skin.getShell());
@@ -111,7 +114,7 @@ public class BrowserSimMenuCreator {
 
 	private void createMenusForMenuBar(Menu appMenuBar) {
 		Menu file = createDropDownMenu(appMenuBar, Messages.BrowserSim_FILE);
-		addFileItems(file, skin, commonPreferences, specificPreferences);
+		addFileItemsToMenuBar(file, skin, commonPreferences, specificPreferences);
 
 		// If Platform is Mac OS X, application will have no duplicated menu items (Exit/Quit BrowserSim)
 		if (!PlatformUtil.OS_MACOSX.equals(PlatformUtil.getOs())) {
@@ -165,8 +168,12 @@ public class BrowserSimMenuCreator {
 		ToolsMenuCreator.addTouchEventsItem(contextMenu, specificPreferences);
 	}
 
-	protected void addFileItems(final Menu menu, final BrowserSimSkin skin, final CommonPreferences commonPreferences, final SpecificPreferences specificPreferences) {
-		new FileMenuCreator().addItems(menu, skin, commonPreferences, specificPreferences);
+	protected void addFileItemsToContextMenu(final Menu menu, final BrowserSimSkin skin, final CommonPreferences commonPreferences, final SpecificPreferences specificPreferences) {
+		new FileMenuCreator().addItemsToContextMenu(menu, skin, commonPreferences, specificPreferences);
+	}
+	
+	protected void addFileItemsToMenuBar(final Menu menu, final BrowserSimSkin skin, final CommonPreferences commonPreferences, final SpecificPreferences specificPreferences) {
+		new FileMenuCreator().addItemsToMenuBar(menu, skin, commonPreferences, specificPreferences);
 	}
 	
 	private Menu createDropDownMenu(Menu menuBar, String name) {
