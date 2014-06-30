@@ -65,7 +65,7 @@ public class BrowserSimRunner {
 		Display display = null;
 		try {
 			if (!isJavaFxAvailable && !isWebKitAvailable) {
-				String errorMessage = "";
+				String errorMessage = ""; //$NON-NLS-1$
 				String os = PlatformUtil.getOs();
 				if (PlatformUtil.OS_LINUX.equals(os)) {
 					errorMessage = MessageFormat.format(

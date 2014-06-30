@@ -12,6 +12,9 @@ package org.jboss.tools.vpe.browsersim.eclipse.preferences;
 
 import java.io.File;
 import java.io.IOException;
+import java.net.URI;
+import java.net.URISyntaxException;
+import java.net.URL;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
@@ -19,6 +22,7 @@ import java.util.Map;
 import java.util.Map.Entry;
 
 import org.eclipse.core.runtime.CoreException;
+import org.eclipse.core.runtime.FileLocator;
 import org.eclipse.core.runtime.Platform;
 import org.eclipse.debug.core.DebugPlugin;
 import org.eclipse.debug.core.ILaunchManager;
@@ -47,6 +51,7 @@ public class PreferencesUtil {
 	 * @since 3.3 OSX environment variable specifying JRE to use
 	 */
 	protected static final String JAVA_JVM_VERSION = "JAVA_JVM_VERSION"; //$NON-NLS-1$
+	private static String configurationPath = null;
 	
 	/**
 	 * @return JVMs which can run BrowserSim, but no more than {@code limit}.
@@ -182,6 +187,18 @@ public class PreferencesUtil {
 		    LaunchingPlugin.log(NLS.bind(Messages.BrowserSim_LIBRARY_DETECTION_FAILURE, new String[]{javaHome.getAbsolutePath()}));
 		}
 		return arch;
+	}
+	
+	public static String getAbsolutePathToConfigurationFolder() throws URISyntaxException, IOException {
+		if (configurationPath == null) {
+			URL url = FileLocator.toFileURL(Platform.getConfigurationLocation().getURL());
+			URI resolvedURI = new URI(url.getProtocol(), url.getPath(), null);
+			File file = new File(resolvedURI);
+			if (file != null && file.exists()) {
+				configurationPath = file.getAbsolutePath();
+			}
+		}
+		return configurationPath;
 	}
 
 	private static String getArchitecture(IProcess process) {

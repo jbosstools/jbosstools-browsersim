@@ -14,9 +14,9 @@ import org.jboss.tools.vpe.browsersim.BrowserSimArgs;
 import org.w3c.dom.Node;
 
 /**
- * 
  * @author Konstantin Marmalyukov (kmarmaliykov)
- *
+ * @author Ilya Buziuk (ibuziuk)
+ * 
  */
 
 public class PreferencesUtil {
@@ -26,8 +26,17 @@ public class PreferencesUtil {
 	private static final String STANDALONE_PREFERENCES_FOLDER = ".browsersim"; //$NON-NLS-1$
 	private static final String USER_PREFERENCES_FOLDER = "org.jboss.tools.vpe.browsersim"; //$NON-NLS-1$
 	
+	private PreferencesUtil() {
+	}
+	
 	public static final String getConfigFolderPath() {
-		return BrowserSimArgs.standalone ? USER_HOME + SEPARATOR + STANDALONE_PREFERENCES_FOLDER : USER_PREFERENCES_FOLDER;
+		String path = null;
+		if (BrowserSimArgs.standalone) {
+			path = USER_HOME + SEPARATOR + STANDALONE_PREFERENCES_FOLDER;
+		} else {
+			path = BrowserSimArgs.cofigurationFolder + SEPARATOR + USER_PREFERENCES_FOLDER;
+		}
+		return path;
 	}
 	
 	public static boolean isNullOrEmpty(String s) {
@@ -37,4 +46,5 @@ public class PreferencesUtil {
 	public static boolean isNullOrEmpty(Node node) {
 		return node == null || node.getTextContent().trim().isEmpty();
 	}
+
 }

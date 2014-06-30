@@ -87,9 +87,8 @@ public class CommonPreferencesStorage implements PreferencesStorage{
 	}
 	
 	@Override
-	public Object load() {
-		String folder = PreferencesUtil.getConfigFolderPath();
-		File customConfigFile = new File(folder + PreferencesUtil.SEPARATOR + COMMON_PREFERENCES_FILE);
+	public Object load(String configFolder) {
+		File customConfigFile = new File(configFolder + PreferencesUtil.SEPARATOR + COMMON_PREFERENCES_FILE);
 		CommonPreferences commonPreferences = null;
 		if (customConfigFile.exists()) {
 			try {

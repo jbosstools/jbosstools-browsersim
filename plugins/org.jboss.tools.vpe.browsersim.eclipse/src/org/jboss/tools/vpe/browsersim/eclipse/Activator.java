@@ -12,6 +12,7 @@ package org.jboss.tools.vpe.browsersim.eclipse;
 
 import java.io.File;
 import java.io.IOException;
+import java.net.URISyntaxException;
 import java.net.URL;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -28,6 +29,7 @@ import org.eclipse.ui.console.IConsolePageParticipant;
 import org.eclipse.ui.plugin.AbstractUIPlugin;
 import org.jboss.tools.usage.event.UsageEventType;
 import org.jboss.tools.usage.event.UsageReporter;
+import org.jboss.tools.vpe.browsersim.eclipse.preferences.PreferencesUtil;
 import org.jboss.tools.vpe.browsersim.model.preferences.BrowserSimSpecificPreferencesStorage;
 import org.jboss.tools.vpe.browsersim.model.preferences.SpecificPreferences;
 import org.jboss.tools.vpe.browsersim.model.preferences.SpecificPreferencesStorage;
@@ -47,6 +49,8 @@ public class Activator extends AbstractUIPlugin {
 	private static final String BROWSERSIM_ACTION = "browsersim"; //$NON-NLS-1$
 	private static final String JAVA_FX_LABEL = "javafx"; //$NON-NLS-1$
 	private static final String WEBKIT_LABEL = "webkit"; //$NON-NLS-1$
+	private static final String SEPARATOR = System.getProperty("file.separator"); //$NON-NLS-1$
+	private static final String USER_PREFERENCES_FOLDER = "org.jboss.tools.vpe.browsersim"; //$NON-NLS-1$
 
 	private Map<StyledText, IConsolePageParticipant> viewers = new HashMap<StyledText, IConsolePageParticipant>();
 
@@ -73,12 +77,19 @@ public class Activator extends AbstractUIPlugin {
 	}
 
 	public void countLaunchEvent() {
-		String label = getEngineName(BrowserSimSpecificPreferencesStorage.INSTANCE);
-		UsageReporter.getInstance().countEvent(launchEventType.event(label));
+		try {
+			String label = getEngineName(BrowserSimSpecificPreferencesStorage.INSTANCE);
+			UsageReporter.getInstance().countEvent(launchEventType.event(label));
+		} catch (URISyntaxException e) {
+			Activator.logError(e.getMessage(), e);
+		} catch (IOException e) {
+			Activator.logError(e.getMessage(), e);
+		}
 	}
 
-	public static String getEngineName(SpecificPreferencesStorage storage) {
-		SpecificPreferences sp = (SpecificPreferences) storage.load();
+	public static String getEngineName(SpecificPreferencesStorage storage) throws URISyntaxException, IOException {
+		String configFolder = PreferencesUtil.getAbsolutePathToConfigurationFolder() + SEPARATOR + USER_PREFERENCES_FOLDER;
+		SpecificPreferences sp = (SpecificPreferences) storage.load(configFolder);
 		if (sp == null) {
 			sp = (SpecificPreferences) storage.loadDefault();
 		}

@@ -12,6 +12,7 @@ package org.jboss.tools.vpe.browsersim.eclipse.launcher;
 
 import java.io.File;
 import java.io.IOException;
+import java.net.URISyntaxException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -54,9 +55,11 @@ import org.osgi.framework.Bundle;
  */
 public class ExternalProcessLauncher {
 	private static String PATH_SEPARATOR = System.getProperty("path.separator"); //$NON-NLS-1$
+	private static final String CONFIGURATION = "-configuration"; //$NON-NLS-1$
 	private static final String SWT_GTK3 = "SWT_GTK3"; //$NON-NLS-1$
 	private static final String OFF = "0"; //$NON-NLS-1$
 	private static final String ON = "1"; //$NON-NLS-1$
+	
 	
 	public static void launchAsExternalProcess(List<String> bundles, List<String> resourcesBundles,
 			final List<ExternalProcessCallback> callbacks, String className, List<String> parameters, final String programName, IVMInstall jvm) {
@@ -69,7 +72,9 @@ public class ExternalProcessLauncher {
 				if (Platform.OS_MACOSX.equals(Platform.getOS())) {
 					commandElements.add("-XstartOnFirstThread"); //$NON-NLS-1$
 				}
-				
+
+				addConfigurationFolderParameter(parameters);
+
 				ILaunch launch = launch(programName, classPath, className, parameters, jreContainerPath, commandElements);
 				ProcessCallBacks(launch, callbacks);
 			} else {
@@ -79,9 +84,17 @@ public class ExternalProcessLauncher {
 			Activator.logError(e.getMessage(), e);
 		} catch (CoreException e) {
 			Activator.logError(e.getMessage(), e);
+		} catch (URISyntaxException e) {
+			Activator.logError(e.getMessage(), e);
 		}
 	}
 	
+	// JBIDE-17718 Need to save preferences in the folder with configuration info 
+	private static List<String> addConfigurationFolderParameter(List<String> parameters) throws URISyntaxException, IOException {
+		parameters.add(CONFIGURATION);
+		parameters.add(PreferencesUtil.getAbsolutePathToConfigurationFolder());
+		return parameters;
+	}
 	
 	private static void ProcessCallBacks(ILaunch launch, final List<ExternalProcessCallback> callbacks) {
 		IProcess[] processes = launch.getProcesses();
@@ -218,6 +231,8 @@ public class ExternalProcessLauncher {
 		}
 		return result.toString();
 	}
+	
+	
 	
 	private static ILaunch launch(String programmName, String classPath, String className, List<String> parameters, String jvmPath, List<String> commandElements) throws CoreException {
 		ILaunchManager manager = DebugPlugin.getDefault().getLaunchManager();

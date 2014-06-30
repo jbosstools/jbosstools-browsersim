@@ -49,9 +49,8 @@ public abstract class SpecificPreferencesStorage implements PreferencesStorage{
 	}
 
 	@Override
-	public Object load() {
-		String folder = PreferencesUtil.getConfigFolderPath();
-		File customConfigFile = new File(folder + PreferencesUtil.SEPARATOR + getFileName());
+	public Object load(String configFolder) {
+		File customConfigFile = new File(configFolder + PreferencesUtil.SEPARATOR + getFileName());
 		SpecificPreferences specificPreferences = null;
 		if (customConfigFile.exists()) {
 			try {

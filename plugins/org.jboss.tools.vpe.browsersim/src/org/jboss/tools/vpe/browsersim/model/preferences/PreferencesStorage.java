@@ -21,7 +21,7 @@ public interface PreferencesStorage {
 	
 	public void save(Object o);
 	
-	public Object load();
+	public Object load(String configFolder);
 	
 	public Object loadDefault();
 }

@@ -21,9 +21,10 @@ import java.util.List;
  */
 public class BrowserSimArgs {
 	public static final String NOT_STANDALONE = "-not-standalone"; //$NON-NLS-1$
-	private String path;
+	public static String cofigurationFolder;
 	public static boolean standalone;
 	public static int debuggerPort;
+	private String path;
 	
 	private BrowserSimArgs(String path, boolean isStandalone) {
 		this.path = path;
@@ -37,12 +38,16 @@ public class BrowserSimArgs {
 			params.remove(NOT_STANDALONE);
 		}
 		
-		String path;
+		int configurationParameterIndex = params.indexOf("-configuration"); //$NON-NLS-1$
+		if (configurationParameterIndex >= 0) {
+			params.remove(configurationParameterIndex);
+			cofigurationFolder = params.remove(configurationParameterIndex);
+		} 
+		
+		String path = null;
 		if (params.size() > 0) {
 			path = params.get(params.size() - 1);
-		} else {
-			path = null;
-		}
+		} 
 		
 		try {
 			ServerSocket socket = new ServerSocket(0);
@@ -52,11 +57,11 @@ public class BrowserSimArgs {
 			BrowserSimLogger.logError(e.getMessage(), e);
 		}
 		
-		
 		return new BrowserSimArgs(path, !notStandalone);
 	}
 	
 	public String getPath() {
 		return path;
 	}
+
 }

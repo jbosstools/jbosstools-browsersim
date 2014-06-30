@@ -73,6 +73,7 @@ import org.jboss.tools.vpe.browsersim.ui.skin.BrowserSimSkin;
 import org.jboss.tools.vpe.browsersim.ui.skin.ResizableSkinSizeAdvisor;
 import org.jboss.tools.vpe.browsersim.ui.skin.ResizableSkinSizeAdvisorImpl;
 import org.jboss.tools.vpe.browsersim.util.BrowserSimUtil;
+import org.jboss.tools.vpe.browsersim.util.PreferencesUtil;
 
 /**
  * @author Yahor Radtsevich (yradtsevich)
@@ -100,7 +101,7 @@ public class BrowserSim {
 	static {
 		instances = new ArrayList<BrowserSim>();
 		if (commonPreferences == null) {
-			commonPreferences = (CommonPreferences) CommonPreferencesStorage.INSTANCE.load();
+			commonPreferences = (CommonPreferences) CommonPreferencesStorage.INSTANCE.load(PreferencesUtil.getConfigFolderPath());
 			if (commonPreferences == null) {
 				commonPreferences = (CommonPreferences) CommonPreferencesStorage.INSTANCE.loadDefault();
 			}
@@ -113,7 +114,7 @@ public class BrowserSim {
 	}
 	
 	public void open(boolean isJavaFxAvailable, boolean isWebKitAvailable) {
-		SpecificPreferences sp = (SpecificPreferences) getSpecificPreferencesStorage().load();
+		SpecificPreferences sp = (SpecificPreferences) getSpecificPreferencesStorage().load(PreferencesUtil.getConfigFolderPath());
 		if (sp == null) {
 			sp = (SpecificPreferences) getSpecificPreferencesStorage().loadDefault();
 		}
