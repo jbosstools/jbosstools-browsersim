@@ -424,6 +424,9 @@ public class BrowserSim {
 				+		"error: function(message) {" //$NON-NLS-1$
 				+			"originalConsole.error(message);" //$NON-NLS-1$
 				+			ConsoleLogConstants.BROSERSIM_CONSOLE_ERROR + "(message);" //$NON-NLS-1$
+				+		"},"   //$NON-NLS-1$
+				+		"debug: function(message) {" //$NON-NLS-1$ 
+				+			"console.log(message);" //$NON-NLS-1$ do the same as for 'console.log'
 				+		"}"   //$NON-NLS-1$
 				+ 	"};" //$NON-NLS-1$
 
