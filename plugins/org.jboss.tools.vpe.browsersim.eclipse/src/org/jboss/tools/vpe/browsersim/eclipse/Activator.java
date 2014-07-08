@@ -49,8 +49,6 @@ public class Activator extends AbstractUIPlugin {
 	private static final String BROWSERSIM_ACTION = "browsersim"; //$NON-NLS-1$
 	private static final String JAVA_FX_LABEL = "javafx"; //$NON-NLS-1$
 	private static final String WEBKIT_LABEL = "webkit"; //$NON-NLS-1$
-	private static final String SEPARATOR = System.getProperty("file.separator"); //$NON-NLS-1$
-	private static final String USER_PREFERENCES_FOLDER = "org.jboss.tools.vpe.browsersim"; //$NON-NLS-1$
 
 	private Map<StyledText, IConsolePageParticipant> viewers = new HashMap<StyledText, IConsolePageParticipant>();
 
@@ -88,7 +86,7 @@ public class Activator extends AbstractUIPlugin {
 	}
 
 	public static String getEngineName(SpecificPreferencesStorage storage) throws URISyntaxException, IOException {
-		String configFolder = PreferencesUtil.getAbsolutePathToConfigurationFolder() + SEPARATOR + USER_PREFERENCES_FOLDER;
+		String configFolder = PreferencesUtil.getBrowserSimConfigFolderPath();
 		SpecificPreferences sp = (SpecificPreferences) storage.load(configFolder);
 		if (sp == null) {
 			sp = (SpecificPreferences) storage.loadDefault();

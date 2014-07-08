@@ -92,7 +92,7 @@ public class ExternalProcessLauncher {
 	// JBIDE-17718 Need to save preferences in the folder with configuration info 
 	private static List<String> addConfigurationFolderParameter(List<String> parameters) throws URISyntaxException, IOException {
 		parameters.add(CONFIGURATION);
-		parameters.add(PreferencesUtil.getAbsolutePathToConfigurationFolder());
+		parameters.add(PreferencesUtil.getBrowserSimConfigFolderPath());
 		return parameters;
 	}
 	

@@ -50,7 +50,9 @@ public class PreferencesUtil {
 	/**
 	 * @since 3.3 OSX environment variable specifying JRE to use
 	 */
+	public static final String SEPARATOR = System.getProperty("file.separator"); //$NON-NLS-1$
 	protected static final String JAVA_JVM_VERSION = "JAVA_JVM_VERSION"; //$NON-NLS-1$
+	private static final String USER_PREFERENCES_FOLDER = "org.jboss.tools.vpe.browsersim"; //$NON-NLS-1$
 	private static String configurationPath = null;
 	
 	/**
@@ -189,7 +191,7 @@ public class PreferencesUtil {
 		return arch;
 	}
 	
-	public static String getAbsolutePathToConfigurationFolder() throws URISyntaxException, IOException {
+	private static String getAbsolutePathToConfigurationFolder() throws URISyntaxException, IOException {
 		if (configurationPath == null) {
 			URL url = FileLocator.toFileURL(Platform.getConfigurationLocation().getURL());
 			URI resolvedURI = new URI(url.getProtocol(), url.getPath(), null);
@@ -199,6 +201,14 @@ public class PreferencesUtil {
 			}
 		}
 		return configurationPath;
+	}
+	
+	/**
+	 * @return the absolute path to the BrowserSim / CordovaSim configuration folder for preference storing 
+	 * (commonPreferences.xml, specificPreferences.xml and cordovaSpecificPreferences.xml)  
+	 */
+	public static String getBrowserSimConfigFolderPath() throws URISyntaxException, IOException {
+		return getAbsolutePathToConfigurationFolder() + SEPARATOR + USER_PREFERENCES_FOLDER;
 	}
 
 	private static String getArchitecture(IProcess process) {

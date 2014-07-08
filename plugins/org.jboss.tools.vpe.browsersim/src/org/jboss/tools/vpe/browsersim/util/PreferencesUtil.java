@@ -22,9 +22,7 @@ import org.w3c.dom.Node;
 public class PreferencesUtil {
 	public static final String SEPARATOR = System.getProperty("file.separator"); //$NON-NLS-1$
 	public static final String USER_HOME = System.getProperty("user.home"); //$NON-NLS-1$
-	
 	private static final String STANDALONE_PREFERENCES_FOLDER = ".browsersim"; //$NON-NLS-1$
-	private static final String USER_PREFERENCES_FOLDER = "org.jboss.tools.vpe.browsersim"; //$NON-NLS-1$
 	
 	private PreferencesUtil() {
 	}
@@ -34,7 +32,7 @@ public class PreferencesUtil {
 		if (BrowserSimArgs.standalone) {
 			path = USER_HOME + SEPARATOR + STANDALONE_PREFERENCES_FOLDER;
 		} else {
-			path = BrowserSimArgs.cofigurationFolder + SEPARATOR + USER_PREFERENCES_FOLDER;
+			path = BrowserSimArgs.cofigurationFolder;
 		}
 		return path;
 	}

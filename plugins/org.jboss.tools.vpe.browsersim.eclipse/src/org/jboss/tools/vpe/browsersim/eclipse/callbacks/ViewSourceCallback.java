@@ -17,6 +17,8 @@ import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.net.URISyntaxException;
+
 import org.eclipse.core.resources.IStorage;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IPath;
@@ -37,7 +39,7 @@ import org.jboss.tools.vpe.browsersim.eclipse.Activator;
 import org.jboss.tools.vpe.browsersim.eclipse.Messages;
 import org.jboss.tools.vpe.browsersim.eclipse.launcher.ExternalProcessCallback;
 import org.jboss.tools.vpe.browsersim.eclipse.launcher.TransparentReader;
-import org.jboss.tools.vpe.browsersim.util.PreferencesUtil;
+import org.jboss.tools.vpe.browsersim.eclipse.preferences.PreferencesUtil;
 
 /**
  * Handler for the BrowserSim commands printed to the console in the following form:
@@ -64,15 +66,17 @@ public class ViewSourceCallback implements ExternalProcessCallback {
 	@Override
 	public void call(final String lastString, TransparentReader reader) throws IOException {
 		final String address = lastString.substring(VIEW_SOURCE_COMMAND.length());
-		
-		File tempFile = new File(PreferencesUtil.getConfigFolderPath(), "temp.html"); //$NON-NLS-1$
-		InputStream input = new FileInputStream(tempFile);
-		InputStreamReader reader1 = new InputStreamReader(input);
-		BufferedReader bufferedReader = new BufferedReader(reader1);
-
 		StringBuilder stringBuilder = new StringBuilder();
-		String read;
+		
 		try {
+			String configFolder = PreferencesUtil.getBrowserSimConfigFolderPath();
+			File tempFile = new File(configFolder, "temp.html"); //$NON-NLS-1$
+			InputStream input = new FileInputStream(tempFile);
+			InputStreamReader reader1 = new InputStreamReader(input);
+			BufferedReader bufferedReader = new BufferedReader(reader1);
+
+			String read;
+
 			try {
 				while ((read = bufferedReader.readLine()) != null) {
 					stringBuilder.append(read);
@@ -83,6 +87,8 @@ public class ViewSourceCallback implements ExternalProcessCallback {
 				tempFile.delete();
 			}
 		} catch (IOException e) {
+			BrowserSimLogger.logError(e.getMessage(), e);
+		} catch (URISyntaxException e) {
 			BrowserSimLogger.logError(e.getMessage(), e);
 		}
 
