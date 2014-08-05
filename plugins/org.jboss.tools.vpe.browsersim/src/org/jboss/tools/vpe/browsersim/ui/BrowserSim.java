@@ -12,6 +12,7 @@ package org.jboss.tools.vpe.browsersim.ui;
 
 import java.net.HttpURLConnection;
 import java.net.URL;
+import java.text.MessageFormat;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.NoSuchElementException;
@@ -559,7 +560,7 @@ public class BrowserSim {
 	private void processLiveReload(boolean isLiveReloadEnabled) {
 		if (isLiveReloadEnabled) {
 			if (specificPreferences.isJavaFx() && BrowserSimUtil.isJavaFx7Available()) {
-				showLivereloadError(Messages.ManageDevicesDialog_LIVE_RELOAD_UNAVAILABLE);
+				showLivereloadError(MessageFormat.format(Messages.ManageDevicesDialog_OPTION_UNAVAILABLE, Messages.ManageDevicesDialog_LIVE_RELOAD));
 				specificPreferences.setEnableLiveReload(false);
 			} else if (isLivereloadAvailable()) {
 				if (liveReloadLocationAdapter == null) {
