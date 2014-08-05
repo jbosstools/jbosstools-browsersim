@@ -59,10 +59,10 @@ public class ToolsMenuCreator {
 		MenuItem debug = new MenuItem(menu, SWT.CASCADE);
 		debug.setText(Messages.BrowserSim_DEBUG);
 		Menu subMenu = new Menu(debug);
-		addWeinreItem(subMenu, skin, weinreScriptUrl, weinreClientUrl, isJavaFx);
 		if (isJavaFx) {
 			addDevToolsItem(subMenu, skin);
 		} else {
+			addWeinreItem(subMenu, skin, weinreScriptUrl, weinreClientUrl, isJavaFx);
 			addFireBugLiteItem(subMenu, skin);
 		}
 		debug.setMenu(subMenu);
