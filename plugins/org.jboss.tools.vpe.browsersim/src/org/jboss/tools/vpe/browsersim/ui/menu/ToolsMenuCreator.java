@@ -30,6 +30,7 @@ import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Menu;
 import org.eclipse.swt.widgets.MenuItem;
+import org.eclipse.swt.widgets.MessageBox;
 import org.eclipse.swt.widgets.ProgressBar;
 import org.eclipse.swt.widgets.Shell;
 import org.eclipse.swt.widgets.Text;
@@ -85,17 +86,24 @@ public class ToolsMenuCreator {
 		weinre.setText(Messages.BrowserSim_WEINRE);
 		weinre.addSelectionListener(new SelectionAdapter() {
 			public void widgetSelected(SelectionEvent e) {
-				//check if weinre url injected by user only in first page
-				String clientUrl = (String) skin.getBrowser().evaluate("if(window.WeinreServerURL && window.WeinreServerId) {return window.WeinreServerURL + 'client/'} else {return null}"); //$NON-NLS-1$
-				String id = (String) skin.getBrowser().evaluate("if(window.WeinreServerURL && window.WeinreServerId) {return window.WeinreServerId} else {return null}"); //$NON-NLS-1$
-				
-				if (clientUrl == null || id == null) {
-					id = UUID.randomUUID().toString();
-					clientUrl = weinreClientUrl;
-					injectUrl(skin.getBrowser(), weinreScriptUrl, id);
+				if (isJavaFx && BrowserSimUtil.isJavaFx7Available()) {
+					MessageBox warning = new MessageBox(skin.getShell(), SWT.ICON_WARNING);
+					warning.setText(Messages.WARNING);
+					warning.setMessage(MessageFormat.format(Messages.ManageDevicesDialog_OPTION_UNAVAILABLE, Messages.ManageDevicesDialog_WEINRE));
+					warning.open();
+				} else {
+					//check if weinre url injected by user only in first page
+					String clientUrl = (String) skin.getBrowser().evaluate("if(window.WeinreServerURL && window.WeinreServerId) {return window.WeinreServerURL + 'client/'} else {return null}"); //$NON-NLS-1$
+					String id = (String) skin.getBrowser().evaluate("if(window.WeinreServerURL && window.WeinreServerId) {return window.WeinreServerId} else {return null}"); //$NON-NLS-1$
+					
+					if (clientUrl == null || id == null) {
+						id = UUID.randomUUID().toString();
+						clientUrl = weinreClientUrl;
+						injectUrl(skin.getBrowser(), weinreScriptUrl, id);
+					}
+	
+					createWeinreShell(skin, clientUrl + "#" + id, weinreScriptUrl, id, isJavaFx).open(); //$NON-NLS-1$
 				}
-
-				createWeinreShell(skin, clientUrl + "#" + id, weinreScriptUrl, id, isJavaFx).open(); //$NON-NLS-1$
 			}
 		});
 	}

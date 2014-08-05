@@ -9,6 +9,7 @@
  *     Red Hat, Inc. - initial API and implementation
  ******************************************************************************/
 package org.jboss.tools.vpe.browsersim.ui;
+import java.text.MessageFormat;
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.List;
@@ -28,6 +29,7 @@ import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.layout.RowLayout;
 import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Composite;
+import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Dialog;
 import org.eclipse.swt.widgets.DirectoryDialog;
 import org.eclipse.swt.widgets.Display;
@@ -378,7 +380,7 @@ public class ManageDevicesDialog extends Dialog {
 			}
 		});
 		
-		disableLivereloadForJavaFx7(liveReloadGroup);
+		disableOptionForJavaFx7(liveReloadGroup, MessageFormat.format(Messages.ManageDevicesDialog_OPTION_UNAVAILABLE, Messages.ManageDevicesDialog_LIVE_RELOAD));
 		
 		Group touchEventsGroup = new Group(settingsComposite, SWT.NONE);
 		touchEventsGroup.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, true, false, 1, 1));
@@ -399,16 +401,6 @@ public class ManageDevicesDialog extends Dialog {
 		swtBrowserRadio = new Button(browserTypeGroup, SWT.RADIO);
 		swtBrowserRadio.setText(Messages.ManageDevicesDialog_BROWSER_TYPE_SWT);
 
-		SelectionListener browserTypeSelectionListener = new SelectionAdapter() {
-			@Override
-			public void widgetSelected(SelectionEvent e) {
-				isJavaFx = javaFXBrowserRadio.equals((Button) e.widget);
-				disableLivereloadForJavaFx7(liveReloadGroup);
-			}
-		}; 
-		
-		javaFXBrowserRadio.addSelectionListener(browserTypeSelectionListener);
-		swtBrowserRadio.addSelectionListener(browserTypeSelectionListener);
 		
 		disableWebEngineSwitcherIfJavaFxNotAvailable(javaFXBrowserRadio, browserTypeGroup); 
 		disableWebEngineSwitcherIfWebKitNotAvailable(swtBrowserRadio, browserTypeGroup);
@@ -440,7 +432,7 @@ public class ManageDevicesDialog extends Dialog {
 			}
 		});
 		
-		Group weinreGroup = new Group(settingsComposite, SWT.NONE);
+		final Group weinreGroup = new Group(settingsComposite, SWT.NONE);
 		weinreGroup.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, true, false, 1, 1));
 		weinreGroup.setText(Messages.ManageDevicesDialog_WEINRE);
 		weinreGroup.setLayout(new GridLayout(2, false));
@@ -456,6 +448,20 @@ public class ManageDevicesDialog extends Dialog {
 		weinreClientUrlText = new Text(weinreGroup, SWT.BORDER);
 		weinreClientUrlText.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, true, true));
 		weinreClientUrlText.setText(oldCommonPreferences.getWeinreClientUrl());
+		
+		disableOptionForJavaFx7(weinreGroup, MessageFormat.format(Messages.ManageDevicesDialog_OPTION_UNAVAILABLE, Messages.ManageDevicesDialog_WEINRE));
+		
+		SelectionListener browserTypeSelectionListener = new SelectionAdapter() {
+			@Override
+			public void widgetSelected(SelectionEvent e) {
+				isJavaFx = javaFXBrowserRadio.equals((Button) e.widget);
+				disableOptionForJavaFx7(liveReloadGroup, MessageFormat.format(Messages.ManageDevicesDialog_OPTION_UNAVAILABLE, Messages.ManageDevicesDialog_LIVE_RELOAD));
+				disableOptionForJavaFx7(weinreGroup, MessageFormat.format(Messages.ManageDevicesDialog_OPTION_UNAVAILABLE, Messages.ManageDevicesDialog_WEINRE));
+			}
+		}; 
+		
+		javaFXBrowserRadio.addSelectionListener(browserTypeSelectionListener);
+		swtBrowserRadio.addSelectionListener(browserTypeSelectionListener);
 		
 		settingsTab.setControl(settingsComposite);
 		tabFolder.pack();
@@ -545,18 +551,21 @@ public class ManageDevicesDialog extends Dialog {
 		label.setForeground(Display.getDefault().getSystemColor(SWT.COLOR_RED));
 	}
 	
-	private void disableLivereloadForJavaFx7(Composite parent) {
+	private void disableOptionForJavaFx7(Composite parent, String errorMessage) {
 		if (isJavaFx && BrowserSimUtil.isJavaFx7Available()) {
-			liveReloadCheckBox.setSelection(false);
-			liveReloadCheckBox.setEnabled(false);
+			for(Control c : parent.getChildren()) {
+				c.setEnabled(false);
+			}
 			GridData gd = new GridData(SWT.FILL, SWT.CENTER, true, false);
 			gd.horizontalSpan = 2;
 			Label label = new Label(parent, SWT.NONE);
 			label.setLayoutData(gd);
-			label.setText(Messages.ManageDevicesDialog_LIVE_RELOAD_UNAVAILABLE);
+			label.setText(errorMessage);
 			label.setForeground(Display.getDefault().getSystemColor(SWT.COLOR_RED));
 		} else {
-			liveReloadCheckBox.setEnabled(true);
+			for(Control c : parent.getChildren()) {
+				c.setEnabled(true);
+			}
 		}
 	}
 	
