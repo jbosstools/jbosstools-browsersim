@@ -332,7 +332,7 @@ public class JavaFXBrowser extends FXCanvas implements IBrowser {
 			         "+ '>';" +
 			 "return doctypeText";
 		String doctypeText = (String) evaluate(doctypeScript);
-		String innerHtml = (String) evaluate("return window.document.documentElement.innerHTML");
+		String innerHtml = (String) evaluate("return window.document.documentElement.outerHTML");
 		return doctypeText + '\n' + innerHtml;
 	}
 
