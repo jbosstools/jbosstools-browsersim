@@ -318,14 +318,15 @@ public class NativeSkin implements BrowserSimSkin {
 
 	@Override
 	public void progressChanged(int percents) {
-		if (percents > 0) {
-			progressBar.setEnabled(true);
-			progressBar.setSelection(percents);
-		} else {
-			progressBar.setSelection(0);
-			progressBar.setEnabled(false);
+		if (!progressBar.isDisposed()) {
+			if (percents > 0) {
+				progressBar.setEnabled(true);
+				progressBar.setSelection(percents);
+			} else {
+				progressBar.setSelection(0);
+				progressBar.setEnabled(false);
+			}
 		}
-		
 	}
 
 	@Override

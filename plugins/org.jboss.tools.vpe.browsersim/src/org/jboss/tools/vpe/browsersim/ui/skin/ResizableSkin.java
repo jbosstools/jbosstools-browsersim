@@ -337,12 +337,14 @@ public abstract class ResizableSkin implements BrowserSimSkin {
 	@Override
 	public void progressChanged(int percents) {
 		ProgressBar progressBar = deviceComposite.getProgressBar();
-		if (percents > 0) {
-			progressBar.setVisible(true);
-			progressBar.setSelection(percents);
-		} else {
-			progressBar.setVisible(false);
-			progressBar.setSelection(0);
+		if (!progressBar.isDisposed()) {
+			if (percents > 0) {
+				progressBar.setVisible(true);
+				progressBar.setSelection(percents);
+			} else {
+				progressBar.setVisible(false);
+				progressBar.setSelection(0);
+			}
 		}
 	}
 	
