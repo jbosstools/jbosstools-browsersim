@@ -9,6 +9,7 @@
  *     Red Hat, Inc. - initial API and implementation
  ******************************************************************************/
 package org.jboss.tools.vpe.browsersim.ui;
+import java.text.MessageFormat;
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.List;
@@ -90,6 +91,9 @@ public class ManageDevicesDialog extends Dialog {
 	protected Text screenshotsPath;
 	protected Text weinreScriptUrlText;
 	protected Text weinreClientUrlText;	
+	
+	private Label livereloadUnavailable;
+	private Label weinreUnavailable;
 
 	protected Button buttonEdit;
 	protected Button buttonRemove;
@@ -334,7 +338,7 @@ public class ManageDevicesDialog extends Dialog {
 		
 		devicesTab.setControl(devicesComposite);
 		
-		TabItem settingsTab = new TabItem(tabFolder, SWT.NONE);
+		final TabItem settingsTab = new TabItem(tabFolder, SWT.NONE);
 		settingsTab.setText(Messages.ManageDevicesDialog_TABS_SETTINGS);
 		
 		settingsComposite = new Composite(tabFolder, SWT.NONE);
@@ -399,16 +403,6 @@ public class ManageDevicesDialog extends Dialog {
 		swtBrowserRadio = new Button(browserTypeGroup, SWT.RADIO);
 		swtBrowserRadio.setText(Messages.ManageDevicesDialog_BROWSER_TYPE_SWT);
 
-		SelectionListener browserTypeSelectionListener = new SelectionAdapter() {
-			@Override
-			public void widgetSelected(SelectionEvent e) {
-				isJavaFx = javaFXBrowserRadio.equals((Button) e.widget);
-				disableLivereloadForJavaFx7(liveReloadGroup);
-			}
-		}; 
-		
-		javaFXBrowserRadio.addSelectionListener(browserTypeSelectionListener);
-		swtBrowserRadio.addSelectionListener(browserTypeSelectionListener);
 		
 		disableWebEngineSwitcherIfJavaFxNotAvailable(javaFXBrowserRadio, browserTypeGroup); 
 		disableWebEngineSwitcherIfWebKitNotAvailable(swtBrowserRadio, browserTypeGroup);
@@ -440,7 +434,7 @@ public class ManageDevicesDialog extends Dialog {
 			}
 		});
 		
-		Group weinreGroup = new Group(settingsComposite, SWT.NONE);
+		final Group weinreGroup = new Group(settingsComposite, SWT.NONE);
 		weinreGroup.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, true, false, 1, 1));
 		weinreGroup.setText(Messages.ManageDevicesDialog_WEINRE);
 		weinreGroup.setLayout(new GridLayout(2, false));
@@ -456,6 +450,22 @@ public class ManageDevicesDialog extends Dialog {
 		weinreClientUrlText = new Text(weinreGroup, SWT.BORDER);
 		weinreClientUrlText.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, true, true));
 		weinreClientUrlText.setText(oldCommonPreferences.getWeinreClientUrl());
+		
+		disableWeinreForJavaFx7(weinreGroup);
+		
+		SelectionListener browserTypeSelectionListener = new SelectionAdapter() {
+			@Override
+			public void widgetSelected(SelectionEvent e) {
+				if (isJavaFx != javaFXBrowserRadio.equals((Button) e.widget)) {
+					isJavaFx = javaFXBrowserRadio.equals((Button) e.widget);
+					disableLivereloadForJavaFx7(liveReloadGroup);
+					disableWeinreForJavaFx7(weinreGroup);
+				}
+			}
+		}; 
+		
+		javaFXBrowserRadio.addSelectionListener(browserTypeSelectionListener);
+		swtBrowserRadio.addSelectionListener(browserTypeSelectionListener);
 		
 		settingsTab.setControl(settingsComposite);
 		tabFolder.pack();
@@ -545,19 +555,46 @@ public class ManageDevicesDialog extends Dialog {
 		label.setForeground(Display.getDefault().getSystemColor(SWT.COLOR_RED));
 	}
 	
-	private void disableLivereloadForJavaFx7(Composite parent) {
+	private void disableLivereloadForJavaFx7(Composite livereloadGroup) {
 		if (isJavaFx && BrowserSimUtil.isJavaFx7Available()) {
 			liveReloadCheckBox.setSelection(false);
 			liveReloadCheckBox.setEnabled(false);
+			
 			GridData gd = new GridData(SWT.FILL, SWT.CENTER, true, false);
 			gd.horizontalSpan = 2;
-			Label label = new Label(parent, SWT.NONE);
-			label.setLayoutData(gd);
-			label.setText(Messages.ManageDevicesDialog_LIVE_RELOAD_UNAVAILABLE);
-			label.setForeground(Display.getDefault().getSystemColor(SWT.COLOR_RED));
+			livereloadUnavailable = new Label(livereloadGroup, SWT.NONE);
+			livereloadUnavailable.setLayoutData(gd);
+			livereloadUnavailable.setText(MessageFormat.format(Messages.ManageDevicesDialog_OPTION_UNAVAILABLE, Messages.ManageDevicesDialog_LIVE_RELOAD));
+			livereloadUnavailable.setForeground(Display.getDefault().getSystemColor(SWT.COLOR_RED));
 		} else {
 			liveReloadCheckBox.setEnabled(true);
+			if (livereloadUnavailable != null && !livereloadUnavailable.isDisposed()) {
+				livereloadUnavailable.dispose();
+			}
 		}
+		
+		livereloadGroup.getParent().layout();
+	}
+	
+	private void disableWeinreForJavaFx7(Composite weinreGroup) {
+		if (isJavaFx && BrowserSimUtil.isJavaFx7Available()) {
+			weinreScriptUrlText.setEnabled(false);
+			weinreClientUrlText.setEnabled(false);
+			
+			GridData gd = new GridData(SWT.FILL, SWT.CENTER, true, false);
+			gd.horizontalSpan = 2;
+			weinreUnavailable = new Label(weinreGroup, SWT.NONE);
+			weinreUnavailable.setLayoutData(gd);
+			weinreUnavailable.setText(MessageFormat.format(Messages.ManageDevicesDialog_OPTION_UNAVAILABLE, Messages.ManageDevicesDialog_WEINRE));
+			weinreUnavailable.setForeground(Display.getDefault().getSystemColor(SWT.COLOR_RED));
+		} else {
+			weinreScriptUrlText.setEnabled(true);
+			weinreClientUrlText.setEnabled(true);
+			if (weinreUnavailable != null && !weinreUnavailable.isDisposed()) {
+				weinreUnavailable.dispose();
+			}
+		}
+		weinreGroup.getParent().layout();
 	}
 	
 	public void updateDevices() {
