@@ -3,18 +3,20 @@
 	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">		
 	<parent>
                 <groupId>org.jboss.tools</groupId>
-                <artifactId>vpe</artifactId>
+                <artifactId>browsersim</artifactId>
         	<version>3.5.100-SNAPSHOT</version>
         </parent>
 	<modelVersion>4.0.0</modelVersion>
 	<groupId>org.jboss.tools.vpe</groupId>
-	<artifactId>products</artifactId>
+	<artifactId>browsersim.products</artifactId>
 	<packaging>pom</packaging>
 
 	<modules>
 		<module>../plugins/org.jboss.tools.vpe.browsersim.javafx.mock</module>
 		<module>../plugins/org.jboss.tools.vpe.browsersim</module>
+		<module>../plugins/org.jboss.tools.vpe.browsersim.eclipse</module>
 		<module>../plugins/org.jboss.tools.vpe.browsersim.browser</module>
+		<module>../plugins/org.jboss.tools.vpe.browsersim.debugger</module>
 		<module>browsersim-standalone</module>
 	</modules>
 
