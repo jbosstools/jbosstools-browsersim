@@ -15,9 +15,6 @@
  *******************************************************************************/
 package org.jboss.tools.vpe.browsersim.util;
 
-import java.lang.reflect.InvocationTargetException;
-import java.lang.reflect.Method;
-
 /**
  * 
  * @author Konstantin Marmalyukov (kmarmaliykov)
@@ -30,46 +27,38 @@ public class LinuxUtil {
 	}
 	
 	public static final int gtk_major_version() throws Exception {
-		return (Integer)call("org.eclipse.swt.internal.gtk.OS", "gtk_major_version"); //$NON-NLS-1$ //$NON-NLS-2$
+		return (Integer)ReflectionUtil.call("org.eclipse.swt.internal.gtk.OS", "gtk_major_version"); //$NON-NLS-1$ //$NON-NLS-2$
 	}
 
 	public static final int gtk_minor_version() throws Exception {
-		return (Integer)call("org.eclipse.swt.internal.gtk.OS", "gtk_minor_version"); //$NON-NLS-1$ //$NON-NLS-2$
+		return (Integer)ReflectionUtil.call("org.eclipse.swt.internal.gtk.OS", "gtk_minor_version"); //$NON-NLS-1$ //$NON-NLS-2$
 	}
 
 	public static final int gtk_micro_version() throws Exception {
-		return (Integer)call("org.eclipse.swt.internal.gtk.OS", "gtk_micro_version"); //$NON-NLS-1$ //$NON-NLS-2$
+		return (Integer)ReflectionUtil.call("org.eclipse.swt.internal.gtk.OS", "gtk_micro_version"); //$NON-NLS-1$ //$NON-NLS-2$
 	}
 	
 	public static final int webkit_major_version() throws Exception {
-		return (Integer)call("org.eclipse.swt.internal.webkit.WebKitGTK", "webkit_major_version"); //$NON-NLS-1$ //$NON-NLS-2$
+		return (Integer)ReflectionUtil.call("org.eclipse.swt.internal.webkit.WebKitGTK", "webkit_major_version"); //$NON-NLS-1$ //$NON-NLS-2$
 	}
 
 	public static final int webkit_get_major_version() throws Exception {
-		return (Integer)call("org.eclipse.swt.internal.webkit.WebKitGTK", "webkit_get_major_version"); //$NON-NLS-1$ //$NON-NLS-2$
+		return (Integer)ReflectionUtil.call("org.eclipse.swt.internal.webkit.WebKitGTK", "webkit_get_major_version"); //$NON-NLS-1$ //$NON-NLS-2$
 	}
 
 	public static final int webkit_micro_version() throws Exception {
-		return (Integer)call("org.eclipse.swt.internal.webkit.WebKitGTK", "webkit_micro_version"); //$NON-NLS-1$ //$NON-NLS-2$
+		return (Integer)ReflectionUtil.call("org.eclipse.swt.internal.webkit.WebKitGTK", "webkit_micro_version"); //$NON-NLS-1$ //$NON-NLS-2$
 	}
 
 	public static final int webkit_get_micro_version() throws Exception {
-		return (Integer)call("org.eclipse.swt.internal.webkit.WebKitGTK", "webkit_get_micro_version"); //$NON-NLS-1$ //$NON-NLS-2$
+		return (Integer)ReflectionUtil.call("org.eclipse.swt.internal.webkit.WebKitGTK", "webkit_get_micro_version"); //$NON-NLS-1$ //$NON-NLS-2$
 	}
 
 	public static final int webkit_minor_version() throws Exception {
-		return (Integer)call("org.eclipse.swt.internal.webkit.WebKitGTK", "webkit_minor_version"); //$NON-NLS-1$ //$NON-NLS-2$
+		return (Integer)ReflectionUtil.call("org.eclipse.swt.internal.webkit.WebKitGTK", "webkit_minor_version"); //$NON-NLS-1$ //$NON-NLS-2$
 	}
 
 	public static final int webkit_get_minor_version() throws Exception {
-		return (Integer)call("org.eclipse.swt.internal.webkit.WebKitGTK", "webkit_get_minor_version"); //$NON-NLS-1$ //$NON-NLS-2$
-	}
-	
-	private static Object call(String className, String methodName) throws ClassNotFoundException, InstantiationException,
-		IllegalAccessException, NoSuchMethodException, SecurityException, IllegalArgumentException, InvocationTargetException {
-		Class<?> clazz = Class.forName(className);
-		Object o = clazz.newInstance();
-		Method method = clazz.getDeclaredMethod(methodName);
-		return method.invoke(o);
+		return (Integer)ReflectionUtil.call("org.eclipse.swt.internal.webkit.WebKitGTK", "webkit_get_minor_version"); //$NON-NLS-1$ //$NON-NLS-2$
 	}
 }

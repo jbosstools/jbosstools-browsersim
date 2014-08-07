@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2007-2012 Red Hat, Inc.
+ * Copyright (c) 2007-2014 Red Hat, Inc.
  * Distributed under license by Red Hat, Inc. All rights reserved.
  * This program is made available under the terms of the
  * Eclipse Public License v1.0 which accompanies this distribution,
@@ -41,6 +41,8 @@ public class Messages {
 	public static String BrowserSim_LIVERELOAD_WARNING;
 	public static String BrowserSim_NO_WEB_ENGINES_LINUX;
 	public static String BrowserSim_NO_WEB_ENGINES_WINDOWS;
+	public static String BrowserSim_NO_WEB_ENGINES_LINUX_STANDALONE;
+	public static String BrowserSim_NO_WEB_ENGINES_WINDOWS_STANDALONE;
 	public static String BrowserSim_OPEN_IN_DEFAULT_BROWSER;
 	public static String BrowserSim_PREFERENCES;
 	public static String BrowserSim_SKIN;

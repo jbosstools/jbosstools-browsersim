@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2007-2012 Red Hat, Inc.
+ * Copyright (c) 2007-2014 Red Hat, Inc.
  * Distributed under license by Red Hat, Inc. All rights reserved.
  * This program is made available under the terms of the
  * Eclipse Public License v1.0 which accompanies this distribution,
@@ -43,6 +43,7 @@ import org.eclipse.swt.widgets.Table;
 import org.eclipse.swt.widgets.TableColumn;
 import org.eclipse.swt.widgets.TableItem;
 import org.eclipse.swt.widgets.Text;
+import org.jboss.tools.vpe.browsersim.BrowserSimArgs;
 import org.jboss.tools.vpe.browsersim.browser.PlatformUtil;
 import org.jboss.tools.vpe.browsersim.model.Device;
 import org.jboss.tools.vpe.browsersim.model.TruncateWindow;
@@ -388,30 +389,32 @@ public class ManageDevicesDialog extends Dialog {
 		touchEventsCheckBox.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, true, false, 2, 1));
 		touchEventsCheckBox.setText(Messages.ManageDevicesDialog_SIMULATE_TOUCH_EVENTS);
 		
-		Group browserTypeGroup = new Group(settingsComposite, SWT.NONE);
-		browserTypeGroup.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, true, false, 2, 1));
-		browserTypeGroup.setText(Messages.ManageDevicesDialog_BROWSER_ENGINE);
-		browserTypeGroup.setLayout(new RowLayout(SWT.HORIZONTAL));
-		
-		javaFXBrowserRadio = new Button(browserTypeGroup, SWT.RADIO);
-		javaFXBrowserRadio.setText(Messages.ManageDevicesDialog_BROWSER_TYPE_JAVAFX);
-		
-		swtBrowserRadio = new Button(browserTypeGroup, SWT.RADIO);
-		swtBrowserRadio.setText(Messages.ManageDevicesDialog_BROWSER_TYPE_SWT);
-
-		SelectionListener browserTypeSelectionListener = new SelectionAdapter() {
-			@Override
-			public void widgetSelected(SelectionEvent e) {
-				isJavaFx = javaFXBrowserRadio.equals((Button) e.widget);
-				disableLivereloadForJavaFx7(liveReloadGroup);
-			}
-		}; 
-		
-		javaFXBrowserRadio.addSelectionListener(browserTypeSelectionListener);
-		swtBrowserRadio.addSelectionListener(browserTypeSelectionListener);
-		
-		disableWebEngineSwitcherIfJavaFxNotAvailable(javaFXBrowserRadio, browserTypeGroup); 
-		disableWebEngineSwitcherIfWebKitNotAvailable(swtBrowserRadio, browserTypeGroup);
+		if (!BrowserSimArgs.standalone) {
+			Group browserTypeGroup = new Group(settingsComposite, SWT.NONE);
+			browserTypeGroup.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, true, false, 2, 1));
+			browserTypeGroup.setText(Messages.ManageDevicesDialog_BROWSER_ENGINE);
+			browserTypeGroup.setLayout(new RowLayout(SWT.HORIZONTAL));
+			
+			javaFXBrowserRadio = new Button(browserTypeGroup, SWT.RADIO);
+			javaFXBrowserRadio.setText(Messages.ManageDevicesDialog_BROWSER_TYPE_JAVAFX);
+			
+			swtBrowserRadio = new Button(browserTypeGroup, SWT.RADIO);
+			swtBrowserRadio.setText(Messages.ManageDevicesDialog_BROWSER_TYPE_SWT);
+	
+			SelectionListener browserTypeSelectionListener = new SelectionAdapter() {
+				@Override
+				public void widgetSelected(SelectionEvent e) {
+					isJavaFx = javaFXBrowserRadio.equals((Button) e.widget);
+					disableLivereloadForJavaFx7(liveReloadGroup);
+				}
+			}; 
+			
+			javaFXBrowserRadio.addSelectionListener(browserTypeSelectionListener);
+			swtBrowserRadio.addSelectionListener(browserTypeSelectionListener);
+			
+			disableWebEngineSwitcherIfJavaFxNotAvailable(javaFXBrowserRadio, browserTypeGroup); 
+			disableWebEngineSwitcherIfWebKitNotAvailable(swtBrowserRadio, browserTypeGroup);
+		}
 		
 		Group screnshotGroup = new Group(settingsComposite, SWT.NONE);
 		screnshotGroup.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, true, false, 1, 1));
@@ -597,8 +600,10 @@ public class ManageDevicesDialog extends Dialog {
 		alwaysTruncateRadio.setSelection(TruncateWindow.ALWAYS_TRUNCATE.equals(truncateWindow));
 		neverTruncateRadio.setSelection(TruncateWindow.NEVER_TRUNCATE.equals(truncateWindow));
 		
-		javaFXBrowserRadio.setSelection(isJavaFx);
-		swtBrowserRadio.setSelection(!isJavaFx);
+		if (!BrowserSimArgs.standalone) {
+			javaFXBrowserRadio.setSelection(isJavaFx);
+			swtBrowserRadio.setSelection(!isJavaFx);
+		}
 	}
 	
 	private void performOK() {

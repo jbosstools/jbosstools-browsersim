@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2007-2013 Red Hat, Inc.
+ * Copyright (c) 2007-2014 Red Hat, Inc.
  * Distributed under license by Red Hat, Inc. All rights reserved.
  * This program is made available under the terms of the
  * Eclipse Public License v1.0 which accompanies this distribution,
@@ -44,6 +44,7 @@ import org.eclipse.swt.widgets.Listener;
 import org.eclipse.swt.widgets.Menu;
 import org.eclipse.swt.widgets.MessageBox;
 import org.eclipse.swt.widgets.Shell;
+import org.jboss.tools.vpe.browsersim.BrowserSimArgs;
 import org.jboss.tools.vpe.browsersim.BrowserSimLogger;
 import org.jboss.tools.vpe.browsersim.browser.ExtendedOpenWindowListener;
 import org.jboss.tools.vpe.browsersim.browser.ExtendedWindowEvent;
@@ -74,6 +75,7 @@ import org.jboss.tools.vpe.browsersim.ui.skin.ResizableSkinSizeAdvisor;
 import org.jboss.tools.vpe.browsersim.ui.skin.ResizableSkinSizeAdvisorImpl;
 import org.jboss.tools.vpe.browsersim.util.BrowserSimUtil;
 import org.jboss.tools.vpe.browsersim.util.PreferencesUtil;
+import org.jboss.tools.vpe.browsersim.util.ReflectionUtil;
 
 /**
  * @author Yahor Radtsevich (yradtsevich)
@@ -119,13 +121,17 @@ public class BrowserSim {
 			sp = (SpecificPreferences) getSpecificPreferencesStorage().loadDefault();
 		}
 		
-		if (!isWebKitAvailable) {
-			if (isJavaFxAvailable) {
-				sp.setJavaFx(true);
-			}
-		}
-		if (!isJavaFxAvailable) {
+		if (BrowserSimArgs.standalone) {
 			sp.setJavaFx(false);
+		} else {
+			if (!isWebKitAvailable) {
+				if (isJavaFxAvailable) {
+					sp.setJavaFx(true);
+				}
+			}
+			if (!isJavaFxAvailable) {
+				sp.setJavaFx(false);
+			}
 		}
 		
 		open(sp, null);
@@ -204,7 +210,9 @@ public class BrowserSim {
 			@Override
 			public void widgetDisposed(DisposeEvent arg0) {
 				try {
-					DevToolsDebuggerServer.stopDebugServer();
+					if (!BrowserSimArgs.standalone) {
+						ReflectionUtil.call("org.jboss.tools.vpe.browsersim.devtools.DevToolsDebuggerServer", "stopDebugServer");
+					}
 				} catch (Exception e) {
 					BrowserSimLogger.logError(e.getMessage(), e);
 				}

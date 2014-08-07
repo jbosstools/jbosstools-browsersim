@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2007-2013 Red Hat, Inc.
+ * Copyright (c) 2007-2014 Red Hat, Inc.
  * Distributed under license by Red Hat, Inc. All rights reserved.
  * This program is made available under the terms of the
  * Eclipse Public License v1.0 which accompanies this distribution,
@@ -32,6 +32,7 @@ import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Monitor;
 import org.eclipse.swt.widgets.Shell;
 import org.eclipse.swt.widgets.Widget;
+import org.jboss.tools.vpe.browsersim.BrowserSimArgs;
 import org.jboss.tools.vpe.browsersim.BrowserSimLogger;
 import org.jboss.tools.vpe.browsersim.browser.IBrowser;
 import org.jboss.tools.vpe.browsersim.browser.PlatformUtil;
@@ -378,7 +379,7 @@ public class BrowserSimUtil {
 		String javaVersion = System.getProperty("java.version");
 		
 		//if 7u51 <= java version < 8 load javafx first
-		if (0 >= java7u51.compareTo(javaVersion) && java8.compareTo(javaVersion) >0) {
+		if (!BrowserSimArgs.standalone && 0 >= java7u51.compareTo(javaVersion) && java8.compareTo(javaVersion) >0) {
 			@SuppressWarnings("unused")
 			JavaFXBrowser tempJavaFXBrowser = new JavaFXBrowser(new Shell());
 		}
