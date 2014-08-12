@@ -2,7 +2,7 @@
 
 ## Summary
 
-[BrowserSim](https://community.jboss.org/wiki/BrowserSimFAQ) is a browser simulator which primarily is intended for having a quick, easy and multi-platform way of testing if a webapp / website will be rendered correctly on a mobile device. Browsersim makes it easy to test basic layout issues without having to install a platform specific emulator or manually using a phone.  
+[BrowserSim](http://tools.jboss.org/documentation/faq/browsersim.html) is a browser simulator which primarily is intended for having a quick, easy and multi-platform way of testing if a webapp / website will be rendered correctly on a mobile device. Browsersim makes it easy to test basic layout issues without having to install a platform specific emulator or manually using a phone.  
 
 ## Install
 
@@ -42,7 +42,11 @@ If you just want to check if things compiles/builds you can run:
     $ mvn clean verify -DskipTest=true
 
 But *do not* push changes without having the new and existing unit tests pass!
- 
+
+## Standalone Browsersim Application
+
+See details [here](https://github.com/jbosstools/jbosstools-browsersim/tree/master/products).
+
 ## Contribute fixes and features
 
 _JBoss Tools Browser Simulator_ is open source, and we welcome anybody that wants to
