@@ -69,6 +69,9 @@ public class ExternalProcessLauncher {
 			if (jreContainerPath != null) {
 				List<String> commandElements = new ArrayList<String>();
 				
+				// RT-35868 and JBIDE-18404 - need to handle CORS headers correctly
+				commandElements.add("-Dsun.net.http.allowRestrictedHeaders=true"); //$NON-NLS-1$
+				
 				if (Platform.OS_MACOSX.equals(Platform.getOS())) {
 					commandElements.add("-XstartOnFirstThread"); //$NON-NLS-1$
 				}
