@@ -40,6 +40,7 @@ public class Messages {
 	public static String BrowserSim_HELP;
 	public static String BrowserSim_LIVERELOAD_WARNING;
 	public static String BrowserSim_NO_WEB_ENGINES_LINUX;
+	public static String BrowserSim_NO_WEB_ENGINES_LINUX_GTK3;
 	public static String BrowserSim_NO_WEB_ENGINES_WINDOWS;
 	public static String BrowserSim_NO_WEB_ENGINES_LINUX_STANDALONE;
 	public static String BrowserSim_NO_WEB_ENGINES_WINDOWS_STANDALONE;

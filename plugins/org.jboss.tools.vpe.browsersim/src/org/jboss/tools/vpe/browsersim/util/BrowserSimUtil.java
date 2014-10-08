@@ -426,10 +426,7 @@ public class BrowserSimUtil {
 
 			String webkit2 = System.getenv("SWT_WEBKIT2"); // $NON-NLS-1$
 			
-			final int GTK_VERSION = LinuxUtil.VERSION(LinuxUtil.gtk_major_version(), LinuxUtil.gtk_minor_version(), LinuxUtil.gtk_micro_version());
-
-			final boolean GTK3 = GTK_VERSION >= LinuxUtil.VERSION(3, 0, 0);
-			boolean WEBKIT2 = webkit2 != null && webkit2.equals("1") && GTK3; // $NON-NLS-1$
+			boolean WEBKIT2 = webkit2 != null && webkit2.equals("1") && isGTK3(); // $NON-NLS-1$
 			// TODO webkit_check_version() should take care of the following,
 			// but for some
 			// reason this symbol is missing from the latest build. If it is
@@ -452,8 +449,27 @@ public class BrowserSimUtil {
 			(major == MIN_VERSION[0] && minor > MIN_VERSION[1]) ||
 			(major == MIN_VERSION[0] && minor == MIN_VERSION[1] && micro >= MIN_VERSION[2]);
 		} catch (Throwable e) {
-			BrowserSimLogger.logError(e.getMessage(), e);
-			return false;
+		    BrowserSimLogger.logError(e.getMessage(), e);
+            return false;
 		}
+	}
+	
+	/**
+	 * Detects GTK3.
+	 * 
+	 * @return <code>true</code> if browsersim is runned under GTK3, <code>false</code> if browsersim runned under GTK2 and if OS is not Linux 
+	 */
+	public static boolean isGTK3() {
+        if (PlatformUtil.OS_LINUX.equals(PlatformUtil.getOs())) {            
+            try {
+                int GTK_VERSION = LinuxUtil.VERSION(LinuxUtil.gtk_major_version(), LinuxUtil.gtk_minor_version(), LinuxUtil.gtk_micro_version());
+                return GTK_VERSION >= LinuxUtil.VERSION(3, 0, 0);
+            } catch (Exception e) {
+                BrowserSimLogger.logError(e.getMessage(), e);
+                return false;
+            }
+        } else {
+            return false;
+        }
 	}
 }

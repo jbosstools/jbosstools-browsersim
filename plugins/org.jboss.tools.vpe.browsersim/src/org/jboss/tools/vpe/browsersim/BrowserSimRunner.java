@@ -68,7 +68,7 @@ public class BrowserSimRunner {
 				String os = PlatformUtil.getOs();
 				if (PlatformUtil.OS_LINUX.equals(os)) {
 					errorMessage = MessageFormat.format(
-							Messages.BrowserSim_NO_WEB_ENGINES_LINUX,
+					        BrowserSimUtil.isGTK3() ? Messages.BrowserSim_NO_WEB_ENGINES_LINUX_GTK3 : Messages.BrowserSim_NO_WEB_ENGINES_LINUX,
 							Messages.BrowserSim_BROWSER_SIM);
 				} else if(PlatformUtil.OS_WIN32.equals(os)) {
 					errorMessage = MessageFormat.format(
