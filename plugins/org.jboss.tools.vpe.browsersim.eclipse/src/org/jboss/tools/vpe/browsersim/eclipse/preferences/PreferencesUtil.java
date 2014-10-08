@@ -36,6 +36,8 @@ import org.eclipse.jdt.launching.IVMInstall;
 import org.eclipse.jdt.launching.IVMInstallType;
 import org.eclipse.jdt.launching.JavaRuntime;
 import org.eclipse.osgi.util.NLS;
+import org.jboss.tools.usage.googleanalytics.eclipse.LinuxSystem;
+import org.jboss.tools.usage.googleanalytics.eclipse.LinuxSystem.LinuxDistro;
 import org.jboss.tools.vpe.browsersim.browser.PlatformUtil;
 import org.jboss.tools.vpe.browsersim.eclipse.Activator;
 import org.jboss.tools.vpe.browsersim.eclipse.Messages;
@@ -237,5 +239,10 @@ public class PreferencesUtil {
 			return '\"' + str + '\"';
 		}
 		return str;
+	}
+	
+	public static boolean requiresGTK3() {
+	    LinuxDistro distro = LinuxSystem.INSTANCE.getDistro();
+	    return LinuxSystem.INSTANCE.REDHAT.equals(distro) && distro.getVersion().compareTo("7") >= 0; //$NON-NLS-1$
 	}
 }

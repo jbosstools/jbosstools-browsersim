@@ -20,6 +20,6 @@ public class BrowserSimPreferencesInitializer extends AbstractPreferenceInitiali
 		IPreferenceStore store = Activator.getDefault().getPreferenceStore();
 		
 		store.setDefault(BrowserSimPreferencesPage.BROWSERSIM_JVM_AUTOMATICALLY, IPreferenceStore.TRUE);
-		store.setDefault(BrowserSimPreferencesPage.BROWSERSIM_GTK_2, IPreferenceStore.TRUE);
+		store.setDefault(BrowserSimPreferencesPage.BROWSERSIM_GTK_2, PreferencesUtil.requiresGTK3() ? IPreferenceStore.FALSE : IPreferenceStore.TRUE);
 	}
 }
