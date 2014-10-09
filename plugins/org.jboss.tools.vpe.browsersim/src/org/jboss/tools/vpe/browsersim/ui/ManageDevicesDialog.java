@@ -97,6 +97,8 @@ public class ManageDevicesDialog extends Dialog {
 	
 	protected Composite settingsComposite;
 	
+	private Label livereloadErrorLabel;
+	
 	/**
 	 * Create the dialog.
 	 * @param parent
@@ -379,6 +381,13 @@ public class ManageDevicesDialog extends Dialog {
 			}
 		});
 		
+		livereloadErrorLabel = new Label(liveReloadGroup, SWT.NONE);
+		GridData gd = new GridData(SWT.FILL, SWT.CENTER, true, false);
+        gd.horizontalSpan = 2;
+        livereloadErrorLabel.setLayoutData(gd);
+        livereloadErrorLabel.setText(Messages.ManageDevicesDialog_LIVE_RELOAD_UNAVAILABLE);
+        livereloadErrorLabel.setForeground(Display.getDefault().getSystemColor(SWT.COLOR_RED));
+		
 		disableLivereloadForJavaFx7(liveReloadGroup);
 		
 		Group touchEventsGroup = new Group(settingsComposite, SWT.NONE);
@@ -552,14 +561,10 @@ public class ManageDevicesDialog extends Dialog {
 		if (isJavaFx && BrowserSimUtil.isJavaFx7Available()) {
 			liveReloadCheckBox.setSelection(false);
 			liveReloadCheckBox.setEnabled(false);
-			GridData gd = new GridData(SWT.FILL, SWT.CENTER, true, false);
-			gd.horizontalSpan = 2;
-			Label label = new Label(parent, SWT.NONE);
-			label.setLayoutData(gd);
-			label.setText(Messages.ManageDevicesDialog_LIVE_RELOAD_UNAVAILABLE);
-			label.setForeground(Display.getDefault().getSystemColor(SWT.COLOR_RED));
+			livereloadErrorLabel.setVisible(true);
 		} else {
 			liveReloadCheckBox.setEnabled(true);
+			livereloadErrorLabel.setVisible(false);
 		}
 	}
 	
