@@ -45,18 +45,25 @@
 								<propertyregex property="org.eclipse.swt.version" input="${org.eclipse.swt.file}" regexp=".*org\.eclipse\.swt\.gtk\.linux\.x86_64_(.*)\.jar" select="\1" casesensitive="true" />
 								<echo message="${org.eclipse.swt.version}"/> 
 								
-								<copy file="target/repository/plugins/org.eclipse.swt.win32.win32.x86_${org.eclipse.swt.version}.jar" tofile="target/application/temp/swt/swt-win32-${org.eclipse.swt.version}.jar"/>
-								<copy file="target/repository/plugins/org.eclipse.swt.win32.win32.x86_64_${org.eclipse.swt.version}.jar" tofile="target/application/temp/swt/swt-win64-${org.eclipse.swt.version}.jar"/>
-								<copy file="target/repository/plugins/org.eclipse.swt.cocoa.macosx.x86_64_${org.eclipse.swt.version}.jar" tofile="target/application/temp/swt/swt-osx64-${org.eclipse.swt.version}.jar"/>
-								<copy file="target/repository/plugins/org.eclipse.swt.gtk.linux.x86_${org.eclipse.swt.version}.jar" tofile="target/application/temp/swt/swt-linux32-${org.eclipse.swt.version}.jar"/>
-								<copy file="target/repository/plugins/org.eclipse.swt.gtk.linux.x86_64_${org.eclipse.swt.version}.jar" tofile="target/application/temp/swt/swt-linux64-${org.eclipse.swt.version}.jar"/>
-								
 								<path id="org.jboss.tools.vpe.browsersim.javafx.mock.file.id"> 
 									<fileset dir="target/repository/plugins">
 										<include name="org.jboss.tools.vpe.browsersim.javafx.mock_*.jar"/> 
 									 </fileset>
 								</path> 
 								<property name="org.jboss.tools.vpe.browsersim.javafx.mock.file" refid="org.jboss.tools.vpe.browsersim.javafx.mock.file.id"/>
+								
+								<echo message="${org.jboss.tools.vpe.browsersim.javafx.mock.file}"/> 
+								<propertyregex property="mock.version" input="${org.jboss.tools.vpe.browsersim.javafx.mock.file}" regexp=".*org\.jboss\.tools\.vpe\.browsersim\.javafx\.mock_(.*)\.jar" select="\1" casesensitive="true" />
+								<echo message="${mock.version}"/> 
+								
+								<copy file="target/repository/plugins/org.eclipse.swt.win32.win32.x86_${org.eclipse.swt.version}.jar" tofile="target/application/temp/swt/swt-win32-${org.eclipse.swt.version}.jar"/>
+								<copy file="target/repository/plugins/org.eclipse.swt.win32.win32.x86_64_${org.eclipse.swt.version}.jar" tofile="target/application/temp/swt/swt-win64-${org.eclipse.swt.version}.jar"/>
+								<!--copy file="target/repository/plugins/org.eclipse.swt.cocoa.macosx_${org.eclipse.swt.version}.jar" tofile="target/application/temp/swt/swt-osx32-${org.eclipse.swt.version}.jar"/-->
+								<copy file="target/repository/plugins/org.eclipse.swt.cocoa.macosx.x86_64_${org.eclipse.swt.version}.jar" tofile="target/application/temp/swt/swt-osx64-${org.eclipse.swt.version}.jar"/>
+								<copy file="target/repository/plugins/org.eclipse.swt.gtk.linux.x86_${org.eclipse.swt.version}.jar" tofile="target/application/temp/swt/swt-linux32-${org.eclipse.swt.version}.jar"/>
+								<copy file="target/repository/plugins/org.eclipse.swt.gtk.linux.x86_64_${org.eclipse.swt.version}.jar" tofile="target/application/temp/swt/swt-linux64-${org.eclipse.swt.version}.jar"/>
+								
+								<copy file="target/repository/plugins/org.jboss.tools.vpe.browsersim.javafx.mock_${mock.version}.jar" tofile="target/application/temp/swt/javafx-mock.jar"/>
 
 								<path id="org.jboss.tools.vpe.browsersim.browser.file.id"> 
 									<fileset dir="target/repository/plugins">
@@ -72,18 +79,98 @@
 								</path>
 								<property name="org.jboss.tools.vpe.browsersim.file" refid="org.jboss.tools.vpe.browsersim.file.id"/> 
 								
+								<path id="org.jboss.tools.vpe.browsersim.debugger.file.id"> 
+									<fileset dir="target/repository/plugins">
+										<include name="org.jboss.tools.vpe.browsersim.debugger_*.jar"/>
+									 </fileset>
+								</path>
+								<property name="org.jboss.tools.vpe.browsersim.debugger.file" refid="org.jboss.tools.vpe.browsersim.debugger.file.id"/> 
+								
+								<path id="javax.servlet.file.id"> 
+									<fileset dir="target/repository/plugins">
+										<include name="javax.servlet_*.jar"/>
+									 </fileset>
+								</path>
+								<property name="javax.servlet.file" refid="javax.servlet.file.id"/> 
+								
+								<path id="org.eclipse.jetty.continuation.file.id"> 
+									<fileset dir="target/repository/plugins">
+										<include name="org.eclipse.jetty.continuation_*.jar"/>
+									 </fileset>
+								</path>
+								<property name="org.eclipse.jetty.continuation.file" refid="org.eclipse.jetty.continuation.file.id"/> 
+								
+								<path id="org.eclipse.jetty.http.file.id"> 
+									<fileset dir="target/repository/plugins">
+										<include name="org.eclipse.jetty.http_*.jar"/>
+									 </fileset>
+								</path>
+								<property name="org.eclipse.jetty.http.file" refid="org.eclipse.jetty.http.file.id"/>
+								
+								<path id="org.eclipse.jetty.io.file.id"> 
+									<fileset dir="target/repository/plugins">
+										<include name="org.eclipse.jetty.io_*.jar"/>
+									 </fileset>
+								</path>
+								<property name="org.eclipse.jetty.io.file" refid="org.eclipse.jetty.io.file.id"/>
+								
+								<path id="org.eclipse.jetty.security.file.id"> 
+									<fileset dir="target/repository/plugins">
+										<include name="org.eclipse.jetty.security_*.jar"/>
+									 </fileset>
+								</path>
+								<property name="org.eclipse.jetty.security.file" refid="org.eclipse.jetty.security.file.id"/>
+								
+								<path id="org.eclipse.jetty.server.file.id"> 
+									<fileset dir="target/repository/plugins">
+										<include name="org.eclipse.jetty.server_*.jar"/>
+									 </fileset>
+								</path>
+								<property name="org.eclipse.jetty.server.file" refid="org.eclipse.jetty.server.file.id"/>
+								
+								<path id="org.eclipse.jetty.servlet.file.id"> 
+									<fileset dir="target/repository/plugins">
+										<include name="org.eclipse.jetty.servlet_*.jar"/>
+									 </fileset>
+								</path>
+								<property name="org.eclipse.jetty.servlet.file" refid="org.eclipse.jetty.servlet.file.id"/>
+								
+								<path id="org.eclipse.jetty.util.file.id"> 
+									<fileset dir="target/repository/plugins">
+										<include name="org.eclipse.jetty.util_*.jar"/>
+									 </fileset>
+								</path>
+								<property name="org.eclipse.jetty.util.file" refid="org.eclipse.jetty.util.file.id"/>
+
+								<path id="org.eclipse.jetty.websocket.file.id"> 
+									<fileset dir="target/repository/plugins">
+										<include name="org.eclipse.jetty.websocket_*.jar"/>
+									 </fileset>
+								</path>
+								<property name="org.eclipse.jetty.websocket.file" refid="org.eclipse.jetty.websocket.file.id"/> 
 								<!-- Package cross platform SWT Jar -->
 								<taskdef name="swtjar" classname="org.swtjar.ant.SWTJarTask" classpath="ant/swtjar.jar"/>
-								<swtjar jarfile="target/application/browsersim.jar" targetmainclass="org.jboss.tools.vpe.browsersim.BrowserSimStandaloneRunner" swtversion="${org.eclipse.swt.version}">
+								<swtjar jarfile="target/application/browsersim.jar" targetmainclass="org.jboss.tools.vpe.browsersim.BrowserSimRunner" swtversion="${org.eclipse.swt.version}">
 									<!--fileset dir="build/classes" includes="**/*" /-->
 									<manifest>
 									    <attribute name="Bundle-SymbolicName" value="org.jboss.tools.vpe.browsersim;singleton:=true" />
 									    <attribute name="Bundle-Version" value="${project.version}-${maven.build.timestamp}" />
 									</manifest>
 									<fileset dir="target/application/temp/swt" includes="*.jar" />
-									<zipfileset excludes="META-INF/*.MF" src="${org.jboss.tools.vpe.browsersim.javafx.mock.file}"/>
+									
+									<!--<zipfileset excludes="META-INF/*.MF" src="${org.jboss.tools.vpe.browsersim.javafx.mock.file}"/-->
 									<zipfileset excludes="META-INF/*.MF" src="${org.jboss.tools.vpe.browsersim.browser.file}"/>
 									<zipfileset excludes="META-INF/*.MF" src="${org.jboss.tools.vpe.browsersim.file}"/>
+									<zipfileset excludes="META-INF/*.MF" src="${org.jboss.tools.vpe.browsersim.debugger.file}"/>
+									<zipfileset excludes="META-INF/*, about.html" src="${javax.servlet.file}"/>
+									<zipfileset excludes="META-INF/*, about.html" src="${org.eclipse.jetty.continuation.file}"/>
+									<zipfileset excludes="META-INF/*, about.html" src="${org.eclipse.jetty.http.file}"/>
+									<zipfileset excludes="META-INF/*, about.html" src="${org.eclipse.jetty.io.file}"/>
+									<zipfileset excludes="META-INF/*, about.html" src="${org.eclipse.jetty.security.file}"/>
+									<zipfileset excludes="META-INF/*, about.html" src="${org.eclipse.jetty.server.file}"/>
+									<zipfileset excludes="META-INF/*, about.html" src="${org.eclipse.jetty.servlet.file}"/>
+									<zipfileset excludes="META-INF/*, about.html" src="${org.eclipse.jetty.util.file}"/>
+									<zipfileset excludes="META-INF/*, about.html" src="${org.eclipse.jetty.websocket.file}"/>
 								</swtjar> 
 								<delete dir="target/application/temp"/>
 							</tasks>

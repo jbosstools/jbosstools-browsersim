@@ -11,10 +11,16 @@
 package org.jboss.tools.vpe.browsersim.util;
 
 import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.IOException;
+import java.io.InputStream;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.net.URL;
 import java.net.URLClassLoader;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.Map;
 
 import org.eclipse.swt.SWT;
@@ -32,7 +38,6 @@ import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Monitor;
 import org.eclipse.swt.widgets.Shell;
 import org.eclipse.swt.widgets.Widget;
-import org.jboss.tools.vpe.browsersim.BrowserSimArgs;
 import org.jboss.tools.vpe.browsersim.BrowserSimLogger;
 import org.jboss.tools.vpe.browsersim.browser.IBrowser;
 import org.jboss.tools.vpe.browsersim.browser.PlatformUtil;
@@ -255,6 +260,35 @@ public class BrowserSimUtil {
 		return false;
 	}
 	
+	/**Extracts jar file with mocks to temporal folder and load it to classpath.
+	 * This method should be used only for Standalone BrowserSim.
+	 * 
+	 * @param tempDir - directory to extract jar file
+	 * @param jarName - path to jar file
+	 */
+	public static void loadMock(String tempDir, String jarName) {
+	    InputStream inputStream = null;
+	    try {
+			inputStream = BrowserSimUtil.class.getClassLoader().getResourceAsStream(jarName);
+			Path tmpFile = Paths.get(tempDir, jarName);
+			Files.copy(inputStream, tmpFile);
+			loadJar(tmpFile.toFile());          
+	    } catch (FileNotFoundException e) {
+            BrowserSimLogger.logError(e.getMessage(), e);
+        } catch (IOException e) {
+            BrowserSimLogger.logError(e.getMessage(), e);
+        } finally {
+            if (inputStream != null) {
+                try {
+                    inputStream.close();
+                } catch (IOException e) {
+                    BrowserSimLogger.logError(e.getMessage(), e);
+                }
+            }
+        }
+        
+    }
+	
 	public static boolean isJavaFxAvailable() {
 		String javaHome = System.getProperty("java.home"); //$NON-NLS-1$
 		return isJavaFxAvailable(javaHome);
@@ -376,10 +410,10 @@ public class BrowserSimUtil {
 		 * Workaround for Java7u51 and higher. Loading SWT.WEBKIT libraries before JavaFX webkit causes an error. 
 		 * @see https://javafx-jira.kenai.com/browse/RT-35480
 		 */
-		String javaVersion = System.getProperty("java.version");
+		String javaVersion = System.getProperty("java.version"); //$NON-NLS-1$
 		
 		//if 7u51 <= java version < 8 load javafx first
-		if (!BrowserSimArgs.standalone && 0 >= java7u51.compareTo(javaVersion) && java8.compareTo(javaVersion) >0) {
+		if (0 >= java7u51.compareTo(javaVersion) && java8.compareTo(javaVersion) >0) {
 			@SuppressWarnings("unused")
 			JavaFXBrowser tempJavaFXBrowser = new JavaFXBrowser(new Shell());
 		}
@@ -422,11 +456,11 @@ public class BrowserSimUtil {
 	
 	public static boolean isLinuxWebkitInstalled() {
 		try {
-			Library.loadLibrary("swt-webkit"); // $NON-NLS-1$
+			Library.loadLibrary("swt-webkit"); //$NON-NLS-1$
 
-			String webkit2 = System.getenv("SWT_WEBKIT2"); // $NON-NLS-1$
+			String webkit2 = System.getenv("SWT_WEBKIT2"); //$NON-NLS-1$
 			
-			boolean WEBKIT2 = webkit2 != null && webkit2.equals("1") && isGTK3(); // $NON-NLS-1$
+			boolean WEBKIT2 = webkit2 != null && webkit2.equals("1") && isGTK3(); //$NON-NLS-1$
 			// TODO webkit_check_version() should take care of the following,
 			// but for some
 			// reason this symbol is missing from the latest build. If it is

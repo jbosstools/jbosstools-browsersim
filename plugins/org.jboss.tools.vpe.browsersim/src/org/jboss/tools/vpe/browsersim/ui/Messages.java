@@ -122,6 +122,7 @@ public class Messages {
 	public static String ManageDevicesDialog_PROMPT;
 	public static String ManageDevicesDialog_REMOVE;
 	public static String ManageDevicesDialog_REVERT_ALL;
+	public static String ManageDevicesDialog_STANDALONE_RESTART;
 	public static String ManageDevicesDialog_SCREENSHOTS;
 	public static String ManageDevicesDialog_SELECT_FOLDER;
 	public static String ManageDevicesDialog_SKIN;

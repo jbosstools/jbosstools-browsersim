@@ -44,7 +44,6 @@ import org.eclipse.swt.widgets.Listener;
 import org.eclipse.swt.widgets.Menu;
 import org.eclipse.swt.widgets.MessageBox;
 import org.eclipse.swt.widgets.Shell;
-import org.jboss.tools.vpe.browsersim.BrowserSimArgs;
 import org.jboss.tools.vpe.browsersim.BrowserSimLogger;
 import org.jboss.tools.vpe.browsersim.browser.ExtendedOpenWindowListener;
 import org.jboss.tools.vpe.browsersim.browser.ExtendedWindowEvent;
@@ -122,19 +121,14 @@ public class BrowserSim {
 			sp = (SpecificPreferences) getSpecificPreferencesStorage().loadDefault();
 		}
 		
-		if (BrowserSimArgs.standalone) {
-			sp.setJavaFx(false);
-		} else {
-			if (!isWebKitAvailable) {
-				if (isJavaFxAvailable) {
-					sp.setJavaFx(true);
-				}
-			}
-			if (!isJavaFxAvailable) {
-				sp.setJavaFx(false);
+		if (!isWebKitAvailable) {
+			if (isJavaFxAvailable) {
+				sp.setJavaFx(true);
 			}
 		}
-
+		if (!isJavaFxAvailable) {
+			sp.setJavaFx(false);
+		}
 		open(sp, null);
 	}
 
@@ -206,9 +200,7 @@ public class BrowserSim {
 			@Override
 			public void widgetDisposed(DisposeEvent arg0) {
 				try {
-					if (!BrowserSimArgs.standalone) {
-						ReflectionUtil.call("org.jboss.tools.vpe.browsersim.devtools.DevToolsDebuggerServer", "stopDebugServer"); //$NON-NLS-1$ //$NON-NLS-2$
-					}
+					ReflectionUtil.call("org.jboss.tools.vpe.browsersim.devtools.DevToolsDebuggerServer", "stopDebugServer"); //$NON-NLS-1$ //$NON-NLS-2$
 				} catch (Exception e) {
 					BrowserSimLogger.logError(e.getMessage(), e);
 				}

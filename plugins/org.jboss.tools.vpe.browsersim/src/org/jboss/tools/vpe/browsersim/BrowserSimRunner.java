@@ -10,8 +10,14 @@
  ******************************************************************************/
 package org.jboss.tools.vpe.browsersim;
 
+import java.io.IOException;
 import java.net.URI;
 import java.net.URISyntaxException;
+import java.nio.file.FileVisitResult;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.SimpleFileVisitor;
+import java.nio.file.attribute.BasicFileAttributes;
 import java.text.MessageFormat;
 
 import org.eclipse.jetty.server.Server;
@@ -33,13 +39,14 @@ import org.jboss.tools.vpe.browsersim.util.BrowserSimUtil;
  */
 
 public class BrowserSimRunner {
-	public static final String PLUGIN_ID = "org.jboss.tools.vpe.browsersim"; //$NON-NLS-1$
-		
-	public static final String NOT_STANDALONE = "-not-standalone"; //$NON-NLS-1$
 	public static final String ABOUT_BLANK = "about:blank"; //"http://www.w3schools.com/js/tryit_view.asp?filename=try_nav_useragent"; //$NON-NLS-1$
+	
+	private static final String STANDALONE_MOCK_JAR = "javafx-mock.jar"; //$NON-NLS-1$
 	
 	private static boolean isJavaFxAvailable;
 	private static boolean isWebKitAvailable;
+	
+	private static Path tempDir;
 	static {
 		if (PlatformUtil.OS_MACOSX.equals(PlatformUtil.getOs())) {
 			CocoaUIEnhancer.initializeMacOSMenuBar(Messages.BrowserSim_BROWSER_SIM);
@@ -79,6 +86,11 @@ public class BrowserSimRunner {
 			}
 			
 			BrowserSimArgs browserSimArgs = BrowserSimArgs.parseArgs(args);
+			
+			if (!isJavaFxAvailable && BrowserSimArgs.standalone) {
+				tempDir = Files.createTempDirectory("browsersim"); //$NON-NLS-1$
+			    BrowserSimUtil.loadMock(tempDir.toString(), STANDALONE_MOCK_JAR);
+			}
 			
 			String path = browserSimArgs.getPath();
 			String url;
@@ -121,6 +133,28 @@ public class BrowserSimRunner {
 		} finally {
 			if (display != null) {
 				display.dispose();
+			}
+			
+			// do a cleanup
+			if (BrowserSimArgs.standalone && tempDir != null) {
+			    try {
+			    	Files.walkFileTree(tempDir, new SimpleFileVisitor<Path>() {
+			    		   @Override
+			    		   public FileVisitResult visitFile(Path file, BasicFileAttributes attrs) throws IOException {
+			    			   Files.delete(file);
+			    			   return FileVisitResult.CONTINUE;
+			    		   }
+
+			    		   @Override
+			    		   public FileVisitResult postVisitDirectory(Path dir, IOException exc) throws IOException {
+			    			   Files.delete(dir);
+			    			   return FileVisitResult.CONTINUE;
+			    		   }
+
+			    	   });
+				} catch (IOException e) {
+					BrowserSimLogger.logError(e.getMessage(), e);
+				}
 			}
 		}
 	}

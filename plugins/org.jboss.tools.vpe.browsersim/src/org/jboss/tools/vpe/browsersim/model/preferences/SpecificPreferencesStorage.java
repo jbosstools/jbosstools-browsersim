@@ -44,7 +44,6 @@ public abstract class SpecificPreferencesStorage implements PreferencesStorage{
 		File configFolder = new File(PreferencesUtil.getConfigFolderPath());
 		configFolder.mkdir();
 		File configFile = new File(configFolder, getFileName());
-		
 		save((SpecificPreferences) o, configFile);
 	}
 

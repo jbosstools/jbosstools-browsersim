@@ -398,32 +398,30 @@ public class ManageDevicesDialog extends Dialog {
 		touchEventsCheckBox.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, true, false, 2, 1));
 		touchEventsCheckBox.setText(Messages.ManageDevicesDialog_SIMULATE_TOUCH_EVENTS);
 		
-		if (!BrowserSimArgs.standalone) {
-			Group browserTypeGroup = new Group(settingsComposite, SWT.NONE);
-			browserTypeGroup.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, true, false, 2, 1));
-			browserTypeGroup.setText(Messages.ManageDevicesDialog_BROWSER_ENGINE);
-			browserTypeGroup.setLayout(new RowLayout(SWT.HORIZONTAL));
-			
-			javaFXBrowserRadio = new Button(browserTypeGroup, SWT.RADIO);
-			javaFXBrowserRadio.setText(Messages.ManageDevicesDialog_BROWSER_TYPE_JAVAFX);
-			
-			swtBrowserRadio = new Button(browserTypeGroup, SWT.RADIO);
-			swtBrowserRadio.setText(Messages.ManageDevicesDialog_BROWSER_TYPE_SWT);
-	
-			SelectionListener browserTypeSelectionListener = new SelectionAdapter() {
-				@Override
-				public void widgetSelected(SelectionEvent e) {
-					isJavaFx = javaFXBrowserRadio.equals((Button) e.widget);
-					disableLivereloadForJavaFx7(liveReloadGroup);
-				}
-			}; 
-			
-			javaFXBrowserRadio.addSelectionListener(browserTypeSelectionListener);
-			swtBrowserRadio.addSelectionListener(browserTypeSelectionListener);
-			
-			disableWebEngineSwitcherIfJavaFxNotAvailable(javaFXBrowserRadio, browserTypeGroup); 
-			disableWebEngineSwitcherIfWebKitNotAvailable(swtBrowserRadio, browserTypeGroup);
-		}
+		Group browserTypeGroup = new Group(settingsComposite, SWT.NONE);
+		browserTypeGroup.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, true, false, 2, 1));
+		browserTypeGroup.setText(Messages.ManageDevicesDialog_BROWSER_ENGINE);
+		browserTypeGroup.setLayout(new RowLayout(SWT.HORIZONTAL));
+
+		javaFXBrowserRadio = new Button(browserTypeGroup, SWT.RADIO);
+		javaFXBrowserRadio.setText(Messages.ManageDevicesDialog_BROWSER_TYPE_JAVAFX);
+
+		swtBrowserRadio = new Button(browserTypeGroup, SWT.RADIO);
+		swtBrowserRadio.setText(Messages.ManageDevicesDialog_BROWSER_TYPE_SWT);
+
+		SelectionListener browserTypeSelectionListener = new SelectionAdapter() {
+			@Override
+			public void widgetSelected(SelectionEvent e) {
+				isJavaFx = javaFXBrowserRadio.equals((Button) e.widget);
+				disableLivereloadForJavaFx7(liveReloadGroup);
+			}
+		};
+
+		javaFXBrowserRadio.addSelectionListener(browserTypeSelectionListener);
+		swtBrowserRadio.addSelectionListener(browserTypeSelectionListener);
+
+		disableWebEngineSwitcherIfJavaFxNotAvailable(javaFXBrowserRadio, browserTypeGroup);
+		disableWebEngineSwitcherIfWebKitNotAvailable(swtBrowserRadio, browserTypeGroup);
 		
 		Group screnshotGroup = new Group(settingsComposite, SWT.NONE);
 		screnshotGroup.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, true, false, 1, 1));
@@ -605,10 +603,8 @@ public class ManageDevicesDialog extends Dialog {
 		alwaysTruncateRadio.setSelection(TruncateWindow.ALWAYS_TRUNCATE.equals(truncateWindow));
 		neverTruncateRadio.setSelection(TruncateWindow.NEVER_TRUNCATE.equals(truncateWindow));
 		
-		if (!BrowserSimArgs.standalone) {
-			javaFXBrowserRadio.setSelection(isJavaFx);
-			swtBrowserRadio.setSelection(!isJavaFx);
-		}
+		javaFXBrowserRadio.setSelection(isJavaFx);
+		swtBrowserRadio.setSelection(!isJavaFx);
 	}
 	
 	private void performOK() {
@@ -679,7 +675,14 @@ public class ManageDevicesDialog extends Dialog {
 				oldSpecificPreferences.getOrientationAngle(), getParent().getLocation(), isJavaFx);
 	}
 
+	/**
+	 * Send restart command to Eclipse or send a message to user to do a restart manually
+	 */
 	protected void sendRestartCommand() {
-		System.out.println(BROWSERSIM_RESTART_COMMAND + currentUrl);
+		if (!BrowserSimArgs.standalone) {
+			System.out.println(BROWSERSIM_RESTART_COMMAND + currentUrl);
+		} else {
+			System.out.println(Messages.ManageDevicesDialog_STANDALONE_RESTART);
+		}
 	}
 }
