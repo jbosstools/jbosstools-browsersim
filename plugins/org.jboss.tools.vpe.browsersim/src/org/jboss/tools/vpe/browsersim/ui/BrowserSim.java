@@ -133,7 +133,7 @@ public class BrowserSim {
 				sp.setJavaFx(false);
 			}
 		}
-		
+
 		open(sp, null);
 	}
 
@@ -143,6 +143,7 @@ public class BrowserSim {
 		}
 		
 		specificPreferences = sp;
+		enableLivereloadIfAvailable();
 		initObservers();
 		Device defaultDevice = commonPreferences.getDevices().get(specificPreferences.getSelectedDeviceId()); 
 		if (defaultDevice == null) {
@@ -446,6 +447,14 @@ public class BrowserSim {
 		+ "})();");	 //$NON-NLS-1$
 	}
 
+	private void enableLivereloadIfAvailable() {
+	    if (isLivereloadAvailable()) {
+            specificPreferences.setEnableLiveReload(true); 
+        } else {
+            specificPreferences.setEnableLiveReload(false);
+        }
+	}
+	
 	private void initObservers() {
 		commonPreferencesObserver = new Observer() {
 			@Override
@@ -625,6 +634,7 @@ public class BrowserSim {
 			HttpURLConnection.setFollowRedirects(false);
 			URL url = new URL("http://localhost:" + specificPreferences.getLiveReloadPort() + "/livereload.js"); //$NON-NLS-1$ //$NON-NLS-2$
 			HttpURLConnection con = (HttpURLConnection) url.openConnection();
+			con.setConnectTimeout(1000);
 			con.setRequestMethod("HEAD"); //$NON-NLS-1$
 			return (con.getResponseCode() == HttpURLConnection.HTTP_OK);
 		} catch (Exception e) {
