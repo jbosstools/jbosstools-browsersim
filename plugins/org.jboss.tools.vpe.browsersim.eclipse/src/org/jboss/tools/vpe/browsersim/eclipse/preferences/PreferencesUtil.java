@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2007-2013 Red Hat, Inc.
+ * Copyright (c) 2007-2014 Red Hat, Inc.
  * Distributed under license by Red Hat, Inc. All rights reserved.
  * This program is made available under the terms of the
  * Eclipse Public License v1.0 which accompanies this distribution,
@@ -7,6 +7,7 @@
  *
  * Contributor:
  *     Red Hat, Inc. - initial API and implementation
+ *     Zend Technologies Ltd. - JBIDE-18678
  ******************************************************************************/
 package org.jboss.tools.vpe.browsersim.eclipse.preferences;
 
@@ -46,6 +47,7 @@ import org.jboss.tools.vpe.browsersim.eclipse.launcher.ExternalProcessLauncher;
 /**
  * @author Konstantin Marmalyukov (kmarmaliykov)
  * @author Ilya Buziuk (ibuziuk)
+ * @author Kaloyan Raev (kaloyan-raev)
  */
 @SuppressWarnings("restriction")
 public class PreferencesUtil {
@@ -242,7 +244,13 @@ public class PreferencesUtil {
 	}
 	
 	public static boolean requiresGTK3() {
-	    LinuxDistro distro = LinuxSystem.INSTANCE.getDistro();
-	    return LinuxSystem.INSTANCE.REDHAT.equals(distro) && distro.getVersion().compareTo("7") >= 0; //$NON-NLS-1$
+		try {
+		    LinuxDistro distro = LinuxSystem.INSTANCE.getDistro();
+		    return LinuxSystem.INSTANCE.REDHAT.equals(distro) && distro.getVersion().compareTo("7") >= 0; //$NON-NLS-1$
+		} catch (NoClassDefFoundError e) {
+			// org.jboss.tools.usage bundle is not present, so it cannot be
+			// determined if the OS is RedHat 7 or greater
+			return false;
+		}
 	}
 }
