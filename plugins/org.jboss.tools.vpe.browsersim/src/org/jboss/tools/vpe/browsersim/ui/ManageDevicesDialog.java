@@ -512,6 +512,12 @@ public class ManageDevicesDialog extends Dialog {
 		newSpecificPreferences = create(selectedDeviceId, useSkins, enableLiveReload, getLiveReloadPort(), touchEventsCheckBox.getSelection(), isJavaFx);
 		getSpecificPreferencesStorage().save(newSpecificPreferences);
 		CommonPreferencesStorage.INSTANCE.save(newCommonPreferences);
+		Shell[] shells = Display.getDefault().getShells();
+		for (Shell s : shells) {
+			if (s != null && !s.isDisposed()) {
+				s.close();				
+			}
+		}
 		Display.getDefault().dispose();						
 		sendRestartCommand();
 	}
