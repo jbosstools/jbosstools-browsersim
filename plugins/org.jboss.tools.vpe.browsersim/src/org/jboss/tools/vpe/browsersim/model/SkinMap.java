@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2007-2012 Red Hat, Inc.
+ * Copyright (c) 2007-2014 Red Hat, Inc.
  * Distributed under license by Red Hat, Inc. All rights reserved.
  * This program is made available under the terms of the
  * Eclipse Public License v1.0 which accompanies this distribution,
@@ -22,6 +22,7 @@ import org.jboss.tools.vpe.browsersim.ui.skin.ios.AppleIPadMiniResizableSkin;
 import org.jboss.tools.vpe.browsersim.ui.skin.ios.AppleIPadResizableSkin;
 import org.jboss.tools.vpe.browsersim.ui.skin.ios.AppleIPhone3ResizableSkin;
 import org.jboss.tools.vpe.browsersim.ui.skin.ios.AppleIPhone4ResizableSkin;
+import org.jboss.tools.vpe.browsersim.ui.skin.ios.AppleIPhone6ResizableSkin;
 
 public class SkinMap {
 	public static final  Class<? extends BrowserSimSkin> DEFAULT_SKIN_CLASS = NativeSkin.class;
@@ -37,6 +38,7 @@ public class SkinMap {
 		map.put(GalaxyS3Skin.ANDROID_SKIN_ID, GalaxyS3Skin.class);
 		map.put(AppleIPadResizableSkin.IPAD_SKIN_ID, AppleIPadResizableSkin.class);
 		map.put(AppleIPadMiniResizableSkin.IPAD_MINI_SKIN_ID, AppleIPadMiniResizableSkin.class);
+		map.put(AppleIPhone6ResizableSkin.IPHONE6_SKIN_ID, AppleIPhone6ResizableSkin.class);
 	}
 	
 	public static SkinMap getInstance() {
