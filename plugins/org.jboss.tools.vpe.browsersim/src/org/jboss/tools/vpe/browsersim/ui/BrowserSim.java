@@ -80,6 +80,7 @@ import org.jboss.tools.vpe.browsersim.util.ReflectionUtil;
 /**
  * @author Yahor Radtsevich (yradtsevich)
  * @author Konstantin Marmalyukov (kmarmaliykov)
+ * @author Ilya Buziuk (ibuziuk)
  */
 public class BrowserSim {
 	public static final String BROWSERSIM_PLUGIN_ID = "org.jboss.tools.vpe.browsersim"; //$NON-NLS-1$
@@ -197,13 +198,7 @@ public class BrowserSim {
 		shell.addListener(SWT.Close, new Listener() {
 			@Override
 			public void handleEvent(Event event) {
-				instances.remove(BrowserSim.this);
-				specificPreferences.setLocation(currentLocation);
-				getSpecificPreferencesStorage().save(specificPreferences);
-				if(instances.isEmpty()) {
-					CommonPreferencesStorage.INSTANCE.save(commonPreferences);
-				}
-				commonPreferences.deleteObserver(commonPreferencesObserver);
+				cleanUpOnClose(shell);
 			}
 		});
 		
@@ -783,4 +778,20 @@ public class BrowserSim {
 			}
 		};
 	}
+	
+	/**
+	 * Performs the cleanup work (saving preferences / removing synchronized window) on BrowserSim close.
+	 *
+	 * @param shell the BrowserSim shell
+	 */
+	protected void cleanUpOnClose(Shell shell) {
+		instances.remove(BrowserSim.this);
+		specificPreferences.setLocation(shell.getLocation());
+		getSpecificPreferencesStorage().save(specificPreferences);
+		if (instances.isEmpty()) {
+			CommonPreferencesStorage.INSTANCE.save(commonPreferences);
+		}
+		commonPreferences.deleteObserver(commonPreferencesObserver);
+	}
+	
 }
