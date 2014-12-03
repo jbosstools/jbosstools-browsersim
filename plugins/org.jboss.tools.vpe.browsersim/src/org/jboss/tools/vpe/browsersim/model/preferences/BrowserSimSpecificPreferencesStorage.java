@@ -37,7 +37,7 @@ import org.xml.sax.SAXException;
  * @author Konstantin Marmalyukov (kmarmaliykov)
  */
 public class BrowserSimSpecificPreferencesStorage extends SpecificPreferencesStorage{
-	private static final int CURRENT_CONFIG_VERSION = 11;
+	private static final int CURRENT_CONFIG_VERSION = 12;
 	private static final String SPECIFIC_PREFERENCES_FILE = "specificPreferences.xml"; //$NON-NLS-1$
 	private static final String DEFAULT_SPECIFIC_PREFERENCES_RESOURCE = "config/specificPreferences.xml"; //$NON-NLS-1$
 	

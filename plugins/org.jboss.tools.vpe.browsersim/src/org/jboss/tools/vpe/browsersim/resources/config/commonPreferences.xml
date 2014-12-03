@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<browserSim version="12">
+<browserSim version="13">
 	<truncateWindow>PROMPT</truncateWindow>
 	<screenshotsFolder></screenshotsFolder>
 	<weinre>
@@ -31,6 +31,22 @@
 			<userAgent>Mozilla/5.0 (iPad; U; CPU OS 4_3_1 like Mac OS X; en-us) AppleWebKit/533.17.9 (KHTML, like Gecko) Version/5.0.2 Mobile/8G4 Safari/6533.18.5</userAgent>
 			<skin>iPad mini</skin>
 		</device>
+		<device id="f1412672-661c-44fc-b601-7f022ac10fda">
+		    <name>Apple iPhone 6+</name>
+		    <width>1224</width>
+		    <height>2208</height>
+		    <pixelRatio>3.0</pixelRatio>
+		    <userAgent>Mozilla/5.0 (iPhone; CPU iPhone OS 8_0 like Mac OS X) AppleWebKit/600.1.4 (KHTML, like Gecko) Version/8.0 Mobile/12A366 Safari/600.1.4</userAgent>
+		    <skin>iPhone 6</skin>
+		</device>
+		<device id="e673f647-73ea-498d-8501-e5aa915a4cd4">
+		    <name>Apple iPhone 6</name>
+		    <width>750</width>
+		    <height>1334</height>
+		    <pixelRatio>2.0</pixelRatio>
+		    <userAgent>Mozilla/5.0 (iPhone; CPU iPhone OS 8_0_2 like Mac OS X) AppleWebKit/600.1.4 (KHTML, like Gecko) Version/8.0 Mobile/12A366 Safari/600.1.4</userAgent>
+		    <skin>iPhone 6</skin>
+		</device>
 		<device id="7192d646-0179-45bc-9c85-f68e325e8971">
 			<name>Apple iPhone 5</name>
 			<width>640</width>
@@ -48,7 +64,7 @@
 			<skin>iPhone 4</skin>
 		</device>
 		<device id="037f1de3-60cf-44e6-904e-e4dc3ca9f602">
-			<name>HTC One(M8)</name>
+			<name>HTC One (M8)</name>
 			<width>1080</width>
 			<height>1920</height>
 			<pixelRatio>3.0</pixelRatio>
