@@ -69,7 +69,7 @@ public class CommonPreferencesStorage implements PreferencesStorage{
 	private static final String DEFAULT_WEINRE_SCRIPT_URL = "http://debug.build.phonegap.com/target/target-script-min.js"; //$NON-NLS-1$
 	private static final String DEFAULT_WEINRE_CLIENT_URL = "http://debug.build.phonegap.com/client/"; //$NON-NLS-1$
 	
-	private static final int CURRENT_CONFIG_VERSION = 12;
+	private static final int CURRENT_CONFIG_VERSION = 13;
 	
 	public static final CommonPreferencesStorage INSTANCE = new CommonPreferencesStorage();
 	
