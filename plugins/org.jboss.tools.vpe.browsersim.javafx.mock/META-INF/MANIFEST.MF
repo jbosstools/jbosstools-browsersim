@@ -3,7 +3,7 @@ Bundle-ManifestVersion: 2
 Bundle-Name: Mock
 Bundle-SymbolicName: org.jboss.tools.vpe.browsersim.javafx.mock
 Bundle-Version: 3.6.0.qualifier
-Bundle-RequiredExecutionEnvironment: JavaSE-1.6
+Bundle-RequiredExecutionEnvironment: JavaSE-1.7
 Require-Bundle: org.eclipse.swt
 Export-Package: com.sun.javafx.scene.web,
  javafx.application,
