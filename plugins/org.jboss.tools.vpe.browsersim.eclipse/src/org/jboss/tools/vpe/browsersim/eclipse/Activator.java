@@ -7,6 +7,7 @@
  *
  * Contributor:
  *     Red Hat, Inc. - initial API and implementation
+ *     Zend Technologies Ltd. - JBIDE-18678
  ******************************************************************************/
 package org.jboss.tools.vpe.browsersim.eclipse;
 
@@ -40,6 +41,7 @@ import org.osgi.framework.BundleContext;
  * 
  * @author "Yahor Radtsevich (yradtsevich)"
  * @author Ilya Buziuk (ibuziuk)
+ * @author Kaloyan Raev (kaloyan-raev)
  */
 public class Activator extends AbstractUIPlugin {
 	
@@ -70,8 +72,14 @@ public class Activator extends AbstractUIPlugin {
 	public void start(BundleContext context) throws Exception {
 		super.start(context);
 		plugin = this;
-		launchEventType = new UsageEventType(this, BROWSERSIM_ACTION, Messages.UsageEventTypeLaunchLabelDescription, UsageEventType.HOW_MANY_TIMES_VALUE_DESCRIPTION);
-		UsageReporter.getInstance().registerEvent(launchEventType);
+		
+		try {
+			launchEventType = new UsageEventType(this, BROWSERSIM_ACTION, Messages.UsageEventTypeLaunchLabelDescription, UsageEventType.HOW_MANY_TIMES_VALUE_DESCRIPTION);
+			UsageReporter.getInstance().registerEvent(launchEventType);
+		} catch (NoClassDefFoundError e) {
+			// org.jboss.tools.usage bundle is not present, so no usage
+			// reporting action will be taken
+		}
 	}
 
 	public void countLaunchEvent() {
@@ -82,6 +90,9 @@ public class Activator extends AbstractUIPlugin {
 			Activator.logError(e.getMessage(), e);
 		} catch (IOException e) {
 			Activator.logError(e.getMessage(), e);
+		} catch (NoClassDefFoundError e) {
+			// org.jboss.tools.usage bundle is not present, so no usage
+			// reporting action will be taken
 		}
 	}
 
