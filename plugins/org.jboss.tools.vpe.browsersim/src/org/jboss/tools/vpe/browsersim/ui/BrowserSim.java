@@ -212,7 +212,7 @@ public class BrowserSim {
 			public void widgetDisposed(DisposeEvent arg0) {
 				try {
 					if (!BrowserSimArgs.standalone) {
-						ReflectionUtil.call("org.jboss.tools.vpe.browsersim.devtools.DevToolsDebuggerServer", "stopDebugServer");
+						ReflectionUtil.call("org.jboss.tools.vpe.browsersim.devtools.DevToolsDebuggerServer", "stopDebugServer"); //$NON-NLS-1$ //$NON-NLS-2$
 					}
 				} catch (Exception e) {
 					BrowserSimLogger.logError(e.getMessage(), e);
@@ -405,46 +405,50 @@ public class BrowserSim {
 		});
 	}
 
-	private void createLogFunctions(IBrowser browser) {
-		browser.registerBrowserFunction(ConsoleLogConstants.BROSERSIM_CONSOLE_LOG, new JsLogFunction(browser,  MessageType.LOG)); 
-		browser.registerBrowserFunction(ConsoleLogConstants.BROSERSIM_CONSOLE_INFO, new JsLogFunction(browser,  MessageType.INFO));  
-		browser.registerBrowserFunction(ConsoleLogConstants.BROSERSIM_CONSOLE_WARN, new JsLogFunction(browser,  MessageType.WARN));  
-		browser.registerBrowserFunction(ConsoleLogConstants.BROSERSIM_CONSOLE_ERROR, new JsLogFunction(browser,  MessageType.ERROR));  
+	private void createLogFunctions(final IBrowser browser) {
+		if (browser != null && !browser.isDisposed()) { 
+			browser.registerBrowserFunction(ConsoleLogConstants.BROSERSIM_CONSOLE_LOG, new JsLogFunction(browser,  MessageType.LOG)); 
+			browser.registerBrowserFunction(ConsoleLogConstants.BROSERSIM_CONSOLE_INFO, new JsLogFunction(browser,  MessageType.INFO));  
+			browser.registerBrowserFunction(ConsoleLogConstants.BROSERSIM_CONSOLE_WARN, new JsLogFunction(browser,  MessageType.WARN));  
+			browser.registerBrowserFunction(ConsoleLogConstants.BROSERSIM_CONSOLE_ERROR, new JsLogFunction(browser,  MessageType.ERROR));  
+		}
 	}
 	
-	private void overrideJsLogFunctions(IBrowser browser) {
-		browser.execute("(function() {" //$NON-NLS-1$
-				+ "if (window.console) {" //$NON-NLS-1$
-				//  Adding BrowserFunction to the process of logging
-				+ 	"var originalConsole = window.console;" //$NON-NLS-1$
-				+ 	"console = {" //$NON-NLS-1$
-				+		"log: function(message) {" //$NON-NLS-1$
-				+			"originalConsole.log(message);" //$NON-NLS-1$
-				+			ConsoleLogConstants.BROSERSIM_CONSOLE_LOG + "(message);" //$NON-NLS-1$
-				+		"}," //$NON-NLS-1$
-				+		"info: function(message) {" //$NON-NLS-1$
-				+			"originalConsole.info(message);" //$NON-NLS-1$
-				+			ConsoleLogConstants.BROSERSIM_CONSOLE_INFO + "(message);" //$NON-NLS-1$
-				+		"},"  //$NON-NLS-1$
-				+		"warn: function(message) {" //$NON-NLS-1$
-				+			"originalConsole.warn(message);" //$NON-NLS-1$
-				+			ConsoleLogConstants.BROSERSIM_CONSOLE_WARN + "(message);" //$NON-NLS-1$
-				+		"},"   //$NON-NLS-1$
-				+		"error: function(message) {" //$NON-NLS-1$
-				+			"originalConsole.error(message);" //$NON-NLS-1$
-				+			ConsoleLogConstants.BROSERSIM_CONSOLE_ERROR + "(message);" //$NON-NLS-1$
-				+		"},"   //$NON-NLS-1$
-				+		"debug: function(message) {" //$NON-NLS-1$ 
-				+			"console.log(message);" //$NON-NLS-1$ do the same as for 'console.log'
-				+		"}"   //$NON-NLS-1$
-				+ 	"};" //$NON-NLS-1$
-
-				// Overriding window.onerror 
-				+	"window.onerror = function(msg, url, lineNumber) {" //$NON-NLS-1$
-				+		"console.error(msg + ' on line ' + lineNumber + ' for ' + url);"  //$NON-NLS-1$
-				+	"}" //$NON-NLS-1$
-				+ "}" //$NON-NLS-1$
-		+ "})();");	 //$NON-NLS-1$
+	private void overrideJsLogFunctions(final IBrowser browser) {
+		if (browser != null && !browser.isDisposed()) {
+			browser.execute("(function() {" //$NON-NLS-1$
+					+ "if (window.console) {" //$NON-NLS-1$
+					//  Adding BrowserFunction to the process of logging
+					+ 	"var originalConsole = window.console;" //$NON-NLS-1$
+					+ 	"console = {" //$NON-NLS-1$
+					+		"log: function(message) {" //$NON-NLS-1$
+					+			"originalConsole.log(message);" //$NON-NLS-1$
+					+			ConsoleLogConstants.BROSERSIM_CONSOLE_LOG + "(message);" //$NON-NLS-1$
+					+		"}," //$NON-NLS-1$
+					+		"info: function(message) {" //$NON-NLS-1$
+					+			"originalConsole.info(message);" //$NON-NLS-1$
+					+			ConsoleLogConstants.BROSERSIM_CONSOLE_INFO + "(message);" //$NON-NLS-1$
+					+		"},"  //$NON-NLS-1$
+					+		"warn: function(message) {" //$NON-NLS-1$
+					+			"originalConsole.warn(message);" //$NON-NLS-1$
+					+			ConsoleLogConstants.BROSERSIM_CONSOLE_WARN + "(message);" //$NON-NLS-1$
+					+		"},"   //$NON-NLS-1$
+					+		"error: function(message) {" //$NON-NLS-1$
+					+			"originalConsole.error(message);" //$NON-NLS-1$
+					+			ConsoleLogConstants.BROSERSIM_CONSOLE_ERROR + "(message);" //$NON-NLS-1$
+					+		"},"   //$NON-NLS-1$
+					+		"debug: function(message) {" //$NON-NLS-1$ 
+					+			"console.log(message);" //$NON-NLS-1$ do the same as for 'console.log'
+					+		"}"   //$NON-NLS-1$
+					+ 	"};" //$NON-NLS-1$
+	
+					// Overriding window.onerror 
+					+	"window.onerror = function(msg, url, lineNumber) {" //$NON-NLS-1$
+					+		"console.error(msg + ' on line ' + lineNumber + ' for ' + url);"  //$NON-NLS-1$
+					+	"}" //$NON-NLS-1$
+					+ "}" //$NON-NLS-1$
+			+ "})();");	 //$NON-NLS-1$
+		}
 	}
 
 	private void enableLivereloadIfAvailable() {
@@ -571,6 +575,7 @@ public class BrowserSim {
 		skin.getBrowser().setUserAgent(device.getUserAgent());
 		skin.getBrowser().setUrl(oldSkinUrl); 
 		skin.getShell().open();
+		processLiveReload(specificPreferences.isEnableLiveReload());
 	}
 	
 	private void processLiveReload(boolean isLiveReloadEnabled) {
