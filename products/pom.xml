@@ -4,7 +4,7 @@
 	<parent>
                 <groupId>org.jboss.tools</groupId>
                 <artifactId>browsersim</artifactId>
-        	<version>3.6.0-SNAPSHOT</version>
+        	<version>3.7.0-SNAPSHOT</version>
         </parent>
 	<modelVersion>4.0.0</modelVersion>
 	<groupId>org.jboss.tools.vpe</groupId>
@@ -18,5 +18,4 @@
 		<module>../plugins/org.jboss.tools.vpe.browsersim.browser</module>
 		<module>browsersim-standalone</module>
 	</modules>
-
 </project>
