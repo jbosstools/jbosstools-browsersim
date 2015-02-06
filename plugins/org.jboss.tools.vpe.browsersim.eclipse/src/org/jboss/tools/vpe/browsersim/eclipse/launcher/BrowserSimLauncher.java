@@ -67,7 +67,7 @@ public class BrowserSimLauncher {
 				bundles.add("org.jboss.tools.vpe.browsersim.javafx.mock"); //$NON-NLS-1$
 			}
 			
-			ExternalProcessLauncher.launchAsExternalProcess(bundles, RESOURCES_BUNDLES,
+			ExternalProcessLauncher.launchAsExternalProcess(bundles, RESOURCES_BUNDLES, getJettyBundles(),
 					BROWSERSIM_CALLBACKS, BROWSERSIM_CLASS_NAME, parameters, Messages.BrowserSim, jvm);
 		}
 	}
@@ -78,19 +78,25 @@ public class BrowserSimLauncher {
 		bundles.add("org.jboss.tools.vpe.browsersim.browser"); //$NON-NLS-1$
 		bundles.add("org.jboss.tools.vpe.browsersim.debugger");  //$NON-NLS-1$
 		
+		bundles.add("org.eclipse.swt"); //$NON-NLS-1$
+		bundles.add("org.eclipse.swt."+ PlatformUtil.CURRENT_PLATFORM); //$NON-NLS-1$
+
+		bundles.add("javax.servlet"); //$NON-NLS-1$
+		return bundles;
+	}
+	
+	public static List<String> getJettyBundles() {
+		List<String> bundles = new ArrayList<String>();
+		
 		bundles.add("org.eclipse.jetty.server"); //$NON-NLS-1$
 		bundles.add("org.eclipse.jetty.servlet"); //$NON-NLS-1$
 		bundles.add("org.eclipse.jetty.websocket"); //$NON-NLS-1$
-		bundles.add("javax.servlet"); //$NON-NLS-1$
 		bundles.add("org.eclipse.jetty.util"); //$NON-NLS-1$
 		bundles.add("org.eclipse.jetty.http"); //$NON-NLS-1$
 		bundles.add("org.eclipse.jetty.io"); //$NON-NLS-1$
 		bundles.add("org.eclipse.jetty.security"); //$NON-NLS-1$
 		bundles.add("org.eclipse.jetty.continuation"); //$NON-NLS-1$
-		
-		bundles.add("org.eclipse.swt"); //$NON-NLS-1$
-		bundles.add("org.eclipse.swt."+ PlatformUtil.CURRENT_PLATFORM); //$NON-NLS-1$
-		
+
 		return bundles;
 	}
 	

@@ -340,9 +340,9 @@ public class BrowserSimMenuCreator {
 	
 	private void showAboutDialog(Shell shell) {
 		String message = ""; //$NON-NLS-1$
-		String version = ManifestUtil.getManifestVersion();
+		String version = ManifestUtil.getManifestVersion(BrowserSim.class);
 		if (version != null) {
-			message = MessageFormat.format(Messages.BrowserSim_ABOUT_BROWSERSIM_MESSAGE, ManifestUtil.getManifestVersion());
+			message = MessageFormat.format(Messages.BrowserSim_ABOUT_BROWSERSIM_MESSAGE, ManifestUtil.getManifestVersion(BrowserSim.class));
 		} else {
 			message = MessageFormat.format(Messages.BrowserSim_ABOUT_BROWSERSIM_MESSAGE, ""); //$NON-NLS-1$
 		}

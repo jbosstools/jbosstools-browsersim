@@ -47,6 +47,7 @@ import org.jboss.tools.vpe.browsersim.eclipse.Messages;
 import org.jboss.tools.vpe.browsersim.eclipse.dialog.BrowserSimErrorDialog;
 import org.jboss.tools.vpe.browsersim.eclipse.preferences.BrowserSimPreferencesPage;
 import org.jboss.tools.vpe.browsersim.eclipse.preferences.PreferencesUtil;
+import org.jboss.tools.vpe.browsersim.util.ManifestUtil;
 import org.osgi.framework.Bundle;
 
 /**
@@ -61,10 +62,10 @@ public class ExternalProcessLauncher {
 	private static final String ON = "1"; //$NON-NLS-1$
 	
 	
-	public static void launchAsExternalProcess(List<String> bundles, List<String> resourcesBundles,
+	public static void launchAsExternalProcess(List<String> bundles, List<String> resourcesBundles, List<String> jettyBundles,
 			final List<ExternalProcessCallback> callbacks, String className, List<String> parameters, final String programName, IVMInstall jvm) {
 		try {			
-			String classPath = getClassPathString(bundles, resourcesBundles);			
+			String classPath = getClassPathString(bundles, resourcesBundles, jettyBundles);			
 			String jreContainerPath = JavaRuntime.newJREContainerPath(jvm).toPortableString();
 			if (jreContainerPath != null) {
 				List<String> commandElements = new ArrayList<String>();
@@ -160,7 +161,7 @@ public class ExternalProcessLauncher {
 		});
 	}
 	
-	private static String getClassPathString(List<String> bundles, List<String> resourcesBundles) throws IOException {
+	private static String getClassPathString(List<String> bundles, List<String> resourcesBundles, List<String> jettyBundles) throws IOException {
 		List<Bundle> classPathBundles = new ArrayList<Bundle>();
 		for (String bundleName : bundles) {
 			Bundle bundle = Platform.getBundle(bundleName);
@@ -168,7 +169,18 @@ public class ExternalProcessLauncher {
 				classPathBundles.add(bundle);
 			}
 		}
-					
+		
+		String jettyVersion = ManifestUtil.getJettyVersion();
+		String jettyMajorVersion = jettyVersion.substring(0, jettyVersion.indexOf(".")); //$NON-NLS-1$
+		for (String bundleName : jettyBundles) {
+			Bundle[] jettys = Platform.getBundles(bundleName, null);
+			for (Bundle jetty : jettys) {				
+				if (jetty.getVersion().toString().startsWith(jettyMajorVersion)) {
+					classPathBundles.add(jetty);
+				}
+			}
+		}
+		
 		StringBuilder classPath = new StringBuilder();
 		if (classPathBundles.size() > 0) {
 			for (int i = 0; i < classPathBundles.size() - 1; i++) {
