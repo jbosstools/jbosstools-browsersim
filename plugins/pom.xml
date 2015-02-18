@@ -4,11 +4,11 @@
 	<parent>
 		<groupId>org.jboss.tools</groupId>
 		<artifactId>browsersim</artifactId>
-		<version>3.6.1-SNAPSHOT</version>
+		<version>3.6.2-SNAPSHOT</version>
 	</parent>
 	<groupId>org.jboss.tools.browsersim</groupId>
 	<artifactId>plugins</artifactId>
-	<version>3.6.1-SNAPSHOT</version>
+	<version>3.6.2-SNAPSHOT</version>
 	<name>browsersim.plugins</name>
 	<packaging>pom</packaging>
 	<modules>

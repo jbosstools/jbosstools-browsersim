@@ -2,7 +2,7 @@ Manifest-Version: 1.0
 Bundle-ManifestVersion: 2
 Bundle-Name: WebKit support for BrowserSim
 Bundle-SymbolicName: org.jboss.tools.vpe.browsersim.browser;singleton:=true
-Bundle-Version: 3.6.1.qualifier
+Bundle-Version: 3.6.2.qualifier
 Bundle-RequiredExecutionEnvironment: JavaSE-1.6
 Eclipse-ExtensibleAPI: true
 Export-Package: org.jboss.tools.vpe.browsersim.browser,
