@@ -4,12 +4,12 @@
 	<parent>
 		<groupId>org.jboss.tools.vpe</groupId>
 		<artifactId>browsersim.products</artifactId>
-		<version>3.6.1-SNAPSHOT</version>
+		<version>3.6.2-SNAPSHOT</version>
 	</parent>	
 	<modelVersion>4.0.0</modelVersion>
 	<groupId>org.jboss.tools.vpe.browsersim</groupId>
 	<artifactId>org.jboss.tools.vpe.browsersim-standalone</artifactId>
-	<version>3.6.1-SNAPSHOT</version>
+	<version>3.6.2-SNAPSHOT</version>
 	<packaging>eclipse-repository</packaging>
 	<name>org.jboss.tools.vpe.browsersim-standalone</name>
 	<build>
