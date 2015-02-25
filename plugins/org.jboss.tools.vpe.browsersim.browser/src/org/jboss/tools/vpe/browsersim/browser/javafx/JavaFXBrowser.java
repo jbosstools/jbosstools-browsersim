@@ -56,7 +56,7 @@ public class JavaFXBrowser extends FXCanvas implements IBrowser {
 		Debugger debugger = getEngine().impl_getDebugger();
 
 		debugger.setEnabled(true);
-		debugger.sendMessage("{\"id\" : -1, \"method\" : \"Network.enable\"}");
+		debugger.sendMessage("{\"id\" : -1, \"method\" : \"Network.enable\"}"); //$NON-NLS-1$
 		getEngine().getLoadWorker().progressProperty().addListener(new ChangeListener<Number>() {
 			@Override
 			public void changed(ObservableValue<? extends Number> observable,
@@ -105,7 +105,7 @@ public class JavaFXBrowser extends FXCanvas implements IBrowser {
 			public void changed(ObservableValue<? extends String> ov, String oldState, String newState) {
 				TitleEvent event = new TitleEvent(JavaFXBrowser.this);
 				event.widget = JavaFXBrowser.this;
-				event.title = newState != null ? newState : "";
+				event.title = newState != null ? newState : ""; //$NON-NLS-1$
 				for (TitleListener titleListener : titleListeners) {
 					titleListener.changed(event);
 				}
@@ -277,12 +277,12 @@ public class JavaFXBrowser extends FXCanvas implements IBrowser {
 
 	@Override
 	public void stop() {
-		execute("window.stop()");
+		execute("window.stop()"); //$NON-NLS-1$
 	}
 
 	@Override
 	public Object evaluate(String script) {
-		return getEngine().executeScript("(function(){" + script + "}())");
+		return getEngine().executeScript("(function(){" + script + "}())"); //$NON-NLS-1$ //$NON-NLS-2$
 	}
 
 	@Override
@@ -297,21 +297,21 @@ public class JavaFXBrowser extends FXCanvas implements IBrowser {
 
 	@Override
 	public IDisposable registerBrowserFunction(final String name, final IBrowserFunction iBrowserFunction) {
-		JSObject window = (JSObject) evaluate("return window");
+		JSObject window = (JSObject) evaluate("return window"); //$NON-NLS-1$
 		
-		final String id = "__webViewProxy_" + name;
+		final String id = "__webViewProxy_" + name; //$NON-NLS-1$
 		window.setMember(id, new JavaFXBrowserFunctionProxy(iBrowserFunction));
-		evaluate("window['" + name + "'] = function(){return window['" + id + "'].func(arguments)}");
+		evaluate("window['" + name + "'] = function(){return window['" + id + "'].func(arguments)}"); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
 		
 		return new IDisposable() {
 			@Override
 			public void dispose() {
-				evaluate("delete window['" + name + "']; delete window['" + id + "']");
+				evaluate("delete window['" + name + "']; delete window['" + id + "']"); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
 			}
 			
 			@Override
 			public boolean isDisposed() {
-				return (Boolean) evaluate("return window['" + name + "'] === undefined && window['" + id + "'] === undefined");
+				return (Boolean) evaluate("return window['" + name + "'] === undefined && window['" + id + "'] === undefined"); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
 			}
 		}; 
 	}
@@ -323,16 +323,16 @@ public class JavaFXBrowser extends FXCanvas implements IBrowser {
 	@Override
 	public String getText() {
 		String doctypeScript = 
-			"var node = document.doctype;" +
-			"var doctypeText = \"<!DOCTYPE \"" +
-			         "+ node.name" +  
-			         "+ (node.publicId ? ' PUBLIC \"' + node.publicId + '\"' : '')" +
-			         "+ (!node.publicId && node.systemId ? ' SYSTEM' : '')" + 
-			         "+ (node.systemId ? ' \"' + node.systemId + '\"' : '')" +
-			         "+ '>';" +
-			 "return doctypeText";
+			"var node = document.doctype;" + //$NON-NLS-1$
+			"var doctypeText = \"<!DOCTYPE \"" + //$NON-NLS-1$
+			         "+ node.name" +   //$NON-NLS-1$
+			         "+ (node.publicId ? ' PUBLIC \"' + node.publicId + '\"' : '')" + //$NON-NLS-1$
+			         "+ (!node.publicId && node.systemId ? ' SYSTEM' : '')" +  //$NON-NLS-1$
+			         "+ (node.systemId ? ' \"' + node.systemId + '\"' : '')" + //$NON-NLS-1$
+			         "+ '>';" + //$NON-NLS-1$
+			 "return doctypeText"; //$NON-NLS-1$
 		String doctypeText = (String) evaluate(doctypeScript);
-		String innerHtml = (String) evaluate("return window.document.documentElement.outerHTML");
+		String innerHtml = (String) evaluate("return window.document.documentElement.outerHTML"); //$NON-NLS-1$
 		return doctypeText + '\n' + innerHtml;
 	}
 
@@ -354,22 +354,26 @@ public class JavaFXBrowser extends FXCanvas implements IBrowser {
 	@Override
 	public void setUserAgent(String userAgent) {
 		if (userAgent == null) {
-			userAgent = ""; // empty string means 'default value' for DevTools
+			userAgent = ""; // empty string means 'default value' for DevTools //$NON-NLS-1$
 		}
 		String escapedUserAgent = userAgent
-				.replace("\\", "\\\\")
-				.replace("\"", "\\\"");
-		getDebugger().sendMessage("{\"id\" : -1, \"method\" : \"Network.setUserAgentOverride\","
-				+ "\"params\" : { "
-				+ 		"\"userAgent\" : \""+ escapedUserAgent +"\""
-				+ "}}");
+				.replace("\\", "\\\\") //$NON-NLS-1$ //$NON-NLS-2$
+				.replace("\"", "\\\""); //$NON-NLS-1$ //$NON-NLS-2$
+		getDebugger().sendMessage("{\"id\" : -1, \"method\" : \"Network.setUserAgentOverride\"," //$NON-NLS-1$
+				+ "\"params\" : { " //$NON-NLS-1$
+				+ 		"\"userAgent\" : \""+ escapedUserAgent +"\"" //$NON-NLS-1$ //$NON-NLS-2$
+				+ "}}"); //$NON-NLS-1$
 	}
 
 	@Override
 	public boolean setUrl(String location) {
-		location = location.trim();
-		if (!location.contains(":")) {
-			location = "http://" + location;
+		if (location == null || location.trim().isEmpty()) {
+			location = "about:blank"; //$NON-NLS-1$
+		} else {
+			location = location.trim();
+			if (!location.contains(":")) { //$NON-NLS-1$
+				location = "http://" + location; //$NON-NLS-1$
+			}
 		}
 		getEngine().load(location);
 
