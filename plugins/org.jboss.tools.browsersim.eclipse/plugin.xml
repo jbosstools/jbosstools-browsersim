@@ -1,0 +1,129 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?eclipse version="3.4"?>
+<plugin>
+   <extension
+         point="org.eclipse.ui.commands">
+      <category
+            name="BrowserSim"
+            id="org.jboss.tools.browsersim.eclipse.commands.category">
+      </category>
+      <command
+            name="Run BrowserSim"
+            categoryId="org.jboss.tools.browsersim.eclipse.commands.category"
+            id="org.jboss.tools.browsersim.eclipse.commands.runBrowserSim">
+      </command>
+   </extension>
+   <!--extension
+         point="org.eclipse.ui.bindings">
+      <key
+            commandId="org.jboss.tools.browsersim.eclipse.commands.runBrowserSim"
+            contextId="org.eclipse.ui.contexts.window"
+            sequence="M1+6"
+            schemeId="org.eclipse.ui.defaultAcceleratorConfiguration">
+      </key>
+   </extension-->
+   <extension
+         point="org.eclipse.ui.actionSets">
+      <actionSet
+            id="org.jboss.tools.browsersim.eclipse.actionSet"
+            label="BrowserSim"
+            visible="false">
+            	<action
+                   id="org.jboss.tools.browsersim.eclipse.runBrowserSim"
+                   definitionId="org.jboss.tools.browsersim.eclipse.commands.runBrowserSim"
+                   toolbarPath="browserSim"
+                   label="Run BrowserSim"
+                   class="org.jboss.tools.browsersim.eclipse.actions.RunBrowserSimAction"
+                   icon="icons/browsersim_16px.png">
+            	</action>
+      </actionSet>
+   </extension>
+   <extension
+         point="org.eclipse.ui.editors">
+      <editor
+            extensions="htm, html"
+            icon="icons/browsersim_16px.png"
+            id="org.jboss.tools.browsersim.eclipse.editors.BrowserSimLauncher"
+            launcher="org.jboss.tools.browsersim.eclipse.editors.BrowserSimEditorLauncher"
+            name="BrowserSim">
+      </editor>
+   </extension>
+   <extension point="org.eclipse.ui.console.consolePageParticipants">
+		<consolePageParticipant 
+			class="org.jboss.tools.browsersim.eclipse.console.ConsolePageParticipant" 
+			id="org.jboss.tools.browsersim.eclipse.console.consolePageParticipant">
+		<enablement>
+			<instanceof value="org.eclipse.ui.console.IConsole" />
+		</enablement>
+	</consolePageParticipant>
+   </extension>
+   <extension point="org.eclipse.ui.browser.browsers">
+       <browser
+             executable="."
+             factoryclass="org.jboss.tools.browsersim.eclipse.BrowserSimFactory"
+             id="org.jboss.tools.browsersim.eclipse"
+             name="BrowserSim"
+             os="Win32,linux,MacOSX">
+          <location>
+             .
+          </location>
+   		</browser>
+   </extension>
+   <extension point="org.eclipse.ui.menus">
+    	<menuContribution 
+      		locationURI="popup:org.eclipse.ui.navigate.showInQuickMenu?after=additions">
+	              <command
+	                   commandId="org.jboss.tools.browsersim.eclipse.commands.runBrowserSim"
+	                   icon="icons/browsersim_16px.png"
+	                   label="BrowserSim"
+	                   style="push">
+	                   <visibleWhen checkEnabled="false">
+	                      <with variable="selection">
+	                        <iterate
+	                              ifEmpty="false"
+	                              operator="or">
+	                            <adapt
+	                                  type="org.eclipse.wst.server.ui.IServerModule">
+	                            </adapt>
+	                        </iterate>
+	                      </with>
+	                   </visibleWhen>
+	              </command>
+      	</menuContribution>
+    </extension>
+    <extension point="org.eclipse.ui.handlers">
+    </extension>
+	<extension point="org.eclipse.ui.perspectiveExtensions"> 
+		<perspectiveExtension targetID="org.jboss.tools.common.ui.JBossPerspective"> 
+			<actionSet id="org.jboss.tools.browsersim.eclipse.actionSet"/> 
+		</perspectiveExtension> 
+		<perspectiveExtension targetID="org.jboss.tools.jst.web.ui.WebDevelopmentPerspective"> 
+			<actionSet id="org.jboss.tools.browsersim.eclipse.actionSet"/> 
+		</perspectiveExtension> 
+		<perspectiveExtension targetID="org.jboss.tools.jst.cssPerspective"> 
+			<actionSet id="org.jboss.tools.browsersim.eclipse.actionSet"/> 
+		</perspectiveExtension> 
+	</extension>
+	<extension point="org.jboss.tools.jst.web.ui.openWithEditorExtension">
+	    <editor-launcher
+	    	class="org.jboss.tools.browsersim.eclipse.launcher.OpenWithBrowserSimLauncher"
+	        editor-name="BrowserSim"
+	        id="org.jboss.tools.browsersim.eclipse.OpenWithBrowserSim">
+		</editor-launcher>
+	</extension>
+	<extension
+         point="org.eclipse.ui.preferencePages">
+      <page
+      		category="org.jboss.tools.common.model.ui.MainPreferencePage"
+            class="org.jboss.tools.browsersim.eclipse.preferences.BrowserSimPreferencesPage"
+            id="org.jboss.tools.browsersim.eclipse.preferences.BrowserSimPreferences"
+            name="BrowserSim/CordovaSim">
+      </page>
+   </extension>
+   <extension
+      point="org.eclipse.core.runtime.preferences">
+	   <initializer
+	         class="org.jboss.tools.browsersim.eclipse.preferences.BrowserSimPreferencesInitializer">
+	   </initializer>
+	</extension>
+</plugin>

@@ -1,0 +1,34 @@
+Manifest-Version: 1.0
+Bundle-ManifestVersion: 2
+Bundle-Name: BrowserSim
+Bundle-Description: Provides a WebKit-based browser, which allows you to view web pages
+ as if they are opened by a mobile phone.\n\n
+ Based in part on Yahoo! Design Stencil Kit version 1.0 (http://developer.yahoo.com/ypatterns/about/stencils/).
+ Copyright 2012 Yahoo! Inc. Licensed under a Creative Commons Attribution 2.5 License (http://creativecommons.org/licenses/by/2.5/).
+Bundle-SymbolicName: org.jboss.tools.browsersim;singleton:=true
+Bundle-Version: 3.7.0.qualifier
+Bundle-RequiredExecutionEnvironment: JavaSE-1.7
+Require-Bundle: org.eclipse.swt;bundle-version="3.7.0",
+ org.jboss.tools.browsersim.browser;bundle-version="1.0.0",
+ org.eclipse.jetty.server;bundle-version="8.1.14",
+ org.eclipse.jetty.servlet;bundle-version="8.1.14",
+ org.eclipse.jetty.websocket;bundle-version="8.1.14",
+ javax.servlet;bundle-version="3.0.0",
+ org.eclipse.jetty.util;bundle-version="8.1.14",
+ org.eclipse.jetty.http;bundle-version="8.1.14",
+ org.eclipse.jetty.io;bundle-version="8.1.14",
+ org.eclipse.jetty.security;bundle-version="8.1.14",
+ org.eclipse.jetty.continuation;bundle-version="8.1.14",
+ org.jboss.tools.browsersim.javafx.mock;bundle-version="3.6.0";resolution:=optional,
+ org.jboss.tools.browsersim.debugger;bundle-version="3.6.0"
+Export-Package: org.jboss.tools.browsersim,
+ org.jboss.tools.browsersim.devtools,
+ org.jboss.tools.browsersim.js.log,
+ org.jboss.tools.browsersim.model,
+ org.jboss.tools.browsersim.model.preferences,
+ org.jboss.tools.browsersim.ui,
+ org.jboss.tools.browsersim.ui.events,
+ org.jboss.tools.browsersim.ui.menu,
+ org.jboss.tools.browsersim.ui.skin,
+ org.jboss.tools.browsersim.util
+Bundle-Vendor: JBoss by Red Hat
