@@ -20,7 +20,7 @@ import org.jboss.tools.browsersim.ui.BrowserSim;
  */
 public class BrowserSimResourcesUtil {
 
-	private static final String RESOURCES_ROOT_FOLDER = "/org/jboss/tools/vpe/browsersim/resources/"; //$NON-NLS-1$
+	private static final String RESOURCES_ROOT_FOLDER = "/org/jboss/tools/browsersim/resources/"; //$NON-NLS-1$
 
 	public static InputStream getResourceAsStream(String name) {
 		return ResourcesUtil.getResourceAsStream(RESOURCES_ROOT_FOLDER, name);

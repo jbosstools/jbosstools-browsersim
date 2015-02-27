@@ -1,11 +1,12 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <?pde version="3.5"?>
 
-<product name="JBoss Tools Mobile Browser Simulator" uid="org.jboss.tools.browsersim" application="org.jboss.tools.vpe.browsersim.eclipse.application" version="1.0.0.qualifier" useFeatures="false" includeLaunchers="false">
+<product name="JBoss Tools Mobile Browser Simulator" uid="org.jboss.tools.browsersim" application="org.jboss.tools.browsersim.eclipse.application" version="1.0.0.qualifier" useFeatures="false" includeLaunchers="false">
    <plugins>
       <plugin id="org.eclipse.swt"/>
-      <plugin id="org.jboss.tools.vpe.browsersim.javafx.mock"/>
-      <plugin id="org.jboss.tools.vpe.browsersim"/>
-      <plugin id="org.jboss.tools.vpe.browsersim.browser"/>
+      <plugin id="org.jboss.tools.browsersim.javafx.mock"/>
+      <plugin id="org.jboss.tools.browsersim.ui"/>
+      <plugin id="org.jboss.tools.browsersim.browser"/>
+      <plugin id="org.jboss.tools.browsersim.debugger"/>
    </plugins>
 </product>

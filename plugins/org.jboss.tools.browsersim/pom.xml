@@ -7,7 +7,7 @@
 		<version>3.7.0-SNAPSHOT</version>
 	</parent>
 	<groupId>org.jboss.tools.browsersim.plugins</groupId>
-	<artifactId>org.jboss.tools.browsersim</artifactId> 
+	<artifactId>org.jboss.tools.browsersim.ui</artifactId> 
 	
 	<packaging>eclipse-plugin</packaging>
 </project>
