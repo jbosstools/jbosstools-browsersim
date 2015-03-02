@@ -8,10 +8,10 @@
 	</category-def>
 
 	<!--BrowserSim-->
-	<feature url="features/org.jboss.tools.vpe.browsersim.feature_0.0.0.jar" id="org.jboss.tools.vpe.browsersim.feature" version="0.0.0">
+	<feature url="features/org.jboss.tools.browsersim.feature_0.0.0.jar" id="org.jboss.tools.browsersim.feature" version="0.0.0">
 		<category name="JBoss Tools vpe Nightly Build Update Site"/>
 	</feature>
-	<feature url="features/org.jboss.tools.vpe.browsersim.feature.source_0.0.0.jar" id="org.jboss.tools.vpe.browsersim.feature.source" version="0.0.0">
+	<feature url="features/org.jboss.tools.browsersim.feature.source_0.0.0.jar" id="org.jboss.tools.browsersim.feature.source" version="0.0.0">
 		<category name="JBoss Tools vpe Nightly Build Update Site"/>
 	</feature>
 </site>
