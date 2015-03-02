@@ -12,10 +12,10 @@
 	<name>browsersim.plugins</name>
 	<packaging>pom</packaging>
 	<modules>
-		<module>org.jboss.tools.vpe.browsersim.eclipse</module>
-		<module>org.jboss.tools.vpe.browsersim.browser</module>
-		<module>org.jboss.tools.vpe.browsersim.javafx.mock</module>
-		<module>org.jboss.tools.vpe.browsersim</module>
-		<module>org.jboss.tools.vpe.browsersim.debugger</module>
+		<module>org.jboss.tools.browsersim.eclipse</module>
+		<module>org.jboss.tools.browsersim.browser</module>
+		<module>org.jboss.tools.browsersim.javafx.mock</module>
+		<module>org.jboss.tools.browsersim</module>
+		<module>org.jboss.tools.browsersim.debugger</module>
 	</modules>
 </project>

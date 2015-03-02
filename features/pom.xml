@@ -12,7 +12,7 @@
 	<name>browsersim.features</name>
 	<packaging>pom</packaging>
 	<modules>
-		<module>org.jboss.tools.vpe.browsersim.feature</module>
+		<module>org.jboss.tools.browsersim.feature</module>
 	</modules>
 	<build>
 		<plugins>

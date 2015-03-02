@@ -7,15 +7,15 @@
         	<version>3.7.0-SNAPSHOT</version>
         </parent>
 	<modelVersion>4.0.0</modelVersion>
-	<groupId>org.jboss.tools.vpe</groupId>
+	<groupId>org.jboss.tools</groupId>
 	<artifactId>browsersim.products</artifactId>
 	<packaging>pom</packaging>
 
 	<modules>
-		<module>../plugins/org.jboss.tools.vpe.browsersim.javafx.mock</module>
-		<module>../plugins/org.jboss.tools.vpe.browsersim.debugger</module>
-		<module>../plugins/org.jboss.tools.vpe.browsersim</module>
-		<module>../plugins/org.jboss.tools.vpe.browsersim.browser</module>
+		<module>../plugins/org.jboss.tools.browsersim.javafx.mock</module>
+		<module>../plugins/org.jboss.tools.browsersim.debugger</module>
+		<module>../plugins/org.jboss.tools.browsersim</module>
+		<module>../plugins/org.jboss.tools.browsersim.browser</module>
 		<module>browsersim-standalone</module>
 	</modules>
 </project>
