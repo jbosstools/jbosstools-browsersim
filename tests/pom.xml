@@ -13,8 +13,8 @@
 	<packaging>pom</packaging>
 
 	<modules>
-		<!--module>org.jboss.tools.vpe.browsersim.browser.test</module-->
-		<module>org.jboss.tools.vpe.browsersim.eclipse.test</module>
+		<!--module>org.jboss.tools.browsersim.browser.test</module-->
+		<module>org.jboss.tools.browsersim.eclipse.test</module>
 	</modules>
 
 	<properties>

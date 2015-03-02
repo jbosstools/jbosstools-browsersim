@@ -2,16 +2,16 @@
 <project xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd" xmlns="http://maven.apache.org/POM/4.0.0"
     xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
 	<parent>
-		<groupId>org.jboss.tools.vpe</groupId>
+		<groupId>org.jboss.tools.browsersim</groupId>
 		<artifactId>browsersim.products</artifactId>
 		<version>3.7.0-SNAPSHOT</version>
 	</parent>	
 	<modelVersion>4.0.0</modelVersion>
-	<groupId>org.jboss.tools.vpe.browsersim</groupId>
-	<artifactId>org.jboss.tools.vpe.browsersim-standalone</artifactId>
+	<groupId>org.jboss.tools.browsersim</groupId>
+	<artifactId>org.jboss.tools.browsersim-standalone</artifactId>
 	<version>3.7.0-SNAPSHOT</version>
 	<packaging>eclipse-repository</packaging>
-	<name>org.jboss.tools.vpe.browsersim-standalone</name>
+	<name>org.jboss.tools.browsersim-standalone</name>
 	<build>
 		<plugins>
 			<plugin>
@@ -45,15 +45,15 @@
 								<propertyregex property="org.eclipse.swt.version" input="${org.eclipse.swt.file}" regexp=".*org\.eclipse\.swt\.gtk\.linux\.x86_64_(.*)\.jar" select="\1" casesensitive="true" />
 								<echo message="${org.eclipse.swt.version}"/> 
 								
-								<path id="org.jboss.tools.vpe.browsersim.javafx.mock.file.id"> 
+								<path id="org.jboss.tools.browsersim.javafx.mock.file.id"> 
 									<fileset dir="target/repository/plugins">
-										<include name="org.jboss.tools.vpe.browsersim.javafx.mock_*.jar"/> 
+										<include name="org.jboss.tools.browsersim.javafx.mock_*.jar"/> 
 									 </fileset>
 								</path> 
-								<property name="org.jboss.tools.vpe.browsersim.javafx.mock.file" refid="org.jboss.tools.vpe.browsersim.javafx.mock.file.id"/>
+								<property name="org.jboss.tools.browsersim.javafx.mock.file" refid="org.jboss.tools.browsersim.javafx.mock.file.id"/>
 								
-								<echo message="${org.jboss.tools.vpe.browsersim.javafx.mock.file}"/> 
-								<propertyregex property="mock.version" input="${org.jboss.tools.vpe.browsersim.javafx.mock.file}" regexp=".*org\.jboss\.tools\.vpe\.browsersim\.javafx\.mock_(.*)\.jar" select="\1" casesensitive="true" />
+								<echo message="${org.jboss.tools.browsersim.javafx.mock.file}"/> 
+								<propertyregex property="mock.version" input="${org.jboss.tools.browsersim.javafx.mock.file}" regexp=".*org\.jboss\.tools\.browsersim\.javafx\.mock_(.*)\.jar" select="\1" casesensitive="true" />
 								<echo message="${mock.version}"/> 
 								
 								<copy file="target/repository/plugins/org.eclipse.swt.win32.win32.x86_${org.eclipse.swt.version}.jar" tofile="target/application/temp/swt/swt-win32-${org.eclipse.swt.version}.jar"/>
@@ -63,28 +63,28 @@
 								<copy file="target/repository/plugins/org.eclipse.swt.gtk.linux.x86_${org.eclipse.swt.version}.jar" tofile="target/application/temp/swt/swt-linux32-${org.eclipse.swt.version}.jar"/>
 								<copy file="target/repository/plugins/org.eclipse.swt.gtk.linux.x86_64_${org.eclipse.swt.version}.jar" tofile="target/application/temp/swt/swt-linux64-${org.eclipse.swt.version}.jar"/>
 								
-								<copy file="target/repository/plugins/org.jboss.tools.vpe.browsersim.javafx.mock_${mock.version}.jar" tofile="target/application/temp/swt/javafx-mock.jar"/>
+								<copy file="target/repository/plugins/org.jboss.tools.browsersim.javafx.mock_${mock.version}.jar" tofile="target/application/temp/swt/javafx-mock.jar"/>
 
-								<path id="org.jboss.tools.vpe.browsersim.browser.file.id"> 
+								<path id="org.jboss.tools.browsersim.browser.file.id"> 
 									<fileset dir="target/repository/plugins">
-										<include name="org.jboss.tools.vpe.browsersim.browser_*.jar"/> 
+										<include name="org.jboss.tools.browsersim.browser_*.jar"/> 
 									 </fileset>
 								</path> 
-								<property name="org.jboss.tools.vpe.browsersim.browser.file" refid="org.jboss.tools.vpe.browsersim.browser.file.id"/>
+								<property name="org.jboss.tools.browsersim.browser.file" refid="org.jboss.tools.browsersim.browser.file.id"/>
 
-								<path id="org.jboss.tools.vpe.browsersim.file.id"> 
+								<path id="org.jboss.tools.browsersim.ui.file.id"> 
 									<fileset dir="target/repository/plugins">
-										<include name="org.jboss.tools.vpe.browsersim_*.jar"/>
+										<include name="org.jboss.tools.browsersim.ui_*.jar"/>
 									 </fileset>
 								</path>
-								<property name="org.jboss.tools.vpe.browsersim.file" refid="org.jboss.tools.vpe.browsersim.file.id"/> 
+								<property name="org.jboss.tools.browsersim.ui.file" refid="org.jboss.tools.browsersim.ui.file.id"/> 
 								
-								<path id="org.jboss.tools.vpe.browsersim.debugger.file.id"> 
+								<path id="org.jboss.tools.browsersim.debugger.file.id"> 
 									<fileset dir="target/repository/plugins">
-										<include name="org.jboss.tools.vpe.browsersim.debugger_*.jar"/>
+										<include name="org.jboss.tools.browsersim.debugger_*.jar"/>
 									 </fileset>
 								</path>
-								<property name="org.jboss.tools.vpe.browsersim.debugger.file" refid="org.jboss.tools.vpe.browsersim.debugger.file.id"/> 
+								<property name="org.jboss.tools.browsersim.debugger.file" refid="org.jboss.tools.browsersim.debugger.file.id"/> 
 								
 								<path id="javax.servlet.file.id"> 
 									<fileset dir="target/repository/plugins">
@@ -150,18 +150,18 @@
 								<property name="org.eclipse.jetty.websocket.file" refid="org.eclipse.jetty.websocket.file.id"/> 
 								<!-- Package cross platform SWT Jar -->
 								<taskdef name="swtjar" classname="org.swtjar.ant.SWTJarTask" classpath="ant/swtjar.jar"/>
-								<swtjar jarfile="target/application/browsersim.jar" targetmainclass="org.jboss.tools.vpe.browsersim.BrowserSimRunner" swtversion="${org.eclipse.swt.version}">
+								<swtjar jarfile="target/application/browsersim.jar" targetmainclass="org.jboss.tools.browsersim.ui.launch.BrowserSimRunner" swtversion="${org.eclipse.swt.version}">
 									<!--fileset dir="build/classes" includes="**/*" /-->
 									<manifest>
-									    <attribute name="Bundle-SymbolicName" value="org.jboss.tools.vpe.browsersim;singleton:=true" />
+									    <attribute name="Bundle-SymbolicName" value="org.jboss.tools.browsersim;singleton:=true" />
 									    <attribute name="Bundle-Version" value="${project.version}-${maven.build.timestamp}" />
 									</manifest>
 									<fileset dir="target/application/temp/swt" includes="*.jar" />
 									
-									<!--<zipfileset excludes="META-INF/*.MF" src="${org.jboss.tools.vpe.browsersim.javafx.mock.file}"/-->
-									<zipfileset excludes="META-INF/*.MF" src="${org.jboss.tools.vpe.browsersim.browser.file}"/>
-									<zipfileset excludes="META-INF/*.MF" src="${org.jboss.tools.vpe.browsersim.file}"/>
-									<zipfileset excludes="META-INF/*.MF" src="${org.jboss.tools.vpe.browsersim.debugger.file}"/>
+									<!--<zipfileset excludes="META-INF/*.MF" src="${org.jboss.tools.browsersim.javafx.mock.file}"/-->
+									<zipfileset excludes="META-INF/*.MF" src="${org.jboss.tools.browsersim.browser.file}"/>
+									<zipfileset excludes="META-INF/*.MF" src="${org.jboss.tools.browsersim.ui.file}"/>
+									<zipfileset excludes="META-INF/*.MF" src="${org.jboss.tools.browsersim.debugger.file}"/>
 									<zipfileset excludes="META-INF/*, about.html" src="${javax.servlet.file}"/>
 									<zipfileset excludes="META-INF/*, about.html" src="${org.eclipse.jetty.continuation.file}"/>
 									<zipfileset excludes="META-INF/*, about.html" src="${org.eclipse.jetty.http.file}"/>
