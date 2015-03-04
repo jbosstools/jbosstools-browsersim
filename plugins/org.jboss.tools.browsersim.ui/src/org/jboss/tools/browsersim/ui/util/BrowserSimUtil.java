@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2007-2014 Red Hat, Inc.
+ * Copyright (c) 2007-2015 Red Hat, Inc.
  * Distributed under license by Red Hat, Inc. All rights reserved.
  * This program is made available under the terms of the
  * Eclipse Public License v1.0 which accompanies this distribution,
@@ -238,24 +238,42 @@ public class BrowserSimUtil {
 		};
 	}
 	
+	/**Checks if current JVM has JavaFX libraries and loads it into runtime.
+	 * 
+	 * @return true if JavaFX is available for current JVM
+	 */
 	public static boolean loadJavaFX() {
 		String javaHome = System.getProperty("java.home"); //$NON-NLS-1$
-		File jfxrt7 = new File(javaHome + File.separator
-				+ "lib" + File.separator + "jfxrt.jar"); //$NON-NLS-1$ //$NON-NLS-2$
+		return loadJavaFX9(javaHome) || loadJavaFX8(javaHome) || loadJavaFX7(javaHome);
+	}
+	
+	private static boolean loadJavaFX7(String javaHome) {
+		File jfxrt7 = new File(javaHome + File.separator + "lib" + File.separator + "jfxrt.jar"); //$NON-NLS-1$ //$NON-NLS-2$
 		if (jfxrt7.exists()) {
 			loadJar(jfxrt7);
 			return true;
-		} else {
-			//java 8 case
-			File jfxrt8 = new File(javaHome + File.separator
-					+ "lib" + File.separator + "ext" + File.separator + "jfxrt.jar"); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
-			File jfxswt8 = new File(javaHome + File.separator
-					+ "lib" + File.separator + "jfxswt.jar"); //$NON-NLS-1$ //$NON-NLS-2$
-			if (jfxrt8.exists() && jfxswt8.exists()) {
-				loadJar(jfxrt8);
-				loadJar(jfxswt8);
-				return true;
-			}
+		}
+		return false;
+	}
+	
+	private static boolean loadJavaFX8(String javaHome) {
+		File jfxrt8 = new File(javaHome + File.separator + "lib" + File.separator + "ext" + File.separator + "jfxrt.jar"); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
+		File jfxswt8 = new File(javaHome + File.separator + "lib" + File.separator + "jfxswt.jar"); //$NON-NLS-1$ //$NON-NLS-2$
+		if (jfxrt8.exists() && jfxswt8.exists()) {
+			loadJar(jfxrt8);
+			loadJar(jfxswt8);
+			return true;
+		}
+		return false;
+	}
+	
+	private static boolean loadJavaFX9(String javaHome) {
+		File jfxrt9 = new File(javaHome + File.separator + "lib" + File.separator + "jfxrt.jar"); //$NON-NLS-1$ //$NON-NLS-2$
+		File jfxswt9 = new File(javaHome + File.separator + "lib" + File.separator + "jfxswt.jar"); //$NON-NLS-1$ //$NON-NLS-2$
+		if (jfxrt9.exists() && jfxswt9.exists()) {
+			loadJar(jfxrt9);
+			loadJar(jfxswt9);
+			return true;
 		}
 		return false;
 	}
