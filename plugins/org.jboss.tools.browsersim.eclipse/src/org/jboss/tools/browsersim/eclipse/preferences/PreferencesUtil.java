@@ -193,7 +193,7 @@ public class PreferencesUtil {
 		return arch;
 	}
 	
-	private static String getAbsolutePathToConfigurationFolder() throws URISyntaxException, IOException {
+	public static String getAbsolutePathToConfigurationFolder() throws URISyntaxException, IOException {
 		if (configurationPath == null) {
 			URL url = FileLocator.toFileURL(Platform.getConfigurationLocation().getURL());
 			URI resolvedURI = new URI(url.getProtocol(), url.getPath(), null);
