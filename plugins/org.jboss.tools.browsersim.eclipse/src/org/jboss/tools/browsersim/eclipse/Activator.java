@@ -22,11 +22,14 @@ import java.util.Set;
 import org.eclipse.core.runtime.FileLocator;
 import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.IStatus;
+import org.eclipse.core.runtime.Platform;
 import org.eclipse.core.runtime.Status;
+import org.eclipse.jface.preference.IPreferenceStore;
 import org.eclipse.jface.resource.ImageDescriptor;
 import org.eclipse.swt.custom.StyledText;
 import org.eclipse.ui.console.IConsolePageParticipant;
 import org.eclipse.ui.plugin.AbstractUIPlugin;
+import org.jboss.tools.browsersim.eclipse.preferences.BrowserSimPreferencesPage;
 import org.jboss.tools.browsersim.eclipse.preferences.PreferencesUtil;
 import org.jboss.tools.browsersim.ui.model.preferences.BrowserSimSpecificPreferencesStorage;
 import org.jboss.tools.browsersim.ui.model.preferences.SpecificPreferences;
@@ -49,7 +52,15 @@ public class Activator extends AbstractUIPlugin {
 	private static final String BROWSERSIM_ACTION = "browsersim"; //$NON-NLS-1$
 	private static final String JAVA_FX_LABEL = "javafx"; //$NON-NLS-1$
 	private static final String WEBKIT_LABEL = "webkit"; //$NON-NLS-1$
-
+	
+	private static final String SEPARATOR = System.getProperty("file.separator"); //$NON-NLS-1$
+	private static final String OLD_USER_PREFERENCES_FOLDER = "org.jboss.tools.vpe.browsersim"; //$NON-NLS-1$
+	
+	private static final String OLD_PLUGIN_ID = "org.jboss.tools.vpe.browsersim.eclipse"; //$NON-NLS-1$
+	private static final String OLD_BROWSERSIM_JVM_ID = "org.jboss.tools.vpe.browsersim.jvm"; //$NON-NLS-1$
+	private static final String OLD_BROWSERSIM_JVM_AUTOMATICALLY = "org.jboss.tools.vpe.browsersim.jvm.automatically"; //$NON-NLS-1$
+	private static final String OLD_BROWSERSIM_GTK_2 = "org.jboss.tools.vpe.browsersim.gtk2"; //$NON-NLS-1$
+	
 	private Map<StyledText, IConsolePageParticipant> viewers = new HashMap<StyledText, IConsolePageParticipant>();
 
 	// The shared instance
@@ -72,8 +83,44 @@ public class Activator extends AbstractUIPlugin {
 		plugin = this;
 		launchEventType = new UsageEventType(this, BROWSERSIM_ACTION, Messages.UsageEventTypeLaunchLabelDescription, UsageEventType.HOW_MANY_TIMES_VALUE_DESCRIPTION);
 		UsageReporter.getInstance().registerEvent(launchEventType);
+		backportPreferences();
 	}
 
+	/**
+	 * Because of moving from o.j.t.vpe.browsersim to o.j.t.browsersim we need to keep old user preferences:
+	 * - browsersim and cordovasim preferences
+	 * - eclipse preferences for GTK and jvm
+	 */
+	private void backportPreferences() {
+		try {
+			File oldPreferencesFolder = new File(PreferencesUtil.getAbsolutePathToConfigurationFolder() + SEPARATOR + OLD_USER_PREFERENCES_FOLDER);
+			if (oldPreferencesFolder.exists()) {
+				oldPreferencesFolder.renameTo(new File(PreferencesUtil.getBrowserSimConfigFolderPath()));
+				
+				// need to do it only one time for each Workspace
+				backportEclipsePreferences();
+			}
+		} catch (URISyntaxException | IOException e) {
+			logError(e.getMessage(), e);
+		}
+	}
+	
+	/**
+	 * Sets Eclipse preferences values from o.j.t.vpe.browsersim to o.j.t.browsersim preferences store 
+	 */
+	private void backportEclipsePreferences() {
+		String oldJvmAutomatically = Platform.getPreferencesService().getString(OLD_PLUGIN_ID, OLD_BROWSERSIM_JVM_AUTOMATICALLY, null, null);
+		if (oldJvmAutomatically != null) {
+			String oldGTK2 = Platform.getPreferencesService().getString(OLD_PLUGIN_ID, OLD_BROWSERSIM_GTK_2, PreferencesUtil.requiresGTK3() ? IPreferenceStore.FALSE : IPreferenceStore.TRUE, null);
+			String oldJvmId = Platform.getPreferencesService().getString(OLD_PLUGIN_ID, OLD_BROWSERSIM_JVM_ID, "", null); //$NON-NLS-1$
+			
+			IPreferenceStore store = getPreferenceStore();
+			store.setValue(BrowserSimPreferencesPage.BROWSERSIM_GTK_2, oldGTK2);
+			store.setValue(BrowserSimPreferencesPage.BROWSERSIM_JVM_AUTOMATICALLY, oldJvmAutomatically);
+			store.setValue(BrowserSimPreferencesPage.BROWSERSIM_JVM_ID, oldJvmId);
+		}
+	}
+	
 	public void countLaunchEvent() {
 		try {
 			String label = getEngineName(BrowserSimSpecificPreferencesStorage.INSTANCE);
