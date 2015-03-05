@@ -54,6 +54,7 @@ import org.jboss.tools.browsersim.ui.model.preferences.CommonPreferencesStorage;
 import org.jboss.tools.browsersim.ui.model.preferences.SpecificPreferences;
 import org.jboss.tools.browsersim.ui.model.preferences.SpecificPreferencesStorage;
 import org.jboss.tools.browsersim.ui.util.BrowserSimUtil;
+import org.jboss.tools.browsersim.ui.util.JavaFXUtil;
 
 /**
  * @author Yahor Radtsevich (yradtsevich)
@@ -519,7 +520,7 @@ public class ManageDevicesDialog extends Dialog {
 		// For now JavaFx is compiled against gtk 2 only, no support for gtk 3 on Linux - https://bugs.eclipse.org/bugs/show_bug.cgi?id=420182
 		if (PlatformUtil.OS_LINUX.equals(PlatformUtil.getOs()) && !BrowserSimUtil.isRunningAgainstGTK2()) {
 			message = Messages.ManageDevicesDialog_BROWSER_ENGINE_WARNING_ON_LINUX;
-		} else if (!BrowserSimUtil.isJavaFxAvailable()) {
+		} else if (!JavaFXUtil.isJavaFXAvailable()) {
 			message = Messages.ManageDevicesDialog_BROWSER_ENGINE_WARNING;
 	    }	
 		
@@ -556,7 +557,7 @@ public class ManageDevicesDialog extends Dialog {
 	}
 	
 	private void disableLivereloadForJavaFx7(Composite parent) {
-		if (isJavaFx && BrowserSimUtil.isJavaFx7Available()) {
+		if (isJavaFx && !JavaFXUtil.isJavaFX8OrHigher()) {
 			liveReloadCheckBox.setSelection(false);
 			liveReloadCheckBox.setEnabled(false);
 			livereloadErrorLabel.setVisible(true);

@@ -72,6 +72,7 @@ import org.jboss.tools.browsersim.ui.skin.BrowserSimSkin;
 import org.jboss.tools.browsersim.ui.skin.ResizableSkinSizeAdvisor;
 import org.jboss.tools.browsersim.ui.skin.ResizableSkinSizeAdvisorImpl;
 import org.jboss.tools.browsersim.ui.util.BrowserSimUtil;
+import org.jboss.tools.browsersim.ui.util.JavaFXUtil;
 import org.jboss.tools.browsersim.ui.util.PreferencesUtil;
 import org.jboss.tools.browsersim.ui.util.ReflectionUtil;
 
@@ -375,7 +376,7 @@ public class BrowserSim {
 		browser.addLocationListener(new LocationAdapter() {  
 			@Override
 			public void changed(LocationEvent e) {
-				if (browser instanceof JavaFXBrowser && BrowserSimUtil.isJavaFx8Available()) {
+				if (browser instanceof JavaFXBrowser && JavaFXUtil.isJavaFX8OrHigher()) {
 					 Platform.runLater(new Runnable() {
 						@Override
 						public void run() {
@@ -566,7 +567,7 @@ public class BrowserSim {
 	
 	private void processLiveReload(boolean isLiveReloadEnabled) {
 		if (isLiveReloadEnabled) {
-			if (specificPreferences.isJavaFx() && BrowserSimUtil.isJavaFx7Available()) {
+			if (specificPreferences.isJavaFx() && !JavaFXUtil.isJavaFX8OrHigher()) {
 				showLivereloadError(Messages.ManageDevicesDialog_LIVE_RELOAD_UNAVAILABLE);
 				specificPreferences.setEnableLiveReload(false);
 			} else if (isLivereloadAvailable()) {

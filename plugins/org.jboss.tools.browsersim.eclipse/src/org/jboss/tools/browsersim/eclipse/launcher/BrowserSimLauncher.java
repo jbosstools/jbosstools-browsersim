@@ -26,7 +26,7 @@ import org.jboss.tools.browsersim.eclipse.callbacks.RestartCallback;
 import org.jboss.tools.browsersim.eclipse.callbacks.ViewSourceCallback;
 import org.jboss.tools.browsersim.eclipse.preferences.BrowserSimPreferencesPage;
 import org.jboss.tools.browsersim.eclipse.preferences.PreferencesUtil;
-import org.jboss.tools.browsersim.ui.util.BrowserSimUtil;
+import org.jboss.tools.browsersim.ui.util.JavaFXUtil;
 
 /**
  * @author "Yahor Radtsevich (yradtsevich)"
@@ -63,7 +63,7 @@ public class BrowserSimLauncher {
 			List<String> bundles = getBundles();
 			
 			if (!ExternalProcessLauncher.isGTK2()
-					|| (!BrowserSimUtil.isJavaFxAvailable(jvmPath) && !BrowserSimUtil.isJavaFxAvailable(jrePath))) {
+					|| (!JavaFXUtil.isJavaFXAvailable(jvmPath) && !JavaFXUtil.isJavaFXAvailable(jrePath))) {
 				bundles.add("org.jboss.tools.browsersim.javafx.mock"); //$NON-NLS-1$
 			}
 			

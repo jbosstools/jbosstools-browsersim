@@ -34,6 +34,7 @@ import org.jboss.tools.browsersim.ui.ExceptionNotifier;
 import org.jboss.tools.browsersim.ui.Messages;
 import org.jboss.tools.browsersim.ui.devtools.DevToolsDebuggerServer;
 import org.jboss.tools.browsersim.ui.util.BrowserSimUtil;
+import org.jboss.tools.browsersim.ui.util.JavaFXUtil;
 
 /**
  * @author Konstantin Marmalyukov (kmarmaliykov)
@@ -62,7 +63,7 @@ public class BrowserSimRunner {
 
 		// Trying to load javaFx libs except Linux GTK3 case
 		if (!(isLinux && !BrowserSimUtil.isRunningAgainstGTK2())) {
-			isJavaFxAvailable = BrowserSimUtil.loadJavaFX();
+			isJavaFxAvailable = JavaFXUtil.loadJavaFX();
 		}
 		
 		isWebKitAvailable = BrowserSimUtil.isWebkitAvailable();
@@ -90,7 +91,7 @@ public class BrowserSimRunner {
 			
 			if (!isJavaFxAvailable && BrowserSimArgs.standalone) {
 				tempDir = Files.createTempDirectory("browsersim"); //$NON-NLS-1$
-			    BrowserSimUtil.loadMock(tempDir.toString(), STANDALONE_MOCK_JAR);
+			    JavaFXUtil.loadMock(tempDir.toString(), STANDALONE_MOCK_JAR);
 			}
 			
 			String path = browserSimArgs.getPath();
