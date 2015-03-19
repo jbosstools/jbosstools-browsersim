@@ -90,12 +90,15 @@ public class BrowserSimLauncher {
 		
 		bundles.add("org.eclipse.jetty.server"); //$NON-NLS-1$
 		bundles.add("org.eclipse.jetty.servlet"); //$NON-NLS-1$
-		bundles.add("org.eclipse.jetty.websocket"); //$NON-NLS-1$
 		bundles.add("org.eclipse.jetty.util"); //$NON-NLS-1$
 		bundles.add("org.eclipse.jetty.http"); //$NON-NLS-1$
 		bundles.add("org.eclipse.jetty.io"); //$NON-NLS-1$
 		bundles.add("org.eclipse.jetty.security"); //$NON-NLS-1$
 		bundles.add("org.eclipse.jetty.continuation"); //$NON-NLS-1$
+		bundles.add("org.eclipse.jetty.websocket.api"); //$NON-NLS-1$
+		bundles.add("org.eclipse.jetty.websocket.common"); //$NON-NLS-1$
+		bundles.add("org.eclipse.jetty.websocket.servlet"); //$NON-NLS-1$
+		bundles.add("org.eclipse.jetty.websocket.server"); //$NON-NLS-1$
 
 		return bundles;
 	}

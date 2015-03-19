@@ -60,6 +60,10 @@ public class Messages {
 	public static String BrowserSim_ZERO_PIXEL_RATIO;
 	public static String BrowserSim_NO_SELECTED_DEVICE;
 	public static String BrowserSim_WEINRE_INSPECTOR;
+	public static String DevTools_CLIENT_CONNECTED;
+	public static String DevTools_CLIENT_DISCONNECTED;
+	public static String DevTools_CONNECTION_REFUSED;
+	public static String DevTools_WEBSOCKET_ERROR;	
 	public static String EditDeviceDialog_CANCEL;
 	public static String EditDeviceDialog_ADD_DEVICE;
 	public static String EditDeviceDialog_ADD_DEVICE_STATUS;

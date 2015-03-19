@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2007-2013 Red Hat, Inc.
+ * Copyright (c) 2007-2015 Red Hat, Inc.
  * Distributed under license by Red Hat, Inc. All rights reserved.
  * This program is made available under the terms of the
  * Eclipse Public License v1.0 which accompanies this distribution,
@@ -47,7 +47,6 @@ import org.jboss.tools.browsersim.eclipse.dialog.BrowserSimErrorDialog;
 import org.jboss.tools.browsersim.eclipse.preferences.BrowserSimPreferencesPage;
 import org.jboss.tools.browsersim.eclipse.preferences.PreferencesUtil;
 import org.jboss.tools.browsersim.ui.BrowserSimLogger;
-import org.jboss.tools.browsersim.ui.util.ManifestUtil;
 import org.osgi.framework.Bundle;
 
 /**
@@ -169,16 +168,10 @@ public class ExternalProcessLauncher {
 				classPathBundles.add(bundle);
 			}
 		}
-		
-		String jettyVersion = ManifestUtil.getJettyVersion();
-		String jettyMajorVersion = jettyVersion.substring(0, jettyVersion.indexOf(".")); //$NON-NLS-1$
+
 		for (String bundleName : jettyBundles) {
-			Bundle[] jettys = Platform.getBundles(bundleName, null);
-			for (Bundle jetty : jettys) {				
-				if (jetty.getVersion().toString().startsWith(jettyMajorVersion)) {
-					classPathBundles.add(jetty);
-				}
-			}
+			Bundle bundle = Platform.getBundle(bundleName); // Highest jetty version from TP
+			classPathBundles.add(bundle);
 		}
 		
 		StringBuilder classPath = new StringBuilder();
