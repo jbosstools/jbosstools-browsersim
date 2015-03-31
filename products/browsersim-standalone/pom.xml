@@ -142,12 +142,34 @@
 								</path>
 								<property name="org.eclipse.jetty.util.file" refid="org.eclipse.jetty.util.file.id"/>
 
-								<path id="org.eclipse.jetty.websocket.file.id"> 
+								<path id="org.eclipse.jetty.websocket.api.file.id"> 
 									<fileset dir="target/repository/plugins">
-										<include name="org.eclipse.jetty.websocket_*.jar"/>
+										<include name="org.eclipse.jetty.websocket.api_*.jar"/>
 									 </fileset>
 								</path>
-								<property name="org.eclipse.jetty.websocket.file" refid="org.eclipse.jetty.websocket.file.id"/> 
+								<property name="org.eclipse.jetty.websocket.api.file" refid="org.eclipse.jetty.websocket.api.file.id"/> 
+								
+								<path id="org.eclipse.jetty.websocket.common.file.id"> 
+									<fileset dir="target/repository/plugins">
+										<include name="org.eclipse.jetty.websocket.common_*.jar"/>
+									 </fileset>
+								</path>
+								<property name="org.eclipse.jetty.websocket.common.file" refid="org.eclipse.jetty.websocket.common.file.id"/> 
+								
+								<path id="org.eclipse.jetty.websocket.server.file.id"> 
+									<fileset dir="target/repository/plugins">
+										<include name="org.eclipse.jetty.websocket.server_*.jar"/>
+									 </fileset>
+								</path>
+								<property name="org.eclipse.jetty.websocket.server.file" refid="org.eclipse.jetty.websocket.server.file.id"/> 
+								
+								<path id="org.eclipse.jetty.websocket.servlet.file.id"> 
+									<fileset dir="target/repository/plugins">
+										<include name="org.eclipse.jetty.websocket.servlet_*.jar"/>
+									 </fileset>
+								</path>
+								<property name="org.eclipse.jetty.websocket.servlet.file" refid="org.eclipse.jetty.websocket.servlet.file.id"/> 			
+								
 								<!-- Package cross platform SWT Jar -->
 								<taskdef name="swtjar" classname="org.swtjar.ant.SWTJarTask" classpath="ant/swtjar.jar"/>
 								<swtjar jarfile="target/application/browsersim.jar" targetmainclass="org.jboss.tools.browsersim.ui.launch.BrowserSimRunner" swtversion="${org.eclipse.swt.version}">
@@ -170,7 +192,10 @@
 									<zipfileset excludes="META-INF/*, about.html" src="${org.eclipse.jetty.server.file}"/>
 									<zipfileset excludes="META-INF/*, about.html" src="${org.eclipse.jetty.servlet.file}"/>
 									<zipfileset excludes="META-INF/*, about.html" src="${org.eclipse.jetty.util.file}"/>
-									<zipfileset excludes="META-INF/*, about.html" src="${org.eclipse.jetty.websocket.file}"/>
+									<zipfileset excludes="META-INF/*, about.html" src="${org.eclipse.jetty.websocket.api.file}"/>
+									<zipfileset excludes="META-INF/*, about.html" src="${org.eclipse.jetty.websocket.common.file}"/>
+									<zipfileset excludes="META-INF/*, about.html" src="${org.eclipse.jetty.websocket.server.file}"/>
+									<zipfileset excludes="META-INF/*, about.html" src="${org.eclipse.jetty.websocket.servlet.file}"/>
 								</swtjar> 
 								<delete dir="target/application/temp"/>
 							</tasks>
