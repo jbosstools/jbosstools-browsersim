@@ -14,7 +14,7 @@ package org.jboss.tools.browsersim.ui.js.log;
  * @author Ilya Buziuk (ibuziuk)
  */
 public enum MessageType {
-	ERROR("ERROR"), WARN("WARN"), INFO("INFO"), LOG("LOG");//$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$
+	ERROR("ERROR"), WARN("WARN"), INFO("INFO"), LOG("LOG"), DEBUG("DEBUG");//$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$ //$NON-NLS-5$
 
 	private String type;
 

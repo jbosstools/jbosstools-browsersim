@@ -22,4 +22,5 @@ public final class ConsoleLogConstants {
 	public static final String BROSERSIM_CONSOLE_INFO = "browserSimConsoleInfo"; //$NON-NLS-1$
 	public static final String BROSERSIM_CONSOLE_WARN = "browserSimConsoleWarn"; //$NON-NLS-1$
 	public static final String BROSERSIM_CONSOLE_ERROR = "browserSimConsoleError"; //$NON-NLS-1$
+	public static final String BROSERSIM_CONSOLE_DEBUG = "browserSimConsoleDebug"; //$NON-NLS-1$
 }

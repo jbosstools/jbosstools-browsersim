@@ -398,6 +398,7 @@ public class BrowserSim {
 			browser.registerBrowserFunction(ConsoleLogConstants.BROSERSIM_CONSOLE_INFO, new JsLogFunction(browser,  MessageType.INFO));  
 			browser.registerBrowserFunction(ConsoleLogConstants.BROSERSIM_CONSOLE_WARN, new JsLogFunction(browser,  MessageType.WARN));  
 			browser.registerBrowserFunction(ConsoleLogConstants.BROSERSIM_CONSOLE_ERROR, new JsLogFunction(browser,  MessageType.ERROR));  
+			browser.registerBrowserFunction(ConsoleLogConstants.BROSERSIM_CONSOLE_DEBUG, new JsLogFunction(browser,  MessageType.DEBUG));  
 		}
 	}
 	
@@ -424,8 +425,9 @@ public class BrowserSim {
 					+			"originalConsole.error(message);" //$NON-NLS-1$
 					+			ConsoleLogConstants.BROSERSIM_CONSOLE_ERROR + "(message);" //$NON-NLS-1$
 					+		"},"   //$NON-NLS-1$
-					+		"debug: function(message) {" //$NON-NLS-1$ 
-					+			"console.log(message);" //$NON-NLS-1$ do the same as for 'console.log'
+					+		"debug: function(message) {" //$NON-NLS-1$
+					+			"originalConsole.debug(message);" //$NON-NLS-1$
+					+			ConsoleLogConstants.BROSERSIM_CONSOLE_DEBUG + "(message);" //$NON-NLS-1$
 					+		"}"   //$NON-NLS-1$
 					+ 	"};" //$NON-NLS-1$
 	
