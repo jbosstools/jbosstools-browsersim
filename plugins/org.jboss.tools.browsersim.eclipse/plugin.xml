@@ -10,7 +10,13 @@
       <command
             name="Run BrowserSim"
             categoryId="org.jboss.tools.browsersim.eclipse.commands.category"
-            id="org.jboss.tools.browsersim.eclipse.commands.runBrowserSim">
+            id="org.jboss.tools.browsersim.eclipse.commands.runBrowserSim"
+            defaultHandler="org.jboss.tools.browsersim.eclipse.handlers.RunBrowserSimHandler">
+        <commandParameter
+	         id="url"
+	         name="Launch URL"
+	         optional="true">
+        </commandParameter>
       </command>
    </extension>
    <!--extension
