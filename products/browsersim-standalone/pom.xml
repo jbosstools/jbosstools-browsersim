@@ -266,6 +266,41 @@
 			</plugin>
 		</plugins>
 	</build>
+
+	<profiles>
+		<profile>
+			<id>deploy-to-jboss.org</id>
+			<build>
+				<plugins>
+					<plugin>
+						<groupId>org.codehaus.mojo</groupId>
+						<artifactId>exec-maven-plugin</artifactId>
+						<executions>
+							<execution>
+								<!-- replaces default deploy step from parent -->
+								<id>deploy-snapshot-build</id>
+								<goals>
+									<goal>exec</goal>
+								</goals>
+								<phase>deploy</phase>
+								<configuration>
+									<arguments>
+										<arg>-s</arg>
+										<arg>${project.build.directory}</arg>
+										<arg>-i</arg>
+										<arg>browsersim-${project.version}-${buildQualifier}-standalone.zip</arg>
+										<arg>-t</arg>
+										<arg>${jbosstools-build-type}/${JOB_NAME}/${BUILD_ID}-B${BUILD_NUMBER}/</arg>
+									</arguments>
+								</configuration>
+							</execution>
+						</executions>
+					</plugin>
+				</plugins>
+			</build>
+		</profile>
+	</profiles>
+
 	<repositories>
         <repository>
             <id>jbosstools-browsersim</id>
