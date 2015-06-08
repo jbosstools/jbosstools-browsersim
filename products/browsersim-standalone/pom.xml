@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd" xmlns="http://maven.apache.org/POM/4.0.0"
-    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+		xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
 	<parent>
 		<groupId>org.jboss.tools.browsersim</groupId>
 		<artifactId>browsersim.products</artifactId>
@@ -22,6 +22,40 @@
 					<includeAllDependencies>true</includeAllDependencies>
 				</configuration>
 			</plugin>
+			<!-- get major.minor.incremental from root pom, then use ${parsedVersion.majorVersion}.${parsedVersion.minorVersion}.${parsedVersion.incrementalVersion}.${BUILD_ALIAS} -->
+			<plugin>
+				<groupId>org.codehaus.mojo</groupId>
+				<artifactId>build-helper-maven-plugin</artifactId>
+				<version>1.9.1</version>
+				<executions>
+					<execution>
+						<phase>validate</phase>
+						<id>parse-version</id>
+						<goals>
+							<goal>parse-version</goal>
+						</goals>
+						<configuration>
+							<versionString>${project.parent.parent.parent.version}</versionString>
+						</configuration>
+					</execution>
+					<execution>
+						<id>attach-standalone</id>
+						<phase>package</phase>
+						<goals>
+							<goal>attach-artifact</goal>
+						</goals>
+						<configuration>
+							<artifacts>
+								<artifact>
+									<file>${project.build.directory}/application/browsersim.jar</file>
+									<type>jar</type>
+									<classifier>standalone</classifier>
+								</artifact>
+							</artifacts>
+						</configuration>
+					</execution>
+				</executions>
+			</plugin>
 			<plugin>
 				<artifactId>maven-antrun-plugin</artifactId>
 				<version>1.7</version>
@@ -41,9 +75,9 @@
 								</path> 
 
 								<property name="org.eclipse.swt.file" refid="org.eclipse.swt.file.id"/>
-								<echo message="${org.eclipse.swt.file}"/> 
+								<echo level="debug" message="${org.eclipse.swt.file}"/> 
 								<propertyregex property="org.eclipse.swt.version" input="${org.eclipse.swt.file}" regexp=".*org\.eclipse\.swt\.gtk\.linux\.x86_64_(.*)\.jar" select="\1" casesensitive="true" />
-								<echo message="${org.eclipse.swt.version}"/> 
+								<echo level="debug" message="${org.eclipse.swt.version}"/> 
 								
 								<path id="org.jboss.tools.browsersim.javafx.mock.file.id"> 
 									<fileset dir="target/repository/plugins">
@@ -52,9 +86,9 @@
 								</path> 
 								<property name="org.jboss.tools.browsersim.javafx.mock.file" refid="org.jboss.tools.browsersim.javafx.mock.file.id"/>
 								
-								<echo message="${org.jboss.tools.browsersim.javafx.mock.file}"/> 
+								<echo level="debug" message="${org.jboss.tools.browsersim.javafx.mock.file}"/> 
 								<propertyregex property="mock.version" input="${org.jboss.tools.browsersim.javafx.mock.file}" regexp=".*org\.jboss\.tools\.browsersim\.javafx\.mock_(.*)\.jar" select="\1" casesensitive="true" />
-								<echo message="${mock.version}"/> 
+								<echo level="debug" message="${mock.version}"/> 
 								
 								<copy file="target/repository/plugins/org.eclipse.swt.win32.win32.x86_${org.eclipse.swt.version}.jar" tofile="target/application/temp/swt/swt-win32-${org.eclipse.swt.version}.jar"/>
 								<copy file="target/repository/plugins/org.eclipse.swt.win32.win32.x86_64_${org.eclipse.swt.version}.jar" tofile="target/application/temp/swt/swt-win64-${org.eclipse.swt.version}.jar"/>
@@ -175,8 +209,8 @@
 								<swtjar jarfile="target/application/browsersim.jar" targetmainclass="org.jboss.tools.browsersim.ui.launch.BrowserSimRunner" swtversion="${org.eclipse.swt.version}">
 									<!--fileset dir="build/classes" includes="**/*" /-->
 									<manifest>
-									    <attribute name="Bundle-SymbolicName" value="org.jboss.tools.browsersim;singleton:=true" />
-									    <attribute name="Bundle-Version" value="${project.version}-${maven.build.timestamp}" />
+											<attribute name="Bundle-SymbolicName" value="org.jboss.tools.browsersim;singleton:=true" />
+											<attribute name="Bundle-Version" value="${project.version}-${maven.build.timestamp}" />
 									</manifest>
 									<fileset dir="target/application/temp/swt" includes="*.jar" />
 									
@@ -197,70 +231,59 @@
 									<zipfileset excludes="META-INF/*, about.html" src="${org.eclipse.jetty.websocket.server.file}"/>
 									<zipfileset excludes="META-INF/*, about.html" src="${org.eclipse.jetty.websocket.servlet.file}"/>
 								</swtjar> 
-								<delete dir="target/application/temp"/>
-							</tasks>
-						</configuration>
-						<goals>
-							<goal>run</goal>
-						</goals>
-					</execution>
-				</executions>
-				<dependencies>
-					<dependency>
-						<groupId>ant-contrib</groupId>
-						<artifactId>ant-contrib</artifactId>
-						<version>1.0b3</version>
-						<exclusions>
-							<exclusion>
-								<groupId>ant</groupId>
-								<artifactId>ant</artifactId>
-							</exclusion>
-						</exclusions>
-					</dependency>
-					<dependency>
-						<groupId>org.apache.ant</groupId>
-						<artifactId>ant-nodeps</artifactId>
-						<version>1.8.1</version>
-					</dependency>
-				</dependencies>
-			</plugin>
-			<plugin>
-				<groupId>org.codehaus.mojo</groupId>
-				<artifactId>build-helper-maven-plugin</artifactId>
-				<version>1.7</version>
-				<executions>
-					<execution>
-						<id>attach-standalone</id>
-						<phase>package</phase>
-						<goals>
-							<goal>attach-artifact</goal>
-						</goals>
-						<configuration>
-							<artifacts>
-								<artifact>
-									<file>${project.build.directory}/application/browsersim.jar</file>
-									<type>jar</type>
-									<classifier>standalone</classifier>
-								</artifact>
-							</artifacts>
-						</configuration>
-					</execution>
-				</executions>
+							<delete dir="target/application/temp"/>
+						</tasks>
+					</configuration>
+					<goals>
+						<goal>run</goal>
+					</goals>
+				</execution>
+			</executions>
+			<dependencies>
+				<dependency>
+					<groupId>ant-contrib</groupId>
+					<artifactId>ant-contrib</artifactId>
+					<version>1.0b3</version>
+					<exclusions>
+						<exclusion>
+							<groupId>ant</groupId>
+							<artifactId>ant</artifactId>
+						</exclusion>
+					</exclusions>
+				</dependency>
+				<dependency>
+					<groupId>org.apache.ant</groupId>
+					<artifactId>ant-nodeps</artifactId>
+					<version>1.8.1</version>
+				</dependency>
+			</dependencies>
 			</plugin>
 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
 				<artifactId>maven-assembly-plugin</artifactId>
 				<configuration>
 					<descriptor>assembly/config.xml</descriptor>
-					<!--TODO: Add correct build qualifier if it will not be done during Jenkins build-->
-					<finalName>browsersim-${project.version}-${buildQualifier}</finalName>
 				</configuration>
 				<executions>
 					<execution>
+						<id>assemble-zip</id>
 						<phase>package</phase>
 						<goals>
 							<goal>single</goal>
 						</goals>
+						<configuration>
+							<finalName>browsersim-${project.version}-${buildQualifier}</finalName>
+						</configuration>
+					</execution>
+					<execution>
+						<id>assemble-jbt-versioned-zip</id>
+						<phase>package</phase>
+						<goals>
+							<goal>single</goal>
+						</goals>
+						<configuration>
+							<finalName>jbosstools-${parsedVersion.majorVersion}.${parsedVersion.minorVersion}.${parsedVersion.incrementalVersion}.${BUILD_ALIAS}-browsersim</finalName>
+						</configuration>
 					</execution>
 				</executions>
 			</plugin>
@@ -288,7 +311,7 @@
 										<arg>-s</arg>
 										<arg>${project.build.directory}</arg>
 										<arg>-i</arg>
-										<arg>browsersim-${project.version}-${buildQualifier}-standalone.zip</arg>
+										<arg>jbosstools-${parsedVersion.majorVersion}.${parsedVersion.minorVersion}.${parsedVersion.incrementalVersion}.${BUILD_ALIAS}-browsersim-standalone.zip</arg>
 										<arg>-t</arg>
 										<arg>${jbosstools-build-type}/${JOB_NAME}/${BUILD_ID}-B${BUILD_NUMBER}/</arg>
 									</arguments>
@@ -302,10 +325,10 @@
 	</profiles>
 
 	<repositories>
-        <repository>
-            <id>jbosstools-browsersim</id>
-            <layout>p2</layout>
-            <url>${jbosstools-browsersim-site}</url>
-        </repository>
+		<repository>
+			<id>jbosstools-browsersim</id>
+			<layout>p2</layout>
+			<url>${jbosstools-browsersim-site}</url>
+		</repository>
 	</repositories>
 </project>
