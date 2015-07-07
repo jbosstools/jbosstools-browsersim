@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<feature id="org.jboss.tools.browsersim.feature" label="%featureName" version="3.7.0.qualifier" provider-name="%providerName">
+<feature id="org.jboss.tools.browsersim.feature" label="%featureName" version="3.7.0.qualifier" provider-name="%providerName" license-feature="org.jboss.tools.foundation.license.feature" license-feature-version="0.0.0">
 
 	<description url="http://www.jboss.org/tools">
       %description
@@ -9,10 +9,10 @@
       %copyright
    </copyright>
 
-	<license url="%licenseURL">
+	<license>
       %license
    </license>
-
+	
    <plugin id="org.jboss.tools.browsersim.ui" download-size="0" install-size="0" version="0.0.0" unpack="false" />
    <plugin id="org.jboss.tools.browsersim.browser" download-size="0" install-size="0" version="0.0.0" unpack="false" />
    <plugin id="org.jboss.tools.browsersim.javafx.mock" download-size="0" install-size="0" version="0.0.0" unpack="false" />
