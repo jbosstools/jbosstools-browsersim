@@ -115,7 +115,9 @@
 			if (onEventName in finger.target) {
 				console.warn('Converting `' + onEventName + '` property to event listener.', finger.target);
 				finger.target.addEventListener(eventName, finger.target[onEventName], false);
-				delete finger.target[onEventName];
+				if (finger.target[onEventName]) {
+					delete finger.target[onEventName];
+				}
 			}
 
 			if (finger.target.hasAttribute(onEventName)) {

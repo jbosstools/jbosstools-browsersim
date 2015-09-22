@@ -18,11 +18,16 @@ public class TouchSupportLoader {
 		String phantomLimb = BrowserSimResourcesUtil.getResourceAsString("javascript/phantom-limb.js"); //$NON-NLS-1$
 		browser.execute(
 				"if (!window._limbLoaded) {" //$NON-NLS-1$
+					+ "if(document.readyState == 'complete') {"//$NON-NLS-1$
+						+ phantomLimb
+					+ "} else {" //$NON-NLS-1$
 					+ "window.addEventListener('DOMContentLoaded', function () {" //$NON-NLS-1$
 						+ phantomLimb
 					+ "});" //$NON-NLS-1$
+					+ "}"//$NON-NLS-1$
+					+ "window._limbLoaded = true;"//$NON-NLS-1$
 				+ "}" //$NON-NLS-1$
-				+ "window._limbLoaded = true;"); //$NON-NLS-1$
+				);
 		
 	}
 }
