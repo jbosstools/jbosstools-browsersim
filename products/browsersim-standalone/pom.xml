@@ -308,7 +308,7 @@
 										<arg>-s</arg>
 										<arg>${project.build.directory}</arg>
 										<arg>-i</arg>
-										<arg>jbosstools-${parsedVersion.majorVersion}.${parsedVersion.minorVersion}.${parsedVersion.incrementalVersion}.${BUILD_ALIAS}-browsersim-standalone.zip</arg>
+										<arg>jbosstools-${parsedVersion.majorVersion}.${parsedVersion.minorVersion}.${parsedVersion.incrementalVersion}.${BUILD_ALIAS}-browsersim-standalone.zip*</arg>
 										<arg>-t</arg>
 										<arg>${jbosstools-build-type}/${JOB_NAME}/${BUILD_ID}-B${BUILD_NUMBER}/</arg>
 									</arguments>
