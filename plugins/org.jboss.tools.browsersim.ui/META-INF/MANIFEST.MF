@@ -6,7 +6,7 @@ Bundle-Description: Provides a WebKit-based browser, which allows you to view we
  Based in part on Yahoo! Design Stencil Kit version 1.0 (http://developer.yahoo.com/ypatterns/about/stencils/).
  Copyright 2012 Yahoo! Inc. Licensed under a Creative Commons Attribution 2.5 License (http://creativecommons.org/licenses/by/2.5/).
 Bundle-SymbolicName: org.jboss.tools.browsersim.ui;singleton:=true
-Bundle-Version: 3.7.0.qualifier
+Bundle-Version: 3.8.0.qualifier
 Bundle-RequiredExecutionEnvironment: JavaSE-1.7
 Require-Bundle: org.eclipse.swt;bundle-version="3.7.0",
  org.jboss.tools.browsersim.browser;bundle-version="3.7.0",
