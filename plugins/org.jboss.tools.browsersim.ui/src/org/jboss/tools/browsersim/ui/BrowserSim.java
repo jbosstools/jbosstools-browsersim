@@ -10,15 +10,11 @@
  ******************************************************************************/
 package org.jboss.tools.browsersim.ui;
 
-import java.net.HttpURLConnection;
-import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.NoSuchElementException;
 import java.util.Observable;
 import java.util.Observer;
-
-import javafx.application.Platform;
 
 import org.eclipse.jetty.server.Server;
 import org.eclipse.swt.SWT;
@@ -42,7 +38,6 @@ import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Event;
 import org.eclipse.swt.widgets.Listener;
 import org.eclipse.swt.widgets.Menu;
-import org.eclipse.swt.widgets.MessageBox;
 import org.eclipse.swt.widgets.Shell;
 import org.jboss.tools.browsersim.browser.ExtendedOpenWindowListener;
 import org.jboss.tools.browsersim.browser.ExtendedWindowEvent;
@@ -73,8 +68,11 @@ import org.jboss.tools.browsersim.ui.skin.ResizableSkinSizeAdvisor;
 import org.jboss.tools.browsersim.ui.skin.ResizableSkinSizeAdvisorImpl;
 import org.jboss.tools.browsersim.ui.util.BrowserSimUtil;
 import org.jboss.tools.browsersim.ui.util.JavaFXUtil;
+import org.jboss.tools.browsersim.ui.util.LiveReloadUtil;
 import org.jboss.tools.browsersim.ui.util.PreferencesUtil;
 import org.jboss.tools.browsersim.ui.util.ReflectionUtil;
+
+import javafx.application.Platform;
 
 /**
  * @author Yahor Radtsevich (yradtsevich)
@@ -441,7 +439,7 @@ public class BrowserSim {
 	}
 
 	private void enableLivereloadIfAvailable() {
-	    if (isLivereloadAvailable()) {
+	    if (LiveReloadUtil.isLivereloadAvailable(specificPreferences.getLiveReloadPort())) {
             specificPreferences.setEnableLiveReload(true); 
         } else {
             specificPreferences.setEnableLiveReload(false);
@@ -570,15 +568,15 @@ public class BrowserSim {
 	private void processLiveReload(boolean isLiveReloadEnabled) {
 		if (isLiveReloadEnabled) {
 			if (specificPreferences.isJavaFx() && !JavaFXUtil.isJavaFX8OrHigher()) {
-				showLivereloadError(Messages.ManageDevicesDialog_LIVE_RELOAD_UNAVAILABLE);
+				LiveReloadUtil.showLivereloadError(Messages.ManageDevicesDialog_LIVE_RELOAD_UNAVAILABLE, skin.getShell());
 				specificPreferences.setEnableLiveReload(false);
-			} else if (isLivereloadAvailable()) {
+			} else if (LiveReloadUtil.isLivereloadAvailable(specificPreferences.getLiveReloadPort())) {
 				if (liveReloadLocationAdapter == null) {
 					initLiveReloadLocationAdapter();
 				}
 				skin.getBrowser().addLocationListener(liveReloadLocationAdapter);
 			} else {
-				showLivereloadError(Messages.BrowserSim_LIVERELOAD_WARNING);
+				LiveReloadUtil.showLivereloadError(Messages.BrowserSim_LIVERELOAD_WARNING, skin.getShell());
 				specificPreferences.setEnableLiveReload(false);
 			}
 		} else {
@@ -603,57 +601,24 @@ public class BrowserSim {
 		liveReloadLocationAdapter = new LocationAdapter() {
 			@Override
 			public void changed(final LocationEvent event) {
-				if (isLivereloadAvailable()) {
+				if (LiveReloadUtil.isLivereloadAvailable(specificPreferences.getLiveReloadPort())) {
 					if (specificPreferences.isJavaFx()) {
 						Platform.runLater(new Runnable() {
 							@Override
 							public void run() {
-								processLiveReloadEvent(event);
+								LiveReloadUtil.injectScript((IBrowser) event.widget, specificPreferences.getLiveReloadPort(), true);
 							}
 						});
 					} else {
-						processLiveReloadEvent(event);
+						LiveReloadUtil.injectScript((IBrowser) event.widget, specificPreferences.getLiveReloadPort(), false);
 					}
 				} else {
-					showLivereloadError(Messages.BrowserSim_LIVERELOAD_WARNING);
+					LiveReloadUtil.showLivereloadError(Messages.BrowserSim_LIVERELOAD_WARNING, skin.getShell());
 					skin.getBrowser().removeLocationListener(liveReloadLocationAdapter);
 					specificPreferences.setEnableLiveReload(false);
 				}
 			}
 		};
-	}
-
-	private boolean isLivereloadAvailable() {
-		try {
-			HttpURLConnection.setFollowRedirects(false);
-			URL url = new URL("http://localhost:" + specificPreferences.getLiveReloadPort() + "/livereload.js"); //$NON-NLS-1$ //$NON-NLS-2$
-			HttpURLConnection con = (HttpURLConnection) url.openConnection();
-			con.setConnectTimeout(1000);
-			con.setRequestMethod("HEAD"); //$NON-NLS-1$
-			return (con.getResponseCode() == HttpURLConnection.HTTP_OK);
-		} catch (Exception e) {
-			return false;
-		}
-	}
-
-	private void showLivereloadError(String message) {
-		MessageBox warning = new MessageBox(skin.getShell(), SWT.ICON_WARNING);
-		warning.setText(Messages.WARNING);
-		warning.setMessage(message);
-		warning.open();
-	}
-	
-	private void processLiveReloadEvent(final LocationEvent event) {
-		IBrowser browser = (IBrowser) event.widget;
-		browser.execute("if (!window.LiveReload) {" + //$NON-NLS-1$
-				"window.addEventListener('load', function(){" + //$NON-NLS-1$
-					"var e = document.createElement('script');" + //$NON-NLS-1$
-					"e.type = 'text/javascript';" + //$NON-NLS-1$
-					"e.async = 'true';" + //$NON-NLS-1$
-					"e.src = 'http://localhost:" + specificPreferences.getLiveReloadPort() + "/livereload.js';" + //$NON-NLS-1$ //$NON-NLS-2$
-					"document.head.appendChild(e);" + //$NON-NLS-1$
-				"});" + //$NON-NLS-1$
-			"}"); //$NON-NLS-1$
 	}
 	
 	private void initTouchEventsLocationAdapter() {
