@@ -8,5 +8,5 @@ Eclipse-ExtensibleAPI: true
 Export-Package: org.jboss.tools.browsersim.browser,
  org.jboss.tools.browsersim.browser.javafx
 Require-Bundle: org.eclipse.swt;bundle-version="3.7.0",
- org.jboss.tools.browsersim.javafx.mock;bundle-version="3.6.0";resolution:=optional
+ org.jboss.tools.browsersim.javafx.mock;bundle-version="3.8.0";resolution:=optional
 Bundle-Vendor: JBoss by Red Hat

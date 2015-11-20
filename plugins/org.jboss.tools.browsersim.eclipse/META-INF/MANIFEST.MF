@@ -20,8 +20,8 @@ Require-Bundle: org.eclipse.ui,
  org.eclipse.wst.server.core;resolution:=optional,
  org.eclipse.swt,
  org.eclipse.ui.console,
- org.jboss.tools.browsersim.browser;bundle-version="3.7.0",
- org.jboss.tools.browsersim.ui;bundle-version="3.7.0",
+ org.jboss.tools.browsersim.browser;bundle-version="3.8.0",
+ org.jboss.tools.browsersim.ui;bundle-version="3.8.0",
  org.jboss.tools.usage;bundle-version="2.0.0"
 Bundle-ActivationPolicy: lazy
 Bundle-RequiredExecutionEnvironment: JavaSE-1.7
