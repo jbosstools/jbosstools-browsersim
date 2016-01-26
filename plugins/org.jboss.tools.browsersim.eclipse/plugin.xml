@@ -19,6 +19,10 @@
 	         optional="true">
         </commandParameter>
       </command>
+      <command
+            id="org.jboss.tools.browsersim.openWithBrowserSim"
+            name="Open with BrowserSim">
+      </command>
    </extension>
    <extension
          point="org.eclipse.ui.handlers">
@@ -33,6 +37,40 @@
 	            </with>
 	        </activeWhen>
       	 </handler>
+      	 <handler
+            class="org.jboss.tools.browsersim.eclipse.handlers.RunBrowserSimHandler"
+            commandId="org.jboss.tools.browsersim.openWithBrowserSim">
+	        <activeWhen>
+            <with variable="selection">
+              <and>
+                 <count
+                       value="1">
+                 </count>
+                 <iterate
+                       ifEmpty="false"
+                       operator="or">
+                    <instanceof
+                          value="org.eclipse.wst.server.ui.IServerModule">
+                    </instanceof>
+                 </iterate>
+                 <test
+                       forcePluginActivation="true"
+                       property="org.jboss.tools.browsersim.serverStarted">
+                 </test>
+              </and>
+           </with>
+          </activeWhen>
+      	 </handler>
+   </extension>
+   <extension
+         point="org.eclipse.core.expressions.propertyTesters">
+      <propertyTester
+            class="org.jboss.tools.browsersim.eclipse.handlers.OpenInWebBrowserWithBrowsersimEnablementTester"
+            id="org.jboss.tools.browsersim.browserSimPropertyTester"
+            namespace="org.jboss.tools.browsersim"
+            properties="serverStarted"
+            type="org.eclipse.jface.viewers.ITreeSelection">
+      </propertyTester> 
    </extension>
    <!--extension
          point="org.eclipse.ui.bindings">
@@ -94,7 +132,7 @@
     	<menuContribution 
       		locationURI="popup:org.eclipse.ui.navigate.showInQuickMenu?after=additions">
 	              <command
-	                   commandId="org.jboss.tools.vpe.browsersim.eclipse.commands.runBrowserSim"
+	                   commandId="org.jboss.tools.browsersim.openWithBrowserSim"
 	                   icon="icons/browsersim_16px.png"
 	                   label="BrowserSim"
 	                   style="push">
