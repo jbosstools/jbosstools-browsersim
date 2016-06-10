@@ -3,7 +3,7 @@ Bundle-ManifestVersion: 2
 Bundle-Name: JavaFx mocks for BrowserSim
 Bundle-Vendor: JBoss by Red Hat
 Bundle-SymbolicName: org.jboss.tools.browsersim.javafx.mock
-Bundle-Version: 3.8.0.qualifier
+Bundle-Version: 3.8.1.qualifier
 Bundle-RequiredExecutionEnvironment: JavaSE-1.7
 Require-Bundle: org.eclipse.swt
 Export-Package: com.sun.javafx.scene.web,

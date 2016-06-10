@@ -4,7 +4,7 @@
 	<parent>
 		<groupId>org.jboss.tools</groupId>
 		<artifactId>browsersim</artifactId>
-		<version>3.8.0-SNAPSHOT</version>
+		<version>3.8.1-SNAPSHOT</version>
 	</parent>
 	<groupId>org.jboss.tools.browsersim</groupId>
 	<artifactId>features</artifactId>
