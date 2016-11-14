@@ -198,7 +198,9 @@ public class BrowserSim {
 			@Override
 			public void widgetDisposed(DisposeEvent arg0) {
 				try {
-					ReflectionUtil.call("org.jboss.tools.browsersim.ui.devtools.DevToolsDebuggerServer", "stopDebugServer"); //$NON-NLS-1$ //$NON-NLS-2$
+					if (getBrowser() instanceof JavaFXBrowser) {
+						ReflectionUtil.call("org.jboss.tools.browsersim.ui.devtools.DevToolsDebuggerServer", "stopDebugServer"); //$NON-NLS-1$ //$NON-NLS-2$
+					}
 				} catch (Exception e) {
 					BrowserSimLogger.logError(e.getMessage(), e);
 				}
