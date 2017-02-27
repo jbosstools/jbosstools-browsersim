@@ -8,7 +8,7 @@
 	</parent>
 	<groupId>org.jboss.tools</groupId>
 	<artifactId>browsersim</artifactId>
-	<version>3.8.3-SNAPSHOT</version>
+	<version>3.8.4-SNAPSHOT</version>
 	<name>jbosstools-browsersim</name>
 	<packaging>pom</packaging>
 	<properties>
