@@ -293,6 +293,7 @@
 			<properties>
 				<!-- https://issues.jboss.org/browse/JBIDE-21012 by default, push zip to JBoss Nexus AND to download.jboss.org -->
 				<maven.deploy.skip>false</maven.deploy.skip>
+				<skipNexusStagingDeployMojo>false</skipNexusStagingDeployMojo>
 			</properties>
 			<build>
 				<plugins>
