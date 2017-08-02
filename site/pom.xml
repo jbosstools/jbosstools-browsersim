@@ -8,7 +8,9 @@
 	</parent>
 	<groupId>org.jboss.tools.browsersim</groupId>
 	<artifactId>browsersim.site</artifactId>
-	<name>browsersim.site</name>
-	<version>3.8.4-SNAPSHOT</version>
+
 	<packaging>eclipse-repository</packaging>
+	<properties>
+		<skipDeployToJBossOrg>false</skipDeployToJBossOrg>
+	</properties>
 </project>
