@@ -12,6 +12,10 @@
 	<version>3.8.4-SNAPSHOT</version>
 	<packaging>eclipse-repository</packaging>
 	<name>org.jboss.tools.browsersim-standalone</name>
+
+	<properties>
+		<skipDeployToJBossOrg>false</skipDeployToJBossOrg>
+	</properties>
 	<build>
 		<plugins>
 			<plugin>
