@@ -40,8 +40,8 @@ import org.jboss.tools.browsersim.browser.PlatformUtil;
 import org.jboss.tools.browsersim.eclipse.Activator;
 import org.jboss.tools.browsersim.eclipse.Messages;
 import org.jboss.tools.browsersim.eclipse.launcher.ExternalProcessLauncher;
-import org.jboss.tools.usage.googleanalytics.eclipse.LinuxSystem;
-import org.jboss.tools.usage.googleanalytics.eclipse.LinuxSystem.LinuxDistro;
+import org.jboss.tools.usage.internal.environment.eclipse.LinuxSystem;
+import org.jboss.tools.usage.internal.environment.eclipse.LinuxSystem.LinuxDistro;
 
 /**
  * @author Konstantin Marmalyukov (kmarmaliykov)
