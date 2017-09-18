@@ -49,7 +49,7 @@ public class WebKitBrowser_gtk_linux_x86_64 extends AbstractWebKitBrowser {
 				invokeOS_g_object_set(settings, USER_AGENT, 0, 0);
 			} else {
 				//byte[] bytes = org.eclipse.swt.internal.Converter.wcsToMbcs(null, userAgent, true);
-				byte[] bytes = invokeConverter_wcsToMbcs(null, userAgent, true);
+				byte[] bytes = invokeConverter_wcsToMbcs(userAgent, true);
 				
 				//org.eclipse.swt.internal.gtk.OS.g_object_set(settings, USER_AGENT, bytes, 0);
 				invokeOS_g_object_set(settings, USER_AGENT, bytes, 0);
@@ -103,12 +103,12 @@ public class WebKitBrowser_gtk_linux_x86_64 extends AbstractWebKitBrowser {
 	}
 	
 	// public static byte [] org.eclipse.swt.internal.Converter#wcsToMbcs (String codePage, String string, boolean terminate)
-	private byte [] invokeConverter_wcsToMbcs (String codePage, String string, boolean terminate)
+	private byte [] invokeConverter_wcsToMbcs (String string, boolean terminate)
 			throws ClassNotFoundException, NoSuchMethodException,
 			IllegalAccessException, InvocationTargetException {
 		Class<?> Converter = Browser.class.getClassLoader().loadClass("org.eclipse.swt.internal.Converter"); //$NON-NLS-1$
-		Method Converter_wcsToMbcs = Converter.getDeclaredMethod("wcsToMbcs", String.class, String.class, boolean.class); //$NON-NLS-1$
-		return (byte[]) Converter_wcsToMbcs.invoke(null, codePage, string, terminate);
+		Method Converter_wcsToMbcs = Converter.getDeclaredMethod("wcsToMbcs", String.class, boolean.class); //$NON-NLS-1$
+		return (byte[]) Converter_wcsToMbcs.invoke(null, string, terminate);
 	}
 	
 	// org.eclipse.swt.internal.webkit.WebKitGTK#webkit_web_view_get_settings(webView);
