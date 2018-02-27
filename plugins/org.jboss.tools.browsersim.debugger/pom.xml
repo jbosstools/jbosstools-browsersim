@@ -8,5 +8,6 @@
 	</parent>
 	<groupId>org.jboss.tools.browsersim.plugins</groupId>
 	<artifactId>org.jboss.tools.browsersim.debugger</artifactId> 
+	<version>3.8.101-SNAPSHOT</version>
 	<packaging>eclipse-plugin</packaging>
 </project>
